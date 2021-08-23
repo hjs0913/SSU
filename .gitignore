@@ -1,0 +1,8 @@
+
+샘플프로그램/.vs
+샘플프로그램/Debug
+샘플프로그램/LabProject/Debug
+샘플프로그램/LabProject/x64/Debug
+*.exe
+*.pdb
+*.user
