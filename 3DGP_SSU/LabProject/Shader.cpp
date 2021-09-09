@@ -128,8 +128,22 @@ D3D12_SHADER_BYTECODE CShader::CompileShaderFromFile(WCHAR* pszFileName, LPCSTR 
 		pszShaderName, pszShaderProfile, nCompileFlags, 0, ppd3dShaderBlob, &pd3dErrorBlob);*/
 	// hResult = E_FAIL
 	std::cout << *ppd3dShaderBlob << std::endl;
+	
 
-	::D3DCompileFromFile(pszFileName, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, pszShaderName, pszShaderProfile, nCompileFlags, 0, ppd3dShaderBlob, NULL);
+	ID3DBlob *error_message;
+
+
+	auto hresult = ::D3DCompileFromFile(pszFileName, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, pszShaderName, pszShaderProfile, nCompileFlags, 0, ppd3dShaderBlob, &(error_message));
+	if (FAILED(hresult))
+	{
+		// If the shader failed to compile it should have writen something to the error message.
+		if (error_message)
+		{
+			auto error = (char*)error_message->GetBufferPointer();
+			std::cout << "Error:" << error;
+		}
+
+	}
 
 	std::cout << *ppd3dShaderBlob << std::endl;
 	std::cout << "여기까지는 돼유" << std::endl;
