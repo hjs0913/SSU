@@ -3,6 +3,13 @@
 샘플프로그램/Debug
 샘플프로그램/LabProject/Debug
 샘플프로그램/LabProject/x64/Debug
+
+SSU_Server/.vs
+SSU_Server/SSU_Server/x64
+SSU_Server_Client/.vs
+SSU_Server_Client/client_sample/x64
+
+
 *.exe
 *.pdb
 *.user
