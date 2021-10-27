@@ -216,21 +216,21 @@ void ProcessPacket(char* ptr)
 		break;
 	}
 
-	//case SC_PACKET_REMOVE_OBJECT:
-	//{
-	//	sc_packet_remove_object* my_packet = reinterpret_cast<sc_packet_remove_object*>(ptr);
-	//	int other_id = my_packet->id;
-	//	if (other_id == g_myid) {
-	//		avatar.hide();
-	//	}
-	//	else if (other_id < MAX_USER) {
-	//		players[other_id].hide();
-	//	}
-	//	else {
-	//		//		npc[other_id - NPC_START].attr &= ~BOB_ATTR_VISIBLE;
-	//	}
-	//	break;
-	//}
+	case SC_PACKET_LOGOUT:
+	{
+		sc_packet_logout* my_packet = reinterpret_cast<sc_packet_logout*>(ptr);
+		int other_id = my_packet->id;
+		if (other_id == g_myid) {
+			avatar.hide();
+		}
+		else if (other_id < MAX_USER) {
+			players[other_id].hide();
+		}
+		else {
+			//		npc[other_id - NPC_START].attr &= ~BOB_ATTR_VISIBLE;
+		}
+		break;
+	}
 	default:
 		printf("Unknown PACKET type [%d]\n", ptr[1]);
 	}

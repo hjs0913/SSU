@@ -9,6 +9,7 @@
 
 using namespace std;
 
+void Disconnect(int c_id);
 
 class EXP_OVER
 {
@@ -96,7 +97,9 @@ public:
 		int ret = WSARecv(_sock, &_recv_over._wsa_buf, 1, 0, &recv_flag, &_recv_over._wsa_over, NULL);
 		if (ret == SOCKET_ERROR) {
 			int err_num = WSAGetLastError();
-			// display_error(err_num);
+			if (ERROR_IO_PENDING != err_num) {
+				Disconnect(_id);
+			}
 		}
 	}
 
@@ -168,12 +171,21 @@ int get_new_id()
 	return -1;
 }
 
+void send_remove_object(int c_id, int victim)
+{
+	sc_packet_logout packet;
+	packet.id = victim;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_LOGOUT;
+	clients[c_id].do_send(sizeof(packet), &packet);
+}
+
 void Disconnect(int c_id)
 {
 	clients[c_id]._use = false;
 	for (auto& cl : clients) {
 		if (false == cl._use) continue;
-		// 연결이 끊겼다는 패킷을 보내주는 함수를 만들자
+		send_remove_object(cl._id, c_id);
 	}
 	closesocket(clients[c_id]._sock);
 }
@@ -212,15 +224,6 @@ void send_move_packet(int c_id, int mover)
 	packet.x = clients[mover].x;
 	packet.y = clients[mover].y;
 
-	clients[c_id].do_send(sizeof(packet), &packet);
-}
-
-void send_remove_object(int c_id, int victim)
-{
-	sc_packet_logout packet;
-	packet.id = victim;
-	packet.size = sizeof(packet);
-	packet.type = SC_PACKET_LOGOUT;
 	clients[c_id].do_send(sizeof(packet), &packet);
 }
 
@@ -413,7 +416,7 @@ int main()
 		EXP_OVER* exp_over = reinterpret_cast<EXP_OVER*>(p_over);
 
 		// 예외처리 (보통은 연결이 끊어진 것이고 연결이 끊어진것을 처리 해주어야 한다)
-		if (ret == false){
+		if (ret == FALSE){
 			Disconnect(client_id);
 			if (exp_over->_comp_op == OP_SEND)
 				delete exp_over;			// 잘못 받은것을 삭제해 주자
