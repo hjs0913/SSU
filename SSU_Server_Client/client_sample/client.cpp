@@ -45,6 +45,15 @@ private:
 	chrono::system_clock::time_point m_mess_end_time;
 public:
 	int m_x, m_y;
+	int hp, mp;
+	int physical_attack, magical_attack;
+	int physical_defense, magical_defense;
+	ELEMENT element;
+	short level;
+	int exp;
+	short attack_factor;
+	float defense_factor;
+	TRIBE tribe;
 
 	OBJECT(sf::Texture& t, int x, int y, int x2, int y2) {
 		m_showing = false;
@@ -109,6 +118,7 @@ public:
 
 OBJECT avatar;
 OBJECT players[MAX_USER];
+OBJECT monsters;
 
 OBJECT white_tile;
 OBJECT black_tile;
@@ -116,6 +126,7 @@ OBJECT black_tile;
 sf::Texture* board;
 sf::Texture* pieces;
 
+// 클라의 기본 맵 실행
 void client_initialize()
 {
 	board = new sf::Texture;
@@ -132,6 +143,7 @@ void client_initialize()
 	for (auto& pl : players) {
 		pl = OBJECT{ *pieces, 0, 0, 64, 64 };
 	}
+	monsters = OBJECT{ *pieces, 64, 0, 64, 64 };
 }
 
 void client_finish()
@@ -151,26 +163,39 @@ void ProcessPacket(char* ptr)
 		g_myid = packet->id;
 		avatar.m_x = packet->x;
 		avatar.m_y = packet->y;
+		avatar.hp = packet->hp;
+		avatar.mp = packet->mp;
+		avatar.physical_attack = packet->physical_attack;
+		avatar.magical_attack = packet->magical_attack;
+		avatar.physical_defense = packet->physical_defense;
+		avatar.magical_defense = packet->magical_defense;
+		avatar.element = packet->element;
+		avatar.level = packet->level;
+		avatar.exp = packet->exp;
+		avatar.attack_factor = packet->attack_factor;
+		avatar.defense_factor = packet->defense_factor;
+		avatar.tribe = packet->tribe;
 		avatar.move(packet->x, packet->y);
 		avatar.show();
 	}
 	break;
 	case SC_PACKET_PUT_OBJECT:
 	{
+		cout << "여기 들어와야 되는데 " << endl;
 		sc_packet_put_object* my_packet = reinterpret_cast<sc_packet_put_object*>(ptr);
-		int id = my_packet->id;
-
-		//players[id].set_name(my_packet->name);
-
-		if (id < MAX_USER) {
-			players[id].set_name(my_packet->name);
-			players[id].move(my_packet->x, my_packet->y);
-			players[id].show();
+		if (my_packet->tribe == T_HUMAN) {
+			int id = my_packet->id;
+			if (id < MAX_USER) {
+				players[id].set_name(my_packet->name);
+				players[id].move(my_packet->x, my_packet->y);
+				players[id].show();
+			}
 		}
-		else {
-			//npc[id - NPC_START].x = my_packet->x;
-			//npc[id - NPC_START].y = my_packet->y;
-			//npc[id - NPC_START].attr |= BOB_ATTR_VISIBLE;
+
+		if(my_packet->tribe == T_MONSTER){
+			monsters.set_name(my_packet->name);
+			monsters.move(my_packet->x, my_packet->y);
+			monsters.show();
 		}
 		break;
 	}
@@ -267,12 +292,23 @@ void client_main()
 		}
 	avatar.draw();
 	for (auto& pl : players) pl.draw();
+	monsters.draw();
 	sf::Text text;
 	text.setFont(g_font);
 	char buf[100];
 	sprintf_s(buf, "(%d, %d)", avatar.m_x, avatar.m_y);
 	text.setString(buf);
 	g_window->draw(text);
+}
+
+void send_attack_packet()
+{
+	cs_packet_move packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_MOVE;
+	packet.direction = 5;
+	size_t sent = 0;
+	socket.send(&packet, sizeof(packet), sent);
 }
 
 void send_move_packet(char dr)
@@ -298,7 +334,7 @@ void send_login_packet(string &name)
 int main()
 {
 	wcout.imbue(locale("korean"));
-	sf::Socket::Status status = socket.connect("127.0.0.1", SERVERPORT);
+	sf::Socket::Status status = socket.connect("127.0.0.1", SERVERPORT);	// connect
 
 
 	socket.setBlocking(false);
@@ -331,21 +367,27 @@ int main()
 				switch (event.key.code) {
 				case sf::Keyboard::Left:
 					p_type = 2;
+					send_move_packet(p_type);
 					break;
 				case sf::Keyboard::Right:
 					p_type = 3;
+					send_move_packet(p_type);
 					break;
 				case sf::Keyboard::Up:
 					p_type = 0;
+					send_move_packet(p_type);
 					break;
 				case sf::Keyboard::Down:
 					p_type = 1;
+					send_move_packet(p_type);
+					break;
+				case sf::Keyboard::A:
+					send_attack_packet();
 					break;
 				case sf::Keyboard::Escape:
 					window.close();
 					break;
 				}
-				send_move_packet(p_type);
 			}
 		}
 

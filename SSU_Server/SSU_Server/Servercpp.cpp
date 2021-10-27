@@ -10,7 +10,7 @@
 using namespace std;
 
 
-class OVER_EX
+class EXP_OVER
 {
 public:
 	WSAOVERLAPPED	_wsa_over;
@@ -19,7 +19,7 @@ public:
 	COMP_OP			_comp_op;
 
 public:
-	OVER_EX(COMP_OP comp_op, char num_bytes, void* mess) : _comp_op(comp_op)
+	EXP_OVER(COMP_OP comp_op, char num_bytes, void* mess) : _comp_op(comp_op)
 	{
 		ZeroMemory(&_wsa_over, sizeof(_wsa_over));
 		_wsa_buf.buf = reinterpret_cast<char*>(_net_buf);
@@ -27,14 +27,14 @@ public:
 		memcpy(_net_buf, mess, num_bytes);
 	}
 
-	OVER_EX(COMP_OP comp_op) : _comp_op(comp_op) {}
+	EXP_OVER(COMP_OP comp_op) : _comp_op(comp_op) {}
 
-	OVER_EX()		// array에 넣기 위해서는 기본생성자가 있어야한다
+	EXP_OVER()		// array에 넣기 위해서는 기본생성자가 있어야한다
 	{
 		_comp_op = OP_RECV;
 	}
 
-	~OVER_EX()
+	~EXP_OVER()
 	{
 
 	}
@@ -43,7 +43,7 @@ public:
 class CLIENT
 {
 public:
-	OVER_EX _recv_over;
+	EXP_OVER _recv_over;
 	SOCKET	_sock;
 	int _prev_size;
 	int _id;
@@ -102,7 +102,7 @@ public:
 
 	void do_send(int num_bytes, void* mess)
 	{
-		OVER_EX* ex_over = new OVER_EX(OP_SEND, num_bytes, mess);
+		EXP_OVER* ex_over = new EXP_OVER(OP_SEND, num_bytes, mess);
 		WSASend(_sock, &ex_over->_wsa_buf, 1, 0, 0, &ex_over->_wsa_over, NULL);
 	}
 };
@@ -198,7 +198,29 @@ void send_login_ok_packet(int c_id)
 	packet.exp = clients[c_id].exp;
 	packet.attack_factor = clients[c_id].attack_factor;
 	packet.defense_factor = clients[c_id].defense_factor;
+	packet.tribe = clients[c_id].tribe;
 
+	clients[c_id].do_send(sizeof(packet), &packet);
+}
+
+void send_move_packet(int c_id, int mover)
+{
+	sc_packet_move packet;
+	packet.id = mover;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_MOVE;
+	packet.x = clients[mover].x;
+	packet.y = clients[mover].y;
+
+	clients[c_id].do_send(sizeof(packet), &packet);
+}
+
+void send_remove_object(int c_id, int victim)
+{
+	sc_packet_logout packet;
+	packet.id = victim;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_LOGOUT;
 	clients[c_id].do_send(sizeof(packet), &packet);
 }
 
@@ -302,6 +324,29 @@ void process_packet(int c_id, unsigned char* p)
 
 	}break;
 	case CS_PACKET_MOVE: {
+		cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(p);
+		int x = cl.x;
+		int y = cl.y;
+		switch (packet->direction) {
+		case 0: if (y > 0) y--; break;
+		case 1: if (y < WORLD_HEIGHT - 1) y++; break;
+		case 2: if (x > 0) x--; break;
+		case 3: if (x < WORLD_WIDTH - 1) x++; break;
+		default:
+			cout << "Invalid move in client " << c_id << endl;
+			exit(-1);
+		}
+		cl.x = x;
+		cl.y = y;
+		// 위치가 바뀌었다고 클라에게 알려줌
+
+		for (auto& cl : clients) {
+			if (cl._use == true)
+				send_move_packet(cl._id, c_id);
+		}
+		break;
+
+
 
 		// 이동이 타당한지 판단한다
 
@@ -350,7 +395,7 @@ int main()
 	// 클라 소켓 생성 -> AcceptEx
 	SOCKET client_sock = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
 	char accept_buf[sizeof(SOCKADDR_IN) * 2 + 32 + 100];
-	OVER_EX accept_ex;
+	EXP_OVER accept_ex;
 
 	ZeroMemory(&accept_ex, sizeof(accept_ex));
 	accept_ex._comp_op = OP_ACCEPT;
@@ -365,21 +410,21 @@ int main()
 		BOOL ret = GetQueuedCompletionStatus(h_iocp, &num_byte, (PULONG_PTR)&iocp_key, &p_over, INFINITE);
 
 		int client_id = static_cast<int>(iocp_key);
-		OVER_EX* over_ex = reinterpret_cast<OVER_EX*>(p_over);
+		EXP_OVER* exp_over = reinterpret_cast<EXP_OVER*>(p_over);
 
 		// 예외처리 (보통은 연결이 끊어진 것이고 연결이 끊어진것을 처리 해주어야 한다)
 		if (ret == false){
 			Disconnect(client_id);
-			if (over_ex->_comp_op == OP_SEND)
-				delete over_ex;			// 잘못 받은것을 삭제해 주자
+			if (exp_over->_comp_op == OP_SEND)
+				delete exp_over;			// 잘못 받은것을 삭제해 주자
 			continue;
 		}
 
-		switch (over_ex->_comp_op) {
+		switch (exp_over->_comp_op) {
 		case OP_RECV: {
 			CLIENT& cl = clients[client_id];
 			int remain_data = num_byte + cl._prev_size;
-			unsigned char* packet_start = over_ex->_net_buf;
+			unsigned char* packet_start = exp_over->_net_buf;
 			int packet_size = packet_start[0];
 			
 			while (packet_size <= remain_data) {
@@ -394,20 +439,19 @@ int main()
 			// 나머지가 있으면 처리
 			if (0 < remain_data) {
 				cl._prev_size = remain_data;
-				memcpy(&over_ex->_net_buf, packet_start, remain_data);
+				memcpy(&exp_over->_net_buf, packet_start, remain_data);
 			}
 
 			cl.do_recv();
 
-		} break;
+			} break;
 
 		case OP_SEND: {
-			cout << "일단 샌드 됩니까" << endl;
-			if (num_byte != over_ex->_wsa_buf.len) {	// 중간에 짤린 경우임
+			if (num_byte != exp_over->_wsa_buf.len) {	// 중간에 짤린 경우임
 				// DISCONNECT();
 			}
-			delete over_ex;
-		} break;
+			delete exp_over;
+			} break;
 
 		case OP_ACCEPT: {
 			int new_id = get_new_id();
@@ -425,6 +469,7 @@ int main()
 			cl.magical_defense = 925;
 
 			// 통신을 위한 변수들 초기화
+			cl._id = new_id;
 			cl._prev_size = 0;
 			cl._recv_over._comp_op = OP_RECV;
 			cl._recv_over._wsa_buf.buf = reinterpret_cast<char*>(cl._recv_over._net_buf);
@@ -440,7 +485,7 @@ int main()
 			client_sock = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
 			AcceptEx(server_sock, client_sock, accept_buf, 0, sizeof(SOCKADDR_IN) + 16,
 				sizeof(SOCKADDR_IN) + 16, NULL, &accept_ex._wsa_over);
-		} break;
+			} break;
 		}
 
 	}

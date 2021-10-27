@@ -9,8 +9,8 @@ const int MAX_USER = 10;
 const int MAX_ID_LEN = 20;
 
 enum COMP_OP { OP_RECV, OP_SEND, OP_ACCEPT };
-enum ELEMENT { E_WATER, E_FULLMETAL, E_WIND, E_FIRE, E_TREE, E_EARTH, E_ICE };
-enum TRIBE { T_HUMAN, T_MONSTER };
+enum ELEMENT{E_WATER, E_FULLMETAL, E_WIND, E_FIRE, E_TREE, E_EARTH, E_ICE};
+enum TRIBE{T_HUMAN, T_MONSTER};
 
 // 패킷 타입 정리
 const int CS_PACKET_LOGIN = 1;
@@ -26,7 +26,7 @@ const int SC_PACKET_ATTACK = 5;
 
 // 패킷 정리
 #pragma pack(push, 1)
-struct cs_packet_login
+struct cs_packet_login 
 {
 	char size;
 	char type;
@@ -61,6 +61,7 @@ struct sc_packet_login
 	int exp;
 	short attack_factor;
 	float defense_factor;
+	TRIBE tribe;
 };
 
 struct sc_packet_move

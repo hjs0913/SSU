@@ -61,6 +61,7 @@ struct sc_packet_login
 	int exp;
 	short attack_factor;
 	float defense_factor;
+	TRIBE tribe;
 };
 
 struct sc_packet_move
