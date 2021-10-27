@@ -7,6 +7,7 @@
 #include <array>
 #include "protocol.h"
 
+
 using namespace std;
 
 void Disconnect(int c_id);
@@ -131,14 +132,14 @@ public:
 	MONSTER() : tribe(T_MONSTER)
 	{
 		_live = true;
-		_id = 200;
+		_id = 0;
 
 		strcpy_s(name, sizeof(name),"Monster" );
 		// 일단 임시로 적어놈
 		x = 6;
 		y = 6;
 		level = 50;
-		hp = 54000;
+		hp = 500000;
 		physical_attack = 1250;
 		physical_defense = 1100;
 		magical_defense = 925;
@@ -225,6 +226,41 @@ void send_move_packet(int c_id, int mover)
 	packet.y = clients[mover].y;
 
 	clients[c_id].do_send(sizeof(packet), &packet);
+}
+
+void combat_packet(int c_id, int m_id)
+{
+	CLIENT& cl = clients[c_id];
+	MONSTER& mon = monsters[m_id];
+	
+	// 속성부여
+
+	// 데미지 계산 공식
+	int damage = cl.physical_attack * cl.attack_factor;
+	float def_temp = mon.defense_factor * mon.physical_defense;
+	int real_damage = int(damage * (1.0f - (def_temp) / (1.0f + def_temp)));
+	mon.hp -= real_damage;
+
+	// 화면에 표시
+	cout << "플레이어 -> 몬스터 데미지 : " << real_damage <<  endl;
+	cout << "플레이어 Hp : " << cl.hp << endl;
+	cout << "몬스터 Hp : " << mon.hp << endl;
+
+	// 전투에 대한 정보를 패킷에 담아 보내자
+	sc_packet_attack packet;
+	packet.id = c_id;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_ATTACK;
+	packet.damage_size = real_damage;
+	packet.p_hp = cl.hp;
+	packet.m_hp = mon.hp;
+
+	cl.do_send(sizeof(packet), &packet);
+
+	if (mon.hp < 0) {
+		// 몬스터가 모든 유저에게 삭제가 되어야 한다
+	}
+
 }
 
 void process_packet(int c_id, unsigned char* p)
@@ -357,13 +393,13 @@ void process_packet(int c_id, unsigned char* p)
 
 	}break;
 	case CS_PACKET_ATTACK: {
-		
-		// 현재 전투에 들어갈만한 몬스터가 있는지 확인
-
-		// 만약 있다면 몬스터의 정보를 보내주자
-
-		// 다른 클라들에게는 전투에 돌입했다는 정보를 보내주자
-
+		for (auto& mon : monsters) {
+			// 현재 플레이어 주위에 전투에 들어갈만한 몬스터가 있는지 확인
+			if ((mon.x <= cl.x + 1 && cl.x - 1 <= mon.x) &&
+				(mon.y <= cl.y + 1 && cl.y - 1 <= mon.y)) {
+				combat_packet(c_id, mon._id);
+			}
+		}
 	}break;
 	}
 }

@@ -103,6 +103,8 @@ struct sc_packet_attack
 	char type;
 	int id;
 	int damage_size;
+	int p_hp;
+	int m_hp;
 
 };
 #pragma pack(pop)

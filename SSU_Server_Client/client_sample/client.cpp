@@ -126,6 +126,31 @@ OBJECT black_tile;
 sf::Texture* board;
 sf::Texture* pieces;
 
+bool start_attack = false;
+
+void clientInfo_display()
+{
+	cout << "나의 정보" << endl;
+	cout << "Level : " << avatar.level << ", 속성 : ";
+	switch (avatar.element)
+	{
+	case E_WATER: cout << "WATER" << endl;break;
+	case E_FULLMETAL: cout << "FULLMETAL" << endl; break;
+	case E_WIND: cout << "WIND" << endl; break;
+	case E_FIRE: cout << "FIRE" << endl; break;
+	case E_TREE: cout << "TREE" << endl; break;
+	case E_EARTH: cout << "EARTH" << endl; break;
+	case E_ICE: cout << "ICE" << endl; break;
+	default:
+		break;
+	}
+	cout << "Hp : " << avatar.hp << ", Mp : " << avatar.mp << endl;
+	cout << "물리 공격력 : " << avatar.physical_attack << ", 마법 공격력 : " << avatar.magical_attack << endl;
+	cout << "물리 방어력 : " << avatar.physical_defense << ", 마법 방어력 : " << avatar.magical_defense << endl;
+
+	cout << "공격 계수 : " << avatar.attack_factor << ", 방어 계수 : " << avatar.defense_factor << endl;
+}
+
 // 클라의 기본 맵 실행
 void client_initialize()
 {
@@ -175,13 +200,13 @@ void ProcessPacket(char* ptr)
 		avatar.attack_factor = packet->attack_factor;
 		avatar.defense_factor = packet->defense_factor;
 		avatar.tribe = packet->tribe;
+		clientInfo_display();
 		avatar.move(packet->x, packet->y);
 		avatar.show();
 	}
 	break;
 	case SC_PACKET_PUT_OBJECT:
 	{
-		cout << "여기 들어와야 되는데 " << endl;
 		sc_packet_put_object* my_packet = reinterpret_cast<sc_packet_put_object*>(ptr);
 		if (my_packet->tribe == T_HUMAN) {
 			int id = my_packet->id;
@@ -215,6 +240,18 @@ void ProcessPacket(char* ptr)
 		}
 		break;
 	}
+
+	case SC_PACKET_ATTACK: {
+		sc_packet_attack* my_packet = reinterpret_cast<sc_packet_attack*>(ptr);
+		avatar.hp = my_packet->p_hp;
+		monsters.hp = my_packet->m_hp;
+		cout << "플레이어 -> 몬스터 데미지 : " << my_packet->damage_size << endl;
+		cout << "플레이어 Hp : " << avatar.hp << endl;
+		cout << "몬스터 Hp : " << monsters.hp << endl;
+		if (monsters.hp < 0) start_attack = false;
+		break;
+	}
+
 
 	case SC_PACKET_LOGOUT:
 	{
@@ -303,10 +340,10 @@ void client_main()
 
 void send_attack_packet()
 {
-	cs_packet_move packet;
+	cs_packet_attack packet;
 	packet.size = sizeof(packet);
-	packet.type = CS_PACKET_MOVE;
-	packet.direction = 5;
+	packet.type = CS_PACKET_ATTACK;
+	packet.skill = 0;
 	size_t sent = 0;
 	socket.send(&packet, sizeof(packet), sent);
 }
@@ -362,6 +399,10 @@ int main()
 		{
 			if (event.type == sf::Event::Closed)
 				window.close();
+			if (start_attack) {
+				send_attack_packet();
+				break;
+			}
 			if (event.type == sf::Event::KeyPressed) {
 				char p_type = NULL;
 				switch (event.key.code) {
@@ -382,6 +423,7 @@ int main()
 					send_move_packet(p_type);
 					break;
 				case sf::Keyboard::A:
+					start_attack = true;
 					send_attack_packet();
 					break;
 				case sf::Keyboard::Escape:
