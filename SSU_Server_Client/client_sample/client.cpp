@@ -257,14 +257,15 @@ void ProcessPacket(char* ptr)
 	{
 		sc_packet_logout* my_packet = reinterpret_cast<sc_packet_logout*>(ptr);
 		int other_id = my_packet->id;
-		if (other_id == g_myid) {
-			avatar.hide();
+		if (my_packet->tribe == T_HUMAN) {
+			if (other_id == g_myid) {
+				avatar.hide();
+			}
+			else
+				players[other_id].hide();
 		}
-		else if (other_id < MAX_USER) {
-			players[other_id].hide();
-		}
-		else {
-			//		npc[other_id - NPC_START].attr &= ~BOB_ATTR_VISIBLE;
+		else{
+			monsters.hide();
 		}
 		break;
 	}
@@ -423,7 +424,7 @@ int main()
 					send_move_packet(p_type);
 					break;
 				case sf::Keyboard::A:
-					start_attack = true;
+					// start_attack = true;
 					send_attack_packet();
 					break;
 				case sf::Keyboard::Escape:

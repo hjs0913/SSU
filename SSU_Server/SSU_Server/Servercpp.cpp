@@ -5,6 +5,9 @@
 #include <WS2tcpip.h>
 #include <MSWSock.h>
 #include <array>
+#include <thread>
+#include <mutex>
+#include <chrono>
 #include "protocol.h"
 
 
@@ -114,7 +117,7 @@ public:
 class MONSTER 
 {
 public:
-	bool _live;
+	volatile bool _live;
 
 	int _id;
 	char name[MAX_ID_LEN];
@@ -172,12 +175,13 @@ int get_new_id()
 	return -1;
 }
 
-void send_remove_object(int c_id, int victim)
+void send_remove_object(int c_id, int victim, TRIBE tribe)
 {
 	sc_packet_logout packet;
 	packet.id = victim;
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET_LOGOUT;
+	packet.tribe = tribe;
 	clients[c_id].do_send(sizeof(packet), &packet);
 }
 
@@ -186,7 +190,7 @@ void Disconnect(int c_id)
 	clients[c_id]._use = false;
 	for (auto& cl : clients) {
 		if (false == cl._use) continue;
-		send_remove_object(cl._id, c_id);
+		send_remove_object(cl._id, c_id, T_HUMAN);
 	}
 	closesocket(clients[c_id]._sock);
 }
@@ -228,7 +232,7 @@ void send_move_packet(int c_id, int mover)
 	clients[c_id].do_send(sizeof(packet), &packet);
 }
 
-void combat_packet(int c_id, int m_id)
+void send_combat_packet(int c_id, int m_id)
 {
 	CLIENT& cl = clients[c_id];
 	MONSTER& mon = monsters[m_id];
@@ -258,7 +262,10 @@ void combat_packet(int c_id, int m_id)
 	cl.do_send(sizeof(packet), &packet);
 
 	if (mon.hp < 0) {
+		mon._live = false;
 		// 몬스터가 모든 유저에게 삭제가 되어야 한다
+		for (auto& cl : clients)
+			send_remove_object(cl._id, m_id, T_MONSTER);
 	}
 
 }
@@ -397,10 +404,52 @@ void process_packet(int c_id, unsigned char* p)
 			// 현재 플레이어 주위에 전투에 들어갈만한 몬스터가 있는지 확인
 			if ((mon.x <= cl.x + 1 && cl.x - 1 <= mon.x) &&
 				(mon.y <= cl.y + 1 && cl.y - 1 <= mon.y)) {
-				combat_packet(c_id, mon._id);
+				if(mon._live == true)
+					send_combat_packet(c_id, mon._id);
 			}
 		}
 	}break;
+	}
+}
+
+void monster_ai()
+{
+	MONSTER& mon = monsters[0];
+	while (1) {
+		if (mon._live == false) {
+			cout << "여긴 들어오나" << endl;
+			this_thread::sleep_for(chrono::seconds(3));
+			mon.hp = 500000;
+
+			sc_packet_put_object packet;
+
+			packet.size = sizeof(packet);
+			packet.type = SC_PACKET_PUT_OBJECT;
+			strcpy_s(packet.name, mon.name);
+			packet.id = mon._id;
+
+			packet.x = mon.x;
+			packet.y = mon.y;
+			packet.hp = mon.hp;
+			packet.mp = 0;
+			packet.physical_attack = mon.physical_attack;
+			packet.magical_attack = 0;
+			packet.physical_defense = mon.physical_defense;
+			packet.magical_defense = mon.magical_defense;
+			packet.element = mon.element;
+			packet.level = mon.level;
+			packet.exp = 0;
+			packet.attack_factor = mon.attack_factor;
+			packet.defense_factor = mon.defense_factor;
+			packet.tribe = mon.tribe;
+
+			for (auto& cl : clients) {
+				if (cl._use == true)
+					cl.do_send(sizeof(packet), &packet);
+			}
+			cout << "여긴 들어오나2" << endl;
+			mon._live = true;
+		}
 	}
 }
 
@@ -428,8 +477,13 @@ int main()
 
 	// iocp 핸들 객체 생성
 	HANDLE h_iocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, 0, 0, 0);
+
 	// 핸들에 소켓 연결
 	CreateIoCompletionPort(reinterpret_cast<HANDLE>(server_sock), h_iocp, 0, 0);
+
+	// AI에 대한 쓰레드 만들기
+	thread monster_ai_thread(monster_ai);
+
 
 	// 클라 소켓 생성 -> AcceptEx
 	SOCKET client_sock = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
@@ -528,6 +582,8 @@ int main()
 		}
 
 	}
+	//몬스터 쓰레드에 대한 join()
+	monster_ai_thread.join();
 
 	closesocket(server_sock);
 	WSACleanup();

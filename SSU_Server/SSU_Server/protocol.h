@@ -77,6 +77,7 @@ struct sc_packet_logout
 	char size;
 	char type;
 	int id;
+	TRIBE tribe;
 };
 
 struct sc_packet_put_object
