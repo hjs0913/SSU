@@ -106,6 +106,6 @@ struct sc_packet_attack
 	int damage_size;
 	int p_hp;
 	int m_hp;
-
+	TRIBE subject;
 };
 #pragma pack(pop)

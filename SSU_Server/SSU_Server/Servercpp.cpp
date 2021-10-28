@@ -143,12 +143,13 @@ public:
 		y = 6;
 		level = 50;
 		hp = 500000;
-		physical_attack = 1250;
-		physical_defense = 1100;
-		magical_defense = 925;
-		attack_factor = 50;
+		physical_attack = 750;
+		physical_defense = 1200;
+		magical_defense = 500;
+		attack_factor = 10;
 		defense_factor = 0.0002;
-		// element;
+		element = E_ICE;
+		tribe = T_MONSTER;
 	}
 
 	~MONSTER()
@@ -232,40 +233,76 @@ void send_move_packet(int c_id, int mover)
 	clients[c_id].do_send(sizeof(packet), &packet);
 }
 
-void send_combat_packet(int c_id, int m_id)
+void send_combat_packet(int c_id, int m_id, TRIBE subject)
 {
 	CLIENT& cl = clients[c_id];
 	MONSTER& mon = monsters[m_id];
 	
-	// 속성부여
+	if (subject == T_HUMAN) {	// 주체가 휴먼
+		// 속성부여
+		// 데미지 계산 공식
+		int damage = cl.physical_attack * cl.attack_factor;
+		float def_temp = mon.defense_factor * mon.physical_defense;
+		int real_damage = int(damage * (1.0f - (def_temp) / (1.0f + def_temp)));
+		mon.hp -= real_damage;
 
-	// 데미지 계산 공식
-	int damage = cl.physical_attack * cl.attack_factor;
-	float def_temp = mon.defense_factor * mon.physical_defense;
-	int real_damage = int(damage * (1.0f - (def_temp) / (1.0f + def_temp)));
-	mon.hp -= real_damage;
+		// 화면에 표시
+		cout << "플레이어 -> 몬스터 데미지 : " << real_damage <<  endl;
+		cout << "플레이어 Hp : " << cl.hp << endl;
+		cout << "몬스터 Hp : " << mon.hp << endl;
 
-	// 화면에 표시
-	cout << "플레이어 -> 몬스터 데미지 : " << real_damage <<  endl;
-	cout << "플레이어 Hp : " << cl.hp << endl;
-	cout << "몬스터 Hp : " << mon.hp << endl;
+		// 전투에 대한 정보를 패킷에 담아 보내자
+		sc_packet_attack packet;
+		packet.id = c_id;
+		packet.size = sizeof(packet);
+		packet.type = SC_PACKET_ATTACK;
+		packet.damage_size = real_damage;
+		packet.p_hp = cl.hp;
+		packet.m_hp = mon.hp;
+		packet.subject = subject;
 
-	// 전투에 대한 정보를 패킷에 담아 보내자
-	sc_packet_attack packet;
-	packet.id = c_id;
-	packet.size = sizeof(packet);
-	packet.type = SC_PACKET_ATTACK;
-	packet.damage_size = real_damage;
-	packet.p_hp = cl.hp;
-	packet.m_hp = mon.hp;
+		cl.do_send(sizeof(packet), &packet);
 
-	cl.do_send(sizeof(packet), &packet);
+		if (mon.hp < 0) {
+			mon._live = false;
+			// 몬스터가 모든 유저에게 삭제가 되어야 한다
+			for (auto& cl : clients)
+				send_remove_object(cl._id, m_id, T_MONSTER);
+		}
+	}
+	else {	// 주체가 MONSTER
+		// 속성부여
+		// 데미지 계산 공식
+		int damage = mon.physical_attack * mon.attack_factor;
+		float def_temp = cl .defense_factor* cl.physical_defense;
+		int real_damage = int(damage * (1.0f - (def_temp) / (1.0f + def_temp)));
+		cl.hp -= real_damage;
 
-	if (mon.hp < 0) {
-		mon._live = false;
-		// 몬스터가 모든 유저에게 삭제가 되어야 한다
-		for (auto& cl : clients)
-			send_remove_object(cl._id, m_id, T_MONSTER);
+		// 화면에 표시
+		cout << "몬스터 -> 플레이어 데미지 : " << real_damage << endl;
+		cout << "플레이어 Hp : " << cl.hp << endl;
+		cout << "몬스터 Hp : " << mon.hp << endl;
+
+		// 전투에 대한 정보를 패킷에 담아 보내자
+		sc_packet_attack packet;
+		packet.id = c_id;
+		packet.size = sizeof(packet);
+		packet.type = SC_PACKET_ATTACK;
+		packet.damage_size = real_damage;
+		packet.p_hp = cl.hp;
+		packet.m_hp = mon.hp;
+		packet.subject = subject;
+
+		cl.do_send(sizeof(packet), &packet);
+
+		if (cl.hp < 0) {
+			// 플레이어가 죽었을때 어떻게 처리를 해줄것인가?
+			// Data Race가 발생하지 않는가?
+		
+			// 몬스터가 모든 유저에게 삭제가 되어야 한다
+			/*for (auto& cl : clients)
+				send_remove_object(cl._id, m_id, T_MONSTER);*/
+		}
 	}
 
 }
@@ -405,7 +442,7 @@ void process_packet(int c_id, unsigned char* p)
 			if ((mon.x <= cl.x + 1 && cl.x - 1 <= mon.x) &&
 				(mon.y <= cl.y + 1 && cl.y - 1 <= mon.y)) {
 				if(mon._live == true)
-					send_combat_packet(c_id, mon._id);
+					send_combat_packet(c_id, mon._id, T_HUMAN);
 			}
 		}
 	}break;
@@ -417,7 +454,6 @@ void monster_ai()
 	MONSTER& mon = monsters[0];
 	while (1) {
 		if (mon._live == false) {
-			cout << "여긴 들어오나" << endl;
 			this_thread::sleep_for(chrono::seconds(3));
 			mon.hp = 500000;
 
@@ -443,12 +479,24 @@ void monster_ai()
 			packet.defense_factor = mon.defense_factor;
 			packet.tribe = mon.tribe;
 
+			// 이부분 Datarace걱정됨
 			for (auto& cl : clients) {
 				if (cl._use == true)
 					cl.do_send(sizeof(packet), &packet);
 			}
-			cout << "여긴 들어오나2" << endl;
 			mon._live = true;
+		}
+		else {
+			// 범위내 플레이어 있다면 플레이어 공격
+			for (auto& cl : clients) {
+				if (cl._use == true) {
+					if ((cl.x <= mon.x + 1 && mon.x - 1 <= cl.x) &&
+						(cl.y <= mon.y + 1 && mon.y - 1 <= cl.y)) {
+						send_combat_packet(cl._id, mon._id, T_MONSTER);
+					}
+				}
+			}
+			this_thread::sleep_for(chrono::seconds(1));
 		}
 	}
 }
