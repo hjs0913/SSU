@@ -1,4 +1,0 @@
-﻿  Servercpp.cpp
-C:\Users\정의범\Downloads\SSU-main (1)\SSU-main\SSU_Server\SSU_Server\Servercpp.cpp(86,1): warning C4305: '=': 'double'에서 'float'(으)로 잘립니다.
-C:\Users\정의범\Downloads\SSU-main (1)\SSU-main\SSU_Server\SSU_Server\Servercpp.cpp(150,1): warning C4305: '=': 'double'에서 'float'(으)로 잘립니다.
-  SSU_Server.vcxproj -> C:\Users\정의범\Downloads\SSU-main (1)\SSU-main\SSU_Server\x64\Debug\SSU_Server.exe

@@ -1,9 +1,13 @@
 #define SFML_STATIC 1
+#define WIN32_LEAN_AND_MEAN //추가 
 #include <SFML/Graphics.hpp>
 #include <SFML/Network.hpp>
 #include <iostream>
 #include <chrono>
 #include "protocol.h"
+#include <Windows.h>  //추가 
+
+
 using namespace std;
 
 #ifdef _DEBUG
@@ -36,6 +40,7 @@ int g_myid;
 sf::RenderWindow* g_window;
 sf::Font g_font;
 
+
 class OBJECT {
 private:
 	bool m_showing;
@@ -54,6 +59,7 @@ public:
 	short attack_factor;
 	float defense_factor;
 	TRIBE tribe;
+	bool died = false;
 
 	OBJECT(sf::Texture& t, int x, int y, int x2, int y2) {
 		m_showing = false;
@@ -245,10 +251,27 @@ void ProcessPacket(char* ptr)
 		sc_packet_attack* my_packet = reinterpret_cast<sc_packet_attack*>(ptr);
 		avatar.hp = my_packet->p_hp;
 		monsters.hp = my_packet->m_hp;
-		cout << "플레이어 -> 몬스터 데미지 : " << my_packet->damage_size << endl;
-		cout << "플레이어 Hp : " << avatar.hp << endl;
-		cout << "몬스터 Hp : " << monsters.hp << endl;
+		cout << my_packet->subject << endl;
+		if (my_packet->subject == T_HUMAN) {
+			start_attack = true;
+			cout << "플레이어 -> 몬스터 데미지 : " << my_packet->damage_size << endl;
+			cout << "플레이어 Hp : " << avatar.hp << endl;
+			cout << "몬스터 Hp : " << monsters.hp << endl;
+		}
+		else {
+			cout << "몬스터 -> 플레이어 데미지 : " << my_packet->damage_size << endl;
+			cout << "플레이어 Hp : " << avatar.hp << endl;
+			cout << "몬스터 Hp : " << monsters.hp << endl;
+		}
+		
 		if (monsters.hp < 0) start_attack = false;
+
+		if (avatar.hp <= 0) {   //죽으면 내꺼에선 사라짐 일단  //추가 
+			start_attack = false;
+			avatar.died = true;
+		}
+			
+
 		break;
 	}
 
@@ -261,11 +284,25 @@ void ProcessPacket(char* ptr)
 			if (other_id == g_myid) {
 				avatar.hide();
 			}
-			else
+			else {
 				players[other_id].hide();
+			}
 		}
 		else{
 			monsters.hide();
+		}
+		break;
+	}
+	case SC_PACKET_DIED:
+	{
+		sc_packet_died* my_packet = reinterpret_cast<sc_packet_died*>(ptr);
+		int other_id = my_packet->id;
+		if (other_id == g_myid) {
+			// cout << "YOU DIED" << endl;
+			avatar.hide();
+		}
+		else {
+			players[other_id].hide();
 		}
 		break;
 	}
@@ -369,6 +406,26 @@ void send_login_packet(string &name)
 	socket.send(&packet, sizeof(packet), sent);
 }
 
+/*
+void keep_attacking() //추가 
+{
+	if (start_attack == true) {
+
+		if (monsters.hp > 0 && avatar.died == false) {
+			send_attack_packet();
+			Sleep(1000);
+			keep_attacking();
+		}
+		else if (monsters.hp <= 0 || avatar.died == true) {
+			start_attack == false;
+			return;
+		}
+
+	}
+
+		
+}*/
+
 int main()
 {
 	wcout.imbue(locale("korean"));
@@ -393,43 +450,50 @@ int main()
 	sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "2D CLIENT");
 	g_window = &window;
 
+	auto start_attack_time = chrono::system_clock::now();
+	auto duration = chrono::duration_cast<chrono::seconds>(chrono::system_clock::now() - start_attack_time);
 	while (window.isOpen())
 	{
 		sf::Event event;
-		while (window.pollEvent(event))
-		{
-			if (event.type == sf::Event::Closed)
-				window.close();
-			if (start_attack) {
+		if (start_attack) {
+			if (duration >= chrono::seconds(1)) {
+				cout << "왜 안들어옴" << endl;
 				send_attack_packet();
-				break;
+				start_attack_time = chrono::system_clock::now();
 			}
-			if (event.type == sf::Event::KeyPressed) {
-				char p_type = NULL;
-				switch (event.key.code) {
-				case sf::Keyboard::Left:
-					p_type = 2;
-					send_move_packet(p_type);
-					break;
-				case sf::Keyboard::Right:
-					p_type = 3;
-					send_move_packet(p_type);
-					break;
-				case sf::Keyboard::Up:
-					p_type = 0;
-					send_move_packet(p_type);
-					break;
-				case sf::Keyboard::Down:
-					p_type = 1;
-					send_move_packet(p_type);
-					break;
-				case sf::Keyboard::A:
-					// start_attack = true;
-					send_attack_packet();
-					break;
-				case sf::Keyboard::Escape:
+			duration = chrono::duration_cast<chrono::seconds>(chrono::system_clock::now() - start_attack_time);
+		}
+		else {
+			while (window.pollEvent(event))
+			{
+				if (event.type == sf::Event::Closed)
 					window.close();
-					break;
+				if (event.type == sf::Event::KeyPressed) {
+					char p_type = NULL;
+					switch (event.key.code) {
+					case sf::Keyboard::Left:
+						p_type = 2;
+						send_move_packet(p_type);
+						break;
+					case sf::Keyboard::Right:
+						p_type = 3;
+						send_move_packet(p_type);
+						break;
+					case sf::Keyboard::Up:
+						p_type = 0;
+						send_move_packet(p_type);
+						break;
+					case sf::Keyboard::Down:
+						p_type = 1;
+						send_move_packet(p_type);
+						break;
+					case sf::Keyboard::A:  //추가 자동공격: 이 부분 수정 필요 1초마다 공격은 하는데 어느순간 터짐  
+						send_attack_packet();
+						break;
+					case sf::Keyboard::Escape:
+						window.close();
+						break;
+					}
 				}
 			}
 		}

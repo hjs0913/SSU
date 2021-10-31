@@ -45,6 +45,29 @@ public:
 	}
 };
 
+class BUF_EFFECT {
+public:
+	BUF_TYPE _type;
+	float _effect;
+	float _time;
+	bool _use;
+public:
+	BUF_EFFECT() {
+		_use = false;
+		_type = B_NONE;
+		_effect = 0.0f;
+		_time = 0.0f;
+	}
+	~BUF_EFFECT() {};
+
+	void buf_setting(BUF_TYPE type, float effect, float time)
+	{
+		_type = type;
+		_effect = effect;
+		_time = time;
+	}
+};
+
 class CLIENT
 {
 public:
@@ -54,6 +77,7 @@ public:
 	int _id;
 
 	bool _use;
+	bool _live;
 
 	char name[MAX_ID_LEN];
 	int x, y;
@@ -66,6 +90,7 @@ public:
 	short attack_factor;
 	float defense_factor;
 	TRIBE tribe;
+	BUF_EFFECT buf_effect;
 public:
 	CLIENT() : tribe(T_HUMAN)
 	{
@@ -130,6 +155,7 @@ public:
 	int attack_factor;
 	float defense_factor;
 	TRIBE tribe;
+	bool do_attack;
 
 public:
 	MONSTER() : tribe(T_MONSTER)
@@ -150,6 +176,7 @@ public:
 		defense_factor = 0.0002;
 		element = E_ICE;
 		tribe = T_MONSTER;
+		do_attack = false;
 	}
 
 	~MONSTER()
@@ -162,6 +189,67 @@ public:
 array<CLIENT, MAX_USER> clients;
 
 array<MONSTER, 1> monsters;
+
+void element_buf(int c_id, int m_id)
+{
+	CLIENT& cl = clients[c_id];
+	MONSTER& mon = monsters[m_id];
+	switch (cl.element)
+	{
+	case E_WATER: {
+		if (mon.element == E_FULLMETAL || mon.element == E_FIRE || mon.element == E_EARTH) {
+			// cl.buf_effect.buf_setting()
+			// 상대방을 너프시키는 어드벤티지
+		}
+		break;
+	}
+	case E_FULLMETAL: {
+		if (mon.element == E_ICE || mon.element == E_TREE || mon.element == E_WIND) {
+			cl.buf_effect.buf_setting(B_PHYDEFENCE, 10.0f, 10.0f);
+			cout << "버프 생성" << endl;
+		}
+		break;
+	}
+	case E_WIND: {
+		if (mon.element == E_WATER || mon.element == E_EARTH || mon.element == E_FIRE) {
+			// cl.buf_effect.buf_setting()
+			// 상대방을 너프시키는 어드벤티지
+		}
+		break;
+	}
+	case E_FIRE: {
+		if (mon.element == E_ICE || mon.element == E_TREE || mon.element == E_FULLMETAL) {
+			// cl.buf_effect.buf_setting()
+			// 상대방을 너프시키는 어드벤티지
+		}
+		break;
+	}
+	case E_TREE: {
+		if (mon.element == E_EARTH || mon.element == E_WATER || mon.element == E_WIND) {
+			// cl.buf_effect.buf_setting()
+			// 상대방을 너프시키는 어드벤티지
+		}
+		break;
+	}
+	case E_EARTH: {
+		if (mon.element == E_ICE || mon.element == E_FULLMETAL || mon.element == E_FIRE) {
+			// cl.buf_effect.buf_setting()
+			// 상대방을 너프시키는 어드벤티지
+		}
+		break;
+	}
+	case E_ICE: {
+		if (mon.element == E_TREE || mon.element == E_WATER || mon.element == E_WIND) {
+			// cl.buf_effect.buf_setting()
+			// 상대방을 너프시키는 어드벤티지
+		}
+		break;
+	}
+
+	default:
+		break;
+	}
+}
 
 int get_new_id()
 {
@@ -176,14 +264,23 @@ int get_new_id()
 	return -1;
 }
 
-void send_remove_object(int c_id, int victim, TRIBE tribe)
+void send_remove_object(int c_id, int victim, TRIBE tribe, bool died)
 {
-	sc_packet_logout packet;
-	packet.id = victim;
-	packet.size = sizeof(packet);
-	packet.type = SC_PACKET_LOGOUT;
-	packet.tribe = tribe;
-	clients[c_id].do_send(sizeof(packet), &packet);
+	if((tribe == T_HUMAN && !died) || tribe == T_MONSTER){
+		sc_packet_logout packet;
+		packet.id = victim;
+		packet.size = sizeof(packet);
+		packet.type = SC_PACKET_LOGOUT;
+		packet.tribe = tribe;
+		clients[c_id].do_send(sizeof(packet), &packet);
+	}
+	else {
+		sc_packet_died packet;
+		packet.id = victim;
+		packet.size = sizeof(packet);
+		packet.type = SC_PACKET_DIED;
+		clients[c_id].do_send(sizeof(packet), &packet);
+	}
 }
 
 void Disconnect(int c_id)
@@ -191,7 +288,7 @@ void Disconnect(int c_id)
 	clients[c_id]._use = false;
 	for (auto& cl : clients) {
 		if (false == cl._use) continue;
-		send_remove_object(cl._id, c_id, T_HUMAN);
+		send_remove_object(cl._id, c_id, T_HUMAN, false);
 	}
 	closesocket(clients[c_id]._sock);
 }
@@ -239,16 +336,21 @@ void send_combat_packet(int c_id, int m_id, TRIBE subject)
 	MONSTER& mon = monsters[m_id];
 	
 	if (subject == T_HUMAN) {	// 주체가 휴먼
-		// 속성부여
+		if (cl.buf_effect._use == false)
+			element_buf(c_id, m_id);
+
 		// 데미지 계산 공식
-		int damage = cl.physical_attack * cl.attack_factor;
+		mon.do_attack = true;
+		int damage;
+		if (cl.buf_effect._type == B_PHYATTACK) damage = (cl.physical_attack*(1+cl.buf_effect._effect/100.0f)) * cl.attack_factor;
+		else damage = cl.physical_attack * cl.attack_factor;
 		float def_temp = mon.defense_factor * mon.physical_defense;
 		int real_damage = int(damage * (1.0f - (def_temp) / (1.0f + def_temp)));
 		mon.hp -= real_damage;
 
 		// 화면에 표시
 		cout << "플레이어 -> 몬스터 데미지 : " << real_damage <<  endl;
-		cout << "플레이어 Hp : " << cl.hp << endl;
+		cout << c_id << " 플레이어 Hp : " << cl.hp << endl;
 		cout << "몬스터 Hp : " << mon.hp << endl;
 
 		// 전투에 대한 정보를 패킷에 담아 보내자
@@ -267,42 +369,60 @@ void send_combat_packet(int c_id, int m_id, TRIBE subject)
 			mon._live = false;
 			// 몬스터가 모든 유저에게 삭제가 되어야 한다
 			for (auto& cl : clients)
-				send_remove_object(cl._id, m_id, T_MONSTER);
+				send_remove_object(cl._id, m_id, T_MONSTER, false);
 		}
 	}
 	else {	// 주체가 MONSTER
-		// 속성부여
-		// 데미지 계산 공식
-		int damage = mon.physical_attack * mon.attack_factor;
-		float def_temp = cl .defense_factor* cl.physical_defense;
-		int real_damage = int(damage * (1.0f - (def_temp) / (1.0f + def_temp)));
-		cl.hp -= real_damage;
 
-		// 화면에 표시
-		cout << "몬스터 -> 플레이어 데미지 : " << real_damage << endl;
-		cout << "플레이어 Hp : " << cl.hp << endl;
-		cout << "몬스터 Hp : " << mon.hp << endl;
+		if (cl.hp > 0) {   //추가   살아있을 때만 계산하자 
+			// 속성부여
+			// 데미지 계산 공식
+			int damage = mon.physical_attack * mon.attack_factor;
+			float def_temp;
+			if(cl.buf_effect._type == B_PHYDEFENCE) def_temp = (cl.defense_factor*(1 + cl.buf_effect._effect/100.0f)) * cl.physical_defense;
+			else def_temp = cl.defense_factor * cl.physical_defense;
+			int real_damage = int(damage * (1.0f - (def_temp) / (1.0f + def_temp)));
 
-		// 전투에 대한 정보를 패킷에 담아 보내자
-		sc_packet_attack packet;
-		packet.id = c_id;
-		packet.size = sizeof(packet);
-		packet.type = SC_PACKET_ATTACK;
-		packet.damage_size = real_damage;
-		packet.p_hp = cl.hp;
-		packet.m_hp = mon.hp;
-		packet.subject = subject;
 
-		cl.do_send(sizeof(packet), &packet);
+			cl.hp -= real_damage;
 
-		if (cl.hp < 0) {
-			// 플레이어가 죽었을때 어떻게 처리를 해줄것인가?
-			// Data Race가 발생하지 않는가?
-		
-			// 몬스터가 모든 유저에게 삭제가 되어야 한다
-			/*for (auto& cl : clients)
-				send_remove_object(cl._id, m_id, T_MONSTER);*/
+			if (cl.hp < 0)  //추가 hp가 음수면 0으로 하자 
+				cl.hp = 0;
+
+
+			// 화면에 표시
+			cout << "몬스터 -> 플레이어 데미지 : " << real_damage << endl;
+			cout << c_id << "번 플레이어 Hp : " << cl.hp << endl;  //추가 몇번 플레이어가 데미지받는지 수정 
+			cout << "몬스터 Hp : " << mon.hp << endl;
+
+			// 전투에 대한 정보를 패킷에 담아 보내자
+			sc_packet_attack packet;
+			packet.id = c_id;
+			packet.size = sizeof(packet);
+			packet.type = SC_PACKET_ATTACK;
+			packet.damage_size = real_damage;
+			packet.p_hp = cl.hp;
+			packet.m_hp = mon.hp;
+			packet.subject = subject;
+
+			cl.do_send(sizeof(packet), &packet);
+
+			if (cl.hp <= 0) {  //추가	
+				mon.do_attack = false;
+				//for (auto& cls : clients)
+				//	if(cls._use == true)
+				//		send_remove_object(cls._id, c_id, T_HUMAN, true);   //죽은 클라 보내기 
+				cout << c_id << "번 플레이어 사망" << endl;
+				cl.hp = 54000;
+				cl.x = 0;
+				cl.y = 0;
+				for (auto& cls : clients) {
+					if (cls._use == true)
+						send_move_packet(cls._id, c_id);
+				}
+			}
 		}
+		
 	}
 
 }
@@ -449,6 +569,7 @@ void process_packet(int c_id, unsigned char* p)
 	}
 }
 
+// 다른 쓰레드에서 작동
 void monster_ai()
 {
 	MONSTER& mon = monsters[0];
@@ -456,6 +577,7 @@ void monster_ai()
 		if (mon._live == false) {
 			this_thread::sleep_for(chrono::seconds(3));
 			mon.hp = 500000;
+			mon.do_attack = false;
 
 			sc_packet_put_object packet;
 
@@ -488,11 +610,13 @@ void monster_ai()
 		}
 		else {
 			// 범위내 플레이어 있다면 플레이어 공격
-			for (auto& cl : clients) {
-				if (cl._use == true) {
-					if ((cl.x <= mon.x + 1 && mon.x - 1 <= cl.x) &&
-						(cl.y <= mon.y + 1 && mon.y - 1 <= cl.y)) {
-						send_combat_packet(cl._id, mon._id, T_MONSTER);
+			if (mon.do_attack) {
+				for (auto& cl : clients) {
+					if (cl._use == true) {
+						if ((cl.x <= mon.x + 1 && mon.x - 1 <= cl.x) &&
+							(cl.y <= mon.y + 1 && mon.y - 1 <= cl.y)) {
+							send_combat_packet(cl._id, mon._id, T_MONSTER);
+						}
 					}
 				}
 			}
