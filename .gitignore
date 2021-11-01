@@ -4,6 +4,9 @@
 샘플프로그램/LabProject/Debug
 샘플프로그램/LabProject/x64/Debug
 
+Sample/.vs
+Sample/x64
+
 SSU_Server/.vs
 SSU_Server/SSU_Server/x64
 SSU_Server/x64
