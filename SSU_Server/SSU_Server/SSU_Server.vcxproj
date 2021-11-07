@@ -139,10 +139,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CBUFF.cpp" />
+    <ClCompile Include="CCLIENT.cpp" />
+    <ClCompile Include="CMONSTER.cpp" />
     <ClCompile Include="Servercpp.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CBUFF.h" />
+    <ClInclude Include="CCLIENT.h" />
+    <ClInclude Include="CMONSTER.h" />
     <ClInclude Include="protocol.h" />
+    <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

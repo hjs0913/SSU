@@ -2,189 +2,17 @@
 #pragma comment(lib, "MSWsock.LIB")
 
 #include <iostream>
-#include <WS2tcpip.h>
-#include <MSWSock.h>
 #include <array>
 #include <thread>
 #include <mutex>
 #include <chrono>
-#include "protocol.h"
-
+#include "CCLIENT.h"
+#include "CMONSTER.h"
+#include "stdafx.h"
 
 using namespace std;
 
 void Disconnect(int c_id);
-
-class EXP_OVER
-{
-public:
-	WSAOVERLAPPED	_wsa_over;
-	WSABUF			_wsa_buf;
-	unsigned char	_net_buf[BUFSIZE];
-	COMP_OP			_comp_op;
-
-public:
-	EXP_OVER(COMP_OP comp_op, char num_bytes, void* mess) : _comp_op(comp_op)
-	{
-		ZeroMemory(&_wsa_over, sizeof(_wsa_over));
-		_wsa_buf.buf = reinterpret_cast<char*>(_net_buf);
-		_wsa_buf.len = num_bytes;
-		memcpy(_net_buf, mess, num_bytes);
-	}
-
-	EXP_OVER(COMP_OP comp_op) : _comp_op(comp_op) {}
-
-	EXP_OVER()		// array에 넣기 위해서는 기본생성자가 있어야한다
-	{
-		_comp_op = OP_RECV;
-	}
-
-	~EXP_OVER()
-	{
-
-	}
-};
-
-class BUF_EFFECT {
-public:
-	BUF_TYPE _type;
-	float _effect;
-	float _time;
-	bool _use;
-public:
-	BUF_EFFECT() {
-		_use = false;
-		_type = B_NONE;
-		_effect = 0.0f;
-		_time = 0.0f;
-	}
-	~BUF_EFFECT() {};
-
-	void buf_setting(BUF_TYPE type, float effect, float time)
-	{
-		_type = type;
-		_effect = effect;
-		_time = time;
-	}
-};
-
-class CLIENT
-{
-public:
-	EXP_OVER _recv_over;
-	SOCKET	_sock;
-	int _prev_size;
-	int _id;
-
-	bool _use;
-	bool _live;
-
-	char name[MAX_ID_LEN];
-	int x, y;
-	int hp, mp;
-	int physical_attack, magical_attack;
-	int physical_defense, magical_defense;
-	ELEMENT element;
-	short level;
-	int exp;
-	short attack_factor;
-	float defense_factor;
-	TRIBE tribe;
-	BUF_EFFECT buf_effect;
-public:
-	CLIENT() : tribe(T_HUMAN)
-	{
-		_use = false;
-		_prev_size = 0;
-
-		// 일단 임시로 적어놈
-		x = 0;
-		y = 0;
-		level = 50;
-		hp = 54000;
-		mp = 27500;
-		physical_attack = 1250;
-		magical_attack = 500;
-		physical_defense = 1100;
-		magical_defense  = 925;
-		attack_factor = 50;
-		defense_factor = 0.0002;
-		exp = 0;
-		element = E_FULLMETAL;
-	}
-	~CLIENT() 
-	{
-		closesocket(_sock);
-	}
-
-	void do_recv()
-	{
-		DWORD recv_flag = 0;
-		ZeroMemory(&_recv_over._wsa_over, sizeof(_recv_over._wsa_over));
-		_recv_over._wsa_buf.buf = reinterpret_cast<char*>(_recv_over._net_buf + _prev_size);
-		_recv_over._wsa_buf.len = sizeof(_recv_over._net_buf) - _prev_size;
-		int ret = WSARecv(_sock, &_recv_over._wsa_buf, 1, 0, &recv_flag, &_recv_over._wsa_over, NULL);
-		if (ret == SOCKET_ERROR) {
-			int err_num = WSAGetLastError();
-			if (ERROR_IO_PENDING != err_num) {
-				Disconnect(_id);
-			}
-		}
-	}
-
-	void do_send(int num_bytes, void* mess)
-	{
-		EXP_OVER* ex_over = new EXP_OVER(OP_SEND, num_bytes, mess);
-		WSASend(_sock, &ex_over->_wsa_buf, 1, 0, 0, &ex_over->_wsa_over, NULL);
-	}
-};
-
-class MONSTER 
-{
-public:
-	volatile bool _live;
-
-	int _id;
-	char name[MAX_ID_LEN];
-	int x, y;
-	int hp;
-	int physical_attack;
-	int physical_defense, magical_defense;
-	ELEMENT element;
-	short level;
-	int attack_factor;
-	float defense_factor;
-	TRIBE tribe;
-	bool do_attack;
-
-public:
-	MONSTER() : tribe(T_MONSTER)
-	{
-		_live = true;
-		_id = 0;
-
-		strcpy_s(name, sizeof(name),"Monster" );
-		// 일단 임시로 적어놈
-		x = 6;
-		y = 6;
-		level = 50;
-		hp = 500000;
-		physical_attack = 750;
-		physical_defense = 1200;
-		magical_defense = 500;
-		attack_factor = 10;
-		defense_factor = 0.0002;
-		element = E_ICE;
-		tribe = T_MONSTER;
-		do_attack = false;
-	}
-
-	~MONSTER()
-	{
-
-	}
-
-};
 
 array<CLIENT, MAX_USER> clients;
 
@@ -198,50 +26,50 @@ void element_buf(int c_id, int m_id)
 	{
 	case E_WATER: {
 		if (mon.element == E_FULLMETAL || mon.element == E_FIRE || mon.element == E_EARTH) {
-			// cl.buf_effect.buf_setting()
-			// 상대방을 너프시키는 어드벤티지
+			mon.nuff_element.buf_setting(B_MAGATTACK, 10.0f, 10.0f);
+			mon.nuff_element._use = true;
 		}
 		break;
 	}
 	case E_FULLMETAL: {
 		if (mon.element == E_ICE || mon.element == E_TREE || mon.element == E_WIND) {
-			cl.buf_effect.buf_setting(B_PHYDEFENCE, 10.0f, 10.0f);
-			cout << "버프 생성" << endl;
+			cl.buff_element.buf_setting(B_PHYDEFENCE, 10.0f, 10.0f);
+			cl.buff_element._use = true;
 		}
 		break;
 	}
 	case E_WIND: {
 		if (mon.element == E_WATER || mon.element == E_EARTH || mon.element == E_FIRE) {
-			// cl.buf_effect.buf_setting()
-			// 상대방을 너프시키는 어드벤티지
+			cl.buff_element.buf_setting(B_SPEED, 5.0f, 6.0f);
+			cl.buff_element._use = true;
 		}
 		break;
 	}
 	case E_FIRE: {
 		if (mon.element == E_ICE || mon.element == E_TREE || mon.element == E_FULLMETAL) {
-			// cl.buf_effect.buf_setting()
-			// 상대방을 너프시키는 어드벤티지
+			mon.nuff_element.buf_setting(B_BURN, mon.physical_attack * 0.1f, 10.0f);
+			mon.nuff_element._use = true;
 		}
 		break;
 	}
 	case E_TREE: {
 		if (mon.element == E_EARTH || mon.element == E_WATER || mon.element == E_WIND) {
-			// cl.buf_effect.buf_setting()
-			// 상대방을 너프시키는 어드벤티지
+			mon.nuff_element.buf_setting(B_PHYATTACK, 10.0f, 10.0f);
+			mon.nuff_element._use = true;
 		}
 		break;
 	}
 	case E_EARTH: {
 		if (mon.element == E_ICE || mon.element == E_FULLMETAL || mon.element == E_FIRE) {
-			// cl.buf_effect.buf_setting()
-			// 상대방을 너프시키는 어드벤티지
+			cl.buff_element.buf_setting(B_MAGDEFENCE, 10.0f, 10.0f);
+			cl.buff_element._use = true;
 		}
 		break;
 	}
 	case E_ICE: {
 		if (mon.element == E_TREE || mon.element == E_WATER || mon.element == E_WIND) {
-			// cl.buf_effect.buf_setting()
-			// 상대방을 너프시키는 어드벤티지
+			mon.nuff_element.buf_setting(B_SPEED, 10.0f, 10.0f);
+			mon.nuff_element._use = true;
 		}
 		break;
 	}
@@ -336,13 +164,13 @@ void send_combat_packet(int c_id, int m_id, TRIBE subject)
 	MONSTER& mon = monsters[m_id];
 	
 	if (subject == T_HUMAN) {	// 주체가 휴먼
-		if (cl.buf_effect._use == false)
+		if (cl.buff_element._use == false)
 			element_buf(c_id, m_id);
 
 		// 데미지 계산 공식
 		mon.do_attack = true;
 		int damage;
-		if (cl.buf_effect._type == B_PHYATTACK) damage = (cl.physical_attack*(1+cl.buf_effect._effect/100.0f)) * cl.attack_factor;
+		if (cl.buff_element._type == B_PHYATTACK) damage = (cl.physical_attack*(1+cl.buff_element._effect/100.0f)) * cl.attack_factor;
 		else damage = cl.physical_attack * cl.attack_factor;
 		float def_temp = mon.defense_factor * mon.physical_defense;
 		int real_damage = int(damage * (1.0f - (def_temp) / (1.0f + def_temp)));
@@ -379,7 +207,7 @@ void send_combat_packet(int c_id, int m_id, TRIBE subject)
 			// 데미지 계산 공식
 			int damage = mon.physical_attack * mon.attack_factor;
 			float def_temp;
-			if(cl.buf_effect._type == B_PHYDEFENCE) def_temp = (cl.defense_factor*(1 + cl.buf_effect._effect/100.0f)) * cl.physical_defense;
+			if(cl.buff_element._type == B_PHYDEFENCE) def_temp = (cl.defense_factor*(1 + cl.buff_element._effect/100.0f)) * cl.physical_defense;
 			else def_temp = cl.defense_factor * cl.physical_defense;
 			int real_damage = int(damage * (1.0f - (def_temp) / (1.0f + def_temp)));
 
