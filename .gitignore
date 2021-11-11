@@ -12,6 +12,8 @@ SSU_Server/SSU_Server/x64
 SSU_Server/x64
 SSU_Server_Client/.vs
 SSU_Server_Client/client_sample/x64
+SampleForServer/.vs
+SSU_Server_Dx/.vs
 
 
 *.exe
