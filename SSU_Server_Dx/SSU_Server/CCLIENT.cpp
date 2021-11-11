@@ -22,6 +22,7 @@ CLIENT::CLIENT() : tribe(T_HUMAN)
 	// 일단 임시로 적어놈
 	x = 0;
 	y = 0;
+	z = 0;
 	level = 50;
 	hp = 54000;
 	mp = 27500;

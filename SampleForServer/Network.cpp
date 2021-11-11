@@ -136,9 +136,14 @@ void CALLBACK recv_callback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_ove
 		case SC_PACKET_LOGIN:
 			cout << "login" << endl;
 			break;
-		case SC_PACKET_MOVE:
-			cout << "move" << endl;
+		case SC_PACKET_MOVE:{
+			sc_packet_move* packet = reinterpret_cast<sc_packet_move*>(p);
+			my_position.x = packet->x;
+			my_position.y = packet->y;
+			my_position.z = packet->z;
+			cout << packet->x << "." << packet->y << "." << packet->z << endl;
 			break;
+		}
 		case SC_PACKET_LOGOUT:
 			cout << "logout" << endl;
 			break;

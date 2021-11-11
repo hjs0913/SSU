@@ -549,6 +549,11 @@ void CGameFramework::FrameAdvance()
 	
 	ProcessInput();
 
+	// 플레이어의 위치 수정
+	m_pPlayer->SetPosition(return_myPosition());
+	m_pCamera->Move(return_myCamera());
+
+
     AnimateObjects();
 
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();

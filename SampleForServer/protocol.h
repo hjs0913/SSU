@@ -1,5 +1,4 @@
 #pragma once
-
 const int SERVERPORT = 9000;
 const int BUFSIZE = 512;
 
@@ -10,9 +9,9 @@ const int MAX_USER = 10;
 const int MAX_ID_LEN = 20;
 
 enum COMP_OP { OP_RECV, OP_SEND, OP_ACCEPT };
-enum BUF_TYPE { B_NONE, B_PHYATTACK, B_MAGATTACK, B_PHYDEFENCE, B_MAGDEFENCE, B_SPEED };
-enum ELEMENT{E_WATER, E_FULLMETAL, E_WIND, E_FIRE, E_TREE, E_EARTH, E_ICE};
-enum TRIBE{T_HUMAN, T_MONSTER};
+enum BUF_TYPE { B_NONE, B_PHYATTACK, B_MAGATTACK, B_PHYDEFENCE, B_MAGDEFENCE, B_SPEED, B_BURN };
+enum ELEMENT { E_WATER, E_FULLMETAL, E_WIND, E_FIRE, E_TREE, E_EARTH, E_ICE };
+enum TRIBE { T_HUMAN, T_MONSTER };
 
 // 패킷 타입 정리
 const int CS_PACKET_LOGIN = 1;
@@ -29,7 +28,7 @@ const int SC_PACKET_DIED = 6;
 
 // 패킷 정리
 #pragma pack(push, 1)
-struct cs_packet_login 
+struct cs_packet_login
 {
 	char size;
 	char type;
@@ -55,7 +54,7 @@ struct sc_packet_login
 	char size;
 	char type;
 	int id;
-	int x, y;
+	float x, y, z;
 	int hp, mp;
 	int physical_attack, magical_attack;
 	int physical_defense, magical_defense;
@@ -72,7 +71,7 @@ struct sc_packet_move
 	char size;
 	char type;
 	int id;
-	int x, y;
+	float x, y, z;
 };
 
 struct sc_packet_logout
@@ -89,7 +88,7 @@ struct sc_packet_put_object
 	char type;
 	char name[MAX_ID_LEN];
 	int id;
-	int x, y;
+	float x, y, z;
 	int hp, mp;
 	int physical_attack, magical_attack;
 	int physical_defense, magical_defense;

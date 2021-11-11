@@ -130,6 +130,7 @@ void send_login_ok_packet(int c_id)
 
 	packet.x = clients[c_id].x;
 	packet.y = clients[c_id].y;
+	packet.z = clients[c_id].z;
 	packet.hp = clients[c_id].hp;
 	packet.mp = clients[c_id].mp;
 	packet.physical_attack = clients[c_id].physical_attack;
@@ -154,6 +155,7 @@ void send_move_packet(int c_id, int mover)
 	packet.type = SC_PACKET_MOVE;
 	packet.x = clients[mover].x;
 	packet.y = clients[mover].y;
+	packet.z = clients[mover].z;
 
 	clients[c_id].do_send(sizeof(packet), &packet);
 }
@@ -258,7 +260,6 @@ void send_combat_packet(int c_id, int m_id, TRIBE subject)
 void process_packet(int c_id, unsigned char* p)
 {
 	CLIENT& cl = clients[c_id];
-	int size = p[0];
 	int type = p[1];
 
 	switch (type) {
@@ -356,19 +357,23 @@ void process_packet(int c_id, unsigned char* p)
 	}break;
 	case CS_PACKET_MOVE: {
 		cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(p);
-		int x = cl.x;
-		int y = cl.y;
+		float x = cl.x;
+		float y = cl.y;
+		float z = cl.z;
+
+		cout << (int)packet->direction << endl;
 		switch (packet->direction) {
-		case 0: if (y > 0) y--; break;
-		case 1: if (y < WORLD_HEIGHT - 1) y++; break;
-		case 2: if (x > 0) x--; break;
-		case 3: if (x < WORLD_WIDTH - 1) x++; break;
+		case 0: if (z > -(WORLD_HEIGHT - 1)) z = z + (50.0f*0.1); break;
+		case 1: if (z < WORLD_HEIGHT - 1) z = z - (50.0f * 0.1); break;
+		case 2: if (x > -(WORLD_WIDTH - 1)) x = x - (50.0f * 0.1); break;
+		case 3: if (x < WORLD_WIDTH - 1) x = x + (50.0f * 0.1); break;
 		default:
 			cout << "Invalid move in client " << c_id << endl;
 			exit(-1);
 		}
 		cl.x = x;
 		cl.y = y;
+		cl.z = z;
 		// 위치가 바뀌었다고 클라에게 알려줌
 
 		for (auto& cl : clients) {
@@ -553,6 +558,7 @@ int main()
 			// 클라의 정보 초기화
 			cl.x = 0;
 			cl.y = 0;
+			cl.z = 0;
 			cl.level = 50;
 			cl.hp = 54000;
 			cl.mp = 27500;

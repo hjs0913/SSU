@@ -35,7 +35,7 @@ public:
 	bool _live;
 
 	char name[MAX_ID_LEN];
-	int x, y;
+	float x, y, z;
 	int hp, mp;
 	int physical_attack, magical_attack;
 	int physical_defense, magical_defense;

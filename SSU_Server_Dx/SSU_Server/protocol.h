@@ -2,8 +2,8 @@
 const int SERVERPORT = 9000;
 const int BUFSIZE = 512;
 
-const int WORLD_WIDTH = 8;
-const int WORLD_HEIGHT = 8;
+const int WORLD_WIDTH =200;
+const int WORLD_HEIGHT =200;
 
 const int MAX_USER = 10;
 const int MAX_ID_LEN = 20;
@@ -54,7 +54,7 @@ struct sc_packet_login
 	char size;
 	char type;
 	int id;
-	int x, y;
+	float x, y, z;
 	int hp, mp;
 	int physical_attack, magical_attack;
 	int physical_defense, magical_defense;
@@ -71,7 +71,7 @@ struct sc_packet_move
 	char size;
 	char type;
 	int id;
-	int x, y;
+	float x, y, z;
 };
 
 struct sc_packet_logout
@@ -88,7 +88,7 @@ struct sc_packet_put_object
 	char type;
 	char name[MAX_ID_LEN];
 	int id;
-	int x, y;
+	float x, y, z;
 	int hp, mp;
 	int physical_attack, magical_attack;
 	int physical_defense, magical_defense;
