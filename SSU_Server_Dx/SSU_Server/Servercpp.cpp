@@ -281,6 +281,7 @@ void process_packet(int c_id, unsigned char* p)
 
 			packet.x = cl.x;
 			packet.y = cl.y;
+			packet.z = cl.z;
 			packet.hp = cl.hp;
 			packet.mp = cl.mp;
 			packet.physical_attack = cl.physical_attack;
@@ -311,6 +312,7 @@ void process_packet(int c_id, unsigned char* p)
 
 			packet.x = other.x;
 			packet.y = other.y;
+			packet.z = other.z;
 			packet.hp = other.hp;
 			packet.mp = other.mp;
 			packet.physical_attack = other.physical_attack;
@@ -338,6 +340,7 @@ void process_packet(int c_id, unsigned char* p)
 
 			packet.x = mon.x;
 			packet.y = mon.y;
+			packet.z = mon.z;
 			packet.hp = mon.hp;
 			packet.mp = 0;
 			packet.physical_attack = mon.physical_attack;

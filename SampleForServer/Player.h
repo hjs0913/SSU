@@ -39,6 +39,8 @@ protected:
 
 	CCamera						*m_pCamera = NULL;
 
+	bool						m_use = false;
+
 public:
 	CPlayer();
 	
@@ -61,9 +63,12 @@ public:
 	float GetYaw() const { return(m_fYaw); }
 	float GetPitch() const { return(m_fPitch); }
 	float GetRoll() const { return(m_fRoll); }
+	bool  GetUse() const { return(m_use); }
 
 	CCamera *GetCamera() { return(m_pCamera); }
 	void SetCamera(CCamera *pCamera) { m_pCamera = pCamera; }
+
+	void SetUse(bool pUse) { m_use = pUse; }
 
 	void Move(ULONG nDirection, float fDistance, bool bVelocity = false);
 	void Move(const XMFLOAT3& xmf3Shift, bool bVelocity = false);

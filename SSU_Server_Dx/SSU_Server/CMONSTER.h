@@ -11,7 +11,7 @@ public:
 
 	int _id;
 	char name[MAX_ID_LEN];
-	int x, y;
+	int x, y, z;
 	int hp;
 	int physical_attack;
 	int physical_defense, magical_defense;

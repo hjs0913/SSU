@@ -6,6 +6,7 @@
 #include "Timer.h"
 #include "Player.h"
 #include "Scene.h"
+#include "protocol.h"
 
 #define DRAW_SCENE_COLOR				'S'
 
@@ -88,6 +89,8 @@ private:
 	CScene							*m_pScene = NULL;
 	CPlayer							*m_pPlayer = NULL;
 	CCamera							*m_pCamera = NULL;
+
+	CPlayer							*m_pOthers[MAX_USER] = { NULL };
 
 	// 10.30
 	CObjectsShader* m_pObjectShader = NULL;

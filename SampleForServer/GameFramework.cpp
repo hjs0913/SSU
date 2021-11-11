@@ -396,6 +396,9 @@ void CGameFramework::BuildObjects()
 
 	m_pScene->m_pPlayer = m_pPlayer = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), NULL, 1);
 	m_pCamera = m_pPlayer->GetCamera();
+	
+	m_pPlayer->SetUse(true);
+	for (auto& other : m_pOthers) other = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), NULL, 1);
 
 	m_pLaplacianEdgeDetectionShader = new CLaplacianEdgeShader();
 	m_pLaplacianEdgeDetectionShader->CreateShader(m_pd3dDevice, m_pScene->GetGraphicsRootSignature(), 1, NULL, DXGI_FORMAT_D32_FLOAT);
@@ -572,7 +575,9 @@ void CGameFramework::FrameAdvance()
 		m_pScene->Render(m_pd3dCommandList, m_pCamera);
 
 		m_pPlayer->Render(m_pd3dCommandList, m_pCamera);
-
+		
+		return_otherPlayer(m_pOthers, m_pd3dDevice, m_pd3dCommandList, m_pCamera);
+		
 		m_pLaplacianEdgeDetectionShader->OnPostRenderTarget(m_pd3dCommandList);
 	}
 	else

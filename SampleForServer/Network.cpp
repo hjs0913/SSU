@@ -1,5 +1,6 @@
 #include "Network.h"
 #include "Player.h"
+#include "GameFramework.h"
 
 int my_id = 0;
 XMFLOAT3 my_position(-1.0f, 5.0f, -1.0f);
@@ -120,8 +121,7 @@ void do_recv()
 	}
 }
 
-unordered_map<int, CPlayer> mPlayer;
-unordered_map<int, bool> check_createShader;
+array<CPlayer, MAX_USER> mPlayer;
 
 void CALLBACK recv_callback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag)
 {
@@ -133,23 +133,73 @@ void CALLBACK recv_callback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_ove
 		int type = *(p + 1);
 		if (packet_size <= 0) break;
 		switch (type) {
-		case SC_PACKET_LOGIN:
-			cout << "login" << endl;
-			break;
-		case SC_PACKET_MOVE:{
-			sc_packet_move* packet = reinterpret_cast<sc_packet_move*>(p);
+		case SC_PACKET_LOGIN:{
+			sc_packet_login* packet = reinterpret_cast<sc_packet_login*>(p);
+			my_id = packet->id;
 			my_position.x = packet->x;
 			my_position.y = packet->y;
 			my_position.z = packet->z;
-			cout << packet->x << "." << packet->y << "." << packet->z << endl;
+
+			/*packet->hp;
+			packet->mp;
+			packet->physical_attack;
+			packet->magical_attack;
+			packet->physical_defense;
+			packet->magical_defense;
+			packet->element;
+			packet->level;
+			packet->exp;
+			packet->attack_factor;
+			packet->defense_factor;
+			packet->tribe;*/
 			break;
 		}
-		case SC_PACKET_LOGOUT:
-			cout << "logout" << endl;
+		case SC_PACKET_MOVE:{
+			sc_packet_move* packet = reinterpret_cast<sc_packet_move*>(p);
+
+			if (packet->id == my_id) {
+				my_position.x = packet->x;
+				my_position.y = packet->y;
+				my_position.z = packet->z;
+				cout << packet->x << "." << packet->y << "." << packet->z << endl;
+			}
+			else {
+				mPlayer[packet->id].SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
+			}
 			break;
-		case SC_PACKET_PUT_OBJECT:
-			cout << "put" << endl;
+		}
+		case SC_PACKET_LOGOUT: {
+			sc_packet_logout* packet = reinterpret_cast<sc_packet_logout*>(p);
+			int p_id = packet->id;
+			if (packet->tribe == T_HUMAN) mPlayer[p_id].SetUse(false);
 			break;
+		}
+		case SC_PACKET_PUT_OBJECT: {
+			sc_packet_put_object* packet = reinterpret_cast<sc_packet_put_object*> (p);
+			int p_id = packet->id;
+			if (packet->tribe == T_HUMAN) {
+				mPlayer[p_id].SetUse(true);
+				mPlayer[p_id].SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
+			}
+			// 패킷 처리
+			/*packet->name[MAX_ID_LEN];
+			packet->hp;
+			packet->mp;
+			packet->physical_attack;
+			packet->magical_attack;
+			packet->physical_defense;
+			packet->magical_defense;
+			packet->element;
+			packet->level;
+			packet->exp;
+			packet->attack_factor;
+			packet->defense_factor;
+			packet->tribe;
+			*/
+
+
+			break;
+		}
 		case SC_PACKET_ATTACK:
 			cout << "attack" << endl;
 			break;
@@ -226,15 +276,11 @@ XMFLOAT3 return_myPosition() {
 }
 
 void return_otherPlayer(CPlayer** m_otherPlayer, ID3D12Device* m_pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera) {
-	for (auto& k : mPlayer) {
-		if (check_createShader[k.first] == true) {
-			m_otherPlayer[k.first]->SetPosition(k.second.GetPosition());
-			m_otherPlayer[k.first]->Render(pd3dCommandList, pCamera);
-		}
-		if (check_createShader[k.first] == false) {
-			/*check_createShader.erase(k.first);
-			mPlayer.erase(k.first);*/
-		}
+	for (int i = 0; i < MAX_USER; ++i) {
+		if (mPlayer[i].GetUse() == false) continue;
+		m_otherPlayer[i]->SetUse(true);
+		m_otherPlayer[i]->SetPosition(mPlayer[i].GetPosition());
+		m_otherPlayer[i]->Render(pd3dCommandList, pCamera);
 	}
 }
 
