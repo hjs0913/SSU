@@ -2,8 +2,8 @@
 const int SERVERPORT = 9000;
 const int BUFSIZE = 512;
 
-const int WORLD_WIDTH =200;
-const int WORLD_HEIGHT =200;
+const int WORLD_WIDTH =400;
+const int WORLD_HEIGHT =400;
 
 const int MAX_USER = 10;
 const int MAX_ID_LEN = 20;

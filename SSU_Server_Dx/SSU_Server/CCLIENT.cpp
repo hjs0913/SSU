@@ -34,6 +34,10 @@ CLIENT::CLIENT() : tribe(T_HUMAN)
 	defense_factor = 0.0002;
 	exp = 0;
 	element = E_FULLMETAL;
+	_state = ST_FREE;
+	
+
+	
 }
 
 CLIENT::~CLIENT() { closesocket(_sock); };

@@ -449,7 +449,7 @@ void CObjectsShader::UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dComman
 		
 		// 이것이 색깔을 결정짓는 요소
 
-		if (j % 8 == 0) colorBlack = !colorBlack;
+		if (j % 200 == 0) colorBlack = !colorBlack;  // 11.4 여기수정 
 
 		// 검은색이면
 		if (colorBlack) pbMappedcbGameObject->m_xmcColor = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -475,7 +475,7 @@ void CObjectsShader::ReleaseShaderVariables()
 
 void CObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
 {
-	int xObjects = 4, zObjects = 4, i = 0;
+	int xObjects = 100, zObjects = 100, i = 0;   // 11.4 여기수정 
 
 	m_nObjects = (xObjects * 2) * (zObjects * 2);
 

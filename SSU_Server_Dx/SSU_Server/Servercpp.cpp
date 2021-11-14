@@ -18,6 +18,16 @@ array<CLIENT, MAX_USER> clients;
 
 array<MONSTER, 1> monsters;
 
+//거리계산 함수  //현재 반지름 20
+bool is_near(int a, int b)
+{
+
+	if (100 < abs(clients[a].x - clients[b].x)) return false;
+	if (100 < abs(clients[a].z - clients[b].z)) return false;
+	return true;
+}
+
+
 void element_buf(int c_id, int m_id)
 {
 	CLIENT& cl = clients[c_id];
@@ -146,6 +156,23 @@ void send_login_ok_packet(int c_id)
 
 	clients[c_id].do_send(sizeof(packet), &packet);
 }
+void send_put_object(int c_id, int target)
+{
+	sc_packet_put_object packet;
+	packet.id = target;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_PUT_OBJECT;
+	packet.tribe = T_HUMAN;
+	strcpy_s(packet.name, clients[target].name);
+
+	//추가 
+	packet.x = clients[target].x;
+	packet.y = clients[target].y;
+	packet.z = clients[target].z;
+	clients[c_id].do_send(sizeof(packet), &packet);
+}
+
+
 
 void send_move_packet(int c_id, int mover)
 {
@@ -265,13 +292,34 @@ void process_packet(int c_id, unsigned char* p)
 	switch (type) {
 	case CS_PACKET_LOGIN: {
 		cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(p);
+
+		cl.state_lock.lock();
+		cl._state = ST_INGAME;
+		cl.state_lock.unlock();
 		// strcpy_s(cl.name, packet->name);
+
+
 		send_login_ok_packet(c_id);
 
 		// 기존 클라에게 새로 접속한 클라의 정보를 보내줌
 		for (auto& other : clients) {
 			if (other._id == c_id) continue;
 			if (other._use == false) continue;
+
+			other.state_lock.lock();
+			if (ST_INGAME != other._state) {
+				other.state_lock.unlock();
+				continue;
+			}
+			else other.state_lock.unlock();
+			//거리 비교해 뷰리스트에 추가 
+			if (false == is_near(other._id, c_id))
+				continue;
+			clients[c_id].vl.lock();
+			clients[c_id].viewlist.insert(other._id);
+			clients[c_id].vl.unlock();
+
+
 			sc_packet_put_object packet;
 			
 			packet.size = sizeof(packet);
@@ -303,6 +351,20 @@ void process_packet(int c_id, unsigned char* p)
 		for (auto& other : clients) {
 			if (other._id == c_id) continue;
 			if (other._use == false) continue;
+
+			other.state_lock.lock();
+			if (ST_INGAME != other._state) {
+				other.state_lock.unlock();
+				continue;
+			}
+			other.state_lock.unlock();
+
+			if (false == is_near(other._id, c_id))
+				continue;
+			other.vl.lock();
+			other.viewlist.insert(c_id);
+			other.vl.unlock();
+
 			sc_packet_put_object packet;
 
 			packet.size = sizeof(packet);
@@ -366,7 +428,7 @@ void process_packet(int c_id, unsigned char* p)
 
 		cout << (int)packet->direction << endl;
 		switch (packet->direction) {
-		case 0: if (z > -(WORLD_HEIGHT - 1)) z = z + (50.0f*0.1); break;
+		case 0: if (z > -(WORLD_HEIGHT - 1)) z = z + (50.0f * 0.1); break;
 		case 1: if (z < WORLD_HEIGHT - 1) z = z - (50.0f * 0.1); break;
 		case 2: if (x > -(WORLD_WIDTH - 1)) x = x - (50.0f * 0.1); break;
 		case 3: if (x < WORLD_WIDTH - 1) x = x + (50.0f * 0.1); break;
@@ -379,19 +441,94 @@ void process_packet(int c_id, unsigned char* p)
 		cl.z = z;
 		// 위치가 바뀌었다고 클라에게 알려줌
 
+		// 이동 후 다 뿌리지 말고 시야 보고 처리하자
+			// 자신 빼고 주위 있는 클라들을 넣는다 
+		unordered_set <int> nearlist;
+		for (auto& other : clients) {
+			if (other._id == c_id)
+				continue;
+			if (ST_INGAME != other._state)
+				continue;
+			if (false == is_near(c_id, other._id))
+				continue;
+			nearlist.insert(other._id);
+		}
+
 		for (auto& cl : clients) {
 			if (cl._use == true)
 				send_move_packet(cl._id, c_id);
 		}
-		break;
+
+		cl.vl.lock();
+		unordered_set <int> my_vl{ cl.viewlist };
+		cl.vl.unlock();
+
+		// 새로 시야에 들어온 플레이어 처리 
+		for (auto other : nearlist) {
+
+			if (0 == cl.viewlist.count(other)) {     //뷰 리스트에 없던것 
+				cl.vl.lock();
+				cl.viewlist.insert(other);
+				cl.vl.unlock();
+				send_put_object(cl._id, other);
 
 
+				clients[other].vl.lock();
+				if (clients[other].viewlist.count(cl._id) == 0) {
+					clients[other].viewlist.insert(cl._id);
+					clients[other].vl.unlock();
+					send_put_object(other, cl._id);
+				}
+				else {
+					clients[other].vl.unlock();
+					send_move_packet(other, cl._id);
+				}
+			}
+
+
+			else {
+				clients[other].vl.lock();
+				if (clients[other].viewlist.count(cl._id) != 0) {
+					clients[other].vl.unlock();
+					send_move_packet(other, cl._id);
+				}
+				else {
+					clients[other].viewlist.insert(cl._id);
+					clients[other].vl.unlock();
+					send_put_object(other, cl._id);
+				}
+			}
+		}
+
+		// 시야에서 사라진 플레이어 처리
+		for (auto other : my_vl) {
+			if (0 == nearlist.count(other)) {
+				cl.vl.lock();
+				cl.viewlist.erase(other);
+				cl.vl.unlock();
+				send_remove_object(cl._id, other, T_HUMAN, false);
+				
+
+
+				clients[other].vl.lock();
+				if (clients[other].viewlist.count(cl._id) != 0) {
+					clients[other].viewlist.erase(cl._id);
+					clients[other].vl.unlock();
+					send_remove_object(other, cl._id, T_HUMAN, false);
+	
+				}
+				else clients[other].vl.unlock();
+			}
+		}
+	}
+
+	
 
 		// 이동이 타당한지 판단한다
 
 		// 이동이 타당하고 이동을 시켰다면 이동한 정보를 모든 클라에게 보내주자
 
-	}break;
+	break;
 	case CS_PACKET_ATTACK: {
 		for (auto& mon : monsters) {
 			// 현재 플레이어 주위에 전투에 들어갈만한 몬스터가 있는지 확인

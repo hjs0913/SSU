@@ -204,6 +204,9 @@ void CALLBACK recv_callback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_ove
 			cout << "attack" << endl;
 			break;
 		case SC_PACKET_DIED:
+			sc_packet_died* packet = reinterpret_cast<sc_packet_died*> (p);
+			int p_id = packet->id;
+			mPlayer[p_id].SetUse(false);
 			cout << "died" << endl;
 			break;
 		}

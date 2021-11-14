@@ -3,8 +3,10 @@
 #include <MSWSock.h>
 #include "CBUFF.h"
 #include "stdafx.h"
+#include <unordered_set>
+#include <mutex>
 
-
+enum STATE { ST_FREE, ST_ACCEPT, ST_INGAME };
 class EXP_OVER
 {
 public:
@@ -47,10 +49,19 @@ public:
 	TRIBE tribe;
 	BUFF buff_element;
 	NUFF nuff_element;
+
+	mutex vl;
+	mutex state_lock;
+
+	STATE _state;
+
+	unordered_set <int> viewlist;
 public:
 	CLIENT();
+	
+	//CLIENT();
 	~CLIENT();
-
+	
 	void do_recv();
 
 	void do_send(int num_bytes, void* mess);
