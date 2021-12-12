@@ -1,0 +1,23 @@
+와우 스크린샷(게임소개 p.6) : https://www.youtube.com/watch?v=aMNdM2FaJdE
+
+(특징 p.8)
+속성표 : https://thepolariscollective.wordpress.com/2014/05/25/elemental-introducing-the-elementals/
+
+(몬스터 p.10)
+개구리 : https://free3d.com/ko/3d-model/low-poly-3d-monster-toad-jing-2041.html 
+닭       : http://baboya.net/gallery/tokebi/191.htm
+토끼    : https://www.pinterest.co.kr/pin/497999671275973324/
+원숭이 : https://www.dreamstime.com/crazy-cartoon-monkey-skating-over-sized-banana-clip-art-vector-illustration-simple-gradients-all-single-layer-image166353924
+
+
+(개발환경 p.11)
+비쥬얼 스튜디오 : https://m.blog.naver.com/document0330/221971560457
+깃 : https://ko.wikipedia.org/wiki/%EA%B9%83_(%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4)
+깃포크 : https://git-fork.com/
+Direct X : https://www.bodnara.co.kr/bbs/article.html?num=119107
+MS SQL : https://m.blog.naver.com/chsmanager/220528359282
+SSMS : https://www.esoftner.com/database/sql-server-management-studio-download/
+Unity : https://www.google.com/url?sa=i&url=https%3A%2F%2Funity.com%2Fkr&psig=AOvVaw0v6MEQ5wcmOboawPVWVnEZ&ust=1639202842700000&source=images&cd=vfe&ved=0CAsQjRxqFwoTCIigoM3I2PQCFQAAAAAdAAAAABAD
+LUA : https://ko.wikipedia.org/wiki/%EB%A3%A8%EC%95%84_(%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D_%EC%96%B8%EC%96%B4)
+
+
