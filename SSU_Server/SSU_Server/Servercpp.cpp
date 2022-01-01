@@ -6,9 +6,14 @@
 #include <thread>
 #include <mutex>
 #include <chrono>
-#include "CCLIENT.h"
-#include "CMONSTER.h"
+#include <thread>
+#include <vector>
+#include <concurrent_priority_queue.h>
 #include "stdafx.h"
+
+// 전역변수
+SOCKET server_sock;
+HANDLE h_iocp;
 
 using namespace std;
 
@@ -17,6 +22,30 @@ void Disconnect(int c_id);
 array<CLIENT, MAX_USER> clients;
 
 array<MONSTER, 1> monsters;
+
+enum EVENT_TYPE {
+	EVENT_NPC_MOVE, EVENT_NPC_ATTACK, EVENT_AUTO_PLAYER_HP,
+	EVENT_PLAYER_REVIVE, EVENT_NPC_REVIVE, EVENT_PLAYER_ATTACK,
+	EVENT_SKILL_COOLTIME
+};
+
+struct timer_event {
+	int obj_id;
+	chrono::system_clock::time_point start_time;
+	EVENT_TYPE ev;
+	/*     target_id
+	스킬 관련 쿨타임의 경우 : 어떤 스킬인지 넣어줌
+	NPC의 움직임의 경우 : 어그로꾼의 플레이어 id를 넣어줌
+	*/
+	int target_id;
+
+	constexpr bool operator < (const timer_event& _left) const
+	{
+		return (start_time > _left.start_time);
+	}
+
+};
+concurrency::concurrent_priority_queue<timer_event> timer_queue;
 
 void element_buf(int c_id, int m_id)
 {
@@ -453,49 +482,8 @@ void monster_ai()
 	}
 }
 
-int main()
+void worker()
 {
-	wcout.imbue(locale("korean"));
-
-	// 윈속 초기화
-	WSADATA wsa;
-	WSAStartup(MAKEWORD(2, 2), &wsa);
-
-	// listen 소켓 생성
-	SOCKET server_sock = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
-	SOCKADDR_IN server_addr;
-	ZeroMemory(&server_addr, sizeof(server_addr));
-	server_addr.sin_port = htons(SERVERPORT);
-	server_addr.sin_family = AF_INET;
-	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-
-	// bind()
-	bind(server_sock, reinterpret_cast<SOCKADDR*>(&server_addr), sizeof(server_addr));
-
-	// listen()
-	listen(server_sock, SOMAXCONN);
-
-	// iocp 핸들 객체 생성
-	HANDLE h_iocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, 0, 0, 0);
-
-	// 핸들에 소켓 연결
-	CreateIoCompletionPort(reinterpret_cast<HANDLE>(server_sock), h_iocp, 0, 0);
-
-	// AI에 대한 쓰레드 만들기
-	thread monster_ai_thread(monster_ai);
-
-
-	// 클라 소켓 생성 -> AcceptEx
-	SOCKET client_sock = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
-	char accept_buf[sizeof(SOCKADDR_IN) * 2 + 32 + 100];
-	EXP_OVER accept_ex;
-
-	ZeroMemory(&accept_ex, sizeof(accept_ex));
-	accept_ex._comp_op = OP_ACCEPT;
-	
-	AcceptEx(server_sock, client_sock, accept_buf, 0,
-		sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, NULL, &accept_ex._wsa_over);
-
 	while (1) {
 		DWORD num_byte;		// 전송받거나 전송될 데이터의 양
 		LONG64 iocp_key;	// 미리 정해 놓은 ID
@@ -506,7 +494,9 @@ int main()
 		EXP_OVER* exp_over = reinterpret_cast<EXP_OVER*>(p_over);
 
 		// 예외처리 (보통은 연결이 끊어진 것이고 연결이 끊어진것을 처리 해주어야 한다)
-		if (ret == FALSE){
+		if (ret == FALSE) {
+			// int err_no = WSAGetLastError();
+			// error_display(err_no);
 			Disconnect(client_id);
 			if (exp_over->_comp_op == OP_SEND)
 				delete exp_over;			// 잘못 받은것을 삭제해 주자
@@ -519,7 +509,7 @@ int main()
 			int remain_data = num_byte + cl._prev_size;
 			unsigned char* packet_start = exp_over->_net_buf;
 			int packet_size = packet_start[0];
-			
+
 			while (packet_size <= remain_data) {
 				// 패킷 처리
 				process_packet(client_id, packet_start);
@@ -537,14 +527,14 @@ int main()
 
 			cl.do_recv();
 
-			} break;
+		} break;
 
 		case OP_SEND: {
 			if (num_byte != exp_over->_wsa_buf.len) {	// 중간에 짤린 경우임
 				// DISCONNECT();
 			}
 			delete exp_over;
-			} break;
+		} break;
 
 		case OP_ACCEPT: {
 			int new_id = get_new_id();
@@ -578,10 +568,103 @@ int main()
 			client_sock = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
 			AcceptEx(server_sock, client_sock, accept_buf, 0, sizeof(SOCKADDR_IN) + 16,
 				sizeof(SOCKADDR_IN) + 16, NULL, &accept_ex._wsa_over);
-			} break;
+			break;
+			} 
 		}
-
 	}
+}
+
+void do_timer()
+{
+	chrono::system_clock::duration dura;
+	const chrono::milliseconds waittime = 10ms;
+	timer_event temp;
+	bool temp_bool = false;
+	while (true) {
+		timer_event ev;
+		if (timer_queue.size() == 0) break;
+		timer_queue.try_pop(ev);
+
+		dura = ev.start_time - chrono::system_clock::now();
+		if (dura <= 0ms) {
+			EXP_OVER* ex_over = new EXP_OVER;
+			//ex_over->_comp_op = EVtoOP(ev.ev);
+			ex_over->_target = ev.target_id;
+			PostQueuedCompletionStatus(h_iocp, 1, ev.obj_id, &ex_over->_wsa_over);   //0은 소켓취급을 받음
+		}
+		else if (dura <= waittime) {
+				temp = ev;
+				temp_bool = true;
+				break;
+		}
+		else {
+			timer_queue.push(ev);
+		}
+		this_thread::sleep_for(dura);
+	}
+}
+
+
+
+
+
+
+
+int main()
+{
+	setlocale(LC_ALL, "korean");
+	wcout.imbue(locale("korean"));
+
+	// 윈속 초기화
+	WSADATA wsa;
+	WSAStartup(MAKEWORD(2, 2), &wsa);
+
+	// listen 소켓 생성
+	server_sock = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
+	SOCKADDR_IN server_addr;
+	ZeroMemory(&server_addr, sizeof(server_addr));
+	server_addr.sin_port = htons(SERVERPORT);
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+	// bind()
+	bind(server_sock, reinterpret_cast<SOCKADDR*>(&server_addr), sizeof(server_addr));
+
+	// listen()
+	listen(server_sock, SOMAXCONN);
+
+	// iocp 핸들 객체 생성
+	h_iocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, NULL, 0);
+
+	// 핸들에 소켓 연결
+	CreateIoCompletionPort(reinterpret_cast<HANDLE>(server_sock), h_iocp, 0, 0);
+
+	// AI에 대한 쓰레드 만들기
+	thread monster_ai_thread(monster_ai);
+
+
+	// 클라 소켓 생성 -> AcceptEx
+	SOCKET client_sock = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
+	char accept_buf[sizeof(SOCKADDR_IN) * 2 + 32 + 100];
+	EXP_OVER accept_ex;
+
+	ZeroMemory(&accept_ex, sizeof(accept_ex));
+	accept_ex._comp_op = OP_ACCEPT;
+	
+	AcceptEx(server_sock, client_sock, accept_buf, 0,
+		sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, NULL, &accept_ex._wsa_over);
+
+	vector<thread> worker_threads;
+	thread timer_thread{ do_timer };
+
+	for (int i = 0; i < 6; ++i)
+		worker_threads.emplace_back(worker);
+
+	for (auto& th : worker_threads)
+		th.join();
+
+	timer_thread.join();
+
 	//몬스터 쓰레드에 대한 join()
 	monster_ai_thread.join();
 

@@ -17,6 +17,9 @@ SampleForServer/x64
 SSU_Server_Dx/.vs
 SSU_Server_Dx/SSU_Server/x64
 
+RealServer/.vs
+RealServer/Server/x64
+
 
 *.exe
 *.pdb
