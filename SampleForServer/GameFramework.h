@@ -6,7 +6,7 @@
 #include "Timer.h"
 #include "Player.h"
 #include "Scene.h"
-#include "protocol.h"
+#include "../RealServer/Server/protocol.h"
 
 #define DRAW_SCENE_COLOR				'S'
 

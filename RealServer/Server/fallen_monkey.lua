@@ -1,9 +1,10 @@
--- Peace몬스터
-
 my_id = 99999;
-my_lv = 10;
-my_name = "Homework";
-my_hp = 250;
+my_lv = 23;
+my_name = "타락한 바나나 알러지 원숭이";
+my_hp = 160000;
+my_physical_attack = 250;
+my_physical_defence = 2420;
+my_magical_defence = 180;
 my_x = 0;
 my_y = 0;
 
