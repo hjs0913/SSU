@@ -10,6 +10,10 @@ enum EVENT_TYPE { EVENT_NPC_MOVE, EVENT_NPC_ATTACK, EVENT_AUTO_PLAYER_HP,
 	EVENT_PLAYER_REVIVE, EVENT_NPC_REVIVE, EVENT_PLAYER_ATTACK,
 	EVENT_SKILL_COOLTIME};
 enum TRIBE { HUMAN, MONSTER, AGRO, BOSS, OBSTACLE };
+enum BUF_TYPE { B_NONE, B_PHYATTACK, B_MAGATTACK, B_PHYDEFENCE, 
+	B_MAGDEFENCE, B_SPEED, B_BURN };
+enum ELEMENT { E_NONE, E_WATER, E_FULLMETAL, E_WIND, E_FIRE, E_TREE, E_EARTH, E_ICE };
+
 const int BUFSIZE = 256;
 const int RANGE = 7;
 const int AGRORANGE = 5;
@@ -23,8 +27,8 @@ const int  WORLD_WIDTH = 2000;
 const int  MAX_NAME_SIZE = 20;
 const int  MAX_CHAT_SIZE = 100;
 const int  MAX_USER = 10000;
-const int  MAX_NPC = 200000;
-//const int  MAX_NPC = 10000;		// 디버깅 용
+// const int  MAX_NPC = 200000;
+const int  MAX_NPC = 10000;		// 디버깅 용
 constexpr int NPC_ID_START = MAX_USER;
 constexpr int NPC_ID_END = MAX_USER + MAX_NPC - 1;
 
@@ -84,7 +88,7 @@ struct sc_packet_login_ok {
 	char type;
 	int		id;
 	char	name[MAX_NAME_SIZE];	// 기존 프로토콜에 없어서 추가해주었습니다
-	short	x, y;
+	float	x, y, z;
 	short	level;
 	short	hp, maxhp;
 	int		exp;
@@ -95,7 +99,7 @@ struct sc_packet_move {
 	unsigned char size;
 	char type;
 	int		id;
-	short  x, y;
+	float  x, y, z;
 	int		move_time;
 };
 
@@ -103,7 +107,7 @@ struct sc_packet_put_object {
 	unsigned char size;
 	char type;
 	int id;
-	short x, y;
+	float x, y, z;
 	char object_type;
 	char	name[MAX_NAME_SIZE];
 };

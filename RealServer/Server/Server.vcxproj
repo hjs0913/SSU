@@ -169,8 +169,12 @@
     <Library Include="lua54.lib" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="monster.lua" />
-    <None Include="monster2.lua" />
+    <None Include="fallen_flog.lua" />
+    <None Include="fallen_chicken.lua" />
+    <None Include="fallen_monkey.lua" />
+    <None Include="fallen_rabbit.lua" />
+    <None Include="fallen_tiger.lua" />
+    <None Include="wolf_boss.lua" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

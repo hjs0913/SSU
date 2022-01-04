@@ -7,21 +7,25 @@ private:
 protected:
     int _id;
     TRIBE _tribe;
-    short _x;
-    short _y;
+    float _x;
+    float _y;
+    float _z;
 public:
 
     Obstacle() {
         _tribe = OBSTACLE;
     }
+    void set_x(float x);
+    void set_y(float y);
+    void set_z(float z);
+    void set_id(int id);
 
-    int get_x();
-    int get_y();
+    float get_x();
+    float get_y();
+    float get_z();
+
     int get_id();
     TRIBE get_tribe();
 
 
-    void set_x(int x);
-    void set_y(int y);
-    void set_id(int id);
 };

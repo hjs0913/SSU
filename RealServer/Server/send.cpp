@@ -9,6 +9,7 @@ void send_login_ok_packet(Player* pl)
     strcpy_s(packet.name, pl->get_name());
     packet.x = pl->get_x();
     packet.y = pl->get_y();
+    packet.z = pl->get_z();
     packet.level = pl->get_lv();
     packet.hp = pl->get_hp();
     packet.maxhp = pl->get_maxhp();
@@ -17,7 +18,7 @@ void send_login_ok_packet(Player* pl)
     pl->do_send(sizeof(packet), &packet);
 }
 
-bool send_move_packet(Player* pl, Npc* mover)
+void send_move_packet(Player* pl, Npc* mover)
 {
     sc_packet_move packet;
     packet.id = mover->get_Id();
@@ -25,13 +26,12 @@ bool send_move_packet(Player* pl, Npc* mover)
     packet.type = SC_PACKET_MOVE;
     packet.x = mover->get_x();
     packet.y = mover->get_y();
+    packet.z = mover->get_z();
     packet.move_time =  pl->last_move_time;
-    //cout <<"move_time" <<  pl->last_move_time << endl;
-    bool error = pl->do_send(sizeof(packet), &packet);
-    return error;
+    pl->do_send(sizeof(packet), &packet);
 }
 
-bool send_put_object_packet(Player* pl, Npc* target)
+void send_put_object_packet(Player* pl, Npc* target)
 {
     sc_packet_put_object packet;
     packet.id = target->get_Id();
@@ -39,24 +39,23 @@ bool send_put_object_packet(Player* pl, Npc* target)
     packet.type = SC_PACKET_PUT_OBJECT;
     packet.x = target->get_x();
     packet.y = target->get_y();
+    packet.z = target->get_z();
     strcpy_s(packet.name, target->get_name());
     packet.object_type = target->get_tribe();
-    bool error = pl->do_send(sizeof(packet), &packet);
-    return error;
+    pl->do_send(sizeof(packet), &packet);
 }
 
-bool send_remove_object_packet(Player* pl, Npc* victim)
+void send_remove_object_packet(Player* pl, Npc* victim)
 {
     sc_packet_remove_object packet;
     packet.id = victim->get_Id();
     packet.size = sizeof(packet);
     packet.type = SC_PACKET_REMOVE_OBJECT;
     packet.object_type = victim->get_tribe();
-    bool error = pl->do_send(sizeof(packet), &packet);
-    return error;
+    pl->do_send(sizeof(packet), &packet);
 }
 
-bool send_chat_packet(Player* pl, int my_id, char* mess)
+void send_chat_packet(Player* pl, int my_id, char* mess)
 {
     cout << pl->get_name() << endl;
     cout << mess << endl;
@@ -65,8 +64,7 @@ bool send_chat_packet(Player* pl, int my_id, char* mess)
     packet.size = sizeof(packet);
     packet.type = SC_PACKET_CHAT;
     strcpy_s(packet.message, mess);
-    bool error = pl->do_send(sizeof(packet), &packet);
-    return error;
+    pl->do_send(sizeof(packet), &packet);
 }
 
 void send_login_fail_packet(Player* pl, int reason)
@@ -78,7 +76,7 @@ void send_login_fail_packet(Player* pl, int reason)
     pl->do_send(sizeof(packet), &packet);
 }
 
-bool send_status_change_packet(Player* pl)
+void send_status_change_packet(Player* pl)
 {
     sc_packet_status_change packet;
     packet.size = sizeof(packet);
@@ -87,6 +85,5 @@ bool send_status_change_packet(Player* pl)
     packet.hp = pl->get_hp();
     packet.maxhp = pl->get_maxhp();
     packet.exp = pl->get_exp();
-    bool error = pl->do_send(sizeof(packet), &packet);
-    return error;
+    pl->do_send(sizeof(packet), &packet);
 }

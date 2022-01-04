@@ -61,7 +61,7 @@ void send_attack_packet(int skill)
 	cs_packet_attack packet;
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET_ATTACK;
-	packet.skill = (char)skill;
+	//packet.skill = (char)skill;
 	do_send(sizeof(packet), &packet);
 }
 
@@ -133,8 +133,8 @@ void CALLBACK recv_callback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_ove
 		int type = *(p + 1);
 		if (packet_size <= 0) break;
 		switch (type) {
-		case SC_PACKET_LOGIN:{
-			sc_packet_login* packet = reinterpret_cast<sc_packet_login*>(p);
+		case SC_PACKET_LOGIN_OK:{
+			sc_packet_login_ok* packet = reinterpret_cast<sc_packet_login_ok*>(p);
 			my_id = packet->id;
 			my_position.x = packet->x;
 			my_position.y = packet->y;
@@ -168,16 +168,16 @@ void CALLBACK recv_callback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_ove
 			}
 			break;
 		}
-		case SC_PACKET_LOGOUT: {
-			sc_packet_logout* packet = reinterpret_cast<sc_packet_logout*>(p);
+		case SC_PACKET_REMOVE_OBJECT: {
+			sc_packet_remove_object* packet = reinterpret_cast<sc_packet_remove_object*>(p);
 			int p_id = packet->id;
-			if (packet->tribe == T_HUMAN) mPlayer[p_id].SetUse(false);
+			if (static_cast<TRIBE>(packet->object_type) == HUMAN) mPlayer[p_id].SetUse(false);
 			break;
 		}
 		case SC_PACKET_PUT_OBJECT: {
 			sc_packet_put_object* packet = reinterpret_cast<sc_packet_put_object*> (p);
 			int p_id = packet->id;
-			if (packet->tribe == T_HUMAN) {
+			if (static_cast<TRIBE>(packet->object_type) == HUMAN) {
 				mPlayer[p_id].SetUse(true);
 				mPlayer[p_id].SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
 			}
@@ -200,15 +200,16 @@ void CALLBACK recv_callback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_ove
 
 			break;
 		}
-		case SC_PACKET_ATTACK:
+		/*case SC_PACKET_ATTACK: {
 			cout << "attack" << endl;
 			break;
-		case SC_PACKET_DIED:
-			sc_packet_died* packet = reinterpret_cast<sc_packet_died*> (p);
-			int p_id = packet->id;
-			mPlayer[p_id].SetUse(false);
+		}*/
+		case SC_PACKET_DEAD: {
+			sc_packet_dead* packet = reinterpret_cast<sc_packet_dead*> (p);
+			mPlayer[my_id].SetUse(false);
 			cout << "died" << endl;
 			break;
+		}
 		}
 		p = p + packet_size;
 	}
@@ -239,7 +240,7 @@ int netInit()
 	SOCKADDR_IN server_addr;
 	ZeroMemory(&server_addr, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(SERVERPORT);
+	server_addr.sin_port = htons(SERVER_PORT);
 	inet_pton(AF_INET, SERVERIP, &server_addr.sin_addr);
 	int ret = connect(g_s_socket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
 	int err_num = WSAGetLastError();

@@ -1,9 +1,10 @@
--- agro몬스터
-
 my_id = 99999;
-my_lv = 20;
-my_name = "Project";
-my_hp = 900;
+my_lv = 29;
+my_name = "타락한 호랑이";
+my_hp = 170000;
+my_physical_attack = 270;
+my_physical_defence = 400;
+my_magical_defence = 290;
 my_x = 0;
 my_y = 0;
 

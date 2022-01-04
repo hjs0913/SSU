@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="소스 파일\monster_script">
+      <UniqueIdentifier>{2d760122-bff5-4174-a9d4-e355e960593f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\lua_lib">
+      <UniqueIdentifier>{04edfcf1-b2d3-4edc-8b28-437c9932b0b7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="server.cpp">
@@ -41,21 +47,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\lauxlib.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="include\lua.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="include\lua.hpp">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="include\luaconf.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="include\lualib.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Npc.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -83,6 +74,21 @@
     <ClInclude Include="Obstacle.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="include\lua.h">
+      <Filter>헤더 파일\lua_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\lauxlib.h">
+      <Filter>헤더 파일\lua_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\lualib.h">
+      <Filter>헤더 파일\lua_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\lua.hpp">
+      <Filter>헤더 파일\lua_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\luaconf.h">
+      <Filter>헤더 파일\lua_lib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="lua54.lib">
@@ -90,11 +96,23 @@
     </Library>
   </ItemGroup>
   <ItemGroup>
-    <None Include="monster.lua">
-      <Filter>소스 파일</Filter>
+    <None Include="wolf_boss.lua">
+      <Filter>소스 파일\monster_script</Filter>
     </None>
-    <None Include="monster2.lua">
-      <Filter>소스 파일</Filter>
+    <None Include="fallen_chicken.lua">
+      <Filter>소스 파일\monster_script</Filter>
+    </None>
+    <None Include="fallen_flog.lua">
+      <Filter>소스 파일\monster_script</Filter>
+    </None>
+    <None Include="fallen_monkey.lua">
+      <Filter>소스 파일\monster_script</Filter>
+    </None>
+    <None Include="fallen_rabbit.lua">
+      <Filter>소스 파일\monster_script</Filter>
+    </None>
+    <None Include="fallen_tiger.lua">
+      <Filter>소스 파일\monster_script</Filter>
     </None>
   </ItemGroup>
 </Project>

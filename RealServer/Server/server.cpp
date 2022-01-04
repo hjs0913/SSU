@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "database.h"
 #include "send.h"
+#include <fstream>
 
 CRITICAL_SECTION cs;
 
@@ -198,9 +199,6 @@ void send_combat_packet(int c_id, int m_id, TRIBE subject)
 
 //-----------------------------------
 
-
-
-
 void error_display(int err_no)
 {
     WCHAR* lpMsgBuf;
@@ -285,12 +283,17 @@ void Disconnect(int c_id)
         }
         else target->vl.unlock();
     }
+
+    // DB 연결
+    /*
     if (players[c_id]->get_state() == ST_INGAME ||
         players[c_id]->get_state() == ST_DEAD) {
         EnterCriticalSection(&cs);
         Save_position(pl);
         LeaveCriticalSection(&cs);
     }
+    */
+
     players[c_id]->state_lock.lock();
     closesocket(reinterpret_cast<Player*>(players[c_id])->_socket);
     players[c_id]->set_state(ST_FREE);
@@ -326,12 +329,7 @@ void attack_success(int p_id, int target)
             packet.size = sizeof(packet);
             packet.type = SC_PACKET_DEAD;
             packet.attacker_id = p_id;
-            bool b_error = reinterpret_cast<Player*>(players[target])
-                ->do_send(sizeof(packet), &packet);
-            if (b_error == false) {
-                Disconnect(target);
-                return;
-            }
+            reinterpret_cast<Player*>(players[target]) ->do_send(sizeof(packet), &packet);
             
             // 3초후 부활하며 부활과 동시에 위치 좌표를 수정해준다
             timer_event ev;
@@ -357,42 +355,25 @@ void attack_success(int p_id, int target)
             char mess[MAX_CHAT_SIZE];
             sprintf_s(mess, MAX_CHAT_SIZE, "Kill %s, you get %d experience",
                  players[target]->get_name(), get_exp);
-            bool b_error = send_chat_packet(reinterpret_cast<Player*>(players[p_id]), p_id, mess);
-            if (b_error == false) {
-                Disconnect(p_id);
-                return;
-            }
+            send_chat_packet(reinterpret_cast<Player*>(players[p_id]), p_id, mess);
 
-            b_error = send_status_change_packet(reinterpret_cast<Player*>(players[p_id]));
-            if (b_error == false) {
-                Disconnect(p_id);
-                return;
-            }
+            send_status_change_packet(reinterpret_cast<Player*>(players[p_id]));
+
             int max_exp = 100 * pow(2, (players[p_id]->get_lv() - 1));
-            if (players[p_id]->get_exp() + get_exp >= max_exp) {
+            if (reinterpret_cast<Player*>(players[p_id])->get_exp() + get_exp >= max_exp) {
                 players[p_id]->set_lv(players[p_id]->get_lv() + 1);
-                players[p_id]->set_exp(players[p_id]->get_exp()+ get_exp - max_exp);
+                reinterpret_cast<Player*>(players[p_id])->
+                    set_exp(reinterpret_cast<Player*>(players[p_id])->get_exp()+ get_exp - max_exp);
                 sprintf_s(mess, MAX_CHAT_SIZE, "Level up : %d",
                     players[p_id]->get_lv());
-                b_error = send_chat_packet(reinterpret_cast<Player*>(players[p_id]), p_id, mess);
-                if (b_error == false) {
-                    Disconnect(p_id);
-                    return;
-                }
-                b_error = send_status_change_packet(reinterpret_cast<Player*>(players[p_id]));
-                if (b_error == false) {
-                    Disconnect(p_id);
-                    return;
-                }
+                send_chat_packet(reinterpret_cast<Player*>(players[p_id]), p_id, mess);
+                send_status_change_packet(reinterpret_cast<Player*>(players[p_id]));
             }
             else {
-                players[p_id]->set_exp(players[p_id]->get_exp() + get_exp);
+                reinterpret_cast<Player*>(players[p_id])
+                    ->set_exp(reinterpret_cast<Player*>(players[p_id])->get_exp() + get_exp);
             }
-            b_error = send_status_change_packet(reinterpret_cast<Player*>(players[p_id]));
-            if (b_error == false) {
-                Disconnect(p_id);
-                return;
-            }
+            send_status_change_packet(reinterpret_cast<Player*>(players[p_id]));
         }
         // 죽은 target 주위의 플레이어에게 사라지게 해주자
         unordered_set <int> nearlist;
@@ -412,29 +393,19 @@ void attack_success(int p_id, int target)
             if (0 != other_player->viewlist.count(target)) {
                 other_player->viewlist.erase(target);
                 other_player->vl.unlock();
-                bool b_error = send_remove_object_packet(other_player, players[target]);
-                if (b_error == false) {
-                    Disconnect(other);
-                }
+                send_remove_object_packet(other_player, players[target]);
             }
             else other_player->vl.unlock();
         }
     }
     else if(p_id >= NPC_ID_START){
         // 플레이어가 공격을 당한 것이므로 hp정보가 바뀌었으므로 그것을 보내주자
-        bool b_error = send_status_change_packet(reinterpret_cast<Player*>(players[target]));
-        if (b_error == false) {
-            Disconnect(target);
-            return;
-        }
+        send_status_change_packet(reinterpret_cast<Player*>(players[target]));
+
         char mess[MAX_CHAT_SIZE];
         sprintf_s(mess, MAX_CHAT_SIZE, "%s -> %s damage : %d",
             players[p_id]->get_name(), players[target]->get_name(), damage);
-        b_error = send_chat_packet(reinterpret_cast<Player*>(players[target]), target, mess);
-        if (b_error == false) {
-            Disconnect(target);
-            return;
-        }
+        send_chat_packet(reinterpret_cast<Player*>(players[target]), target, mess);
 
         // hp가 깎이였으므로 hp자동회복을 해주도록 하자
         if (reinterpret_cast<Player*>(players[target])->_auto_hp == false) {
@@ -459,8 +430,7 @@ void attack_success(int p_id, int target)
         char mess[MAX_CHAT_SIZE];
         sprintf_s(mess, MAX_CHAT_SIZE, "%s -> %s damage : %d",
             players[p_id]->get_name(), players[target]->get_name(), damage);
-        bool b_error = send_chat_packet(reinterpret_cast<Player*>(players[p_id]), p_id, mess);
-        if (b_error == false) Disconnect(p_id);
+        send_chat_packet(reinterpret_cast<Player*>(players[p_id]), p_id, mess);
     }
 }
 
@@ -473,6 +443,9 @@ void process_packet(int client_id, unsigned char* p)
         cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(p);
 
         // pl->set_name(packet->name);
+
+        // DB 연결
+        /*
         EnterCriticalSection(&cs);
         if (!(Search_Id(pl, packet->name))) {
             send_login_fail_packet(pl, 0);   // 아이디 없음
@@ -481,6 +454,8 @@ void process_packet(int client_id, unsigned char* p)
             return;
         }
         LeaveCriticalSection(&cs);
+        */
+
 
         // 중복 아이디 검사
         for (auto* p : players) {
@@ -659,12 +634,7 @@ void process_packet(int client_id, unsigned char* p)
         }
         nearlist.erase(client_id);  // 내 아이디는 무조건 들어가니 그것을 지워주자
 
-
-        bool error = send_move_packet(pl, pl); // 내 자신의 움직임을 먼저 보내주자
-        if (error == false) {
-            Disconnect(client_id);
-            break;
-        }
+        send_move_packet(pl, pl); // 내 자신의 움직임을 먼저 보내주자
 
         pl->vl.lock();
         unordered_set <int> my_vl{ pl->viewlist };
@@ -676,11 +646,8 @@ void process_packet(int client_id, unsigned char* p)
                 pl->vl.lock();
                 pl->viewlist.insert(other);
                 pl->vl.unlock();
-                bool b_error = send_put_object_packet(pl, players[other]);
-                if (b_error == false) {
-                    Disconnect(client_id);
-                    return;
-                }
+                send_put_object_packet(pl, players[other]);
+
                 // 스크립트 추가
                 if (true == is_npc(other)) break;
 
@@ -690,18 +657,12 @@ void process_packet(int client_id, unsigned char* p)
                 if (0 == other_player->viewlist.count(pl->get_Id())) {
                     other_player->viewlist.insert(pl->get_Id());
                     other_player->vl.unlock();
-                    b_error = send_put_object_packet(other_player, pl);
-                    if (b_error == false) {
-                        Disconnect(other);
-                    }
+                    send_put_object_packet(other_player, pl);
+                    
                 }
                 else {
                     other_player->vl.unlock();
-                    error = send_move_packet(other_player, pl);
-                    if (error == false) {
-                        Disconnect(other);
-                        nearlist.erase(other);
-                    }
+                    send_move_packet(other_player, pl);
                 }
             }
             // 계속 시야에 존재하는 플레이어 처리
@@ -713,17 +674,11 @@ void process_packet(int client_id, unsigned char* p)
                 if (0 == other_player->viewlist.count(pl->get_Id())) {
                     other_player->viewlist.insert(pl->get_Id());
                     other_player->vl.unlock();
-                    bool b_error =  send_put_object_packet(other_player, pl);
-                    if (b_error == false) {
-                        Disconnect(other);
-                    }
+                    send_put_object_packet(other_player, pl);
                 }
                 else {
                     other_player->vl.unlock();
-                    bool b_error = send_move_packet(other_player, pl);
-                    if (b_error == false) {
-                        Disconnect(other);
-                    }
+                    send_move_packet(other_player, pl);
                 }
             }
         }
@@ -733,11 +688,7 @@ void process_packet(int client_id, unsigned char* p)
                 pl->vl.lock();
                 pl->viewlist.erase(other);
                 pl->vl.unlock();
-                bool b_error = send_remove_object_packet(pl, players[other]);
-                if (b_error == false) {
-                    Disconnect(client_id);
-                    return;
-                }
+                send_remove_object_packet(pl, players[other]);
 
                 if (true == is_npc(other)) continue;
                 Player* other_player = reinterpret_cast<Player*>(players[other]);
@@ -745,10 +696,7 @@ void process_packet(int client_id, unsigned char* p)
                 if (0 != other_player->viewlist.count(pl->get_Id())) {
                     other_player->viewlist.erase(pl->get_Id());
                     other_player->vl.unlock();
-                    b_error = send_remove_object_packet(other_player, pl);
-                    if (b_error == false) {
-                        Disconnect(other);
-                    }
+                    send_remove_object_packet(other_player, pl);
                 }
                 else other_player->vl.unlock();
             }
@@ -769,11 +717,7 @@ void process_packet(int client_id, unsigned char* p)
                     packet.type = SC_PACKET_REMOVE_OBJECT;
                     packet.id = ob.get_id();
                     packet.object_type = ob.get_tribe();
-                    bool b_error = pl->do_send(sizeof(packet), &packet);
-                    if (b_error == false) {
-                        Disconnect(client_id);
-                        return;
-                    }
+                    pl->do_send(sizeof(packet), &packet);
                     continue;
                 }
                 pl->ob_vl.unlock();
@@ -797,9 +741,8 @@ void process_packet(int client_id, unsigned char* p)
             packet.x = ob.get_x();
             packet.y = ob.get_y();
             //pl->do_send(sizeof(packet), &packet);
-            if (pl->do_send(sizeof(packet), &packet) == false) {
-                Disconnect(client_id);
-            }
+            pl->do_send(sizeof(packet), &packet);
+                
         }
         break;
     }
@@ -871,8 +814,8 @@ void process_packet(int client_id, unsigned char* p)
             s_pl->state_lock.unlock();
             if (s_pl->get_tribe() == MONSTER) break;
             
-            bool b_error = send_chat_packet(reinterpret_cast<Player*>(s_pl), client_id, c_temp);
-            if (b_error == false) Disconnect(s_pl->get_Id());
+            send_chat_packet(reinterpret_cast<Player*>(s_pl), client_id, c_temp);
+            
         }
         break;
     }
@@ -1012,11 +955,8 @@ void process_packet(int client_id, unsigned char* p)
             }
             pl->set_x(m_x);
             pl->set_y(m_y);
-            bool error = send_move_packet(pl, pl);
-            if (error == false) {
-                Disconnect(client_id);
-                break;
-            }
+            send_move_packet(pl, pl);
+
             // 스킬 쿨타임
             ev.obj_id = client_id;
             ev.start_time = chrono::system_clock::now() + 5s;
@@ -1051,11 +991,7 @@ void player_revive(int client_id)
     pl->set_x(500);
     pl->set_y(500);
     pl->set_exp(pl->get_exp() / 2);
-    bool b_error = send_status_change_packet(pl);
-    if (b_error == false) {
-        Disconnect(client_id);
-        return;
-    }
+    send_status_change_packet(pl);
 
     sc_packet_revive packet;
     packet.size = sizeof(packet);
@@ -1361,10 +1297,7 @@ void worker()
                 ev.target_id = 0;
                 timer_queue.push(ev);
             }
-            bool b_error = send_status_change_packet(pl);
-            if (b_error == false) {
-                Disconnect(client_id);
-            }
+            send_status_change_packet(pl);
             break;
         }
         case OP_PLAYER_REVIVE: {
@@ -1408,10 +1341,7 @@ void worker()
                 other_player->vl.lock();
                 other_player->viewlist.insert(client_id);
                 other_player->vl.unlock();
-                bool b_error =  send_put_object_packet(other_player, players[client_id]);
-                if (b_error == false) {
-                    Disconnect(other);
-                }
+               send_put_object_packet(other_player, players[client_id]);
             }
             delete exp_over;
             break;
@@ -1444,61 +1374,43 @@ void initialise_NPC()
 {
     cout << "NPC 로딩중" << endl;
     char name[MAX_NAME_SIZE];
-    for (int i = NPC_ID_START; i < NPC_ID_END-10000; ++i) {
-        sprintf_s(name, "NPC %d", i);
-        players[i] = new Npc(i, name);
+    for (int i = NPC_ID_START; i < NPC_ID_START+30; ++i) {
+        players[i] = new Npc(i);
         lua_State* L = players[i]->L = luaL_newstate();
         luaL_openlibs(L);
-        int error = luaL_loadfile(L, "monster.lua") ||
+        int error = luaL_loadfile(L, "fallen_flog.lua") ||
             lua_pcall(L, 0, 0, 0);
+
+        //-------------------------------------------
+        // 여기서 위치를 받아오자
+        //float temp_x;
+        //float temp_y;
+        //-------------------------------------------
 
         lua_getglobal(L, "set_uid");
         lua_pushnumber(L, i);
-        lua_pushnumber(L, players[i]->get_x());
-        lua_pushnumber(L, players[i]->get_y());
-        error = lua_pcall(L, 3, 3, 0);
+        lua_pushnumber(L, i);
+        lua_pushnumber(L, i);
+        //lua_pushnumber(L, temp_x);
+        //lua_pushnumber(L, temp_y);
+        error = lua_pcall(L, 3, 7, 0);
 
         if (error != 0) {
             cout << "초기화 오류" << endl;
         }
-
-        players[i]->set_tribe(MONSTER);
-        players[i]->set_lv(lua_tointeger(L, -3));
-        players[i]->set_hp(lua_tointeger(L, -2));
-        players[i]->set_name(lua_tostring(L, -1));
-        lua_pop(L, 4);// eliminate set_uid from stack after call
-
-        lua_register(L, "API_get_x", API_get_x);
-        lua_register(L, "API_get_y", API_get_y);
-
-    }
-    for (int i = NPC_ID_END - 10000; i <= NPC_ID_END; ++i) {
-        sprintf_s(name, "NPC %d", i);
-        players[i] = new Npc(i, name);
-
-        lua_State* L = players[i]->L = luaL_newstate();
-        luaL_openlibs(L);
-        int error = luaL_loadfile(L, "monster2.lua") ||
-            lua_pcall(L, 0, 0, 0);
-        lua_getglobal(L, "set_uid");
-        lua_pushnumber(L, i);
-        lua_pushnumber(L, players[i]->get_x());
-        lua_pushnumber(L, players[i]->get_y());
-        error = lua_pcall(L, 3, 3, 0);
-        if (error != 0) {
-            cout << "초기화 오류" << endl;
-        }
-        players[i]->set_tribe(BOSS);
-        players[i]->set_lv(lua_tointeger(L, -3));
-        players[i]->set_hp(lua_tointeger(L, -2));
-        players[i]->set_name(lua_tostring(L, -1));
-        lua_pop(L, 4);// eliminate set_uid from stack after call
+        players[i]->set_lv(lua_tointeger(L, -7));
+        players[i]->set_name(lua_tostring(L, -6));
+        players[i]->set_hp(lua_tointeger(L, -5));
+        players[i]->set_physical_attack(lua_tonumber(L, -4));
+        players[i]->set_magical_attack(lua_tonumber(L, -3));
+        players[i]->set_physical_defence(lua_tonumber(L, -2));
+        players[i]->set_magical_defence(lua_tonumber(L, -1));
+        lua_pop(L, 8);// eliminate set_uid from stack after call
 
         lua_register(L, "API_get_x", API_get_x);
         lua_register(L, "API_get_y", API_get_y);
-
+        // 여기는 나중에 생각하자
     }
-
     cout << "NPC로딩 완료" << endl;
 }
 
@@ -1567,16 +1479,12 @@ void return_npc_position(int npc_id)
             reinterpret_cast<Player*>(players[pl])->vl.lock();
             reinterpret_cast<Player*>(players[pl])->viewlist.insert(npc_id);
             reinterpret_cast<Player*>(players[pl])->vl.unlock();
-            bool b_error = send_put_object_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id]);
-            if (b_error == false) {
-                Disconnect(pl);
-            }
+            send_put_object_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id]);
+  
         }
         else {
-            bool b_error = send_move_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id]);
-            if (b_error == false) {
-                Disconnect(pl);
-            }
+            send_move_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id]);
+
         }
     }
 
@@ -1586,10 +1494,7 @@ void return_npc_position(int npc_id)
             reinterpret_cast<Player*>(players[pl])->vl.lock();
             reinterpret_cast<Player*>(players[pl])->viewlist.erase(npc_id);
             reinterpret_cast<Player*>(players[pl])->vl.unlock();
-            bool b_error = send_remove_object_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id]);
-            if (b_error == false) {
-                Disconnect(pl);
-            }
+            send_remove_object_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id]);
         }
     }
 
@@ -1666,16 +1571,10 @@ void do_npc_move(int npc_id, int target)
             reinterpret_cast<Player*>(players[pl])->vl.lock();
             reinterpret_cast<Player*>(players[pl])->viewlist.insert(npc_id);
             reinterpret_cast<Player*>(players[pl])->vl.unlock();
-            bool b_error = send_put_object_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id]);
-            if (b_error == false) {
-                Disconnect(pl);
-            }
+            send_put_object_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id]);
         }
         else {
-            bool b_error = send_move_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id]);
-            if (b_error == false) {
-                Disconnect(pl);
-            }
+            send_move_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id]);
         }
     }
 
@@ -1685,10 +1584,7 @@ void do_npc_move(int npc_id, int target)
             reinterpret_cast<Player*>(players[pl])->vl.lock();
             reinterpret_cast<Player*>(players[pl])->viewlist.erase(npc_id);
             reinterpret_cast<Player*>(players[pl])->vl.unlock();
-            bool b_error = send_remove_object_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id]);
-            if (b_error == false) {
-                Disconnect(pl);
-            }
+            send_remove_object_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id]);
         }
     }
 
@@ -1806,6 +1702,7 @@ int main()
     g_h_iocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, NULL, 0);
     CreateIoCompletionPort(reinterpret_cast<HANDLE>(g_s_socket), g_h_iocp, 0, 0);
 
+    // DB 연결 (동시에 DB에 많이 접근하면 DB에서 튕기기 때문)
     InitializeCriticalSection(&cs);
 
     SOCKET c_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
@@ -1824,14 +1721,29 @@ int main()
         players[i] = new Player(i);
     }
 
-    Initialise_DB();
+    // DB 연결1
+    // Initialise_DB();
     initialise_NPC();
 
-    for (int i = 0; i < MAX_OBSTACLE; i++) {
-        obstacles[i].set_id(i);
-        obstacles[i].set_x(rand() % WORLD_WIDTH);
-        obstacles[i].set_y(rand() % WORLD_HEIGHT);
+    ifstream obstacles_read("tree_position.txt");
+    if (!obstacles_read.is_open()) {
+        cout << "파일을 읽을 수 없습니다" << endl;
+        return 0;
     }
+
+    for (int i = 0; i < 609; i++) {
+        float x, y, z;
+        obstacles_read >> x >> y >> z;
+        cout << x << "," << y << "," << z << endl;
+        obstacles[i].set_id(i);
+        obstacles[i].set_x(x);
+        obstacles[i].set_y(y);
+        obstacles[i].set_z(z);
+    }
+
+    obstacles_read.close();
+
+    cout << "중단점" << endl;
 
     vector <thread> worker_threads;
     thread timer_thread{ do_timer };
@@ -1849,5 +1761,7 @@ int main()
     closesocket(g_s_socket);
     DeleteCriticalSection(&cs);
     WSACleanup();
-    Disconnect_DB();
+    
+    // DB 연결
+    // Disconnect_DB();
 }
