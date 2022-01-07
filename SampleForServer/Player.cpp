@@ -354,3 +354,13 @@ CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 
 	return(m_pCamera);
 }
+
+TRIBE CPlayer::GetTribe()
+{
+	return m_tribe;
+}
+
+void CPlayer::SetTribe(TRIBE t)
+{
+	m_tribe = t;
+}

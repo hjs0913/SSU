@@ -1,8 +1,11 @@
+#include "stdafx.h"
 #include "Network.h"
 #include "Player.h"
-#include "GameFramework.h"
+//#include "GameFramework.h"
 
 int my_id = 0;
+int m_prev_size = 0;
+
 XMFLOAT3 my_position(-1.0f, 5.0f, -1.0f);
 XMFLOAT3 my_camera(0.0f, 0.0f, 0.0f);
 WSADATA wsa;
@@ -11,30 +14,36 @@ SOCKADDR_IN serveraddr;
 int retval = 0;
 
 SOCKET g_s_socket;
-char g_recv_buf[BUFSIZE];
 
 WSABUF mybuf_recv;
 WSABUF mybuf;
 
+struct EXP_OVER {
+	WSAOVERLAPPED m_wsa_over;
+	WSABUF m_wsa_buf;
+	unsigned char m_net_buf[BUFSIZE];
+	COMP_OP m_comp_op;
+};
+
+EXP_OVER _recv_over;
+
+HANDLE g_h_iocp;	// 나중에 iocp바꿀 시 사용
+
+
 bool g_client_shutdown = false;
+array<CPlayer*, MAX_USER+MAX_NPC> mPlayer;
 
-void CALLBACK send_callback(DWORD err, DWORD num_byte, LPWSAOVERLAPPED send_over, DWORD flag);
-void CALLBACK recv_callback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag);
-
-void err_display(const char* msg)
+void err_display(int err_no)
 {
-	LPVOID lpMsgBuf;
-
+	WCHAR* lpMsgBuf;
 	FormatMessage(
 		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-		NULL,
-		WSAGetLastError(),
+		NULL, err_no,
 		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		(LPTSTR)&lpMsgBuf,
-		0,
-		NULL);
+		(LPTSTR)&lpMsgBuf, 0, 0);
+	wcout << lpMsgBuf << endl;
 
-	cout << "[" << msg << "] " << (char*)lpMsgBuf << endl;
+	//while (true);
 	LocalFree(lpMsgBuf);
 }
 
@@ -76,150 +85,162 @@ void send_move_packet(int direction)
 
 void do_send(int num_bytes, void* mess)
 {
-	char buf[BUFSIZE];
-	ZeroMemory(&buf, sizeof(buf));
-	memcpy(buf, mess, num_bytes);
+	EXP_OVER ex_over;
+	ex_over.m_comp_op = OP_SEND;
+	ZeroMemory(&ex_over.m_wsa_over, sizeof(ex_over.m_wsa_over));
+	ex_over.m_wsa_buf.buf = reinterpret_cast<char*>(ex_over.m_net_buf);
+	ex_over.m_wsa_buf.len = num_bytes;
+	memcpy(ex_over.m_net_buf, mess, num_bytes);
 
-	// send()
-	DWORD sent_byte;
-	mybuf.buf = buf;
-	mybuf.len = num_bytes;
-
-	// Overlapped 추가사항
-	WSAOVERLAPPED* send_over = new WSAOVERLAPPED;
-	ZeroMemory(send_over, sizeof(send_over));
-
-	int ret = WSASend(g_s_socket, &mybuf, 1, &sent_byte, 0, send_over, send_callback);
-	if (ret == SOCKET_ERROR) {
-		int err_num = WSAGetLastError();
-		if (WSA_IO_PENDING != err_num) {
-			cout << " EROOR : SEND " << endl;
-			err_display("send()");
+	int ret = WSASend(g_s_socket, &ex_over.m_wsa_buf, 1, 0, 0, &ex_over.m_wsa_over, NULL);
+	if (SOCKET_ERROR == ret) {
+		int error_num = WSAGetLastError();
+		if (ERROR_IO_PENDING != error_num) {
+			WCHAR* lpMsgBuf;
+			FormatMessage(
+				FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+				NULL, error_num,
+				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+				(LPTSTR)&lpMsgBuf, 0, 0);
+			wcout << lpMsgBuf << endl;
+			LocalFree(lpMsgBuf);
 		}
 	}
 }
 
 void do_recv()
 {
-	cout << "recv" << endl;
-	// recv()
-	mybuf_recv.buf = g_recv_buf;
-	mybuf_recv.len = BUFSIZE;
 	DWORD recv_flag = 0;
-
-	WSAOVERLAPPED* recv_over = new WSAOVERLAPPED;
-	ZeroMemory(recv_over, sizeof(recv_over));
-
-	int ret = WSARecv(g_s_socket, &mybuf_recv, 1, 0, &recv_flag, recv_over, recv_callback);
-	if (ret == SOCKET_ERROR) {
-		int err_num = WSAGetLastError();
-		if (WSA_IO_PENDING != err_num) {
-			cout << "에러??" << endl;
-			cout << " EROOR : RECV " << endl;
-			err_display("recv()");
+	ZeroMemory(&_recv_over.m_wsa_over, sizeof(_recv_over.m_wsa_over));
+	_recv_over.m_wsa_buf.buf = reinterpret_cast<char*>(_recv_over.m_net_buf + m_prev_size);
+	_recv_over.m_wsa_buf.len = sizeof(_recv_over.m_net_buf) - m_prev_size;
+	int ret = WSARecv(g_s_socket, &_recv_over.m_wsa_buf, 1, 0, &recv_flag, &_recv_over.m_wsa_over, NULL);
+	
+	if (SOCKET_ERROR == ret) {
+		int error_num = WSAGetLastError();
+		if (ERROR_IO_PENDING != error_num) {
+			WCHAR* lpMsgBuf;
+			FormatMessage(
+				FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+				NULL, error_num,
+				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+				(LPTSTR)&lpMsgBuf, 0, 0);
+			wcout << lpMsgBuf << endl;
+			//while (true);
+			LocalFree(lpMsgBuf);
 		}
 	}
 }
 
-array<CPlayer, MAX_USER> mPlayer;
-
-void CALLBACK recv_callback(DWORD err, DWORD num_bytes, LPWSAOVERLAPPED recv_over, DWORD flag)
+void process_packet(unsigned char* p) 
 {
-	delete recv_over;
-	cout << "recvcallback" << endl;
-	char* p = g_recv_buf;
-	while (p < g_recv_buf + num_bytes) {
-		unsigned char packet_size = *p;
-		int type = *(p + 1);
-		if (packet_size <= 0) break;
-		switch (type) {
-		case SC_PACKET_LOGIN_OK:{
-			sc_packet_login_ok* packet = reinterpret_cast<sc_packet_login_ok*>(p);
-			my_id = packet->id;
+
+	int type = *(p + 1);
+	cout << "타입 : " << type << endl;
+	switch (type) {
+	case SC_PACKET_LOGIN_OK: {
+		sc_packet_login_ok* packet = reinterpret_cast<sc_packet_login_ok*>(p);
+		my_id = packet->id;
+		my_position.x = packet->x;
+		my_position.y = packet->y;
+		my_position.z = packet->z;
+		break;
+	}
+	case SC_PACKET_MOVE: {
+		sc_packet_move* packet = reinterpret_cast<sc_packet_move*>(p);
+
+		if (packet->id == my_id) {
 			my_position.x = packet->x;
 			my_position.y = packet->y;
 			my_position.z = packet->z;
-
-			/*packet->hp;
-			packet->mp;
-			packet->physical_attack;
-			packet->magical_attack;
-			packet->physical_defense;
-			packet->magical_defense;
-			packet->element;
-			packet->level;
-			packet->exp;
-			packet->attack_factor;
-			packet->defense_factor;
-			packet->tribe;*/
-			break;
+			cout << packet->x << "." << packet->y << "." << packet->z << endl;
 		}
-		case SC_PACKET_MOVE:{
-			sc_packet_move* packet = reinterpret_cast<sc_packet_move*>(p);
-
-			if (packet->id == my_id) {
-				my_position.x = packet->x;
-				my_position.y = packet->y;
-				my_position.z = packet->z;
-				cout << packet->x << "." << packet->y << "." << packet->z << endl;
-			}
-			else {
-				mPlayer[packet->id].SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
-			}
-			break;
+		else {
+			mPlayer[packet->id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
 		}
-		case SC_PACKET_REMOVE_OBJECT: {
-			sc_packet_remove_object* packet = reinterpret_cast<sc_packet_remove_object*>(p);
-			int p_id = packet->id;
-			if (static_cast<TRIBE>(packet->object_type) == HUMAN) mPlayer[p_id].SetUse(false);
-			break;
-		}
-		case SC_PACKET_PUT_OBJECT: {
-			sc_packet_put_object* packet = reinterpret_cast<sc_packet_put_object*> (p);
-			int p_id = packet->id;
-			if (static_cast<TRIBE>(packet->object_type) == HUMAN) {
-				mPlayer[p_id].SetUse(true);
-				mPlayer[p_id].SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
-			}
-			// 패킷 처리
-			/*packet->name[MAX_ID_LEN];
-			packet->hp;
-			packet->mp;
-			packet->physical_attack;
-			packet->magical_attack;
-			packet->physical_defense;
-			packet->magical_defense;
-			packet->element;
-			packet->level;
-			packet->exp;
-			packet->attack_factor;
-			packet->defense_factor;
-			packet->tribe;
-			*/
-
-
-			break;
-		}
-		/*case SC_PACKET_ATTACK: {
-			cout << "attack" << endl;
-			break;
-		}*/
-		case SC_PACKET_DEAD: {
-			sc_packet_dead* packet = reinterpret_cast<sc_packet_dead*> (p);
-			mPlayer[my_id].SetUse(false);
-			cout << "died" << endl;
-			break;
-		}
-		}
-		p = p + packet_size;
+		break;
 	}
-
-	do_recv();
+	case SC_PACKET_REMOVE_OBJECT: {
+		sc_packet_remove_object* packet = reinterpret_cast<sc_packet_remove_object*>(p);
+		int p_id = packet->id;
+		if (static_cast<TRIBE>(packet->object_type) == HUMAN) mPlayer[p_id]->SetUse(false);
+		break;
+	}
+	case SC_PACKET_PUT_OBJECT: {
+		sc_packet_put_object* packet = reinterpret_cast<sc_packet_put_object*> (p);
+		int p_id = packet->id;
+		if (static_cast<TRIBE>(packet->object_type) == HUMAN) {
+			mPlayer[p_id]->SetUse(true);
+			mPlayer[p_id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
+		}
+		break;
+	}
+	case SC_PACKET_DEAD: {
+		sc_packet_dead* packet = reinterpret_cast<sc_packet_dead*> (p);
+		mPlayer[my_id]->SetUse(false);
+		cout << "died" << endl;
+		break;
+	}
+	default: break;
+	}
 }
 
-void CALLBACK send_callback(DWORD err, DWORD num_byte, LPWSAOVERLAPPED send_over, DWORD flag)
+void worker()
 {
-	delete send_over;
+	for (;;) {
+		DWORD num_byte;
+		LONG64 iocp_key;
+		WSAOVERLAPPED* p_over;
+		BOOL ret = GetQueuedCompletionStatus(g_h_iocp, &num_byte, (PULONG_PTR)&iocp_key, &p_over, INFINITE);
+		EXP_OVER* exp_over = reinterpret_cast<EXP_OVER*>(p_over);
+		if (FALSE == ret) {
+			int err_no = WSAGetLastError();
+			err_display(err_no);
+			return;
+			// 멈춰서 네트워크 쓰레드가 멈추면 네트워크 접속이 종료되었다고 
+			// LabProject에서 처리
+		}
+		switch (exp_over->m_comp_op) {
+		case OP_RECV: {
+			if (num_byte == 0) {
+				/*Disconnect(client_id);
+				continue;*/
+				return;
+			}
+			cout << "num_byte : " << num_byte << endl;
+			cout << m_prev_size << endl;
+			int remain_data = num_byte + m_prev_size;
+			unsigned char* packet_start = exp_over->m_net_buf;
+			int packet_size = packet_start[0];
+			cout << packet_size << endl;
+			
+			//if (packet_size <= 0) break;
+
+			while (packet_size <= remain_data) {
+				process_packet(packet_start);
+				remain_data -= packet_size;
+				packet_start += packet_size;
+				if (remain_data > 0) packet_size = packet_start[0];
+				else break;
+			}
+
+			if (0 < remain_data) {
+				m_prev_size = remain_data;
+				memcpy(&exp_over->m_net_buf, packet_start, remain_data);
+			}
+			do_recv();
+			break;
+		}
+		case OP_SEND: {
+			if (num_byte != exp_over->m_wsa_buf.len) {
+				//Disconnect(client_id);
+				return;
+			}
+			delete exp_over;
+			break;
+		}
+		}
+	}
 }
 
 int netInit()
@@ -249,8 +270,15 @@ int netInit()
 		if (WSA_IO_PENDING != err_num) {
 			cout << " EROOR : Connect " << endl;
 			err_quit("connect()");
-
 		}
+	}
+	_recv_over.m_comp_op = OP_RECV;
+
+    g_h_iocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, NULL, 0);
+    CreateIoCompletionPort(reinterpret_cast<HANDLE>(g_s_socket), g_h_iocp, 0, 0);
+
+	for (auto& pl : mPlayer) {
+		pl = new CPlayer();
 	}
 
 	cs_packet_login packet;
@@ -258,11 +286,6 @@ int netInit()
 	packet.type = CS_PACKET_LOGIN;
 	strcpy_s(packet.name, "황천길");
 	do_send(sizeof(packet), &packet);
-
-	// Nodelay설정
-	int tcp_option = 1;
-	setsockopt(g_s_socket, IPPROTO_TCP, TCP_NODELAY, reinterpret_cast<char*>(&tcp_option), sizeof(tcp_option));
-	do_recv();
 }
 
 int netclose()
@@ -281,9 +304,9 @@ XMFLOAT3 return_myPosition() {
 
 void return_otherPlayer(CPlayer** m_otherPlayer, ID3D12Device* m_pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera) {
 	for (int i = 0; i < MAX_USER; ++i) {
-		if (mPlayer[i].GetUse() == false) continue;
+		if (mPlayer[i]->GetUse() == false) continue;
 		m_otherPlayer[i]->SetUse(true);
-		m_otherPlayer[i]->SetPosition(mPlayer[i].GetPosition());
+		m_otherPlayer[i]->SetPosition(mPlayer[i]->GetPosition());
 		m_otherPlayer[i]->Render(pd3dCommandList, pCamera);
 	}
 }

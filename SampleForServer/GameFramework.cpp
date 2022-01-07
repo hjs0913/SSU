@@ -4,13 +4,9 @@
 
 #include "stdafx.h"
 #include "GameFramework.h"
-#include "Network.h"
 
 CGameFramework::CGameFramework()
 {
-	// 네트워크 연결
-	netInit();
-
 	m_pdxgiFactory = NULL;
 	m_pdxgiSwapChain = NULL;
 	m_pd3dDevice = NULL;
@@ -444,44 +440,24 @@ void CGameFramework::ProcessInput()
 	{
 		DWORD dwDirection = 0;
 		if (pKeysBuffer[VK_UP] & 0xF0) {
-			if (!press_keyboard[0]) {
-				press_keyboard[0] = true;
-				send_move_packet(0);
-			}
+			send_move_packet(0);
 		}
-		else press_keyboard[0] = false;
 
 		if (pKeysBuffer[VK_DOWN] & 0xF0) {
-			if (!press_keyboard[1]) {
-				press_keyboard[1] = true;
-				send_move_packet(1);
-			}
+			send_move_packet(1);
 		}
-		else press_keyboard[1] = false;
 
 		if (pKeysBuffer[VK_LEFT] & 0xF0) {
-			if (!press_keyboard[2]) {
-				press_keyboard[2] = true;
-				send_move_packet(2);
-			}
+			send_move_packet(2);
 		}
-		else press_keyboard[2] = false;
 
 		if (pKeysBuffer[VK_RIGHT] & 0xF0) {
-			if (!press_keyboard[3]) {
-				press_keyboard[3] = true;
-				send_move_packet(3);
-			}
+			send_move_packet(3);
 		}
-		else press_keyboard[3] = false;
 
 		if (pKeysBuffer[VK_SPACE] & 0xF0) {
-			if (!press_keyboard[4]) {
-				press_keyboard[4] = true;
-				send_attack_packet(0);
-			}
+			send_attack_packet(0);
 		}
-		else press_keyboard[4] = false;
 
 
 		if (pKeysBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
@@ -500,11 +476,12 @@ void CGameFramework::ProcessInput()
 
 		if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f))
 		{
+			cout << "mouse??2" << endl;
 			if (cxDelta || cyDelta)
 			{
-				if (pKeysBuffer[VK_RBUTTON] & 0xF0)
+				if (pKeysBuffer[VK_RBUTTON] & 0xF0) 
 					m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
-				else
+				else 
 					m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
 			}
 			if (dwDirection) m_pPlayer->Move(dwDirection, 50.0f * m_GameTimer.GetTimeElapsed(), true);

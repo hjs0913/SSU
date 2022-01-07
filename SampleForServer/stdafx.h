@@ -36,6 +36,7 @@
 #include <wrl.h>
 
 #include <vector>
+#include <thread>
 
 #include <iostream>
 

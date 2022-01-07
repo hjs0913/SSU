@@ -30,6 +30,7 @@ public:
         _prev_size = 0;
         _x = 0;
         _y = 0;
+        _z = 0;
         set_tribe(HUMAN);
         _attack_active = false;
         last_move_time = 0;

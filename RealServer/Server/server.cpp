@@ -216,7 +216,7 @@ void error_display(int err_no)
 bool is_near(int a, int b)
 {
     if (RANGE < abs(players[a]->get_x() - players[b]->get_x())) return false;
-    if (RANGE < abs(players[a]->get_y() - players[b]->get_y())) return false;
+    if (RANGE < abs(players[a]->get_z() - players[b]->get_z())) return false;
     return true;
 }
 
@@ -224,7 +224,7 @@ bool is_agro_near(int a, int b)
 {
     if (players[b]->get_tribe() != BOSS) return false;
     if (AGRORANGE < abs(players[a]->get_x() - players[b]->get_x())) return false;
-    if (AGRORANGE < abs(players[a]->get_y() - players[b]->get_y())) return false;
+    if (AGRORANGE < abs(players[a]->get_z() - players[b]->get_z())) return false;
     return true;
 }
 
@@ -456,8 +456,8 @@ void process_packet(int client_id, unsigned char* p)
         LeaveCriticalSection(&cs);
         */
 
-
         // 중복 아이디 검사
+        /*
         for (auto* p : players) {
             if (p->get_tribe() != HUMAN) break;
             if (p->get_state() == ST_FREE) continue;
@@ -468,6 +468,7 @@ void process_packet(int client_id, unsigned char* p)
                 return;
             }
         }
+        */
 
         if (pl->get_hp() <= pl->get_maxhp()) {
             // hp가 깎이였으므로 hp자동회복을 해주도록 하자
@@ -486,7 +487,6 @@ void process_packet(int client_id, unsigned char* p)
         pl->state_lock.lock();
         pl->set_state(ST_INGAME);
         pl->state_lock.unlock();
-
         // 새로 접속한 정보를 다른이에게 보내줌
         for (auto& other : players) {
             if (other->get_Id() == client_id) continue;   // 나다
@@ -517,7 +517,6 @@ void process_packet(int client_id, unsigned char* p)
             packet.y = pl->get_y();
             other_player->do_send(sizeof(packet), &packet);
         }
-
         // 새로 접속한 플레이어에게 기존 정보를 보내중
         for (auto& other : players) {
             if (other->get_Id() == client_id) continue;
@@ -582,18 +581,18 @@ void process_packet(int client_id, unsigned char* p)
             packet.y = ob.get_y();
             pl->do_send(sizeof(packet), &packet);
         }
-
         break;
     }
     case CS_PACKET_MOVE: {
         cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(p);
         // pl.last_move_time = packet->move_time;
-        int x = pl->get_x();
-        int y = pl->get_y();
+        float x = pl->get_x();
+        float y = pl->get_y();
+        float z = pl->get_z();
         pl->last_move_time = packet->move_time;
         switch (packet->direction) {
-        case 0: if (y > 0) y--; break;
-        case 1: if (y < (WORLD_HEIGHT - 1)) y++; break;
+        case 0: if (z > 0) z++; break;
+        case 1: if (z < (WORLD_HEIGHT - 1)) z--; break;
         case 2: if (x > 0) x--; break;
         case 3: if (x < (WORLD_WIDTH - 1)) x++; break;
         default:
@@ -601,12 +600,12 @@ void process_packet(int client_id, unsigned char* p)
             exit(-1);
         }
         pl->direction = packet->direction;
-        if (check_move_alright(x, y) == false) {
+        if (check_move_alright(x, z) == false) {
             break;
         }
 
         pl->set_x(x);
-        pl->set_y(y);
+        pl->set_z(z);
 
         unordered_set <int> nearlist;
         for (auto& other : players) {
@@ -1162,9 +1161,10 @@ void worker()
             else {
                 //players[new_id] = new Player(new_id);
                 Player* pl = reinterpret_cast<Player*>(players[new_id]);
-                pl->set_x(rand() % WORLD_WIDTH);
-                pl->set_y(rand() % WORLD_HEIGHT);
                 pl->set_id(new_id);
+                pl->set_x(300);
+                pl->set_y(0);
+                pl->set_z(300);
                 pl->_prev_size = 0;
                 pl->_recv_over._comp_op = OP_RECV;
                 pl->_recv_over._wsa_buf.buf = reinterpret_cast<char*>(pl->_recv_over._net_buf);
@@ -1383,17 +1383,21 @@ void initialise_NPC()
 
         //-------------------------------------------
         // 여기서 위치를 받아오자
-        //float temp_x;
-        //float temp_y;
+
+        // 임시 좌표(원래는 몬스터 놓을 곳의 좌표를 뽑아와야한다)
+        players[i]->set_x(i-1000+301);
+        float temp_x = players[i]->get_x();
+        float temp_y = players[i]->get_y();
+        float temp_z = players[i]->get_z();
         //-------------------------------------------
+
 
         lua_getglobal(L, "set_uid");
         lua_pushnumber(L, i);
-        lua_pushnumber(L, i);
-        lua_pushnumber(L, i);
-        //lua_pushnumber(L, temp_x);
-        //lua_pushnumber(L, temp_y);
-        error = lua_pcall(L, 3, 7, 0);
+        lua_pushnumber(L, temp_x);
+        lua_pushnumber(L, temp_y);
+        lua_pushnumber(L, temp_z);
+        error = lua_pcall(L, 4, 7, 0);
 
         if (error != 0) {
             cout << "초기화 오류" << endl;
@@ -1409,6 +1413,7 @@ void initialise_NPC()
 
         lua_register(L, "API_get_x", API_get_x);
         lua_register(L, "API_get_y", API_get_y);
+        cout << temp_x << " " << temp_y << " " << temp_z << endl;
         // 여기는 나중에 생각하자
     }
     cout << "NPC로딩 완료" << endl;

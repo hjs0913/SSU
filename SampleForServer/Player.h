@@ -9,6 +9,7 @@
 
 #include "Object.h"
 #include "Camera.h"
+#include "../RealServer/Server/protocol.h"
 
 struct CB_PLAYER_INFO
 {
@@ -38,6 +39,7 @@ protected:
 	LPVOID						m_pCameraUpdatedContext = NULL;
 
 	CCamera						*m_pCamera = NULL;
+	TRIBE						m_tribe = HUMAN;
 
 	bool						m_use = false;
 
@@ -93,6 +95,10 @@ public:
 	virtual void OnPrepareRender(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 	virtual void SetRootParameter(ID3D12GraphicsCommandList *pd3dCommandList);
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera = NULL);
+
+	// player∆Øº∫
+	TRIBE GetTribe();
+	void SetTribe(TRIBE t);
 
 protected:
 	ID3D12Resource					*m_pd3dcbPlayer = NULL;
