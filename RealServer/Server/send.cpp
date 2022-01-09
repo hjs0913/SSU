@@ -5,7 +5,7 @@ void send_login_ok_packet(Player* pl)
     sc_packet_login_ok packet;
     packet.size = sizeof(packet);
     packet.type = SC_PACKET_LOGIN_OK;
-    packet.id = pl->get_Id();
+    packet.id = pl->get_id();
     strcpy_s(packet.name, pl->get_name());
     packet.x = pl->get_x();
     packet.y = pl->get_y();
@@ -21,7 +21,7 @@ void send_login_ok_packet(Player* pl)
 void send_move_packet(Player* pl, Npc* mover)
 {
     sc_packet_move packet;
-    packet.id = mover->get_Id();
+    packet.id = mover->get_id();
     packet.size = sizeof(packet);
     packet.type = SC_PACKET_MOVE;
     packet.x = mover->get_x();
@@ -33,24 +33,25 @@ void send_move_packet(Player* pl, Npc* mover)
 
 void send_put_object_packet(Player* pl, Npc* target)
 {
-    cout << "??" << endl;
-    cout << target->get_id() << endl;
     sc_packet_put_object packet;
     packet.size = sizeof(packet);
     packet.type = SC_PACKET_PUT_OBJECT;
-    packet.id = target->get_Id();
+    packet.id = target->get_id();
     packet.x = target->get_x();
     packet.y = target->get_y();
     packet.z = target->get_z();
+
     strcpy_s(packet.name, target->get_name());
     packet.object_type = target->get_tribe();
     pl->do_send(sizeof(packet), &packet);
+    cout << target->get_id() << endl;
+    cout << packet.x << "," << packet.y << "," << packet.z << endl;
 }
 
 void send_remove_object_packet(Player* pl, Npc* victim)
 {
     sc_packet_remove_object packet;
-    packet.id = victim->get_Id();
+    packet.id = victim->get_id();
     packet.size = sizeof(packet);
     packet.type = SC_PACKET_REMOVE_OBJECT;
     packet.object_type = victim->get_tribe();

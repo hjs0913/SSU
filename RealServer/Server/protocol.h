@@ -13,6 +13,8 @@ enum TRIBE { HUMAN, MONSTER, AGRO, BOSS, OBSTACLE };
 enum BUF_TYPE { B_NONE, B_PHYATTACK, B_MAGATTACK, B_PHYDEFENCE, 
 	B_MAGDEFENCE, B_SPEED, B_BURN };
 enum ELEMENT { E_NONE, E_WATER, E_FULLMETAL, E_WIND, E_FIRE, E_TREE, E_EARTH, E_ICE };
+enum JOB {J_DILLER, J_TANKER, J_MAGISIAN, J_SUPPORTER};
+
 
 const int BUFSIZE = 256;
 const int RANGE = 20;
@@ -37,6 +39,7 @@ const char CS_PACKET_MOVE = 2;
 const char CS_PACKET_ATTACK = 3;
 const char CS_PACKET_CHAT = 4;
 const char CS_PACKET_TELEPORT = 5;
+const char CS_PACKET_SKILL = 6;
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -45,9 +48,6 @@ const char SC_PACKET_REMOVE_OBJECT = 4;
 const char SC_PACKET_CHAT = 5;
 const char SC_PACKET_LOGIN_FAIL = 6;
 const char SC_PACKET_STATUS_CHANGE = 7;
-//---------------------------------------------------
-// 추가사항
-const char CS_PACKET_SKILL = 6;
 const char SC_PACKET_DEAD = 8;
 const char SC_PACKET_REVIVE = 9;
 //---------------------------------------------------
@@ -81,6 +81,15 @@ struct cs_packet_teleport {
 	// 더미 클라이언트에서 동접 테스트용으로 사용.
 	unsigned char size;
 	char	type;
+};
+
+struct cs_packet_skill {
+	unsigned char size;
+	char type;
+	char skill_type;
+	// 0 : 대각선까지 범위형 공격
+	// 1 : 직선 쭉 뚫고 가는 공격
+	// 2 : 버프형 공격(공격이 10초동안 50%상승)
 };
 
 struct sc_packet_login_ok {
@@ -134,22 +143,10 @@ struct sc_packet_login_fail {
 
 struct sc_packet_status_change {
 	unsigned char size;
-	char type;
+	char	type;                           
 	short	level;
 	short	hp, maxhp;
 	int		exp;
-};
-
-#pragma pack(pop)
-// 추가 사항 -----------------------------
-
-struct cs_packet_skill {
-	unsigned char size;
-	char type;
-	char skill_type;	
-	// 0 : 대각선까지 범위형 공격
-	// 1 : 직선 쭉 뚫고 가는 공격
-	// 2 : 버프형 공격(공격이 10초동안 50%상승)
 };
 
 struct sc_packet_dead {
@@ -161,7 +158,9 @@ struct sc_packet_dead {
 struct sc_packet_revive {
 	unsigned char size;
 	char type;
-	short	x, y;
+	float	x, y, z;
 	int		hp;
 	int		exp;
 };
+
+#pragma pack(pop)
