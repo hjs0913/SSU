@@ -156,23 +156,37 @@ void process_packet(unsigned char* p)
 			cout << packet->x << "." << packet->y << "." << packet->z << endl;
 		}
 		else {
+			cout << "다른 플레이어 움직임 : " << packet->x << ", " <<  packet->y << "," <<  packet->z << endl;
 			mPlayer[packet->id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
+		}
+		break;
+	}
+	case SC_PACKET_PUT_OBJECT: {
+		sc_packet_put_object* packet = reinterpret_cast<sc_packet_put_object*> (p);
+		int p_id = packet->id;
+
+
+		if (static_cast<TRIBE>(packet->object_type) != OBSTACLE) {
+			cout << "p_id : " << p_id << endl;
+			cout << "obj type : " << (int)packet->object_type << endl;
+			cout << packet->x << "," << packet->y << ", " << packet->z << endl;
+			mPlayer[p_id]->SetUse(true);
+			mPlayer[p_id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
 		}
 		break;
 	}
 	case SC_PACKET_REMOVE_OBJECT: {
 		sc_packet_remove_object* packet = reinterpret_cast<sc_packet_remove_object*>(p);
 		int p_id = packet->id;
-		if (static_cast<TRIBE>(packet->object_type) == HUMAN) mPlayer[p_id]->SetUse(false);
+		if (static_cast<TRIBE>(packet->object_type) != OBSTACLE) mPlayer[p_id]->SetUse(false);
 		break;
 	}
-	case SC_PACKET_PUT_OBJECT: {
-		sc_packet_put_object* packet = reinterpret_cast<sc_packet_put_object*> (p);
-		int p_id = packet->id;
-		if (static_cast<TRIBE>(packet->object_type) == HUMAN) {
-			mPlayer[p_id]->SetUse(true);
-			mPlayer[p_id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
-		}
+	case SC_PACKET_CHAT: {
+		// 아직 미구현
+		break;
+	}
+	case SC_PACKET_STATUS_CHANGE: {
+		// 아직 미구현
 		break;
 	}
 	case SC_PACKET_DEAD: {
@@ -181,8 +195,12 @@ void process_packet(unsigned char* p)
 		cout << "died" << endl;
 		break;
 	}
+	case SC_PACKET_REVIVE: {
+		// 아직 미구현
+		break;
+	}
 	default:
-		cout << "씨발 오류" << endl;
+		cout << "Process packet 오류" << endl;
 		break;
 	}
 }
@@ -217,14 +235,12 @@ void worker()
 			//if (packet_size <= 0) break;
 
 			while (packet_size <= remain_data) {
-				cout << "prev_size(1) : " << m_prev_size << endl;
 				cout << "remain_data(1) : " << remain_data << endl;
 				cout << "packet_size(1) : " << packet_size << endl;
 				process_packet(packet_start);
 				remain_data -= packet_size;
 				packet_start += packet_size;
 				cout << "remain_data(2) : " << remain_data << endl;
-				cout << "packet_size(2) : " << packet_size << endl;
 				if (remain_data > 0) packet_size = packet_start[0];
 				else break;
 			}
@@ -312,7 +328,7 @@ XMFLOAT3 return_myPosition() {
 }
 
 void return_otherPlayer(CPlayer** m_otherPlayer, ID3D12Device* m_pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera) {
-	for (int i = 0; i < MAX_USER; ++i) {
+	for (int i = 0; i < MAX_USER+MAX_NPC; ++i) {
 		if (mPlayer[i]->GetUse() == false) continue;
 		m_otherPlayer[i]->SetUse(true);
 		m_otherPlayer[i]->SetPosition(mPlayer[i]->GetPosition());

@@ -7,6 +7,8 @@ class Player : public Npc
 private:
     int                 _login_id;
     int		            _exp;
+    JOB                 _job;
+
     atomic_bool	        _attack_active;		// NPC가 가만히 안있고 움직일때
     atomic_bool         _skill_active[3] = { false };
 public:
@@ -24,18 +26,8 @@ public:
     int                 last_move_time;
     int                 direction;  // 0 : up, 1: down, 2: left, 3:right 
 public:
-    Player(int id) : Npc(id)
-    {
-        _state = ST_FREE;
-        _prev_size = 0;
-        _x = 0;
-        _y = 0;
-        _z = 0;
-        set_tribe(HUMAN);
-        _attack_active = false;
-        last_move_time = 0;
-        direction = 1;
-    }
+    Player(int id);
+
     ~Player()
     {
         closesocket(_socket);
@@ -100,6 +92,8 @@ public:
 
     void set_exp(int exp);
 
+    void set_job(JOB job);
+
     int get_login_id() {
         return _login_id;
     }
@@ -114,4 +108,6 @@ public:
     }
 
     int get_exp();
+
+    JOB get_job();
 };

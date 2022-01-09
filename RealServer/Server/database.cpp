@@ -104,7 +104,7 @@ bool Search_Id(Player* pl, char* login_id)
 			pl->set_lv(c_lv);
 			pl->set_exp(c_exp);
 			pl->set_maxhp(c_maxhp);
-			cout << pl->get_Id() << "," << pl->get_name() << "," << pl->get_x() << "," << pl->get_y() << ","
+			cout << pl->get_id() << "," << pl->get_name() << "," << pl->get_x() << "," << pl->get_y() << ","
 				<< pl->get_hp() << "," << pl->get_lv() << "," << pl->get_exp() << "," << pl->get_maxhp() << endl;
 			SQLCancel(hstmt);
 			delete exec;
@@ -157,7 +157,7 @@ bool Search_Id(Player* pl, char* login_id)
 							pl->set_lv(c_lv);
 							pl->set_exp(c_exp);
 							pl->set_maxhp(c_maxhp);
-							cout << pl->get_Id() << endl;
+							cout << pl->get_id() << endl;
 							SQLCancel(hstmt);
 							delete exec;
 							return true;

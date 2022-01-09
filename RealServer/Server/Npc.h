@@ -11,6 +11,8 @@ protected:
 	float	_magical_attack;
 	float	_physical_defence;
 	float	_magical_defence;
+	float	_basic_attack_factor;
+	float	_defence_factor;
 	ELEMENT	_element;
 	float	_move_speed;
 	float	_attack_speed;
@@ -33,11 +35,9 @@ public:
 	void set_initialize();
 
 	void set_pos(int x, int y);
-	void set_x(int x);
-	void set_y(int y);
 	void set_state(STATE s);
 	void set_name(const char* name);
-	void set_id(int id);
+
 	void set_active(bool act);
 	void set_tribe(TRIBE tribe);
 	void set_lv(short lv);
@@ -47,10 +47,10 @@ public:
 	void set_magical_attack(float magical_attack);
 	void set_physical_defence(float physical_defence);
 	void set_magical_defence(float magical_defence);
+	void set_basic_attack_factor(float basic_attack);
+	void set_defence_factor(float defence_factor);
 
-	int get_x();
-	int get_y();
-	int get_Id();
+
 	char* get_name();
 	STATE get_state();
 	bool get_active();
@@ -58,5 +58,11 @@ public:
 	short get_lv();
 	int get_hp();
 	int get_maxhp();
+	float get_physical_attack();
+	float get_magical_attack();
+	float get_physical_defence();
+	float get_magical_defence();
+	float get_basic_attack_factor();
+	float get_defence_factor();
 };
 
