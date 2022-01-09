@@ -33,10 +33,12 @@ void send_move_packet(Player* pl, Npc* mover)
 
 void send_put_object_packet(Player* pl, Npc* target)
 {
+    cout << "??" << endl;
+    cout << target->get_id() << endl;
     sc_packet_put_object packet;
-    packet.id = target->get_Id();
     packet.size = sizeof(packet);
     packet.type = SC_PACKET_PUT_OBJECT;
+    packet.id = target->get_Id();
     packet.x = target->get_x();
     packet.y = target->get_y();
     packet.z = target->get_z();

@@ -15,7 +15,7 @@ enum BUF_TYPE { B_NONE, B_PHYATTACK, B_MAGATTACK, B_PHYDEFENCE,
 enum ELEMENT { E_NONE, E_WATER, E_FULLMETAL, E_WIND, E_FIRE, E_TREE, E_EARTH, E_ICE };
 
 const int BUFSIZE = 256;
-const int RANGE = 7;
+const int RANGE = 20;
 const int AGRORANGE = 5;
 const int MAX_OBSTACLE = 10000;
 //------------------------------------------------------------
@@ -26,9 +26,9 @@ const int  WORLD_HEIGHT = 2000;
 const int  WORLD_WIDTH = 2000;
 const int  MAX_NAME_SIZE = 20;
 const int  MAX_CHAT_SIZE = 100;
-const int  MAX_USER = 10000;
+const int  MAX_USER = 1000;
 // const int  MAX_NPC = 200000;
-const int  MAX_NPC = 10000;		// µð¹ö±ë ¿ë
+const int  MAX_NPC = 30;		// µð¹ö±ë ¿ë
 constexpr int NPC_ID_START = MAX_USER;
 constexpr int NPC_ID_END = MAX_USER + MAX_NPC - 1;
 

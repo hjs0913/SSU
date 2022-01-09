@@ -6,6 +6,11 @@ Npc::Npc(int id)
 	_tribe = MONSTER;
 	_state = ST_INGAME;
 	_active = false;
+
+	_x = 300;
+	_y = 0;
+	_z = 300;
+
 	// _x = rand() % WORLD_WIDTH;
 	// _y = rand() % WORLD_HEIGHT;
 }

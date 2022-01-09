@@ -20,20 +20,28 @@
 using namespace std;
 
 
-// HANDLE g_h_iocp;	// 나중에 iocp바꿀 시 사용
+extern int my_id;
+extern int m_prev_recv;
+
+
 
 void err_quit(const char* msg);
 
 void err_display(const char* msg);
 
 void send_attack_packet(int skill);
+
 void send_move_packet(int direction);
 
 int netInit();
 
+void process_packet(unsigned char* p);
+
 // void network_check();	// 나중에 iocp바꿀 시 사용
 
 int netclose();
+
+void worker();
 
 void do_send(int num_bytes, void* mess);
 
