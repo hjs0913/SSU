@@ -91,7 +91,7 @@ private:
 	CPlayer							*m_pPlayer = NULL;
 	CCamera							*m_pCamera = NULL;
 
-	CPlayer							*m_pOthers[10] = { NULL };
+	CPlayer							*m_pOthers[MAX_USER+MAX_NPC] = { NULL };
 
 	// 10.30
 	CObjectsShader* m_pObjectShader = NULL;
