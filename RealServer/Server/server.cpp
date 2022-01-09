@@ -1106,6 +1106,7 @@ void worker()
         LONG64 iocp_key;
         WSAOVERLAPPED* p_over;
         BOOL ret = GetQueuedCompletionStatus(g_h_iocp, &num_byte, (PULONG_PTR)&iocp_key, &p_over, INFINITE);
+        cout << "pover:" << p_over << endl;
         int client_id = static_cast<int>(iocp_key);
         EXP_OVER* exp_over = reinterpret_cast<EXP_OVER*>(p_over);
         if (FALSE == ret) {
@@ -1123,6 +1124,8 @@ void worker()
                 Disconnect(client_id);
                 continue;
             }
+            cout << "expover:" << exp_over << endl;
+
             Player* pl = reinterpret_cast<Player*>(players[client_id]);
             int remain_data = num_byte + pl->_prev_size;
             unsigned char* packet_start = exp_over->_net_buf;

@@ -66,6 +66,7 @@ public:
 
     void do_send(int num_bytes, void* mess)
     {
+        cout << "send??" << endl;
         EXP_OVER* ex_over = new EXP_OVER(OP_SEND, num_bytes, mess);
         int ret = WSASend(_socket, &ex_over->_wsa_buf, 1, 0, 0, &ex_over->_wsa_over, NULL);
         if (SOCKET_ERROR == ret) {

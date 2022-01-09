@@ -85,14 +85,14 @@ void send_move_packet(int direction)
 
 void do_send(int num_bytes, void* mess)
 {
-	EXP_OVER ex_over;
-	ex_over.m_comp_op = OP_SEND;
-	ZeroMemory(&ex_over.m_wsa_over, sizeof(ex_over.m_wsa_over));
-	ex_over.m_wsa_buf.buf = reinterpret_cast<char*>(ex_over.m_net_buf);
-	ex_over.m_wsa_buf.len = num_bytes;
-	memcpy(ex_over.m_net_buf, mess, num_bytes);
+	EXP_OVER* ex_over = new EXP_OVER;
+	ex_over->m_comp_op = OP_SEND;
+	ZeroMemory(&ex_over->m_wsa_over, sizeof(ex_over->m_wsa_over));
+	ex_over->m_wsa_buf.buf = reinterpret_cast<char*>(ex_over->m_net_buf);
+	ex_over->m_wsa_buf.len = num_bytes;
+	memcpy(ex_over->m_net_buf, mess, num_bytes);
 
-	int ret = WSASend(g_s_socket, &ex_over.m_wsa_buf, 1, 0, 0, &ex_over.m_wsa_over, NULL);
+	int ret = WSASend(g_s_socket, &ex_over->m_wsa_buf, 1, 0, 0, &ex_over->m_wsa_over, NULL);
 	if (SOCKET_ERROR == ret) {
 		int error_num = WSAGetLastError();
 		if (ERROR_IO_PENDING != error_num) {
@@ -111,6 +111,7 @@ void do_send(int num_bytes, void* mess)
 void do_recv()
 {
 	DWORD recv_flag = 0;
+	cout << "recv_over : " << & _recv_over << endl;
 	ZeroMemory(&_recv_over.m_wsa_over, sizeof(_recv_over.m_wsa_over));
 	_recv_over.m_wsa_buf.buf = reinterpret_cast<char*>(_recv_over.m_net_buf + m_prev_size);
 	_recv_over.m_wsa_buf.len = sizeof(_recv_over.m_net_buf) - m_prev_size;
@@ -136,7 +137,7 @@ void process_packet(unsigned char* p)
 {
 
 	int type = *(p + 1);
-	cout << "타입 : " << type << endl;
+	cout << "type : " << type << endl;
 	switch (type) {
 	case SC_PACKET_LOGIN_OK: {
 		sc_packet_login_ok* packet = reinterpret_cast<sc_packet_login_ok*>(p);
@@ -207,12 +208,12 @@ void worker()
 				continue;*/
 				return;
 			}
-			cout << "num_byte : " << num_byte << endl;
-			cout << m_prev_size << endl;
-			int remain_data = num_byte + m_prev_size;
+			
+			cout << "recv exp_over : " << exp_over << endl;
+
 			unsigned char* packet_start = exp_over->m_net_buf;
+			int remain_data = num_byte + m_prev_size;
 			int packet_size = packet_start[0];
-			cout << packet_size << endl;
 			
 			//if (packet_size <= 0) break;
 
@@ -272,6 +273,7 @@ int netInit()
 			err_quit("connect()");
 		}
 	}
+	ZeroMemory(&_recv_over, sizeof(_recv_over));
 	_recv_over.m_comp_op = OP_RECV;
 
     g_h_iocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, NULL, 0);
@@ -286,6 +288,8 @@ int netInit()
 	packet.type = CS_PACKET_LOGIN;
 	strcpy_s(packet.name, "황천길");
 	do_send(sizeof(packet), &packet);
+
+	do_recv();
 }
 
 int netclose()
