@@ -1,7 +1,7 @@
-#include "stdafx.h"
+//#include "stdafx.h"
 #include "Network.h"
 #include "Player.h"
-//#include "GameFramework.h"
+#include "GameFramework.h"
 
 int my_id = 0;
 int m_prev_size = 0;
@@ -111,7 +111,6 @@ void do_send(int num_bytes, void* mess)
 void do_recv()
 {
 	DWORD recv_flag = 0;
-	cout << "recv_over : " << & _recv_over << endl;
 	ZeroMemory(&_recv_over.m_wsa_over, sizeof(_recv_over.m_wsa_over));
 	_recv_over.m_wsa_buf.buf = reinterpret_cast<char*>(_recv_over.m_net_buf + m_prev_size);
 	_recv_over.m_wsa_buf.len = sizeof(_recv_over.m_net_buf) - m_prev_size;
@@ -182,7 +181,9 @@ void process_packet(unsigned char* p)
 		cout << "died" << endl;
 		break;
 	}
-	default: break;
+	default:
+		cout << "¾¾¹ß ¿À·ù" << endl;
+		break;
 	}
 }
 
@@ -208,19 +209,22 @@ void worker()
 				continue;*/
 				return;
 			}
-			
-			cout << "recv exp_over : " << exp_over << endl;
-
 			unsigned char* packet_start = exp_over->m_net_buf;
 			int remain_data = num_byte + m_prev_size;
 			int packet_size = packet_start[0];
-			
+
+
 			//if (packet_size <= 0) break;
 
 			while (packet_size <= remain_data) {
+				cout << "prev_size(1) : " << m_prev_size << endl;
+				cout << "remain_data(1) : " << remain_data << endl;
+				cout << "packet_size(1) : " << packet_size << endl;
 				process_packet(packet_start);
 				remain_data -= packet_size;
 				packet_start += packet_size;
+				cout << "remain_data(2) : " << remain_data << endl;
+				cout << "packet_size(2) : " << packet_size << endl;
 				if (remain_data > 0) packet_size = packet_start[0];
 				else break;
 			}
@@ -229,6 +233,7 @@ void worker()
 				m_prev_size = remain_data;
 				memcpy(&exp_over->m_net_buf, packet_start, remain_data);
 			}
+			if (remain_data == 0) m_prev_size = 0;
 			do_recv();
 			break;
 		}

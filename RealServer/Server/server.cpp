@@ -1106,7 +1106,6 @@ void worker()
         LONG64 iocp_key;
         WSAOVERLAPPED* p_over;
         BOOL ret = GetQueuedCompletionStatus(g_h_iocp, &num_byte, (PULONG_PTR)&iocp_key, &p_over, INFINITE);
-        cout << "pover:" << p_over << endl;
         int client_id = static_cast<int>(iocp_key);
         EXP_OVER* exp_over = reinterpret_cast<EXP_OVER*>(p_over);
         if (FALSE == ret) {
@@ -1124,7 +1123,6 @@ void worker()
                 Disconnect(client_id);
                 continue;
             }
-            cout << "expover:" << exp_over << endl;
 
             Player* pl = reinterpret_cast<Player*>(players[client_id]);
             int remain_data = num_byte + pl->_prev_size;
@@ -1188,6 +1186,7 @@ void worker()
             break;
         }
         case OP_NPC_MOVE: {
+            /*
             players[client_id]->state_lock.lock();
             if ((players[client_id]->get_state() != ST_INGAME)) {
                 players[client_id]->state_lock.unlock();
@@ -1236,9 +1235,11 @@ void worker()
                 return_npc_position(client_id);
             }
             delete exp_over;
+            */
             break;
         }
         case OP_NPC_ATTACK: {
+            /*
             // 죽은 상태나 공격하는 상태인지 아닌지 확인
             players[client_id]->state_lock.lock();
             if ((players[client_id]->get_state() != ST_INGAME) || (false == players[client_id]->get_active())) {
@@ -1277,9 +1278,11 @@ void worker()
             }
             players[client_id]->lua_lock.unlock();
             delete exp_over;
+            */
             break;
         }
         case OP_AUTO_PLAYER_HP: {
+            /*
             Player* pl = reinterpret_cast<Player*>(players[client_id]);
             pl->state_lock.lock();
             if (pl->get_state() != ST_INGAME) {
@@ -1301,6 +1304,7 @@ void worker()
                 timer_queue.push(ev);
             }
             send_status_change_packet(pl);
+            */
             break;
         }
         case OP_PLAYER_REVIVE: {
