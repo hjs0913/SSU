@@ -17,7 +17,7 @@ enum JOB {J_DILLER, J_TANKER, J_MAGISIAN, J_SUPPORTER};
 
 
 const int BUFSIZE = 256;
-const int RANGE = 20;
+const int RANGE = 200;
 const int AGRORANGE = 5;
 const int MAX_OBSTACLE = 10000;
 //------------------------------------------------------------
