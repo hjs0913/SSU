@@ -1511,12 +1511,12 @@ void return_npc_position(int npc_id)
     int now_z = players[npc_id]->get_z();
     bool my_pos_fail = true;
     if (my_x != now_x) {
-        if (my_x >= now_x) now_x = now_x + 1;
-        else now_x = now_x - 1;
+        if (my_x >= now_x) now_x = now_x + 5;
+        else now_x = now_x - 5;
     }
     else if (my_z != now_z) {
-        if (my_z >= now_z) now_z = now_z + 1;
-        else now_z = now_z - 1;
+        if (my_z >= now_z) now_z = now_z + 5;
+        else now_z = now_z - 5;
     }
     else my_pos_fail = false;
 
@@ -1605,12 +1605,12 @@ void do_npc_move(int npc_id, int target)
     cout << "Move : " << x << "," << z << endl;
     // 원래는 여기에 A*알고리즘을 넣어야 한다
     if (t_x != x) {
-        if (t_x > x) x++;
-        else x--;
+        if (t_x > x) x+=5;
+        else x-=5;
     }
     else if(t_z != z){
-        if (t_z > z) z++;
-        else z--;
+        if (t_z > z) z+=5;
+        else z-=5;
     }
     
     if (false == check_move_alright(x, z)) {
