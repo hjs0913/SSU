@@ -139,6 +139,7 @@ void process_packet(unsigned char* p)
 	cout << "type : " << type << endl;
 	switch (type) {
 	case SC_PACKET_LOGIN_OK: {
+		// 플레이어의 모든 정보를 보내주자
 		sc_packet_login_ok* packet = reinterpret_cast<sc_packet_login_ok*>(p);
 		my_id = packet->id;
 		my_position.x = packet->x;
