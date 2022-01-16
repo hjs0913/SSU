@@ -348,4 +348,17 @@ CAirplaneMeshDiffused::~CAirplaneMeshDiffused()
 }
 //////////////////////////////////////////////////////////////////////////////////
 //
+// 아직 미완성
+/*
+CHeightMapGridMesh::CHeightMapGridMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int xStart, int zStart,
+	int nLength, XMFLOAT3 xmf3Scale, XMFLOAT4 xmf4Color, void* pContext) : CMesh(pd3dDevice,
+		pd3dCommandList)
+{
+	
+}
 
+CHeightMapGridMesh::~CHeightMapGridMesh()
+{
+
+}
+*/

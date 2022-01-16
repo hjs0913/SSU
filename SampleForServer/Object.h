@@ -199,3 +199,62 @@ public:
 	virtual void Animate(float fTimeElapsed);
 };
 
+class CHeightMapImage
+{
+private:
+	BYTE* m_pHeightMapPixels;	// 픽셀 배열(2차원)
+
+	int m_nWidth;				// 가로 픽셀의 개수
+	int m_nLength;				// 세로 픽셀의 개수
+
+	XMFLOAT3 m_xmf3Scale;		// 픽셀의 크기(해상도 : 픽셀 사이의 거리)
+
+public:
+	CHeightMapImage(LPCTSTR pFileName, int nWidth, int nLength, XMFLOAT3 xmf3Scale);
+	~CHeightMapImage();
+
+	//높이 맵 이미지에서 (x, z) 위치의 픽셀 값에 기반한 지형의 높이를 반환한다.
+	float GetHeight(float x, float z, bool bReverseQuad);
+
+	//높이 맵 이미지에서 (x, z) 위치의 법선 벡터를 반환한다.
+	XMFLOAT3 GetHeightMapNormal(int x, int z);
+
+	BYTE* GetHeightMapPixels() { return m_pHeightMapPixels; }
+
+	XMFLOAT3 GetScale() { return m_xmf3Scale; }
+	int GetHeightMapWidth() { return m_nWidth; }
+	int GetHeightMapLength() { return m_nLength; }
+};
+
+class CHeightMapTerrain : public CGameObject
+{
+private:
+	//지형의 높이 맵으로 사용할 이미지이다.
+	CHeightMapImage* m_pHeightMapImage;
+
+	//높이 맵의 가로와 세로 크기이다.
+	int m_nWidth;
+	int m_nLength;
+
+	//지형을 실제로 몇 배 확대할 것인가를 나타내는 스케일 벡터이다.
+	XMFLOAT3 m_xmf3Scale;
+
+public:
+	CHeightMapTerrain(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, LPCTSTR pFileName,
+		int nWidth, int nLength, int nBlockWidth, int nBlockLength, XMFLOAT3 xmf3Scale, XMFLOAT4 xmf4Color);
+	~CHeightMapTerrain();
+
+	float GetHeight(float x, float z, bool bReverseQuad = false) 
+	{
+		return (m_pHeightMapImage->GetHeight(x, z, bReverseQuad) * m_xmf3Scale.y);
+	}
+	XMFLOAT3 GetNormal(float x, float z)
+	{
+		return (m_pHeightMapImage->GetHeightMapNormal(int(x / m_xmf3Scale.x), int(z / m_xmf3Scale.z)));
+	}
+	int GetHeightMapWidth() { return(m_pHeightMapImage->GetHeightMapWidth()); }
+	int GetHeightMapLength() { return(m_pHeightMapImage->GetHeightMapLength()); }
+	XMFLOAT3 GetScale() { return m_xmf3Scale; }
+	float GetWidth() { return (m_nWidth * m_xmf3Scale.x); }
+	float GetLength() { return (m_nLength * m_xmf3Scale.z); }
+};

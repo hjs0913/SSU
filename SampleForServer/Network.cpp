@@ -169,7 +169,7 @@ void process_packet(unsigned char* p)
 
 		if (static_cast<TRIBE>(packet->object_type) != OBSTACLE) {
 			cout << "p_id : " << p_id << endl;
-			cout << "obj type : " << (int)packet->object_type << endl;
+			cout << "obj name : " << packet->name << endl;
 			cout << packet->x << "," << packet->y << ", " << packet->z << endl;
 			mPlayer[p_id]->SetUse(true);
 			mPlayer[p_id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));

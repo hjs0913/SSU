@@ -44,8 +44,6 @@ void send_put_object_packet(Player* pl, Npc* target)
     strcpy_s(packet.name, target->get_name());
     packet.object_type = target->get_tribe();
     pl->do_send(sizeof(packet), &packet);
-    cout << target->get_id() << endl;
-    cout << packet.x << "," << packet.y << "," << packet.z << endl;
 }
 
 void send_remove_object_packet(Player* pl, Npc* victim)

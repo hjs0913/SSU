@@ -445,3 +445,60 @@ void CRevolvingObject::Animate(float fTimeElapsed)
 	m_xmf4x4World = Matrix4x4::Multiply(m_xmf4x4World, mtxRotate);
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+CHeightMapImage::CHeightMapImage(LPCTSTR pFileName, int nWidth, int nLength, XMFLOAT3 xmf3Scale)
+{
+	m_nWidth = nWidth;
+	m_nLength = nLength;
+	m_xmf3Scale = xmf3Scale;
+
+	BYTE* pHeightMapPixels = new BYTE[m_nWidth * m_nLength];
+	HANDLE hFile = ::CreateFile(pFileName, GENERIC_READ, 0, NULL, OPEN_EXISTING,
+		FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_READONLY, NULL);
+	DWORD dwBytesRead;
+	::ReadFile(hFile, pHeightMapPixels, (m_nWidth * m_nLength), &dwBytesRead, NULL);
+	::CloseHandle(hFile);
+
+	m_pHeightMapPixels = new BYTE[m_nWidth * m_nLength];
+	for (int z = 0; z < m_nLength; z++) {
+		for (int x = 0; x < m_nWidth; x++) {
+			m_pHeightMapPixels[x + ((m_nLength - 1 - z) * m_nWidth)] = pHeightMapPixels[x + z * (m_nWidth)];
+		}
+	}
+
+	if (pHeightMapPixels) delete[] pHeightMapPixels;
+}
+
+CHeightMapImage::~CHeightMapImage()
+{
+	if (m_pHeightMapPixels) delete[] m_pHeightMapPixels;
+}
+// 아직 미완성
+/*
+float CHeightMapImage::GetHeight(float x, float z, bool bReverseQuad)
+{
+	// 지형의 좌표
+}
+
+XMFLOAT3 CHeightMapImage::GetHeightMapNormal(int x, int z)
+{
+
+}
+*/
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// 아직 미완성
+/*
+CHeightMapTerrain::CHeightMapTerrain(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, LPCTSTR pFileName,
+	int nWidth, int nLength, int nBlockWidth, int nBlockLength, XMFLOAT3 xmf3Scale, XMFLOAT4 xmf4Color) : CGameObject(0)
+{
+	
+}
+
+CHeightMapTerrain::~CHeightMapTerrain()
+{
+	if (m_pHeightMapImage) delete m_pHeightMapImage;
+}
+*/

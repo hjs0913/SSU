@@ -39,9 +39,10 @@ protected:
 	LPVOID						m_pCameraUpdatedContext = NULL;
 
 	CCamera						*m_pCamera = NULL;
-	TRIBE						m_tribe = HUMAN;
 
 	bool						m_use = false;
+//----------플레이어 속성----------------------------	
+	TRIBE						m_tribe = HUMAN;
 
 public:
 	CPlayer();
