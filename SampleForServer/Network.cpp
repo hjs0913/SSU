@@ -165,14 +165,11 @@ void process_packet(unsigned char* p)
 	case SC_PACKET_PUT_OBJECT: {
 		sc_packet_put_object* packet = reinterpret_cast<sc_packet_put_object*> (p);
 		int p_id = packet->id;
-
-
 		if (static_cast<TRIBE>(packet->object_type) != OBSTACLE) {
-			cout << "p_id : " << p_id << endl;
-			cout << "obj name : " << packet->name << endl;
-			cout << packet->x << "," << packet->y << ", " << packet->z << endl;
 			mPlayer[p_id]->SetUse(true);
 			mPlayer[p_id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
+			mPlayer[p_id]->m_tribe = static_cast<TRIBE>(packet->object_type);
+			strcpy(mPlayer[p_id]->m_name, packet->name);
 		}
 		break;
 	}
@@ -330,10 +327,21 @@ XMFLOAT3 return_myPosition() {
 
 void return_otherPlayer(CPlayer** m_otherPlayer, ID3D12Device* m_pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera) {
 	for (int i = 0; i < MAX_USER+MAX_NPC; ++i) {
-		if (mPlayer[i]->GetUse() == false) continue;
-		m_otherPlayer[i]->SetUse(true);
+		if (mPlayer[i]->GetUse() == false) {
+			m_otherPlayer[i]->SetUse(mPlayer[i]->GetUse());
+			continue;
+		}
+		if (m_otherPlayer[i]->GetUse() == false) {
+			m_otherPlayer[i]->SetUse(mPlayer[i]->GetUse());
+			// switch로 몬스터를 구분하자
+			reinterpret_cast<CAirplanePlayer*>(m_otherPlayer[i])->ChangeColor(
+				m_pd3dDevice, pd3dCommandList, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
+		}
+		// 이름에 따른 컬러 바꾸어주기
+		// 한번만 바꿔주도록 하자
 		m_otherPlayer[i]->SetPosition(mPlayer[i]->GetPosition());
 		m_otherPlayer[i]->Render(pd3dCommandList, pCamera);
+
 	}
 }
 
