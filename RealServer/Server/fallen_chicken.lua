@@ -3,16 +3,23 @@ my_lv = 15;
 my_name = "≈∏∂Ù«— ¥ﬂ";
 my_hp = 120000;
 my_physical_attack = 180;
+my_magical_attck = 0;
 my_physical_defence = 300;
 my_magical_defence = 130;
+my_basic_attack_factor = 10;
+my_defence_factor = 0.0002;
 my_x = 0;
 my_y = 0;
+my_z = 0;
 
-function set_uid(id, x, y)
+
+function set_uid(id, x, y, z)
    my_id = id;
    my_x = x;
    my_y = y;
-   return my_lv, my_hp, my_name;
+   my_z = z;
+   return my_lv, my_name, my_hp, my_physical_attack, my_magical_attck, 
+        my_phsical_defence, my_magical_defence, my_basic_attack_factor, my_defence_factor;
 end
 
 function event_npc_move(player)
@@ -29,7 +36,11 @@ function event_npc_move(player)
 end
 
 function return_my_position()
-   return my_x, my_y;
+   return my_x, my_y, my_z;
+end
+
+function monster_revive()
+    return my_x, my_y, my_z, my_hp;
 end
 
 function attack_range(player)

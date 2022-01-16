@@ -227,6 +227,47 @@ CCubeMeshIlluminatedTextured::~CCubeMeshIlluminatedTextured()
 
 //////////////////////////////////////////////////////////////////////////////////
 //
+CFloorMeshIlluminatedTextured::CFloorMeshIlluminatedTextured(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fWidth, float fHeight, float fDepth) : CMeshIlluminatedTextured(pd3dDevice, pd3dCommandList)
+{
+	m_nVertices = 6;
+	m_nStride = sizeof(CIlluminatedTexturedVertex);
+	m_nOffset = 0;
+	m_nSlot = 0;
+	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+	float fx = fWidth * 0.5f, fy = 0, fz = fDepth * 0.5f;
+
+	// 사각형 매핑
+	XMFLOAT3 pxmf3Positions[6];
+	int i = 0;
+	pxmf3Positions[i++] = XMFLOAT3(-fx, 0, +fz);
+	pxmf3Positions[i++] = XMFLOAT3(+fx, 0, +fz);
+	pxmf3Positions[i++] = XMFLOAT3(+fx, 0, -fz);
+
+	pxmf3Positions[i++] = XMFLOAT3(-fx, 0, +fz);
+	pxmf3Positions[i++] = XMFLOAT3(+fx, 0, -fz);
+	pxmf3Positions[i++] = XMFLOAT3(-fx, 0, -fz);
+
+	XMFLOAT3 pxmf3Normals[6];
+	CalculateVertexNormals(pxmf3Normals, pxmf3Positions, m_nVertices, NULL, 0);
+
+	CIlluminatedTexturedVertex pVertices[6];
+	for (int i = 0; i < 6; i++) pVertices[i] = CIlluminatedTexturedVertex(pxmf3Positions[i], pxmf3Normals[i]);
+
+	m_pd3dVertexBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, pVertices, m_nStride * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dVertexUploadBuffer);
+
+	m_d3dVertexBufferView.BufferLocation = m_pd3dVertexBuffer->GetGPUVirtualAddress();
+	m_d3dVertexBufferView.StrideInBytes = m_nStride;
+	m_d3dVertexBufferView.SizeInBytes = m_nStride * m_nVertices;
+}
+
+CFloorMeshIlluminatedTextured::~CFloorMeshIlluminatedTextured()
+{
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////
+//
 CAirplaneMeshDiffused::CAirplaneMeshDiffused(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, float fWidth, float fHeight, float fDepth, XMFLOAT4 xmf4Color) : CMeshDiffused(pd3dDevice, pd3dCommandList)
 {
 	m_nVertices = 36;
@@ -305,4 +346,19 @@ CAirplaneMeshDiffused::CAirplaneMeshDiffused(ID3D12Device *pd3dDevice, ID3D12Gra
 CAirplaneMeshDiffused::~CAirplaneMeshDiffused()
 {
 }
+//////////////////////////////////////////////////////////////////////////////////
+//
+// 아직 미완성
+/*
+CHeightMapGridMesh::CHeightMapGridMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int xStart, int zStart,
+	int nLength, XMFLOAT3 xmf3Scale, XMFLOAT4 xmf4Color, void* pContext) : CMesh(pd3dDevice,
+		pd3dCommandList)
+{
+	
+}
 
+CHeightMapGridMesh::~CHeightMapGridMesh()
+{
+
+}
+*/

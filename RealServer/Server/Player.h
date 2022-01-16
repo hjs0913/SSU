@@ -4,10 +4,12 @@
 #include "SkillBuf.h"
 class Player : public Npc
 {
-private:
+protected:
     int                 _login_id;
     int		            _exp;
     JOB                 _job;
+    int                 _mp;
+    int                 _max_mp;
 
     atomic_bool	        _attack_active;		// NPC가 가만히 안있고 움직일때
     atomic_bool         _skill_active[3] = { false };

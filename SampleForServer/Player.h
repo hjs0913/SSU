@@ -39,9 +39,29 @@ protected:
 	LPVOID						m_pCameraUpdatedContext = NULL;
 
 	CCamera						*m_pCamera = NULL;
-	TRIBE						m_tribe = HUMAN;
 
 	bool						m_use = false;
+//----------플레이어 속성----------------------------	
+public:
+	// 일단 public으로 설정(어차피 서버에서 관리하기도 한다)
+	char						m_name[MAX_NAME_SIZE];
+	int							m_hp;
+	int							m_maxhp;
+	int							m_mp;
+	int							m_max_mp;
+	short						m_lv;
+	float						m_physical_attack;
+	float						m_magical_attack;
+	float						m_physical_defence;
+	float						m_magical_defence;
+	float						m_basic_attack_factor;
+	float						m_defence_factor;
+	ELEMENT						m_element;
+	float						m_move_speed;
+	float						m_attack_speed;
+	int							m_exp;
+	TRIBE						m_tribe = HUMAN;
+
 
 public:
 	CPlayer();
@@ -113,6 +133,8 @@ public:
 
 	virtual CCamera *ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed);
 	virtual void OnPrepareRender(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
+	
+	void ChangeColor(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT4 color);
 };
 
 class CTerrainPlayer : public CPlayer

@@ -475,9 +475,9 @@ void CObjectsShader::ReleaseShaderVariables()
 
 void CObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
 {
-	int xObjects = 100, zObjects = 100, i = 0;   // 11.4 여기수정 
+	int xObjects = 140, zObjects = 140, i = 0;   // 11.4 여기수정 
 
-	m_nObjects = (xObjects * 2) * (zObjects * 2);
+	m_nObjects = (xObjects) * (zObjects);
 
 	CTexture* pTexture = new CTexture(1, RESOURCE_TEXTURE2DARRAY, 0, 1);
 	pTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"StonesArray.dds", RESOURCE_TEXTURE2DARRAY, 0);
@@ -493,7 +493,7 @@ void CObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 	m_pMaterial->SetTexture(pTexture);
 	m_pMaterial->SetReflection(1);
 
-	CCubeMeshIlluminatedTextured* pCubeMesh = new CCubeMeshIlluminatedTextured(pd3dDevice, pd3dCommandList, 5.0f, 5.0f, 5.0f);
+	CFloorMeshIlluminatedTextured* pCubeMesh = new CFloorMeshIlluminatedTextured(pd3dDevice, pd3dCommandList, 5.0f, 5.0f, 5.0f);
 
 	m_ppObjects = new CGameObject * [m_nObjects];
 
@@ -503,8 +503,8 @@ void CObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 
 	CGameObject* pGameObject = NULL;
 
-	for (int x = -xObjects; x < xObjects; ++x) {
-		for (int z = -zObjects; z < zObjects; ++z) {
+	for (int x = 0; x < xObjects; ++x) {
+		for (int z = 0; z < zObjects; ++z) {
 			pGameObject = new CGameObject(1);
 			pGameObject->SetMesh(0, pCubeMesh);
 

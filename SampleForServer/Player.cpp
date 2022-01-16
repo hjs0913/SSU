@@ -304,6 +304,13 @@ void CAirplanePlayer::OnPrepareRender(ID3D12GraphicsCommandList *pd3dCommandList
 	m_xmf4x4World = Matrix4x4::Multiply(mtxRotate, m_xmf4x4World);
 }
 
+void CAirplanePlayer::ChangeColor(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT4 color)
+{
+	// CMesh **m_ppMeshes
+	CAirplaneMeshDiffused* pAirplaneMesh = new CAirplaneMeshDiffused(pd3dDevice, pd3dCommandList, 5.0f, 10.0f, 5.0f, color);
+	SetMesh(0, pAirplaneMesh);
+}
+
 CCamera *CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 {
 	DWORD nCurrentCameraMode = (m_pCamera) ? m_pCamera->GetMode() : 0x00;

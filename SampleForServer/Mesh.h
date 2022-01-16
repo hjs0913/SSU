@@ -1,7 +1,6 @@
 //------------------------------------------------------- ----------------------
 // File: Mesh.h
 //-----------------------------------------------------------------------------
-
 #pragma once
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -183,3 +182,33 @@ public:
 	virtual ~CCubeMeshIlluminatedTextured();
 };
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+class CFloorMeshIlluminatedTextured : public CMeshIlluminatedTextured
+{
+public:
+	CFloorMeshIlluminatedTextured(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fWidth = 2.0f, float fHeight = 2.0f, float fDepth = 2.0f);
+	virtual ~CFloorMeshIlluminatedTextured();
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+class CHeightMapGridMesh : public CMesh
+{
+protected:
+	//격자의 크기(가로: x-방향, 세로: z-방향)이다.
+	int m_nWidth;
+	int m_nLength;
+	/*격자의 스케일(가로: x-방향, 세로: z-방향, 높이: y-방향) 벡터이다. 실제 격자 메쉬의 각 정점의 x-좌표, y-좌표, z-좌표는 스케일 벡터의 x-좌표, y-좌표, z-좌표로 곱한 값을 갖는다. 즉, 실제 격자의 x-축 방향의 간격은 1이 아니
+	라 스케일 벡터의 x-좌표가 된다. 이렇게 하면 작은 격자(적은 정점)를 사용하더라도 큰 크기의 격자(지형)를 생성할
+	수 있다.*/
+	XMFLOAT3 m_xmf3Scale;
+
+public:
+	CHeightMapGridMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int xStart, int zStart,
+		int nLength, XMFLOAT3 xmf3Scale, XMFLOAT4 xmf4Color, void* pContext);
+	~CHeightMapGridMesh();
+
+	virtual float OnGetHeight(int x, int z, void* pContext);
+	virtual XMFLOAT3 OnGetColor(int x, int z, void* pContext);
+};

@@ -30,7 +30,7 @@ const int  MAX_NAME_SIZE = 20;
 const int  MAX_CHAT_SIZE = 100;
 const int  MAX_USER = 1000;
 // const int  MAX_NPC = 200000;
-const int  MAX_NPC = 30;		// µð¹ö±ë ¿ë
+const int  MAX_NPC = 60;		// µð¹ö±ë ¿ë
 constexpr int NPC_ID_START = MAX_USER;
 constexpr int NPC_ID_END = MAX_USER + MAX_NPC - 1;
 

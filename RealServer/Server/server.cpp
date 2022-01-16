@@ -1428,6 +1428,8 @@ void initialise_NPC()
 {
     cout << "NPC 로딩중" << endl;
     char name[MAX_NAME_SIZE];
+
+    // 타락한 개구리 소환
     for (int i = NPC_ID_START; i < NPC_ID_START+30; ++i) {
         players[i] = new Npc(i);
         lua_State* L = players[i]->L = luaL_newstate();
@@ -1472,6 +1474,54 @@ void initialise_NPC()
         lua_register(L, "API_get_z", API_get_z);
         // 여기는 나중에 생각하자
     }
+
+    // 타락한 닭 소환
+    for (int i = NPC_ID_START+30; i < NPC_ID_START + 60; ++i) {
+        players[i] = new Npc(i);
+        lua_State* L = players[i]->L = luaL_newstate();
+        luaL_openlibs(L);
+        int error = luaL_loadfile(L, "fallen_chicken.lua") ||
+            lua_pcall(L, 0, 0, 0);
+
+        //-------------------------------------------
+        // 여기서 위치를 받아오자
+
+        // 임시 좌표(원래는 몬스터 놓을 곳의 좌표를 뽑아와야한다)
+        players[i]->set_x((i - 1000) * 10 + 601);
+        float temp_x = players[i]->get_x();
+        float temp_y = players[i]->get_y();
+        float temp_z = players[i]->get_z();
+        //-------------------------------------------
+
+
+        lua_getglobal(L, "set_uid");
+        lua_pushnumber(L, i);
+        lua_pushnumber(L, temp_x);
+        lua_pushnumber(L, temp_y);
+        lua_pushnumber(L, temp_z);
+        error = lua_pcall(L, 4, 9, 0);
+
+        if (error != 0) {
+            cout << "초기화 오류" << endl;
+        }
+        players[i]->set_lv(lua_tointeger(L, -9));
+        players[i]->set_name(lua_tostring(L, -8));
+        players[i]->set_hp(lua_tointeger(L, -7));
+        players[i]->set_physical_attack(lua_tonumber(L, -6));
+        players[i]->set_magical_attack(lua_tonumber(L, -5));
+        players[i]->set_physical_defence(lua_tonumber(L, -4));
+        players[i]->set_magical_defence(lua_tonumber(L, -3));
+        players[i]->set_basic_attack_factor(lua_tointeger(L, -2));
+        players[i]->set_defence_factor(lua_tonumber(L, -1));
+        lua_pop(L, 10);// eliminate set_uid from stack after call
+
+        lua_register(L, "API_get_x", API_get_x);
+        lua_register(L, "API_get_y", API_get_y);
+        lua_register(L, "API_get_z", API_get_z);
+        // 여기는 나중에 생각하자
+    }
+
+
     cout << "NPC로딩 완료" << endl;
 }
 
