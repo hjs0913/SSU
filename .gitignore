@@ -1,3 +1,8 @@
+test/test/Debug
+test/test/Release
+test/test/.vs
+test/test/x64
+
 
 샘플프로그램/.vs
 샘플프로그램/Debug
