@@ -33,6 +33,8 @@ void send_attack_packet(int skill);
 
 void send_move_packet(int direction);
 
+void send_look_packet(XMFLOAT3 look);
+
 int netInit();
 
 void process_packet(unsigned char* p);

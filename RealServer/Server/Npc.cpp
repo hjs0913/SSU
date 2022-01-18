@@ -105,6 +105,13 @@ void Npc::set_defence_factor(float defence_factor)
 	_defence_factor = defence_factor;
 }
 
+void Npc::set_look(float look_x, float look_y, float look_z)
+{
+	_look_x = look_x;
+	_look_y = look_y;
+	_look_z = look_z;
+}
+
 // get
 
 char* Npc::get_name()
@@ -168,4 +175,19 @@ float Npc::get_basic_attack_factor()
 float Npc::get_defence_factor()
 {
 	return _defence_factor;
+}
+
+float Npc::get_look_x()
+{
+	return _look_x;
+}
+
+float Npc::get_look_y()
+{
+	return _look_y;
+}
+
+float Npc::get_look_z()
+{
+	return _look_z;
 }
