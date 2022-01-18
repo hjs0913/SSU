@@ -83,6 +83,17 @@ void send_move_packet(int direction)
 	do_send(sizeof(packet), &packet);
 }
 
+void send_look_packet(XMFLOAT3 look)
+{
+	cs_packet_look packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_LOOK;
+	packet.x = look.x;
+	packet.y = look.y;
+	packet.z = look.z;
+	do_send(sizeof(packet), &packet);
+}
+
 void do_send(int num_bytes, void* mess)
 {
 	EXP_OVER* ex_over = new EXP_OVER;
@@ -195,6 +206,12 @@ void process_packet(unsigned char* p)
 	}
 	case SC_PACKET_REVIVE: {
 		// 아직 미구현
+		break;
+	}
+	case SC_PACKET_LOOK: {
+		sc_packet_look* packet = reinterpret_cast<sc_packet_look*>(p);
+		cout << "누가 회전하는가??" << endl;
+		//mPlayer[packet->id].get
 		break;
 	}
 	default:

@@ -40,6 +40,7 @@ const char CS_PACKET_ATTACK = 3;
 const char CS_PACKET_CHAT = 4;
 const char CS_PACKET_TELEPORT = 5;
 const char CS_PACKET_SKILL = 6;
+const char CS_PACKET_LOOK = 7;
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -50,6 +51,7 @@ const char SC_PACKET_LOGIN_FAIL = 6;
 const char SC_PACKET_STATUS_CHANGE = 7;
 const char SC_PACKET_DEAD = 8;
 const char SC_PACKET_REVIVE = 9;
+const char SC_PACKET_LOOK = 10;
 //---------------------------------------------------
 #pragma pack (push, 1)
 struct cs_packet_login {
@@ -90,6 +92,12 @@ struct cs_packet_skill {
 	// 0 : 대각선까지 범위형 공격
 	// 1 : 직선 쭉 뚫고 가는 공격
 	// 2 : 버프형 공격(공격이 10초동안 50%상승)
+};
+
+struct cs_packet_look {
+	unsigned char size;
+	char type;
+	float x, y, z;	// look
 };
 
 struct sc_packet_login_ok {
@@ -161,6 +169,13 @@ struct sc_packet_revive {
 	float	x, y, z;
 	int		hp;
 	int		exp;
+};
+
+struct sc_packet_look {
+	unsigned char size;
+	char type;
+	int id;
+	float x, y, z;	// look
 };
 
 #pragma pack(pop)

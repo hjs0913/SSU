@@ -16,6 +16,7 @@ protected:
 	ELEMENT	_element;
 	float	_move_speed;
 	float	_attack_speed;
+	float	_look_x, _look_y, _look_z;
 
 	STATE	_state;
 	atomic_bool	_active;		// NPC가 가만히 안있고 움직일때
@@ -49,6 +50,8 @@ public:
 	void set_magical_defence(float magical_defence);
 	void set_basic_attack_factor(float basic_attack);
 	void set_defence_factor(float defence_factor);
+	void set_look(float look_x, float look_y, float look_z);
+
 
 
 	char* get_name();
@@ -64,5 +67,8 @@ public:
 	float get_magical_defence();
 	float get_basic_attack_factor();
 	float get_defence_factor();
+	float get_look_x();
+	float get_look_y();
+	float get_look_z();
 };
 

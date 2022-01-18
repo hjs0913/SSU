@@ -1010,6 +1010,36 @@ void process_packet(int client_id, unsigned char* p)
         */
         break;
     }
+    case CS_PACKET_LOOK: {
+        cs_packet_look* packet = reinterpret_cast<cs_packet_look*>(p);
+        pl->set_look(packet->x, packet->y, packet->z);
+
+        // 근처에 있는 모든 플레이어에게 방향이 바뀌었다는것을 보내준다
+        pl->vl.lock();
+        unordered_set <int> my_vl{ pl->viewlist };
+        pl->vl.unlock();
+
+        cout << "여기는 되냐??" << endl;
+
+        for (auto i : my_vl) {
+            // Npc
+            if (is_npc(i) == true) continue;
+
+            cout << "여기는 되냐??2" << endl;
+            // Player
+            sc_packet_look s_packet;
+            s_packet.size = sizeof(s_packet);
+            s_packet.type = SC_PACKET_LOOK;
+            s_packet.id = pl->get_id();
+            s_packet.x = pl->get_look_x();
+            s_packet.y = pl->get_look_y();
+            s_packet.z = pl->get_look_z();
+            
+            reinterpret_cast<Player*>(players[i])->do_send(sizeof(s_packet), &s_packet);
+        }
+        break;
+    }
+
     }
 }
 
