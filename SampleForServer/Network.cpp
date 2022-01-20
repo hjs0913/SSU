@@ -211,7 +211,8 @@ void process_packet(unsigned char* p)
 	case SC_PACKET_LOOK: {
 		sc_packet_look* packet = reinterpret_cast<sc_packet_look*>(p);
 		cout << "누가 회전하는가??" << endl;
-		//mPlayer[packet->id].get
+		XMFLOAT3 xmf3Look(packet->x, packet->y, packet->z);
+		mPlayer[packet->id]->SetLook(xmf3Look);
 		break;
 	}
 	default:
@@ -344,10 +345,14 @@ XMFLOAT3 return_myPosition() {
 
 void return_otherPlayer(CPlayer** m_otherPlayer, ID3D12Device* m_pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera) {
 	for (int i = 0; i < MAX_USER+MAX_NPC; ++i) {
+		// 시야에서 사라짐
 		if (mPlayer[i]->GetUse() == false) {
 			m_otherPlayer[i]->SetUse(mPlayer[i]->GetUse());
 			continue;
 		}
+
+		// 시야에 존재
+		// 원래 시야에 없던 존재라면
 		if (m_otherPlayer[i]->GetUse() == false) {
 			m_otherPlayer[i]->SetUse(mPlayer[i]->GetUse());
 			// switch로 몬스터를 구분하자
@@ -357,6 +362,8 @@ void return_otherPlayer(CPlayer** m_otherPlayer, ID3D12Device* m_pd3dDevice, ID3
 		// 이름에 따른 컬러 바꾸어주기
 		// 한번만 바꿔주도록 하자
 		m_otherPlayer[i]->SetPosition(mPlayer[i]->GetPosition());
+		// look을 넣어준다
+		m_otherPlayer[i]->SetLook(mPlayer[i]->GetLookVector());
 		m_otherPlayer[i]->Render(pd3dCommandList, pCamera);
 
 	}
