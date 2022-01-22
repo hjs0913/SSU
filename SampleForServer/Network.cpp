@@ -184,6 +184,7 @@ void process_packet(unsigned char* p)
 			mPlayer[p_id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
 			mPlayer[p_id]->m_tribe = static_cast<TRIBE>(packet->object_type);
 			strcpy(mPlayer[p_id]->m_name, packet->name);
+			mPlayer[p_id]->m_spices = packet->object_class;
 		}
 		break;
 	}
@@ -359,8 +360,28 @@ void return_otherPlayer(CPlayer** m_otherPlayer, ID3D12Device* m_pd3dDevice, ID3
 		if (m_otherPlayer[i]->GetUse() == false) {
 			m_otherPlayer[i]->SetUse(mPlayer[i]->GetUse());
 			// switch로 몬스터를 구분하자
-			reinterpret_cast<CAirplanePlayer*>(m_otherPlayer[i])->ChangeColor(
-				m_pd3dDevice, pd3dCommandList, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
+			if (mPlayer[i]->GetTribe() == MONSTER) {
+				switch (mPlayer[i]->m_spices)
+				{
+				case FALLEN_FLOG: {
+					reinterpret_cast<CAirplanePlayer*>(m_otherPlayer[i])->ChangeColor(
+						m_pd3dDevice, pd3dCommandList, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
+					break;
+				}
+				case FALLEN_CHICKEN: {
+					reinterpret_cast<CAirplanePlayer*>(m_otherPlayer[i])->ChangeColor(
+						m_pd3dDevice, pd3dCommandList, XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f));
+					break;
+				}
+				default:
+					break;
+				}
+			}
+			else if (mPlayer[i]->GetTribe() == HUMAN) {
+				if (i == my_id) continue;
+				reinterpret_cast<CAirplanePlayer*>(m_otherPlayer[i])->ChangeColor(
+					m_pd3dDevice, pd3dCommandList, XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
+			}
 		}
 		// 이름에 따른 컬러 바꾸어주기
 		// 한번만 바꿔주도록 하자

@@ -40,9 +40,14 @@ void send_put_object_packet(Player* pl, Npc* target)
     packet.x = target->get_x();
     packet.y = target->get_y();
     packet.z = target->get_z();
-
-    strcpy_s(packet.name, target->get_name());
     packet.object_type = target->get_tribe();
+    if (target->get_tribe() == HUMAN) {
+        packet.object_class = reinterpret_cast<Player*>(target)->get_job();
+    }
+    else if (target->get_tribe() == MONSTER) {
+        packet.object_class = target->get_mon_spices();
+    }
+    strcpy_s(packet.name, target->get_name());
     pl->do_send(sizeof(packet), &packet);
 }
 

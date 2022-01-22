@@ -41,6 +41,8 @@ protected:
 	CCamera						*m_pCamera = NULL;
 
 	bool						m_use = false;
+
+
 //----------플레이어 속성----------------------------	
 public:
 	// 일단 public으로 설정(어차피 서버에서 관리하기도 한다)
@@ -61,7 +63,7 @@ public:
 	float						m_attack_speed;
 	int							m_exp;
 	TRIBE						m_tribe = HUMAN;
-
+	int							m_spices;
 
 public:
 	CPlayer();

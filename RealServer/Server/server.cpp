@@ -1521,10 +1521,13 @@ void initialise_NPC()
         players[i]->set_defence_factor(lua_tonumber(L, -1));
         lua_pop(L, 10);// eliminate set_uid from stack after call
 
+        // 나중에 어떻게 이용할 것인지 생각
         lua_register(L, "API_get_x", API_get_x);
         lua_register(L, "API_get_y", API_get_y);
         lua_register(L, "API_get_z", API_get_z);
-        // 여기는 나중에 생각하자
+        
+        players[i]->set_mon_species(FALLEN_FLOG);
+
     }
 
     // 타락한 닭 소환
@@ -1567,10 +1570,12 @@ void initialise_NPC()
         players[i]->set_defence_factor(lua_tonumber(L, -1));
         lua_pop(L, 10);// eliminate set_uid from stack after call
 
+        // 여기는 나중에 생각하자
         lua_register(L, "API_get_x", API_get_x);
         lua_register(L, "API_get_y", API_get_y);
         lua_register(L, "API_get_z", API_get_z);
-        // 여기는 나중에 생각하자
+
+        players[i]->set_mon_species(FALLEN_CHICKEN);
     }
 
 
