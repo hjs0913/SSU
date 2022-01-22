@@ -20,6 +20,7 @@ const int BUFSIZE = 256;
 const int RANGE = 200;
 const int AGRORANGE = 5;
 const int MAX_OBSTACLE = 10000;
+const float PLAYER_VELOCITY = 0.5f;
 //------------------------------------------------------------
 
 const short SERVER_PORT = 9000;
@@ -98,6 +99,7 @@ struct cs_packet_look {
 	unsigned char size;
 	char type;
 	float x, y, z;	// look
+	float right_x, right_y, right_z;	// right
 };
 
 struct sc_packet_login_ok {

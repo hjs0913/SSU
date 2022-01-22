@@ -83,7 +83,7 @@ void send_move_packet(int direction)
 	do_send(sizeof(packet), &packet);
 }
 
-void send_look_packet(XMFLOAT3 look)
+void send_look_packet(XMFLOAT3 look, XMFLOAT3 right)
 {
 	cs_packet_look packet;
 	packet.size = sizeof(packet);
@@ -91,6 +91,9 @@ void send_look_packet(XMFLOAT3 look)
 	packet.x = look.x;
 	packet.y = look.y;
 	packet.z = look.z;
+	packet.right_x = right.x;
+	packet.right_y = right.y;
+	packet.right_z = right.z;
 	do_send(sizeof(packet), &packet);
 }
 
