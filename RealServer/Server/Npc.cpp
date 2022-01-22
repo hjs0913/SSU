@@ -11,6 +11,14 @@ Npc::Npc(int id)
 	_y = 0;
 	_z = 300;
 
+	_look_x = 0.0f;
+	_look_y = 0.0f;
+	_look_z = 1.0f;
+
+	_right_x = 1.0f;
+	_right_y = 0.0f;
+	_right_z = 0.0f;
+
 	// _x = rand() % WORLD_WIDTH;
 	// _y = rand() % WORLD_HEIGHT;
 }
@@ -26,6 +34,14 @@ Npc::Npc(int id, const char* name)
 	_tribe = MONSTER;
 	_state = ST_INGAME;
 	_active = false;
+
+	_look_x = 0.0f;
+	_look_y = 0.0f;
+	_look_z = 1.0f;
+
+	_right_x = 1.0f;
+	_right_y = 0.0f;
+	_right_z = 0.0f;
 }
 
 Npc::~Npc() 
@@ -112,6 +128,13 @@ void Npc::set_look(float look_x, float look_y, float look_z)
 	_look_z = look_z;
 }
 
+void Npc::set_right(float right_x, float right_y, float right_z)
+{
+	_right_x = right_x;
+	_right_y = right_y;
+	_right_z = right_z;
+}
+
 // get
 
 char* Npc::get_name()
@@ -190,4 +213,19 @@ float Npc::get_look_y()
 float Npc::get_look_z()
 {
 	return _look_z;
+}
+
+float Npc::get_right_x()
+{
+	return _right_x;
+}
+
+float Npc::get_right_y()
+{
+	return _right_y;
+}
+
+float Npc::get_right_z()
+{
+	return _right_z;
 }

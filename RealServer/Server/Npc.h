@@ -17,6 +17,7 @@ protected:
 	float	_move_speed;
 	float	_attack_speed;
 	float	_look_x, _look_y, _look_z;
+	float	_right_x, _right_y, _right_z;
 
 	STATE	_state;
 	atomic_bool	_active;		// NPC가 가만히 안있고 움직일때
@@ -30,10 +31,6 @@ public:
 	Npc(int id);
 	Npc(int id, const char* name);
 	~Npc();
-	
-
-
-	void set_initialize();
 
 	void set_pos(int x, int y);
 	void set_state(STATE s);
@@ -51,7 +48,7 @@ public:
 	void set_basic_attack_factor(float basic_attack);
 	void set_defence_factor(float defence_factor);
 	void set_look(float look_x, float look_y, float look_z);
-
+	void set_right(float right_x, float right_y, float right_z);	// _look_x, y, z로 만들자
 
 
 	char* get_name();
@@ -70,5 +67,9 @@ public:
 	float get_look_x();
 	float get_look_y();
 	float get_look_z();
+	float get_right_x();
+	float get_right_y();
+	float get_right_z();
+
 };
 
