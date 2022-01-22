@@ -1020,6 +1020,7 @@ void process_packet(int client_id, unsigned char* p)
         pl->vl.unlock();
 
         cout << "여기는 되냐??" << endl;
+        cout << pl->get_look_x() << ", " << pl->get_look_y() << ", " << pl->get_look_z() << endl;
 
         for (auto i : my_vl) {
             // Npc
