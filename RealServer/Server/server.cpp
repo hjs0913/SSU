@@ -638,16 +638,32 @@ void process_packet(int client_id, unsigned char* p)
         float y = pl->get_y();
         float z = pl->get_z();
         pl->last_move_time = packet->move_time;
+        pl->direction = packet->direction;
         switch (packet->direction) {
-        case 0: if (z > -(WORLD_HEIGHT - 1)) z++; break;
-        case 1: if (z < (WORLD_HEIGHT - 1)) z--; break;
-        case 2: if (x > -(WORLD_WIDTH - 1)) x--; break;
-        case 3: if (x < (WORLD_WIDTH - 1)) x++; break;
+        case 0: {
+            x = pl->get_look_x() * PLAYER_VELOCITY + x;
+            z = pl->get_look_z() * PLAYER_VELOCITY + z;
+            break;
+        }
+        case 1: {
+            x = -(pl->get_look_x()) * PLAYER_VELOCITY + x;
+            z = -(pl->get_look_z()) * PLAYER_VELOCITY + z;
+            break;
+        }
+        case 2: {
+            x = -(pl->get_right_x()) * PLAYER_VELOCITY + x;
+            z = -(pl->get_right_z()) * PLAYER_VELOCITY + z;
+            break;
+        }
+        case 3: {
+            x = (pl->get_right_x()) * PLAYER_VELOCITY + x;
+            z = (pl->get_right_z()) * PLAYER_VELOCITY + z;
+            break;
+        }
         default:
             cout << "Invalid move in client " << client_id << endl;
             exit(-1);
         }
-        pl->direction = packet->direction;
         if (check_move_alright(x, z) == false) {
             break;
         }
@@ -1013,6 +1029,7 @@ void process_packet(int client_id, unsigned char* p)
     case CS_PACKET_LOOK: {
         cs_packet_look* packet = reinterpret_cast<cs_packet_look*>(p);
         pl->set_look(packet->x, packet->y, packet->z);
+        pl->set_right(packet->right_x, packet->right_y, packet->right_z);
 
         // 근처에 있는 모든 플레이어에게 방향이 바뀌었다는것을 보내준다
         pl->vl.lock();
@@ -1036,6 +1053,9 @@ void process_packet(int client_id, unsigned char* p)
             s_packet.y = pl->get_look_y();
             s_packet.z = pl->get_look_z();
             
+
+
+
             reinterpret_cast<Player*>(players[i])->do_send(sizeof(s_packet), &s_packet);
         }
         break;
@@ -1215,6 +1235,7 @@ void worker()
                 pl->_prev_size = remain_data;
                 memcpy(&exp_over->_net_buf, packet_start, remain_data);
             }
+            if (remain_data == 0) pl->_prev_size = 0;
             if (pl->get_state() == ST_FREE) continue;
             pl->do_recv();
             break;
