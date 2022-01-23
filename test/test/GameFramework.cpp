@@ -5,10 +5,15 @@
 #include "stdafx.h"
 #include "GameFramework.h"
 #include <iostream>
+#include <fstream>
+
+#include <array>
 using namespace std;
 #define BULLETCNT 100
 #define ROOMX 4000
 #define ROOMZ 4000
+
+
 
 
 
@@ -357,7 +362,7 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 		case VK_F1:
 		case VK_F2:
 		case VK_F3:
-			//	m_pCamera = m_pPlayer->ChangeCamera((DWORD)(wParam - VK_F1 + 1), m_GameTimer.GetTimeElapsed());
+				m_pCamera = m_pPlayer->ChangeCamera((DWORD)(wParam - VK_F1 + 1), m_GameTimer.GetTimeElapsed());
 			break;
 		case VK_F9:
 			ChangeSwapChainState();
@@ -432,6 +437,9 @@ void CGameFramework::OnDestroy()
 
 void CGameFramework::BuildObjects()
 {
+
+
+
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
 
 	m_pScene = new CScene();
@@ -570,7 +578,7 @@ void CGameFramework::ProcessInput()   //¿©±â
 	hp_pos.y = POS_PLAYER.y;
 	hp_pos.z = POS_PLAYER.z;
 
-	//cout << hp_pos.x << " " << hp_pos.y << " " << hp_pos.z << endl;
+	cout << hp_pos.x << " " << hp_pos.y << " " << hp_pos.z << endl;
 }
 
 void CGameFramework::AnimateObjects()

@@ -963,3 +963,6 @@ CTexturedRectMesh::~CTexturedRectMesh()
 {
 }
 
+//void CTexturedRectMesh::set_size(float width, float height)
+//{
+// }
