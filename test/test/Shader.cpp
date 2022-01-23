@@ -7,7 +7,7 @@
 #include "GameFramework.h"
 #include "DDSTextureLoader12.h"
 #include "Player.h"
-
+#include <fstream>
 #include <iostream>
 using namespace std;
 #define BULLETCNT 100
@@ -15,7 +15,8 @@ using namespace std;
 #define ROOMZ 4000
 
 CHeightMapTerrain* map;
-
+ float hp_width = 30;
+ float hp_height = 50;
 float start[BULLETCNT];
 
 
@@ -420,9 +421,34 @@ void CObjectsShader::ReleaseShaderVariables()
 
 	CTexturedShader::ReleaseShaderVariables();
 }
+class Obstacle
+{
+public:
+	int _id;
+	float _x;
+	float _y;
+	float _z;
+};
 
 void CObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList ,void* pContext)
 {
+	Obstacle obstacles[609];
+	ifstream obstacles_read("tree_position.txt");
+	if (!obstacles_read.is_open()) {
+		cout << "파일을 읽을 수 없습니다" << endl;
+		return;
+	}
+	for (int i = 0; i < 609; i++) {
+		float x, y, z;
+		obstacles_read >> x >> y >> z;
+	//	cout << x << "," << y << "," << z << endl;
+		obstacles[i]._id = i;
+		obstacles[i]._x = x +2500;
+		obstacles[i]._y = y + 200;
+		obstacles[i]._z = z + 2500;
+	}
+
+
 	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)pContext;
 
 	map = pTerrain;
@@ -433,20 +459,20 @@ void CObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 	float fTerrainWidth = pTerrain->GetWidth();
 	float fTerrainLength = pTerrain->GetLength();
 
-	int xObjects = int(fTerrainWidth / fxPitch);
+	int xObjects = int(fTerrainWidth / fxPitch);   //97
 	int yObjects = 1;
 	int zObjects = int(fTerrainLength / fzPitch);
-	m_nObjects = (xObjects * yObjects * zObjects);
+	m_nObjects = (xObjects * yObjects * zObjects);  //97
 
 	m_nObjects += 1 + 2 * BULLETCNT + 1 + 4;
 #define TEXTURES 7
 	CTexture* pTexture[TEXTURES];
 	pTexture[0] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
 	pTexture[0] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
-	pTexture[0]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/tree.dds", RESOURCE_TEXTURE2D, 0);
+	pTexture[0]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/hp.dds", RESOURCE_TEXTURE2D, 0);   //여기 
 
 	pTexture[1] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
-	pTexture[1]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/hp.dds", RESOURCE_TEXTURE2D, 0);
+	pTexture[1]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/tree02.dds", RESOURCE_TEXTURE2D, 0);
 
 	pTexture[2] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
 	pTexture[2]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/tree02.dds", RESOURCE_TEXTURE2D, 0);
@@ -474,7 +500,7 @@ void CObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 	m_pMaterial = new CMaterial();
 	m_pMaterial->SetTexture(pTexture);
 #else
-	CMaterial* pMaterials[TEXTURES];
+	//CMaterial* pMaterials[TEXTURES];
 	for (int i = 0; i < TEXTURES; i++)
 	{
 		pMaterials[i] = new CMaterial();
@@ -482,8 +508,8 @@ void CObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 	}
 #endif
 
-	CTexturedRectMesh* pRectMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 30.0f, 50.0f, 0.0f);
-
+	pRectMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, hp_width, hp_height, 0.0f);
+	
 	CTexturedRectMesh* part = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 5, 5, 0.0f);
 
 	CReverseCubeMeshTextured* room = new CReverseCubeMeshTextured(pd3dDevice, pd3dCommandList, 300.0f, 100.0f, 300.0f);
@@ -532,6 +558,7 @@ void CObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 	std::uniform_int_distribution<> uid{ 0,2 };
 
 	int tmp;
+	int num = 0;
 	for (int i = 1 + 2 * BULLETCNT, x = 0; x < xObjects; x++)
 	{
 		for (int z = 0; z < zObjects; z++)
@@ -541,22 +568,36 @@ void CObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 				pBillboardObject = new CBillboardObject(1);
 				pBillboardObject->SetMesh(0, pRectMesh);
 #ifndef _WITH_BATCH_MATERIAL    
-				pBillboardObject->SetMaterial(pMaterials[uid(dre)]);  //여기
+
+				if (i == 201)
+					pBillboardObject->SetMaterial(pMaterials[0]);  //여기
+				else if (i > 201)
+					pBillboardObject->SetMaterial(pMaterials[1]);
+				//	pBillboardObject->SetMaterial(pMaterials[uid(dre)]);
+
 #endif
-				float xPosition = x * fxPitch;
-				float zPosition = z * fzPitch;
+				float xPosition = obstacles[x * num + z]._x;
+				float zPosition = obstacles[x * num + z ]._z;
 				float fHeight = pTerrain->GetHeight(xPosition, zPosition);
-				
-				if (xPosition <= fTerrainWidth / 2 - 200 || xPosition >= fTerrainWidth / 2 + 200 ||   //나무 위치     
-					zPosition <= fTerrainLength / 2 - 200 || zPosition >= fTerrainLength / 2 + 200) {
-					pBillboardObject->SetPosition(1028,  168, 1028);         //1028 168 1028
-					//cout << hp_pos.x << hp_pos.y << hp_pos.z << endl;
-				}
+				//cout << xPosition << " " << fHeight << " " << zPosition << endl;
+			//	if (xPosition <= fTerrainWidth / 2 - 200 || xPosition >= fTerrainWidth / 2 + 200 ||   //나무 위치     
+				//	zPosition <= fTerrainLength / 2 - 200 || zPosition >= fTerrainLength / 2 + 200) {
+				pBillboardObject->SetPosition(xPosition, 35, zPosition);         //1028 168 1028
+				//cout << hp_pos.x << hp_pos.y << hp_pos.z << endl;
+
+		//	}
+			//if (x == 1)
+			//pBillboardObject->SetPosition(xPosition, fHeight, zPosition);
 				pBillboardObject->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 				m_ppObjects[i++] = pBillboardObject;
 				tmp = i;
+
 			}
+			num += 1;
+			if (num > 9)
+				num = 9;
 		}
+	
 	}
 
 

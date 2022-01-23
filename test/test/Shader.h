@@ -9,6 +9,17 @@
 #include "Timer.h"
 
 extern CBillboardObject* pBillboardObject;
+extern CMaterial* pMaterials[7];
+extern CTexturedRectMesh* pRectMesh;
+
+extern float hp_width;
+extern float hp_height;
+
+
+extern ID3D12Device* pd3dDevice;
+extern ID3D12GraphicsCommandList* pd3dCommandList;
+
+
 class CShader
 {
 public:
