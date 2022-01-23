@@ -578,7 +578,7 @@ void CGameFramework::ProcessInput()   //¿©±â
 	hp_pos.y = POS_PLAYER.y;
 	hp_pos.z = POS_PLAYER.z;
 
-	cout << hp_pos.x << " " << hp_pos.y << " " << hp_pos.z << endl;
+	// cout << hp_pos.x << " " << hp_pos.y << " " << hp_pos.z << endl;
 }
 
 void CGameFramework::AnimateObjects()
@@ -622,8 +622,6 @@ void CGameFramework::FrameAdvance()
 	ProcessInput();
 
 	AnimateObjects();
-
-
 
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
