@@ -150,7 +150,6 @@ void process_packet(unsigned char* p)
 {
 
 	int type = *(p + 1);
-	cout << "type : " << type << endl;
 	switch (type) {
 	case SC_PACKET_LOGIN_OK: {
 		// 플레이어의 모든 정보를 보내주자
@@ -168,10 +167,8 @@ void process_packet(unsigned char* p)
 			my_position.x = packet->x;
 			my_position.y = packet->y;
 			my_position.z = packet->z;
-			cout << packet->x << "." << packet->y << "." << packet->z << endl;
 		}
 		else {
-			cout << "다른 플레이어 움직임 : " << packet->x << ", " <<  packet->y << "," <<  packet->z << endl;
 			mPlayer[packet->id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
 		}
 		break;
@@ -184,6 +181,7 @@ void process_packet(unsigned char* p)
 			mPlayer[p_id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
 			mPlayer[p_id]->m_tribe = static_cast<TRIBE>(packet->object_type);
 			strcpy(mPlayer[p_id]->m_name, packet->name);
+			mPlayer[p_id]->m_spices = packet->object_class;
 		}
 		break;
 	}
@@ -213,7 +211,6 @@ void process_packet(unsigned char* p)
 	}
 	case SC_PACKET_LOOK: {
 		sc_packet_look* packet = reinterpret_cast<sc_packet_look*>(p);
-		cout << "누가 회전하는가??" << endl;
 		XMFLOAT3 xmf3Look(packet->x, packet->y, packet->z);
 		mPlayer[packet->id]->SetLook(xmf3Look);
 		break;
@@ -254,12 +251,9 @@ void worker()
 			//if (packet_size <= 0) break;
 
 			while (packet_size <= remain_data) {
-				cout << "remain_data(1) : " << remain_data << endl;
-				cout << "packet_size(1) : " << packet_size << endl;
 				process_packet(packet_start);
 				remain_data -= packet_size;
 				packet_start += packet_size;
-				cout << "remain_data(2) : " << remain_data << endl;
 				if (remain_data > 0) packet_size = packet_start[0];
 				else break;
 			}
@@ -359,8 +353,28 @@ void return_otherPlayer(CPlayer** m_otherPlayer, ID3D12Device* m_pd3dDevice, ID3
 		if (m_otherPlayer[i]->GetUse() == false) {
 			m_otherPlayer[i]->SetUse(mPlayer[i]->GetUse());
 			// switch로 몬스터를 구분하자
-			reinterpret_cast<CAirplanePlayer*>(m_otherPlayer[i])->ChangeColor(
-				m_pd3dDevice, pd3dCommandList, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
+			if (mPlayer[i]->GetTribe() == MONSTER) {
+				switch (mPlayer[i]->m_spices)
+				{
+				case FALLEN_FLOG: {
+					reinterpret_cast<CAirplanePlayer*>(m_otherPlayer[i])->ChangeColor(
+						m_pd3dDevice, pd3dCommandList, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
+					break;
+				}
+				case FALLEN_CHICKEN: {
+					reinterpret_cast<CAirplanePlayer*>(m_otherPlayer[i])->ChangeColor(
+						m_pd3dDevice, pd3dCommandList, XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f));
+					break;
+				}
+				default:
+					break;
+				}
+			}
+			else if (mPlayer[i]->GetTribe() == HUMAN) {
+				if (i == my_id) continue;
+				reinterpret_cast<CAirplanePlayer*>(m_otherPlayer[i])->ChangeColor(
+					m_pd3dDevice, pd3dCommandList, XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
+			}
 		}
 		// 이름에 따른 컬러 바꾸어주기
 		// 한번만 바꿔주도록 하자

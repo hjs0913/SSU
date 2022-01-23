@@ -14,12 +14,12 @@ enum BUF_TYPE { B_NONE, B_PHYATTACK, B_MAGATTACK, B_PHYDEFENCE,
 	B_MAGDEFENCE, B_SPEED, B_BURN };
 enum ELEMENT { E_NONE, E_WATER, E_FULLMETAL, E_WIND, E_FIRE, E_TREE, E_EARTH, E_ICE };
 enum JOB {J_DILLER, J_TANKER, J_MAGISIAN, J_SUPPORTER};
-
+enum MONSTER_SPECIES{FALLEN_FLOG, FALLEN_CHICKEN};
 
 const int BUFSIZE = 256;
 const int RANGE = 200;
 const int AGRORANGE = 5;
-const int MAX_OBSTACLE = 10000;
+const int MAX_OBSTACLE = 609;
 const float PLAYER_VELOCITY = 0.5f;
 //------------------------------------------------------------
 
@@ -128,6 +128,7 @@ struct sc_packet_put_object {
 	int id;
 	float x, y, z;
 	char object_type;
+	char object_class;
 	char	name[MAX_NAME_SIZE];
 };
 

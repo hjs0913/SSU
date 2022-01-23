@@ -88,10 +88,13 @@ private:
 	CGameTimer						m_GameTimer;
 
 	CScene							*m_pScene = NULL;
+	
 	CPlayer							*m_pPlayer = NULL;
 	CCamera							*m_pCamera = NULL;
 
 	CPlayer							*m_pOthers[MAX_USER+MAX_NPC] = { NULL };
+
+	CPlayer							*m_pObstacles[MAX_OBSTACLE] = { NULL };
 
 	// 10.30
 	CObjectsShader* m_pObjectShader = NULL;

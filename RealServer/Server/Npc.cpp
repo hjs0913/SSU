@@ -135,8 +135,13 @@ void Npc::set_right(float right_x, float right_y, float right_z)
 	_right_z = right_z;
 }
 
-// get
+void Npc::set_mon_species(int s)
+{
+	_mon_species = static_cast<MONSTER_SPECIES>(s);
+}
 
+
+// get
 char* Npc::get_name()
 {
 	return _name;
@@ -228,4 +233,9 @@ float Npc::get_right_y()
 float Npc::get_right_z()
 {
 	return _right_z;
+}
+
+MONSTER_SPECIES Npc::get_mon_spices()
+{
+	return _mon_species;
 }
