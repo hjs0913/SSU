@@ -1,0 +1,7 @@
+﻿빌드 시작...
+1>------ 빌드 시작: 프로젝트: test1, 구성: Debug Win32 ------
+1>Object.cpp
+1>D:\test\test\Object.cpp(507,11): warning C4101: 'tmp' :참조되지 않은 지역 변수입니다.
+1>LabProject08-5.vcxproj -> D:\test\test\Debug\test1.exe
+1>"LabProject08-5.vcxproj" 프로젝트를 빌드했습니다.
+========== 빌드: 성공 1, 실패 0, 최신 0, 생략 0 ==========

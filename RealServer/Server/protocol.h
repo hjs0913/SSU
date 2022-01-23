@@ -25,8 +25,8 @@ const float PLAYER_VELOCITY = 0.5f;
 
 const short SERVER_PORT = 9000;
 
-const int  WORLD_HEIGHT = 2000;
-const int  WORLD_WIDTH = 2000;
+const int  WORLD_HEIGHT = 4000;
+const int  WORLD_WIDTH = 4000;
 const int  MAX_NAME_SIZE = 20;
 const int  MAX_CHAT_SIZE = 100;
 const int  MAX_USER = 1000;
