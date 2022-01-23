@@ -10,8 +10,12 @@
 #include <iostream>
 using namespace std;
 CBillboardObject* pBillboardObject = NULL;
+CMaterial* pMaterials[7];
 XMFLOAT3 hp_pos;
 XMFLOAT3 POS_PLAYER;
+CTexturedRectMesh* pRectMesh;
+ ID3D12Device* pd3dDevice;
+extern ID3D12GraphicsCommandList* pd3dCommandList;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 CTexture::CTexture(int nTextures, UINT nTextureType, int nSamplers, int nRootParameters)
@@ -529,6 +533,12 @@ CBillboardObject::~CBillboardObject() {
 void CBillboardObject::Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject* player) {  //여기 빌보드 회전시킴 -> 그러니까 여기서 빌보드의 위치도 머리위로 조정하자   //계속돌아
 
 	pBillboardObject->SetPosition(player->GetPosition().x, player->GetPosition().y + 20, player->GetPosition().z);
+	pBillboardObject->SetMaterial(pMaterials[0]);  //여기
+	hp_width -= 15;
+	hp_height -= 15;
+
+	//pRectMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, hp_width, hp_height, 0.0f);
+
 	XMFLOAT3 xmf3CameraPosition = pCamera->GetPosition();
 	SetLookAt(xmf3CameraPosition);
 
@@ -588,6 +598,7 @@ CHeightMapTerrain::CHeightMapTerrain(ID3D12Device* pd3dDevice, ID3D12GraphicsCom
 
 	pTerrainTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/Base_Texture.dds", RESOURCE_TEXTURE2D, 0);
 	pTerrainTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/load.dds", RESOURCE_TEXTURE2D, 1);
+
 
 	UINT ncbElementBytes = ((sizeof(CB_GAMEOBJECT_INFO) + 255) & ~255); //256의 배수
 
