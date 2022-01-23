@@ -576,8 +576,9 @@ void CObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 				//	pBillboardObject->SetMaterial(pMaterials[uid(dre)]);
 
 #endif
-				float xPosition = obstacles[x * num + z]._x;
-				float zPosition = obstacles[x * num + z ]._z;
+				// 장애물 인덱스 생각(기윤)
+				float xPosition = obstacles[x  + z]._x;
+				float zPosition = obstacles[x  + z ]._z;
 				float fHeight = pTerrain->GetHeight(xPosition, zPosition);
 				//cout << xPosition << " " << fHeight << " " << zPosition << endl;
 			//	if (xPosition <= fTerrainWidth / 2 - 200 || xPosition >= fTerrainWidth / 2 + 200 ||   //나무 위치     
