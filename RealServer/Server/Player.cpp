@@ -4,9 +4,9 @@ Player::Player(int id) : Npc(id)
 {
     _state = ST_FREE;
     _prev_size = 0;
-    _x = 300;
+    _x = 2100;
     _y = 0;
-    _z = 300;
+    _z = 1940;
     set_tribe(HUMAN);
     _lv = 25;
     _job = J_DILLER;

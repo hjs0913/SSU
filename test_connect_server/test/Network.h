@@ -8,7 +8,7 @@
 #include <DirectXMath.h>
 #include <array>
 
-#include "../RealServer/Server/protocol.h"
+#include "../../RealServer/Server/protocol.h"
 #include "stdafx.h"
 
 #ifdef UNICODE

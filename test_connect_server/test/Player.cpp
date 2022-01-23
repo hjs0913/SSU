@@ -10,6 +10,23 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CPlayer
 
+CPlayer::CPlayer()
+{
+	m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	m_xmf3Right = XMFLOAT3(1.0f, 0.0f, 0.0f);
+	m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+	m_xmf3Look = XMFLOAT3(0.0f, 0.0f, 1.0f);
+
+	m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	m_xmf3Gravity = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	m_fMaxVelocityXZ = 0.0f;
+	m_fMaxVelocityY = 0.0f;
+	m_fFriction = 0.0f;
+
+	m_fPitch = 0.0f;
+	m_fRoll = 0.0f;
+	m_fYaw = 0.0f;
+}
 
 CPlayer::CPlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, void* pContext, int nMeshes) : CGameObject(nMeshes)
 {
@@ -92,7 +109,7 @@ void CPlayer::Move(const XMFLOAT3& xmf3Shift, bool bUpdateVelocity)
 	else
 	{
 		m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3Shift);
-		m_pCamera->Move(xmf3Shift);
+		// m_pCamera->Move(xmf3Shift);
 	}
 }
 
@@ -252,18 +269,33 @@ void CPlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamer
 
 CAirplanePlayer::CAirplanePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, void* pContext, int nMeshes) : CPlayer(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, pContext, nMeshes)
 {
+	m_pCamera = ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
+
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+	CAirplaneMeshDiffused* pAirplaneMesh = new CAirplaneMeshDiffused(pd3dDevice, pd3dCommandList, 5.0f, 10.0f, 5.0f, XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	SetMesh(0, pAirplaneMesh);
+
+	UINT ncbElementBytes = ((sizeof(CB_PLAYER_INFO) + 255) & ~255); //256ÀÇ ¹è¼ö
+
+	CPlayerShader* pShader = new CPlayerShader();
+	pShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
+	pShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	pShader->CreateCbvSrvDescriptorHeaps(pd3dDevice, 1, 0);
+	pShader->CreateConstantBufferViews(pd3dDevice, 1, m_pd3dcbPlayer, ncbElementBytes);
+
+	SetCbvGPUDescriptorHandle(pShader->GetGPUCbvDescriptorStartHandle());
+
+	SetShader(pShader);
+
+	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)pContext;
+	SetPosition(XMFLOAT3(pTerrain->GetWidth() * 0.5f, 20.0f, pTerrain->GetLength() * 0.5f));
+	SetPlayerUpdatedContext(pTerrain);
+	SetCameraUpdatedContext(pTerrain);
 }
 
 CAirplanePlayer::~CAirplanePlayer()
 {
-}
-
-void CAirplanePlayer::OnPrepareRender()
-{
-	CPlayer::OnPrepareRender();
-
-	XMMATRIX mtxRotate = XMMatrixRotationRollPitchYaw(XMConvertToRadians(90.0f), 0.0f, 0.0f);
-	m_xmf4x4World = Matrix4x4::Multiply(mtxRotate, m_xmf4x4World);
 }
 
 CCamera* CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
@@ -315,6 +347,13 @@ CCamera* CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 	Update(fTimeElapsed);
 
 	return(m_pCamera);
+}
+
+void CAirplanePlayer::ChangeColor(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT4 color)
+{
+	// CMesh **m_ppMeshes
+	CAirplaneMeshDiffused* pAirplaneMesh = new CAirplaneMeshDiffused(pd3dDevice, pd3dCommandList, 5.0f, 10.0f, 5.0f, color);
+	SetMesh(0, pAirplaneMesh);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -402,7 +441,7 @@ void CTerrainPlayer::OnPlayerUpdateCallback(float fTimeElapsed)
 	XMFLOAT3 xmf3PlayerPosition = GetPosition();
 	int z = (int)(xmf3PlayerPosition.z / xmf3Scale.z);
 	bool bReverseQuad = ((z % 2) != 0);
-	float fHeight = pTerrain->GetHeight(xmf3PlayerPosition.x, xmf3PlayerPosition.z) + 2.0f ;
+	float fHeight = pTerrain->GetHeight(xmf3PlayerPosition.x, xmf3PlayerPosition.z) + 2.0f;
 	if (xmf3PlayerPosition.y < fHeight)
 	{
 		XMFLOAT3 xmf3PlayerVelocity = GetVelocity();
@@ -432,4 +471,14 @@ void CTerrainPlayer::OnCameraUpdateCallback(float fTimeElapsed)
 			p3rdPersonCamera->SetLookAt(GetPosition());
 		}
 	}
+}
+
+TRIBE CPlayer::GetTribe()
+{
+	return m_tribe;
+}
+
+void CPlayer::SetTribe(TRIBE t)
+{
+	m_tribe = t;
 }

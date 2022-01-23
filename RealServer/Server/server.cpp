@@ -422,7 +422,7 @@ void attack_success(int p_id, int target, float atk_factor)
         send_status_change_packet(reinterpret_cast<Player*>(players[target]));
 
         char mess[MAX_CHAT_SIZE];
-        send_chat_packet(reinterpret_cast<Player*>(players[target]), target, mess);
+        //send_chat_packet(reinterpret_cast<Player*>(players[target]), target, mess);
 
         // hp가 깎이였으므로 hp자동회복을 해주도록 하자
         if (reinterpret_cast<Player*>(players[target])->_auto_hp == false) {
@@ -662,7 +662,8 @@ void process_packet(int client_id, unsigned char* p)
         }
         default:
             cout << "Invalid move in client " << client_id << endl;
-            exit(-1);
+            cout << "왜 에러가 날까>>?" << (int)packet->direction << endl;
+            //exit(-1);
         }
         if (check_move_alright(x, z) == false) {
             break;
@@ -1300,6 +1301,9 @@ void worker()
             }
             players[target_id]->state_lock.unlock();
 
+            do_npc_move(client_id, exp_over->_target);
+
+            /*
             players[client_id]->lua_lock.lock();
             lua_State* L = players[client_id]->L;
             lua_getglobal(L, "event_npc_move");
@@ -1321,6 +1325,7 @@ void worker()
                 players[client_id]->set_active(false);
                 return_npc_position(client_id);
             }
+            */
             delete exp_over;
             
             break;
@@ -1690,10 +1695,33 @@ int huristic(int t_x, int t_z, int x, int z)
     return score*10;
 }
 
-
-
 void do_npc_move(int npc_id, int target)
 {
+    int x = players[npc_id]->get_x();
+    int z = players[npc_id]->get_z();
+    int t_x = players[target]->get_x();
+    int t_z = players[target]->get_z();
+
+    players[npc_id]->lua_lock.lock();
+    lua_State* L = players[npc_id]->L;
+    lua_getglobal(L, "event_npc_move");
+    lua_pushnumber(L, target);
+    int error = lua_pcall(L, 1, 1, 0);
+    if (error != 0) {
+        cout << "LUA_NPC_MOVE ERROR" << endl;
+    }
+    // bool값도 리턴을 해주자 
+    // true면 쫒아간다 
+    bool m = lua_toboolean(L, -1);
+    lua_pop(L, 1);
+    players[npc_id]->lua_lock.unlock();
+    if (!m) {
+        players[npc_id]->set_active(false);
+        return_npc_position(npc_id);
+        return;
+    }
+
+
     unordered_set<int> old_viewlist;
     unordered_set<int> new_viewlist;
     for (auto& obj : players) {
@@ -1711,10 +1739,6 @@ void do_npc_move(int npc_id, int target)
     }
 
 
-    int x = players[npc_id]->get_x();
-    int z = players[npc_id]->get_z();
-    int t_x = players[target]->get_x();
-    int t_z = players[target]->get_z();
     
     //cout << "Move : " << x << "," << z << endl;
 
@@ -1748,13 +1772,17 @@ void do_npc_move(int npc_id, int target)
         int cost[8]{ 10, 10, 10, 10, 14, 14, 14, 14 };
         while (true) {
             for (int i = 0; i < 8; i++) {
-                //cout << "씨발 : " << scoreF[now.first + dirX[i]][now.second + dirZ[i]] << endl;
+                //cout << "뭘까뭘까?? : " << scoreF[now.first + dirX[i]][now.second + dirZ[i]] << endl;
                 pos p(now.first + dirX[i], now.second + dirZ[i]);
 
+                if ((p.first > 60 || p.first < 0) || (p.second > 60 || p.second < 0)) continue;
                 // 검색된게 있다면 검색을 해주지 않는다
                 if (scoreF[now.first + dirX[i]][now.second + dirZ[i]] != 0) continue;
                 // 장애물이랑 부딪히는지 확인
-                if (false == check_move_alright(x + p.first - 30, z + p.second - 30)) continue;
+                if (false == check_move_alright(x + p.first - 30, z + p.second - 30)) {
+                    cout << "장애물 부딪힘" << endl;
+                    continue;
+                }
 
                 scoreG[now.first + dirX[i]][now.second + dirZ[i]] = scoreG[now.first][now.second] + cost[i];
                 scoreH[now.first + dirX[i]][now.second + dirZ[i]] = huristic(t_x, t_z, x + p.first - 30, z + p.second - 30);

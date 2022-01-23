@@ -1,7 +1,7 @@
-//#include "stdafx.h"
+#include "stdafx.h"
 #include "Network.h"
 #include "Player.h"
-#include "GameFramework.h"
+//#include "GameFramework.h"
 
 int my_id = 0;
 int m_prev_size = 0;
@@ -169,12 +169,14 @@ void process_packet(unsigned char* p)
 			my_position.z = packet->z;
 		}
 		else {
+			cout << "packet [" << packet->id << "] :" << packet->x << "," << packet->y << ", " << packet->z << endl;
 			mPlayer[packet->id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
 		}
 		break;
 	}
 	case SC_PACKET_PUT_OBJECT: {
 		sc_packet_put_object* packet = reinterpret_cast<sc_packet_put_object*> (p);
+		cout << packet->id << endl;
 		int p_id = packet->id;
 		if (static_cast<TRIBE>(packet->object_type) != OBSTACLE) {
 			mPlayer[p_id]->SetUse(true);
@@ -200,10 +202,12 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_DEAD: {
+		
 		sc_packet_dead* packet = reinterpret_cast<sc_packet_dead*> (p);
 		mPlayer[my_id]->SetUse(false);
 		cout << "died" << endl;
 		break;
+		
 	}
 	case SC_PACKET_REVIVE: {
 		// 아직 미구현
@@ -337,10 +341,12 @@ int netclose()
 }
 
 XMFLOAT3 return_myPosition() {
+	//cout << "position : " << my_position.x << ", " << my_position.y << ", " << my_position.z << endl;
 	return my_position;
 }
 
 void return_otherPlayer(CPlayer** m_otherPlayer, ID3D12Device* m_pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera) {
+	
 	for (int i = 0; i < MAX_USER+MAX_NPC; ++i) {
 		// 시야에서 사라짐
 		if (mPlayer[i]->GetUse() == false) {
@@ -384,6 +390,7 @@ void return_otherPlayer(CPlayer** m_otherPlayer, ID3D12Device* m_pd3dDevice, ID3
 		m_otherPlayer[i]->Render(pd3dCommandList, pCamera);
 
 	}
+	
 }
 
 XMFLOAT3 return_myCamera() {
