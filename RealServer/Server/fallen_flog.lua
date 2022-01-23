@@ -23,10 +23,10 @@ end
 
 function event_npc_move(player)
    player_x = API_get_x(player);
-   player_y = API_get_y(player);
+   player_z = API_get_z(player);
    x = API_get_x(my_id);
-   y = API_get_y(my_id);
-   if (math.abs(my_x - x) > 10) or (math.abs(my_y - y) > 10) then
+   z = API_get_z(my_id);
+   if (math.abs(my_x - x) > 30) or (math.abs(my_z - z) > 30) then
       return false;
    else
       -- 쫒아가는 것은 C로 짠다

@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "GameFramework.h"
+#include <fstream>
 
 CGameFramework::CGameFramework()
 {
@@ -396,6 +397,22 @@ void CGameFramework::BuildObjects()
 	m_pPlayer->SetUse(true);
 	for (auto& other : m_pOthers) other = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), NULL, 1);
 
+	fstream obstacles_read("tree_position.txt");
+	if (!obstacles_read.is_open()) {
+		cout << "파일을 읽을 수 없습니다" << endl;
+		exit(-1);
+	}
+
+	for (int i = 0; i < 609; i++) {
+		XMFLOAT3 read_pos;
+		obstacles_read >> read_pos.x >> read_pos.y >> read_pos.z;
+		m_pObstacles[i] = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), NULL, 1);
+		m_pObstacles[i]->SetPosition(read_pos);
+		m_pObstacles[i]->SetUse(true);
+		/*reinterpret_cast<CAirplanePlayer*>(m_pObstacles[i])->ChangeColor(
+			m_pd3dDevice, m_pd3dCommandList, XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));*/
+	}
+
 	m_pLaplacianEdgeDetectionShader = new CLaplacianEdgeShader();
 	m_pLaplacianEdgeDetectionShader->CreateShader(m_pd3dDevice, m_pScene->GetGraphicsRootSignature(), 1, NULL, DXGI_FORMAT_D32_FLOAT);
 	m_pLaplacianEdgeDetectionShader->BuildObjects(m_pd3dDevice, m_pd3dCommandList, &m_nDrawOptions);
@@ -476,7 +493,6 @@ void CGameFramework::ProcessInput()
 
 		if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f))
 		{
-			cout << "mouse??2" << endl;
 			if (cxDelta || cyDelta)
 			{
 				if (pKeysBuffer[VK_RBUTTON] & 0xF0) 
@@ -555,6 +571,8 @@ void CGameFramework::FrameAdvance()
 
 		return_otherPlayer(m_pOthers, m_pd3dDevice, m_pd3dCommandList, m_pCamera);
 		
+		for (auto& obs : m_pObstacles) obs->Render(m_pd3dCommandList, m_pCamera);
+
 		m_pPlayer->Render(m_pd3dCommandList, m_pCamera);
 		
 		m_pLaplacianEdgeDetectionShader->OnPostRenderTarget(m_pd3dCommandList);

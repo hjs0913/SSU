@@ -150,7 +150,6 @@ void process_packet(unsigned char* p)
 {
 
 	int type = *(p + 1);
-	cout << "type : " << type << endl;
 	switch (type) {
 	case SC_PACKET_LOGIN_OK: {
 		// 플레이어의 모든 정보를 보내주자
@@ -168,10 +167,8 @@ void process_packet(unsigned char* p)
 			my_position.x = packet->x;
 			my_position.y = packet->y;
 			my_position.z = packet->z;
-			cout << packet->x << "." << packet->y << "." << packet->z << endl;
 		}
 		else {
-			cout << "다른 플레이어 움직임 : " << packet->x << ", " <<  packet->y << "," <<  packet->z << endl;
 			mPlayer[packet->id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
 		}
 		break;
@@ -214,7 +211,6 @@ void process_packet(unsigned char* p)
 	}
 	case SC_PACKET_LOOK: {
 		sc_packet_look* packet = reinterpret_cast<sc_packet_look*>(p);
-		cout << "누가 회전하는가??" << endl;
 		XMFLOAT3 xmf3Look(packet->x, packet->y, packet->z);
 		mPlayer[packet->id]->SetLook(xmf3Look);
 		break;
@@ -255,12 +251,9 @@ void worker()
 			//if (packet_size <= 0) break;
 
 			while (packet_size <= remain_data) {
-				cout << "remain_data(1) : " << remain_data << endl;
-				cout << "packet_size(1) : " << packet_size << endl;
 				process_packet(packet_start);
 				remain_data -= packet_size;
 				packet_start += packet_size;
-				cout << "remain_data(2) : " << remain_data << endl;
 				if (remain_data > 0) packet_size = packet_start[0];
 				else break;
 			}

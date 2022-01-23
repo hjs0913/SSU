@@ -19,7 +19,7 @@ enum MONSTER_SPECIES{FALLEN_FLOG, FALLEN_CHICKEN};
 const int BUFSIZE = 256;
 const int RANGE = 200;
 const int AGRORANGE = 5;
-const int MAX_OBSTACLE = 650;
+const int MAX_OBSTACLE = 609;
 const float PLAYER_VELOCITY = 0.5f;
 //------------------------------------------------------------
 

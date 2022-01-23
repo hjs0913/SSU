@@ -3,6 +3,7 @@
 #include "database.h"
 #include "send.h"
 #include <fstream>
+#include <queue>
 
 CRITICAL_SECTION cs;
 
@@ -248,7 +249,7 @@ int get_new_id()
 bool check_move_alright(int x, int z)
 {
     for (auto& ob : obstacles) {
-        if (ob.get_x() == x && ob.get_z() == z) {
+        if ((ob.get_x() -2.5 <= x && x <= ob.get_x() + 2.5) && (ob.get_z() - 2.5 <= z && z <= ob.get_z()+2.5 )) {
             return false;
         }
     }
@@ -318,16 +319,17 @@ void attack_success(int p_id, int target, float atk_factor)
             players[target]->get_physical_defence()));
     float damage = give_damage * (1 - defence_damage);
     int target_hp = players[target]->get_hp() - damage;
-    cout << players[target]->get_defence_factor() << endl;
+   /* cout << players[target]->get_defence_factor() << endl;
     cout << players[target]->get_physical_defence() << endl;
     cout << "give_damage : " << give_damage << endl;
     cout << "defence_damage : " << defence_damage << endl;
     cout << players[target]->get_defence_factor() *
         players[target]->get_physical_defence() << endl;
     cout << (1 + (players[target]->get_defence_factor() *
-        players[target]->get_physical_defence())) << endl;
+        players[target]->get_physical_defence())) << endl;*/
 
-    cout << p_id << "가 " << damage << "의 데미지를 " << target << "에게 입혀"
+    cout << players[p_id]->get_name() << "가 " << damage << "의 데미지를 " 
+        << players[target]->get_name() << "에게 입혀"
         << target_hp << "의 피가 남음" << endl;
 
     players[target]->set_hp(target_hp);
@@ -420,8 +422,6 @@ void attack_success(int p_id, int target, float atk_factor)
         send_status_change_packet(reinterpret_cast<Player*>(players[target]));
 
         char mess[MAX_CHAT_SIZE];
-        sprintf_s(mess, MAX_CHAT_SIZE, "%s -> %s damage : %d",
-            players[p_id]->get_name(), players[target]->get_name(), damage);
         send_chat_packet(reinterpret_cast<Player*>(players[target]), target, mess);
 
         // hp가 깎이였으므로 hp자동회복을 해주도록 하자
@@ -830,8 +830,8 @@ void process_packet(int client_id, unsigned char* p)
                 continue;
             }
             players[i]->state_lock.unlock();
-            if (players[i]->get_x() >= pl->get_x() - 10 && players[i]->get_x() <= pl->get_x() + 10) {
-                if (players[i]->get_z() >= pl->get_z() - 10 && players[i]->get_z() <= pl->get_z() + 10) {
+            if (players[i]->get_x() >= pl->get_x() - 20 && players[i]->get_x() <= pl->get_x() + 20) {
+                if (players[i]->get_z() >= pl->get_z() - 20 && players[i]->get_z() <= pl->get_z() + 20) {
                     attack_success(client_id, players[i]->get_id(), pl->get_basic_attack_factor());    // 데미지 계산
                     // 몬스터의 자동공격을 넣어주자
                     if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
@@ -1036,14 +1036,10 @@ void process_packet(int client_id, unsigned char* p)
         unordered_set <int> my_vl{ pl->viewlist };
         pl->vl.unlock();
 
-        cout << "여기는 되냐??" << endl;
-        cout << pl->get_look_x() << ", " << pl->get_look_y() << ", " << pl->get_look_z() << endl;
-
         for (auto i : my_vl) {
             // Npc
             if (is_npc(i) == true) continue;
 
-            cout << "여기는 되냐??2" << endl;
             // Player
             sc_packet_look s_packet;
             s_packet.size = sizeof(s_packet);
@@ -1685,6 +1681,17 @@ void return_npc_position(int npc_id)
     }
 }
 
+int huristic(int t_x, int t_z, int x, int z) 
+{
+    int s_x = abs(t_x - x);
+    int s_z = abs(t_z - z);
+    int score = sqrt(pow(s_x, 2) + pow(s_z, 2));
+    cout << "huristic : " << score << endl;
+    return score*10;
+}
+
+
+
 void do_npc_move(int npc_id, int target)
 {
     unordered_set<int> old_viewlist;
@@ -1709,22 +1716,94 @@ void do_npc_move(int npc_id, int target)
     int t_x = players[target]->get_x();
     int t_z = players[target]->get_z();
     
-    cout << "Move : " << x << "," << z << endl;
-    // 원래는 여기에 A*알고리즘을 넣어야 한다
-    if (t_x != x) {
-        if (t_x > x) x+=5;
-        else x-=5;
-    }
-    else if(t_z != z){
-        if (t_z > z) z+=5;
-        else z-=5;
-    }
+    //cout << "Move : " << x << "," << z << endl;
+
+    typedef pair<int, int> pos;
+    vector<pos> mon_load;
     
-    if (false == check_move_alright(x, z)) {
-        return;
+    // A*알고리즘
+    {
+        // 쫒아가는 범위는 한 방향으로 30까지이다
+        int scoreG[61][61] = { 0 };
+        int scoreH[61][61] = { 0 };
+        int scoreF[61][61] = { 0 };
+        pos prior_point[61][61]{ pos(0,0) };
+
+        typedef pair<int, pos> weight;
+
+
+
+        pos now(30, 30);
+        scoreG[now.first][now.second] = 0;
+        scoreH[now.first][now.second] = huristic(t_x, t_z, x, z);
+        scoreF[now.first][now.second] = scoreG[now.first][now.second] + scoreH[now.first][now.second];
+
+        priority_queue < weight, vector<weight>, greater<weight>> open_q;
+        priority_queue < weight, vector<weight>, greater<weight>> close_q;
+        close_q.push(weight(scoreF[now.first][now.second], now));
+
+
+        int dirX[8] = { -1, 0, 1, 0, -1, 1, 1, -1 };
+        int dirZ[8] = { 0, -1, 0, 1, -1, -1, 1, 1 };
+        int cost[8]{ 10, 10, 10, 10, 14, 14, 14, 14 };
+        while (true) {
+            for (int i = 0; i < 8; i++) {
+                //cout << "씨발 : " << scoreF[now.first + dirX[i]][now.second + dirZ[i]] << endl;
+                pos p(now.first + dirX[i], now.second + dirZ[i]);
+
+                // 검색된게 있다면 검색을 해주지 않는다
+                if (scoreF[now.first + dirX[i]][now.second + dirZ[i]] != 0) continue;
+                // 장애물이랑 부딪히는지 확인
+                if (false == check_move_alright(x + p.first - 30, z + p.second - 30)) continue;
+
+                scoreG[now.first + dirX[i]][now.second + dirZ[i]] = scoreG[now.first][now.second] + cost[i];
+                scoreH[now.first + dirX[i]][now.second + dirZ[i]] = huristic(t_x, t_z, x + p.first - 30, z + p.second - 30);
+                scoreF[now.first + dirX[i]][now.second + dirZ[i]] = scoreG[now.first + dirX[i]][now.second + dirZ[i]] +
+                    scoreH[now.first + dirX[i]][now.second + dirZ[i]];
+                prior_point[now.first + dirX[i]][now.second + dirZ[i]] = pos(now.first, now.second);
+                
+                //cout << "scoreG : " << scoreG[now.first + dirX[i]][now.second + dirZ[i]] << endl;
+                //cout << "scoreH : " << scoreH[now.first + dirX[i]][now.second + dirZ[i]] << endl;
+                //cout << "scoreF : " << scoreF[now.first + dirX[i]][now.second + dirZ[i]] << endl << endl;
+
+                weight w(scoreF[now.first + dirX[i]][now.second + dirZ[i]], pos(now.first + dirX[i], now.second + dirZ[i]));
+                //cout << w.first << ", " << w.second.first << ", " << w.second.second << endl;
+                open_q.push(w);  
+            }
+            if (open_q.size() == 0) {
+                while (now.first != 30 || now.second != 30) {
+                    mon_load.push_back(now);
+                    now = prior_point[now.first][now.second];
+                }
+                break;
+            }
+            weight temp = open_q.top();
+            open_q.pop();
+            now = temp.second;
+            close_q.push(temp);
+
+            ///cout << " now : " << now.first << ", " << now.second << endl;
+
+            if (abs((now.first-30 + x) - t_x) <= 3 && abs((now.second-30 +z) - t_z) <= 3) {
+                while (now.first != 30 || now.second != 30) {
+                    mon_load.push_back(now);
+                    now = prior_point[now.first][now.second];
+                }
+                break;
+            }
+        }
     }
-    players[npc_id]->set_x(x);
-    players[npc_id]->set_z(z);
+
+    for (int i = 0; i < 2; ++i) {
+        if (mon_load.size() == 0) break;
+        x = x + mon_load.back().first-30;
+        z = z + mon_load.back().second - 30;
+        mon_load.pop_back();
+
+        players[npc_id]->set_x(x);
+        players[npc_id]->set_z(z);
+
+    }
 
     for (auto& obj : players) {
         if (obj->get_state() != ST_INGAME) continue;   // in game이 아닐때
@@ -1904,7 +1983,6 @@ int main()
     for (int i = 0; i < 609; i++) {
         float x, y, z;
         obstacles_read >> x >> y >> z;
-        cout << x << "," << y << "," << z << endl;
         obstacles[i].set_id(i);
         obstacles[i].set_x(x);
         obstacles[i].set_y(y);

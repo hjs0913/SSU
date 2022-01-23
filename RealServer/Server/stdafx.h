@@ -8,6 +8,7 @@
 #include <array>
 #include <vector>
 #include <chrono>
+#include <algorithm>
 #include <concurrent_priority_queue.h>      //lock를 쓰지 않고 열심히 큐를 사용 가능, atomic함 ->peak가 없음, pop도 없고 trypop만 있음
 
 
