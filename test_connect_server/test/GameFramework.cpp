@@ -446,9 +446,6 @@ void CGameFramework::BuildObjects()
 
 	m_pPlayer = new CTerrainPlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->GetTerrain(), 1);
 	m_pCamera = m_pPlayer->GetCamera();
-	
-	for (auto& other : m_pOthers) other = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->GetTerrain(), 1);
-
 	m_pPlayer->SetUse(true);
 
 	m_pd3dCommandList->Close();
@@ -685,7 +682,7 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 #endif
 	m_pPlayer->Render(m_pd3dCommandList, m_pCamera);
-	return_otherPlayer(m_pOthers, m_pd3dDevice, m_pd3dCommandList, m_pCamera);
+	//return_otherPlayer(m_pOthers, m_pd3dDevice, m_pd3dCommandList, m_pCamera);
 
 	d3dResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	d3dResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;

@@ -1,26 +1,32 @@
 my_id = 99999;
 my_lv = 23;
-my_name = "타락한 바나나 알러지 원숭이";
+my_name = "타락한 바나나원숭이";
 my_hp = 160000;
 my_physical_attack = 250;
-my_physical_defence = 2420;
+my_magical_attck = 0;
+my_physical_defence = 420;
 my_magical_defence = 180;
+my_basic_attack_factor = 10;
+my_defence_factor = 0.0002;
 my_x = 0;
 my_y = 0;
+my_z = 0;
 
-function set_uid(id, x, y)
+function set_uid(id, x, y, z)
    my_id = id;
    my_x = x;
    my_y = y;
-   return my_lv, my_hp, my_name;
+   my_z = z;
+   return my_lv, my_name, my_hp, my_physical_attack, my_magical_attck, 
+        my_phsical_defence, my_magical_defence, my_basic_attack_factor, my_defence_factor;
 end
 
 function event_npc_move(player)
    player_x = API_get_x(player);
-   player_y = API_get_y(player);
+   player_z = API_get_z(player);
    x = API_get_x(my_id);
-   y = API_get_y(my_id);
-   if (math.abs(my_x - x) > 10) or (math.abs(my_y - y) > 10) then
+   z = API_get_z(my_id);
+   if (math.abs(my_x - x) > 30) or (math.abs(my_z - z) > 30) then
       return false;
    else
       -- 쫒아가는 것은 C로 짠다
@@ -29,7 +35,11 @@ function event_npc_move(player)
 end
 
 function return_my_position()
-   return my_x, my_y;
+   return my_x, my_y, my_z;
+end
+
+function monster_revive()
+    return my_x, my_y, my_z, my_hp;
 end
 
 function attack_range(player)

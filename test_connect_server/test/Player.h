@@ -50,7 +50,7 @@ public:
 	// 일단 public으로 설정(어차피 서버에서 관리하기도 한다)
 	char						m_name[MAX_NAME_SIZE];
 	int							m_hp;
-	int							m_maxhp;
+	int							m_max_hp;
 	int							m_mp;
 	int							m_max_mp;
 	short						m_lv;
@@ -90,6 +90,10 @@ public:
 
 		m_xmf3Right = Vector3::CrossProduct(m_xmf3Up, m_xmf3Look, true);
 		m_xmf3Up = Vector3::CrossProduct(m_xmf3Look, m_xmf3Right, true);
+
+		m_xmf4x4World._11 = m_xmf3Right.x; m_xmf4x4World._12 = m_xmf3Right.y; m_xmf4x4World._13 = m_xmf3Right.z;
+		m_xmf4x4World._21 = m_xmf3Up.x; m_xmf4x4World._22 = m_xmf3Up.y; m_xmf4x4World._23 = m_xmf3Up.z;
+		m_xmf4x4World._31 = m_xmf3Look.x; m_xmf4x4World._32 = m_xmf3Look.y; m_xmf4x4World._33 = m_xmf3Look.z;
 	}
 
 	const XMFLOAT3& GetVelocity() const { return(m_xmf3Velocity); }
@@ -145,6 +149,7 @@ public:
 
 	void ChangeColor(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT4 color);
 
+	void Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject* otherplayer);
 };
 
 class CTerrainPlayer : public CPlayer

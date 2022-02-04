@@ -487,9 +487,9 @@ void process_packet(int client_id, unsigned char* p)
         }
         */
         // 원래는 DB에서 받아와야 하는 정보를 기본 정보로 대체
-        pl->set_x(300);
+        pl->set_x(2100);
         pl->set_y(0);
-        pl->set_z(300);
+        pl->set_z(1940);
         pl->set_job(J_DILLER);
         pl->set_lv(25);
         switch (pl->get_job()) {
@@ -1494,7 +1494,8 @@ void initialise_NPC()
         // 여기서 위치를 받아오자
 
         // 임시 좌표(원래는 몬스터 놓을 곳의 좌표를 뽑아와야한다)
-        players[i]->set_x((i-1000)*10 + 301);
+        players[i]->set_x(2100);
+        players[i]->set_z(2000);
         float temp_x = players[i]->get_x();
         float temp_y = players[i]->get_y();
         float temp_z = players[i]->get_z();
@@ -1543,7 +1544,8 @@ void initialise_NPC()
         // 여기서 위치를 받아오자
 
         // 임시 좌표(원래는 몬스터 놓을 곳의 좌표를 뽑아와야한다)
-        players[i]->set_x((i - 1000) * 10 + 601);
+        players[i]->set_x(2100);
+        players[i]->set_z(2200);
         float temp_x = players[i]->get_x();
         float temp_y = players[i]->get_y();
         float temp_z = players[i]->get_z();
@@ -1579,6 +1581,197 @@ void initialise_NPC()
         players[i]->set_mon_species(FALLEN_CHICKEN);
     }
 
+    // 타락한 토끼 소환
+    for (int i = NPC_ID_START + 60; i < NPC_ID_START + 90; ++i) {
+        players[i] = new Npc(i);
+        lua_State* L = players[i]->L = luaL_newstate();
+        luaL_openlibs(L);
+        int error = luaL_loadfile(L, "fallen_rabbit.lua") ||
+            lua_pcall(L, 0, 0, 0);
+
+        //-------------------------------------------
+        // 여기서 위치를 받아오자
+
+        // 임시 좌표(원래는 몬스터 놓을 곳의 좌표를 뽑아와야한다)
+        players[i]->set_x(2100);
+        players[i]->set_z(2300);
+        float temp_x = players[i]->get_x();
+        float temp_y = players[i]->get_y();
+        float temp_z = players[i]->get_z();
+        //-------------------------------------------
+
+
+        lua_getglobal(L, "set_uid");
+        lua_pushnumber(L, i);
+        lua_pushnumber(L, temp_x);
+        lua_pushnumber(L, temp_y);
+        lua_pushnumber(L, temp_z);
+        error = lua_pcall(L, 4, 9, 0);
+
+        if (error != 0) {
+            cout << "초기화 오류" << endl;
+        }
+        players[i]->set_lv(lua_tointeger(L, -9));
+        players[i]->set_name(lua_tostring(L, -8));
+        players[i]->set_hp(lua_tointeger(L, -7));
+        players[i]->set_physical_attack(lua_tonumber(L, -6));
+        players[i]->set_magical_attack(lua_tonumber(L, -5));
+        players[i]->set_physical_defence(lua_tonumber(L, -4));
+        players[i]->set_magical_defence(lua_tonumber(L, -3));
+        players[i]->set_basic_attack_factor(lua_tointeger(L, -2));
+        players[i]->set_defence_factor(lua_tonumber(L, -1));
+        lua_pop(L, 10);// eliminate set_uid from stack after call
+
+        // 여기는 나중에 생각하자
+        lua_register(L, "API_get_x", API_get_x);
+        lua_register(L, "API_get_y", API_get_y);
+        lua_register(L, "API_get_z", API_get_z);
+
+        players[i]->set_mon_species(FALLEN_RABBIT);
+    }
+    // 타락한 바나나 원숭이 소환
+    for (int i = NPC_ID_START + 90; i < NPC_ID_START + 120; ++i) {
+        players[i] = new Npc(i);
+        lua_State* L = players[i]->L = luaL_newstate();
+        luaL_openlibs(L);
+        int error = luaL_loadfile(L, "fallen_monkey.lua") ||
+            lua_pcall(L, 0, 0, 0);
+        //-------------------------------------------
+        // 여기서 위치를 받아오자
+
+        // 임시 좌표(원래는 몬스터 놓을 곳의 좌표를 뽑아와야한다)
+        players[i]->set_x(2100);
+        players[i]->set_z(2400);
+        float temp_x = players[i]->get_x();
+        float temp_y = players[i]->get_y();
+        float temp_z = players[i]->get_z();
+        //-------------------------------------------
+
+
+        lua_getglobal(L, "set_uid");
+        lua_pushnumber(L, i);
+        lua_pushnumber(L, temp_x);
+        lua_pushnumber(L, temp_y);
+        lua_pushnumber(L, temp_z);
+        error = lua_pcall(L, 4, 9, 0);
+        if (error != 0) {
+            cout << "초기화 오류" << endl;
+        }
+        players[i]->set_lv(lua_tointeger(L, -9));
+        players[i]->set_name(lua_tostring(L, -8));
+        players[i]->set_hp(lua_tointeger(L, -7));
+        players[i]->set_physical_attack(lua_tonumber(L, -6));
+        players[i]->set_magical_attack(lua_tonumber(L, -5));
+        players[i]->set_physical_defence(lua_tonumber(L, -4));
+        players[i]->set_magical_defence(lua_tonumber(L, -3));
+        players[i]->set_basic_attack_factor(lua_tointeger(L, -2));
+        players[i]->set_defence_factor(lua_tonumber(L, -1));
+        lua_pop(L, 10);// eliminate set_uid from stack after call
+
+        // 여기는 나중에 생각하자
+        lua_register(L, "API_get_x", API_get_x);
+        lua_register(L, "API_get_y", API_get_y);
+        lua_register(L, "API_get_z", API_get_z);
+
+        players[i]->set_mon_species(FALLEN_MONKEY);
+    }
+    // 늑대 우두머리 소환
+    for (int i = NPC_ID_START + 120; i < NPC_ID_START + 150; ++i) {
+        players[i] = new Npc(i);
+        lua_State* L = players[i]->L = luaL_newstate();
+        luaL_openlibs(L);
+        int error = luaL_loadfile(L, "wolf_boss.lua") ||
+            lua_pcall(L, 0, 0, 0);
+
+        //-------------------------------------------
+        // 여기서 위치를 받아오자
+
+        // 임시 좌표(원래는 몬스터 놓을 곳의 좌표를 뽑아와야한다)
+        players[i]->set_x(2100);
+        players[i]->set_z(2500);
+        float temp_x = players[i]->get_x();
+        float temp_y = players[i]->get_y();
+        float temp_z = players[i]->get_z();
+        //-------------------------------------------
+
+
+        lua_getglobal(L, "set_uid");
+        lua_pushnumber(L, i);
+        lua_pushnumber(L, temp_x);
+        lua_pushnumber(L, temp_y);
+        lua_pushnumber(L, temp_z);
+        error = lua_pcall(L, 4, 9, 0);
+
+        if (error != 0) {
+            cout << "초기화 오류" << endl;
+        }
+        players[i]->set_lv(lua_tointeger(L, -9));
+        players[i]->set_name(lua_tostring(L, -8));
+        players[i]->set_hp(lua_tointeger(L, -7));
+        players[i]->set_physical_attack(lua_tonumber(L, -6));
+        players[i]->set_magical_attack(lua_tonumber(L, -5));
+        players[i]->set_physical_defence(lua_tonumber(L, -4));
+        players[i]->set_magical_defence(lua_tonumber(L, -3));
+        players[i]->set_basic_attack_factor(lua_tointeger(L, -2));
+        players[i]->set_defence_factor(lua_tonumber(L, -1));
+        lua_pop(L, 10);// eliminate set_uid from stack after call
+
+        // 여기는 나중에 생각하자
+        lua_register(L, "API_get_x", API_get_x);
+        lua_register(L, "API_get_y", API_get_y);
+        lua_register(L, "API_get_z", API_get_z);
+
+        players[i]->set_mon_species(WOLF_BOSS);
+    }
+
+    // 타락한 호랑이 소환
+    for (int i = NPC_ID_START + 150; i < NPC_ID_START + 180; ++i) {
+        players[i] = new Npc(i);
+        lua_State* L = players[i]->L = luaL_newstate();
+        luaL_openlibs(L);
+        int error = luaL_loadfile(L, "fallen_tiger.lua") ||
+            lua_pcall(L, 0, 0, 0);
+
+        //-------------------------------------------
+        // 여기서 위치를 받아오자
+
+        // 임시 좌표(원래는 몬스터 놓을 곳의 좌표를 뽑아와야한다)
+        players[i]->set_x(2100);
+        players[i]->set_z(2600);
+        float temp_x = players[i]->get_x();
+        float temp_y = players[i]->get_y();
+        float temp_z = players[i]->get_z();
+        //-------------------------------------------
+
+
+        lua_getglobal(L, "set_uid");
+        lua_pushnumber(L, i);
+        lua_pushnumber(L, temp_x);
+        lua_pushnumber(L, temp_y);
+        lua_pushnumber(L, temp_z);
+        error = lua_pcall(L, 4, 9, 0);
+
+        if (error != 0) {
+            cout << "초기화 오류" << endl;
+        }
+        players[i]->set_lv(lua_tointeger(L, -9));
+        players[i]->set_name(lua_tostring(L, -8));
+        players[i]->set_hp(lua_tointeger(L, -7));
+        players[i]->set_physical_attack(lua_tonumber(L, -6));
+        players[i]->set_magical_attack(lua_tonumber(L, -5));
+        players[i]->set_physical_defence(lua_tonumber(L, -4));
+        players[i]->set_magical_defence(lua_tonumber(L, -3));
+        players[i]->set_basic_attack_factor(lua_tointeger(L, -2));
+        players[i]->set_defence_factor(lua_tonumber(L, -1));
+        lua_pop(L, 10);// eliminate set_uid from stack after call
+
+        // 여기는 나중에 생각하자
+        lua_register(L, "API_get_x", API_get_x);
+        lua_register(L, "API_get_y", API_get_y);
+        lua_register(L, "API_get_z", API_get_z);
+
+        players[i]->set_mon_species(FALLEN_TIGER);
+    }
 
     cout << "NPC로딩 완료" << endl;
 }

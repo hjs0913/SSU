@@ -345,54 +345,48 @@ XMFLOAT3 return_myPosition() {
 	return my_position;
 }
 
-void return_otherPlayer(CPlayer** m_otherPlayer, ID3D12Device* m_pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera) {
-	
-	for (int i = 0; i < MAX_USER+MAX_NPC; ++i) {
-		// 시야에서 사라짐
-		if (mPlayer[i]->GetUse() == false) {
-			m_otherPlayer[i]->SetUse(mPlayer[i]->GetUse());
-			continue;
-		}
+void get_basic_information(CPlayer* m_otherPlayer, int id)
+{
+	//m_otherPlayer->m_name = ;
+	m_otherPlayer->m_hp = mPlayer[id]->m_hp;
+	m_otherPlayer->m_max_hp = mPlayer[id]->m_max_hp;
+	m_otherPlayer->m_lv = mPlayer[id]->m_lv;
+	m_otherPlayer->m_tribe = mPlayer[id]->m_tribe;
+	m_otherPlayer->m_spices = mPlayer[id]->m_spices;
+	m_otherPlayer->m_element = mPlayer[id]->m_element;
+}
 
-		// 시야에 존재
-		// 원래 시야에 없던 존재라면
-		if (m_otherPlayer[i]->GetUse() == false) {
-			m_otherPlayer[i]->SetUse(mPlayer[i]->GetUse());
-			// switch로 몬스터를 구분하자
-			if (mPlayer[i]->GetTribe() == MONSTER) {
-				switch (mPlayer[i]->m_spices)
-				{
-				case FALLEN_FLOG: {
-					reinterpret_cast<CAirplanePlayer*>(m_otherPlayer[i])->ChangeColor(
-						m_pd3dDevice, pd3dCommandList, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
-					break;
-				}
-				case FALLEN_CHICKEN: {
-					reinterpret_cast<CAirplanePlayer*>(m_otherPlayer[i])->ChangeColor(
-						m_pd3dDevice, pd3dCommandList, XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f));
-					break;
-				}
-				default:
-					break;
-				}
-			}
-			else if (mPlayer[i]->GetTribe() == HUMAN) {
-				if (i == my_id) continue;
-				reinterpret_cast<CAirplanePlayer*>(m_otherPlayer[i])->ChangeColor(
-					m_pd3dDevice, pd3dCommandList, XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
-			}
-		}
-		// 이름에 따른 컬러 바꾸어주기
-		// 한번만 바꿔주도록 하자
-		m_otherPlayer[i]->SetPosition(mPlayer[i]->GetPosition());
-		// look을 넣어준다
-		m_otherPlayer[i]->SetLook(mPlayer[i]->GetLookVector());
-		m_otherPlayer[i]->Render(pd3dCommandList, pCamera);
-
-	}
-	
+void get_player_information(CPlayer* m_otherPlayer, int id)
+{
+	m_otherPlayer->m_mp = mPlayer[id]->m_mp;
+	m_otherPlayer->m_max_mp = mPlayer[id]->m_max_mp;
+	m_otherPlayer->m_physical_attack = mPlayer[id]->m_physical_attack;
+	m_otherPlayer->m_physical_defence = mPlayer[id]->m_physical_defence;
+	m_otherPlayer->m_magical_attack = mPlayer[id]->m_magical_attack;
+	m_otherPlayer->m_magical_defence = mPlayer[id]->m_magical_defence;
+	m_otherPlayer->m_basic_attack_factor = mPlayer[id]->m_basic_attack_factor;
+	m_otherPlayer->m_defence_factor = mPlayer[id]->m_defence_factor;
+	m_otherPlayer->m_move_speed = mPlayer[id]->m_move_speed;
+	m_otherPlayer->m_attack_speed = mPlayer[id]->m_attack_speed;
+	m_otherPlayer->m_exp = mPlayer[id]->m_exp;
 }
 
 XMFLOAT3 return_myCamera() {
 	return my_camera;
 }
+
+bool get_use_to_server(int id)
+{
+	return mPlayer[id]->GetUse();
+}
+
+XMFLOAT3 get_position_to_server(int id)
+{
+	return mPlayer[id]->GetPosition();
+}
+
+XMFLOAT3 get_look_to_server(int id)
+{
+	return mPlayer[id]->GetLookVector();
+}
+

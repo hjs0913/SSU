@@ -4,6 +4,8 @@
 
 #include "stdafx.h"
 #include "Scene.h"
+#include "../../RealServer/Server/protocol.h"
+#include "Network.h"
 
 CScene::CScene()
 {
@@ -34,8 +36,10 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 
 	CObjectsShader* pObjectShader = new CObjectsShader();
 	pObjectShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
-	pObjectShader->BuildObjects(pd3dDevice, pd3dCommandList, m_pTerrain);
+	//pObjectShader->BuildObjects(pd3dDevice, pd3dCommandList, m_pTerrain);
+	pObjectShader->BuildObjects2(pd3dDevice, pd3dCommandList, m_pTerrain, m_pd3dGraphicsRootSignature);
 	m_ppShaders[0] = pObjectShader;
+
 }
 
 void CScene::ReleaseObjects()
@@ -245,6 +249,7 @@ void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera
 	{
 		m_ppShaders[i]->Render(pd3dCommandList, pCamera);
 	}
+
 //	if (mirror)mirror->Render(pd3dCommandList, pCamera);
 //	if (reflect)reflect->Render(pd3dCommandList, pCamera);
 }

@@ -14,6 +14,7 @@ CMaterial* pMaterials[7];
 XMFLOAT3 hp_pos;
 XMFLOAT3 POS_PLAYER;
 CTexturedRectMesh* pRectMesh;
+CAirplaneMeshDiffused* pOtherPlayerMesh[7];
  ID3D12Device* pd3dDevice;
 extern ID3D12GraphicsCommandList* pd3dCommandList;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

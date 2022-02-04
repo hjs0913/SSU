@@ -10,6 +10,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CPlayer
 
+CAirplanePlayer* pOtherPlayer = NULL;
+
 CPlayer::CPlayer()
 {
 	m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
@@ -288,10 +290,6 @@ CAirplanePlayer::CAirplanePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 
 	SetShader(pShader);
 
-	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)pContext;
-	SetPosition(XMFLOAT3(pTerrain->GetWidth() * 0.5f, 20.0f, pTerrain->GetLength() * 0.5f));
-	SetPlayerUpdatedContext(pTerrain);
-	SetCameraUpdatedContext(pTerrain);
 }
 
 CAirplanePlayer::~CAirplanePlayer()
@@ -354,6 +352,13 @@ void CAirplanePlayer::ChangeColor(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 	// CMesh **m_ppMeshes
 	CAirplaneMeshDiffused* pAirplaneMesh = new CAirplaneMeshDiffused(pd3dDevice, pd3dCommandList, 5.0f, 10.0f, 5.0f, color);
 	SetMesh(0, pAirplaneMesh);
+}
+
+void CAirplanePlayer::Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject* otherplayer)
+{
+	SetPosition(otherplayer->GetPosition());
+	SetLook(otherplayer->GetLook());
+	//pOtherPlayer
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

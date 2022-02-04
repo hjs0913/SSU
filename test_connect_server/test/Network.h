@@ -56,4 +56,13 @@ XMFLOAT3 return_myCamera();
 
 #include "Camera.h"
 #include "Object.h"
-void return_otherPlayer(CPlayer** m_otherPlayer, ID3D12Device* m_pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+void get_basic_information(CPlayer* m_otherPlayer, int id);
+
+void get_player_information(CPlayer* m_otherPlayer, int id);
+
+bool get_use_to_server(int id);
+
+XMFLOAT3 get_position_to_server(int id);
+
+XMFLOAT3 get_look_to_server(int id);
+
