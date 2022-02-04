@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Shader.h"
+#include "Player.h"
 
 class CScene
 {
@@ -39,5 +40,6 @@ protected:
 	CSkyBox						*m_pSkyBox = NULL;
 	Mirror* mirror = NULL;
 	Reflect* reflect = NULL;
+	
 	ID3D12RootSignature			*m_pd3dGraphicsRootSignature = NULL;
 };

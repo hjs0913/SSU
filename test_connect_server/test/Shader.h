@@ -11,6 +11,7 @@
 extern CBillboardObject* pBillboardObject;
 extern CMaterial* pMaterials[7];
 extern CTexturedRectMesh* pRectMesh;
+extern CAirplaneMeshDiffused* pOtherPlayerMesh[7];
 
 extern float hp_width;
 extern float hp_height;
@@ -135,6 +136,7 @@ public:
     virtual ~CObjectsShader();
 
 	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList,  void *pContext = NULL);
+	virtual void BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext, ID3D12RootSignature* pd3dGraphicsRootSignature);
 	virtual void AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameObject* player, int bulletidx);
 	virtual void RotateObject(int i, float x, float y, float z);
 	virtual void ReleaseObjects();

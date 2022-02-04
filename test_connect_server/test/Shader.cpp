@@ -432,6 +432,8 @@ public:
 
 void CObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList ,void* pContext)
 {
+
+
 	Obstacle obstacles[609];
 	ifstream obstacles_read("tree_position.txt");
 	if (!obstacles_read.is_open()) {
@@ -447,7 +449,6 @@ void CObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 		obstacles[i]._y = y + 200;
 		obstacles[i]._z = z + 2500;
 	}
-
 
 	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)pContext;
 
@@ -668,6 +669,279 @@ void CObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 	m_ppObjects[tmp] = phouseObject;
 }
 
+void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext, ID3D12RootSignature* pd3dGraphicsRootSignature)
+{
+
+
+	Obstacle obstacles[609];
+	ifstream obstacles_read("tree_position.txt");
+	if (!obstacles_read.is_open()) {
+		cout << "파일을 읽을 수 없습니다" << endl;
+		return;
+	}
+	for (int i = 0; i < 609; i++) {
+		float x, y, z;
+		obstacles_read >> x >> y >> z;
+		//	cout << x << "," << y << "," << z << endl;
+		obstacles[i]._id = i;
+		obstacles[i]._x = x + 2500;
+		obstacles[i]._y = y + 200;
+		obstacles[i]._z = z + 2500;
+	}
+
+	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)pContext;
+
+	map = pTerrain;
+	float fxPitch = 12.0f * 3.5f;
+	float fyPitch = 12.0f * 3.5f;
+	float fzPitch = 12.0f * 3.5f;
+
+	float fTerrainWidth = pTerrain->GetWidth();
+	float fTerrainLength = pTerrain->GetLength();
+
+	int xObjects = int(fTerrainWidth / fxPitch);   //97
+	int yObjects = 1;
+	int zObjects = int(fTerrainLength / fzPitch);
+	m_nObjects = (xObjects * yObjects * zObjects);  //97
+
+	// m_nObjects += 1 + 2 * BULLETCNT + 1 + 4;
+	m_nObjects += 1 + 2 * BULLETCNT + 1 + 4 + MAX_NPC + MAX_USER;
+#define TEXTURES 7
+	CTexture* pTexture[TEXTURES];
+	pTexture[0] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
+	pTexture[0] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
+	pTexture[0]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/hp.dds", RESOURCE_TEXTURE2D, 0);   //여기 
+
+	pTexture[1] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
+	pTexture[1]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/tree02.dds", RESOURCE_TEXTURE2D, 0);
+
+	pTexture[2] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
+	pTexture[2]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/tree02.dds", RESOURCE_TEXTURE2D, 0);
+
+	pTexture[3] = new CTexture(1, RESOURCE_TEXTURE2D_ARRAY, 0, 1);
+	pTexture[3]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/house.dds", RESOURCE_TEXTURE2D, 0);
+
+	pTexture[4] = new CTexture(1, RESOURCE_TEXTURE2D_ARRAY, 0, 1);
+	pTexture[4]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/roof.dds", RESOURCE_TEXTURE2D, 0);
+
+	pTexture[5] = new CTexture(1, RESOURCE_TEXTURE2D_ARRAY, 0, 1);
+	pTexture[5]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/flare.dds", RESOURCE_TEXTURE2D, 0);
+
+	pTexture[6] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
+	pTexture[6]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/mirror.dds", RESOURCE_TEXTURE2D, 0);
+
+	UINT ncbElementBytes = ((sizeof(CB_GAMEOBJECT_INFO) + 255) & ~255);
+
+	CreateCbvSrvDescriptorHeaps(pd3dDevice, m_nObjects, 7);
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	CreateConstantBufferViews(pd3dDevice, m_nObjects, m_pd3dcbGameObjects, ncbElementBytes);
+	for (int i = 0; i < TEXTURES; i++) CreateShaderResourceViews(pd3dDevice, pTexture[i], 0, 3);
+
+#ifdef _WITH_BATCH_MATERIAL
+	m_pMaterial = new CMaterial();
+	m_pMaterial->SetTexture(pTexture);
+#else
+	//CMaterial* pMaterials[TEXTURES];
+	for (int i = 0; i < TEXTURES; i++)
+	{
+		pMaterials[i] = new CMaterial();
+		pMaterials[i]->SetTexture(pTexture[i]);
+	}
+#endif
+
+	pRectMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, hp_width, hp_height, 0.0f);
+
+	CTexturedRectMesh* part = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 5, 5, 0.0f);
+
+	CReverseCubeMeshTextured* room = new CReverseCubeMeshTextured(pd3dDevice, pd3dCommandList, 300.0f, 100.0f, 300.0f);
+
+	CCubeMeshDiffused* bullet = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 1.0f, 1.0f, 1.0f);
+
+	Car* car = new Car(pd3dDevice, pd3dCommandList, 5.0f, 5.0f, 5.0f);
+
+	pOtherPlayerMesh[0] = new CAirplaneMeshDiffused(pd3dDevice, pd3dCommandList, 
+		20.0f, 20.0f, 4.0f, XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	pOtherPlayerMesh[1] = new CAirplaneMeshDiffused(pd3dDevice, pd3dCommandList,
+		20.0f, 20.0f, 4.0f, XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
+	pOtherPlayerMesh[2] = new CAirplaneMeshDiffused(pd3dDevice, pd3dCommandList,
+		20.0f, 20.0f, 4.0f, XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
+	pOtherPlayerMesh[3] = new CAirplaneMeshDiffused(pd3dDevice, pd3dCommandList,
+		20.0f, 20.0f, 4.0f, XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f));
+	pOtherPlayerMesh[4] = new CAirplaneMeshDiffused(pd3dDevice, pd3dCommandList,
+		20.0f, 20.0f, 4.0f, XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f));
+	pOtherPlayerMesh[5] = new CAirplaneMeshDiffused(pd3dDevice, pd3dCommandList,
+		20.0f, 20.0f, 4.0f, XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f));
+	pOtherPlayerMesh[6] = new CAirplaneMeshDiffused(pd3dDevice, pd3dCommandList,
+		20.0f, 20.0f, 4.0f, XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+	//CAirplaneMeshDiffused* npc = new CAirplaneMeshDiffused(pd3dDevice, pd3dCommandList);
+
+	m_ppObjects = new CGameObject * [m_nObjects];
+	//CBillboardObject* pBillboardObject = NULL;
+
+	CGameObject* phouseObject = new CGameObject(1);
+
+	phouseObject = new CGameObject(1);
+	phouseObject->SetMesh(0, room);
+#ifndef _WITH_BATCH_MATERIAL
+	phouseObject->SetMaterial(pMaterials[3]);
+#endif
+	phouseObject->SetPosition(ROOMX, 50, ROOMZ);
+
+	phouseObject->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr);
+	m_ppObjects[0] = phouseObject;
+
+	CBulletObject* bulletmesh;
+	for (int i = 1; i < 1 + BULLETCNT; ++i) {
+		bulletmesh = new CBulletObject(1);
+		bulletmesh->SetMesh(0, bullet);
+		//bulletmesh->SetMaterial(pMaterials[(i - 2) % 2 + 3]);
+
+		bulletmesh->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+		m_ppObjects[i] = bulletmesh;
+	}
+
+	for (int i = 1 + BULLETCNT; i < 1 + 2 * BULLETCNT; ++i) {
+		pBillboardObject = new CBillboardObject(1);
+		pBillboardObject->SetMesh(0, part);
+#ifndef _WITH_BATCH_MATERIAL
+		pBillboardObject->SetMaterial(pMaterials[5]);
+#endif
+		pBillboardObject->SetPosition(0, -100, 0);
+		pBillboardObject->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+		m_ppObjects[i] = pBillboardObject;
+	}
+
+	std::default_random_engine dre;
+	std::uniform_int_distribution<> uid{ 0,2 };
+
+	int tmp;
+	int num = 0;
+	for (int i = 1 + 2 * BULLETCNT, x = 0; x < xObjects; x++)
+	{
+		for (int z = 0; z < zObjects; z++)
+		{
+			for (int y = 0; y < yObjects; y++)
+			{
+				pBillboardObject = new CBillboardObject(1);
+				pBillboardObject->SetMesh(0, pRectMesh);
+#ifndef _WITH_BATCH_MATERIAL    
+
+				if (i == 201)
+					pBillboardObject->SetMaterial(pMaterials[0]);  //여기
+				else if (i > 201)
+					pBillboardObject->SetMaterial(pMaterials[1]);
+				//	pBillboardObject->SetMaterial(pMaterials[uid(dre)]);
+
+#endif
+				// 장애물 인덱스 생각(기윤)
+				float xPosition = obstacles[x + z]._x;
+				float zPosition = obstacles[x + z]._z;
+				float fHeight = pTerrain->GetHeight(xPosition, zPosition);
+				//cout << xPosition << " " << fHeight << " " << zPosition << endl;
+			//	if (xPosition <= fTerrainWidth / 2 - 200 || xPosition >= fTerrainWidth / 2 + 200 ||   //나무 위치     
+				//	zPosition <= fTerrainLength / 2 - 200 || zPosition >= fTerrainLength / 2 + 200) {
+				pBillboardObject->SetPosition(xPosition, 35, zPosition);         //1028 168 1028
+				//cout << hp_pos.x << hp_pos.y << hp_pos.z << endl;
+
+		//	}
+			//if (x == 1)
+			//pBillboardObject->SetPosition(xPosition, fHeight, zPosition);
+				pBillboardObject->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+				m_ppObjects[i++] = pBillboardObject;
+				tmp = i;
+			}
+			num += 1;
+			if (num > 9)
+				num = 9;
+		}
+
+	}
+
+
+	phouseObject = new CGameObject(1);
+	phouseObject->SetMesh(0, car);
+#ifndef _WITH_BATCH_MATERIAL
+	phouseObject->SetMaterial(pMaterials[6]);
+#endif
+	phouseObject->SetPosition(ROOMX + 30, 12, ROOMZ - 10);
+
+	phouseObject->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + ::gnCbvSrvDescriptorIncrementSize * tmp);
+	m_ppObjects[tmp] = phouseObject;
+
+
+
+
+
+	phouseObject = new CGameObject(1);
+	phouseObject->SetMesh(0, room);
+#ifndef _WITH_BATCH_MATERIAL
+	phouseObject->SetMaterial(pMaterials[3]);
+#endif
+	XMVECTOR mirrorPlane = XMVectorSet(0.0f, 0.0f, 1.0f, 0); // xy plane
+	XMMATRIX R = XMMatrixReflect(mirrorPlane);
+	XMStoreFloat4x4(&phouseObject->m_xmf4x4World, XMLoadFloat4x4(&phouseObject->m_xmf4x4World) * R);
+	phouseObject->SetPosition(ROOMX, 50, ROOMZ + 300);
+	phouseObject->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + ::gnCbvSrvDescriptorIncrementSize * (++tmp));
+	m_ppObjects[tmp] = phouseObject;
+
+
+	phouseObject = new CGameObject(1);
+	phouseObject->SetMesh(0, car);
+#ifndef _WITH_BATCH_MATERIAL
+	phouseObject->SetMaterial(pMaterials[6]);
+#endif
+	mirrorPlane = XMVectorSet(0.0f, 0.0f, 1.0f, 00);
+	R = XMMatrixReflect(mirrorPlane);
+	XMStoreFloat4x4(&phouseObject->m_xmf4x4World, XMLoadFloat4x4(&phouseObject->m_xmf4x4World) * R);
+	phouseObject->SetPosition(ROOMX + 30, 12, ROOMZ + 310);
+	phouseObject->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + ::gnCbvSrvDescriptorIncrementSize * (++tmp));
+	m_ppObjects[tmp] = phouseObject;
+
+
+	Skull* skull = new Skull(pd3dDevice, pd3dCommandList, 2.0f, 2.0f, 2.0f);
+	phouseObject = new CGameObject(1);
+	phouseObject->SetMesh(0, skull);
+#ifndef _WITH_BATCH_MATERIAL
+	phouseObject->SetMaterial(pMaterials[5]);
+#endif
+	mirrorPlane = XMVectorSet(0.0f, 0.0f, 1.0f, 0); // xy plane
+	R = XMMatrixReflect(mirrorPlane);
+	XMStoreFloat4x4(&phouseObject->m_xmf4x4World, XMLoadFloat4x4(&phouseObject->m_xmf4x4World) * R);
+
+	//	phouseObject->SetPosition(ROOMX, 0, ROOMZ + 300);
+	phouseObject->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + ::gnCbvSrvDescriptorIncrementSize * (++tmp));
+	m_ppObjects[tmp] = phouseObject;
+
+
+	CTexturedRectMesh* mirror = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 100, 100, 0.0f, 0, 0, 1);
+	phouseObject = new CGameObject(1);
+	phouseObject->SetMesh(0, mirror);
+#ifndef _WITH_BATCH_MATERIAL
+	phouseObject->SetMaterial(pMaterials[6]);
+#endif
+	phouseObject->SetPosition(ROOMX, 50, ROOMZ + 150);
+	phouseObject->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + ::gnCbvSrvDescriptorIncrementSize * (++tmp));
+	m_ppObjects[tmp] = phouseObject;
+
+	// 플레이어
+	for (int i = m_nObjects - MAX_NPC - MAX_USER; i < m_nObjects - MAX_NPC; i++) {
+		CAirplanePlayer* pOtherPlayer = new CAirplanePlayer(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+		pOtherPlayer->SetMesh(0, pOtherPlayerMesh[2]);
+		pOtherPlayer->SetPosition(XMFLOAT3(0, -100, 0));
+		pOtherPlayer->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr);
+		m_ppObjects[i] = pOtherPlayer;
+	}
+
+	// NPC
+	for (int i = m_nObjects - MAX_NPC; i < m_nObjects; i++) {
+		CAirplanePlayer* pNpc = new CAirplanePlayer(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+		pNpc->SetMesh(0, pOtherPlayerMesh[1]);
+		pNpc->SetPosition(XMFLOAT3(0, -100, 0));
+		pNpc->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr);
+		m_ppObjects[i] = pNpc;
+	}
+}
+
 void CObjectsShader::ReleaseObjects()
 {
 	if (m_ppObjects)
@@ -683,9 +957,66 @@ void CObjectsShader::ReleaseObjects()
 
 void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameObject* player, int bulletidx)
 {
+	CAirplanePlayer* pPlayer = NULL;
+	int server_id = MAX_USER + MAX_NPC;
+	int MAX_WORLD_SHADER = m_nObjects - server_id;
 	for (int j = 0; j < m_nObjects; j++)
 	{
-		if (j <= bulletidx) {
+		if (j >= m_nObjects - server_id) {
+			pPlayer = reinterpret_cast<CAirplanePlayer*>(m_ppObjects[j]);
+			bool tp = pPlayer->GetUse();
+			pPlayer->SetUse(get_use_to_server(j-MAX_WORLD_SHADER));
+			if (pPlayer->GetUse()) {
+				if (tp != pPlayer->GetUse()) {
+					// 최초 정보 불러오기 및 종족에 맞게 변환
+					get_basic_information(pPlayer, j - MAX_WORLD_SHADER);
+					if (pPlayer->m_tribe == HUMAN) {
+						pPlayer->SetMesh(0, pOtherPlayerMesh[2]);
+						get_player_information(pPlayer, j - MAX_WORLD_SHADER);
+					}
+					else {
+						switch (pPlayer->m_spices)
+						{
+						case FALLEN_FLOG: {
+							pPlayer->SetMesh(0, pOtherPlayerMesh[1]);
+							break;
+						}
+						case FALLEN_CHICKEN: {
+							pPlayer->SetMesh(0, pOtherPlayerMesh[3]);
+							break;
+						}
+						case FALLEN_RABBIT: {
+							pPlayer->SetMesh(0, pOtherPlayerMesh[6]);
+							break;
+						}
+						case FALLEN_MONKEY: {
+							pPlayer->SetMesh(0, pOtherPlayerMesh[5]);
+							break;
+						}
+						case WOLF_BOSS: {
+							pPlayer->SetMesh(0, pOtherPlayerMesh[4]);
+							break;
+						}
+						case FALLEN_TIGER: {
+							pPlayer->SetMesh(0, pOtherPlayerMesh[0]);
+							break;
+						}
+						default:
+							break;
+						}
+					}
+				}
+				// 이때만 렌더링
+				m_ppObjects[j]->SetPosition(get_position_to_server(j - MAX_WORLD_SHADER));
+				pPlayer->SetLook(get_look_to_server(j - MAX_WORLD_SHADER));
+				pPlayer->Animate(pTimer, pCamera, m_ppObjects[j]);
+			}
+			else {
+				m_ppObjects[j]->SetPosition(XMFLOAT3(0, -100, 0));
+				pPlayer->Animate(pTimer, pCamera, m_ppObjects[j]);
+			}
+		}
+		else if (j <= bulletidx) {
 			if (m_ppObjects[j]->GetPosition().x < 0 || m_ppObjects[j]->GetPosition().x>5000 ||
 				m_ppObjects[j]->GetPosition().z < 0 || m_ppObjects[j]->GetPosition().z>5000) {
 				m_ppObjects[j]->SetPosition(0, -100, 0);
