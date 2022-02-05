@@ -31,7 +31,7 @@ void err_display(const char* msg);
 
 void send_attack_packet(int skill);
 
-void send_move_packet(int direction);
+void send_move_packet(XMFLOAT3 position);
 
 void send_look_packet(XMFLOAT3 look, XMFLOAT3 right);
 

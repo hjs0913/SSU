@@ -634,38 +634,15 @@ void process_packet(int client_id, unsigned char* p)
     case CS_PACKET_MOVE: {
         cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(p);
         // pl.last_move_time = packet->move_time;
-        float x = pl->get_x();
-        float y = pl->get_y();
-        float z = pl->get_z();
         pl->last_move_time = packet->move_time;
-        pl->direction = packet->direction;
-        switch (packet->direction) {
-        case 0: {
-            x = pl->get_look_x() * PLAYER_VELOCITY + x;
-            z = pl->get_look_z() * PLAYER_VELOCITY + z;
-            break;
-        }
-        case 1: {
-            x = -(pl->get_look_x()) * PLAYER_VELOCITY + x;
-            z = -(pl->get_look_z()) * PLAYER_VELOCITY + z;
-            break;
-        }
-        case 2: {
-            x = -(pl->get_right_x()) * PLAYER_VELOCITY + x;
-            z = -(pl->get_right_z()) * PLAYER_VELOCITY + z;
-            break;
-        }
-        case 3: {
-            x = (pl->get_right_x()) * PLAYER_VELOCITY + x;
-            z = (pl->get_right_z()) * PLAYER_VELOCITY + z;
-            break;
-        }
-        default:
-            cout << "Invalid move in client " << client_id << endl;
-            cout << "왜 에러가 날까>>?" << (int)packet->direction << endl;
-            //exit(-1);
-        }
+        float x = packet->x;
+        float y = packet->y;
+        float z = packet->z;       
+
+        // 유효성 검사
         if (check_move_alright(x, z) == false) {
+            // 올바르지 않을경우 위치를 수정을 해주어야 한다
+            send_move_packet(pl, pl);
             break;
         }
 
@@ -698,7 +675,7 @@ void process_packet(int client_id, unsigned char* p)
         }
         nearlist.erase(client_id);  // 내 아이디는 무조건 들어가니 그것을 지워주자
 
-        send_move_packet(pl, pl); // 내 자신의 움직임을 먼저 보내주자
+        // send_move_packet(pl, pl); // 내 자신의 움직임을 먼저 보내주자
 
         pl->vl.lock();
         unordered_set <int> my_vl{ pl->viewlist };
@@ -869,7 +846,6 @@ void process_packet(int client_id, unsigned char* p)
         break;
     }
     case CS_PACKET_TELEPORT: {
-        pl->direction = 1;
         pl->set_x(rand() % WORLD_WIDTH);
         pl->set_y(rand() % WORLD_HEIGHT);
         sc_packet_move packet;
@@ -1940,7 +1916,7 @@ void do_npc_move(int npc_id, int target)
     
     // A*알고리즘
     {
-        // 쫒아가는 범위는 한 방향으로 30까지이다
+        // 쫒아가는 범위는 한 방향으로 30까지이다 -> (수정필요) 현재 70으로 바뀜
         int scoreG[61][61] = { 0 };
         int scoreH[61][61] = { 0 };
         int scoreF[61][61] = { 0 };
