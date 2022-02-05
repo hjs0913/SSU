@@ -12,7 +12,6 @@ Player::Player(int id) : Npc(id)
     _job = J_DILLER;
     _attack_active = false;
     last_move_time = 0;
-    direction = 1;
 }
 
 void Player::set_exp(int exp)

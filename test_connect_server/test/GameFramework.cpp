@@ -476,20 +476,20 @@ void CGameFramework::ProcessInput()   //여기
 	{
 		DWORD dwDirection = 0;
 		if (pKeysBuffer['W'] & 0xF0) {
-			send_move_packet(0);
-			//dwDirection |= DIR_FORWARD;
+			//send_move_packet(0);
+			dwDirection |= DIR_FORWARD;
 		}
 		if (pKeysBuffer['S'] & 0xF0) {
-			send_move_packet(1);
-			//dwDirection |= DIR_BACKWARD;
+			//send_move_packet(1);
+			dwDirection |= DIR_BACKWARD;
 		}
 		if (pKeysBuffer['A'] & 0xF0) {
-			send_move_packet(2);
-			//dwDirection |= DIR_LEFT;
+			//send_move_packet(2);
+			dwDirection |= DIR_LEFT;
 		}
 		if (pKeysBuffer['D'] & 0xF0) {
-			send_move_packet(3);
-			//dwDirection |= DIR_RIGHT;
+			//send_move_packet(3);
+			dwDirection |= DIR_RIGHT;
 		}
 
 		static bool pushq = true;
@@ -580,18 +580,14 @@ void CGameFramework::ProcessInput()   //여기
 					}
 				}
 			}
-			// if (dwDirection) m_pPlayer->Move(dwDirection, 50.0f * m_GameTimer.GetTimeElapsed(), true);
-
+			// 이동
+			if (dwDirection) m_pPlayer->Move(dwDirection, 50.0f * m_GameTimer.GetTimeElapsed(), true);
+			
+			send_move_packet(m_pPlayer->GetPosition());
 			send_look_packet(m_pPlayer->GetLookVector(), m_pPlayer->GetRightVector());
 		}
 	}
 	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
-	POS_PLAYER = m_pPlayer->GetPosition();
-	hp_pos.x = POS_PLAYER.x;
-	hp_pos.y = POS_PLAYER.y;
-	hp_pos.z = POS_PLAYER.z;
-
-	// cout << hp_pos.x << " " << hp_pos.y << " " << hp_pos.z << endl;
 }
 
 void CGameFramework::AnimateObjects()
@@ -635,8 +631,8 @@ void CGameFramework::FrameAdvance()
 	ProcessInput();
 
 	// receive Player position to server
-	m_pPlayer->SetPosition(return_myPosition());
-	m_pCamera->Move(return_myCamera());
+	// m_pPlayer->SetPosition(return_myPosition());
+	// m_pCamera->Move(return_myCamera());
 	//------------------------------------
 
 	AnimateObjects();
@@ -682,7 +678,6 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 #endif
 	m_pPlayer->Render(m_pd3dCommandList, m_pCamera);
-	//return_otherPlayer(m_pOthers, m_pd3dDevice, m_pd3dCommandList, m_pCamera);
 
 	d3dResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	d3dResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;

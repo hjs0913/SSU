@@ -74,12 +74,15 @@ void send_attack_packet(int skill)
 	do_send(sizeof(packet), &packet);
 }
 
-void send_move_packet(int direction)
+void send_move_packet(XMFLOAT3 position)
 {
 	cs_packet_move packet;
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET_MOVE;
-	packet.direction = (char)direction;
+	//packet.direction = (char)direction;
+	packet.x = position.x;
+	packet.y = position.y;
+	packet.z = position.z;
 	do_send(sizeof(packet), &packet);
 }
 

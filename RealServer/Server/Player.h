@@ -26,7 +26,6 @@ public:
     unordered_set<int>  ob_viewlist;
 
     int                 last_move_time;
-    int                 direction;  // 0 : up, 1: down, 2: left, 3:right 
 public:
     Player(int id);
 
