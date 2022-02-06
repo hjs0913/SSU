@@ -229,71 +229,316 @@ CCubeMeshIlluminatedTextured::~CCubeMeshIlluminatedTextured()
 //
 CAirplaneMeshDiffused::CAirplaneMeshDiffused(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, float fWidth, float fHeight, float fDepth, XMFLOAT4 xmf4Color) : CMeshDiffused(pd3dDevice, pd3dCommandList)
 {
-	m_nVertices = 36;
+	m_nVertices = 192;
 	m_nStride = sizeof(CDiffusedVertex);
 	m_nOffset = 0;
 	m_nSlot = 0;
 	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
-	float fx = fWidth*0.5f, fy = fHeight*0.5f, fz = fDepth*0.5f;
+	float fx = fWidth * 0.5f, fy = fHeight * 0.5f, fz = fDepth * 0.5f;
 
-	CDiffusedVertex pVertices[36];
+	CDiffusedVertex pVertices[192];
+	CDiffusedVertex upCenter = CDiffusedVertex(XMFLOAT3(0, +fy, 0), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	CDiffusedVertex downCenter = CDiffusedVertex(XMFLOAT3(0, -fy, 0), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	float pi = 3.141592f;
+	float angle = pi / 8.0f;			// 22.5
 
 	int i = 0;
-	// 앞
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, +fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	// 위 뚜껑 
+#pragma region UpShape
+	// 1사분면
+	pVertices[i++] = upCenter;		// 0, 1, 2
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(0, +fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fz * sin(angle), +fy, +fz * cos(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
 
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = upCenter;		// 0, 2, 3
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fz * sin(angle), +fy, +fz * cos(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fz * sin(angle * 2.0f), +fy, fz * cos(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
 
-	//뒤
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, -fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = upCenter;		//  0, 3, 4
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fz * sin(angle * 2.0f), +fy, fz * cos(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fz * sin(angle * 3.0f), +fy, fz * cos(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	pVertices[i++] = upCenter;		// 0, 4, 5
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fz * sin(angle * 3.0f), +fy, fz * cos(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, +fy, 0), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	// 2사분면
+	pVertices[i++] = upCenter;		// 0, 5, 6
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, +fy, 0), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fx * cos(angle), +fy, -fx * sin(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	pVertices[i++] = upCenter;		// 0, 6, 7
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fx * cos(angle), +fy, -fx * sin(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fx * cos(angle * 2.0f), +fy, -fx * sin(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+		
+	pVertices[i++] = upCenter;		// 0, 7, 8
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fx * cos(angle * 2.0f), +fy, -fx * sin(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fx * cos(angle * 3.0f), +fy, -fx * sin(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	pVertices[i++] = upCenter;		// 0, 8, 9
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fx * cos(angle * 3.0f), +fy, -fx * sin(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(0, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	// 3사분면
+	pVertices[i++] = upCenter;		// 0, 9, 10
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(0, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fz * sin(angle), +fy, -fz * cos(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	pVertices[i++] = upCenter;		// 0, 10, 11
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fz * sin(angle), +fy, -fz * cos(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fz * sin(angle * 2.0f), +fy, -fz * cos(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	pVertices[i++] = upCenter;		//  0, 11, 12
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fz * sin(angle * 2.0f), +fy, -fz * cos(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fz * sin(angle * 3.0f), +fy, -fz * cos(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	pVertices[i++] = upCenter;		// 0, 12, 13
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fz * sin(angle * 3.0f), +fy, -fz * cos(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, 0), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	// 4사분면
+	pVertices[i++] = upCenter;		// 0, 13, 14
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, 0), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx * cos(angle), +fy, fx * sin(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	pVertices[i++] = upCenter;		// 0, 14, 15
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx * cos(angle), +fy, fx * sin(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx * cos(angle * 2.0f), +fy, fx * sin(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	pVertices[i++] = upCenter;		// 0, 15, 16
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx * cos(angle * 2.0f), +fy, fx * sin(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx * cos(angle * 3.0f), +fy, fx * sin(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	pVertices[i++] = upCenter;		// 0, 16, 1
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx * cos(angle * 3.0f), +fy, fx * sin(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(0, +fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#pragma endregion
+
+	// 옆면
+#pragma region SideShape
+	// 1사분면
+	// 1
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fz * sin(angle), +fy, fz * cos(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(0, +fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fz * sin(angle), -fy, +fz * cos(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(0, +fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(0, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fz * sin(angle), -fy, +fz * cos(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	// 2
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fz * sin(angle * 2.0f), +fy, fz * cos(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fz * sin(angle), +fy, fz * cos(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fz * sin(angle * 2.0f), -fy, fz * cos(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fz * sin(angle), +fy, fz * cos(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fz * sin(angle), -fy, fz * cos(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fz * sin(angle * 2.0f), -fy, fz * cos(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	// 3
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fz * sin(angle * 3.0f), +fy, fz * cos(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fz * sin(angle * 2.0f), +fy, fz * cos(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fz * sin(angle * 3.0f), -fy, fz * cos(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fz * sin(angle * 2.0f), +fy, fz * cos(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fz * sin(angle * 2.0f), -fy, fz * cos(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fz * sin(angle * 3.0f), -fy, fz * cos(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	// 4
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, +fy, 0), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fz * sin(angle * 3.0f), +fy, fz * cos(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, 0), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fz * sin(angle * 3.0f), +fy, fz * cos(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fz * sin(angle * 3.0f), -fy, fz * cos(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, 0), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	// 2사분면
+	// 5
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fx * cos(angle), +fy, -fx * sin(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, +fy, 0), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fx * cos(angle), -fy, -fx * sin(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
 	
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, +fy, 0), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, 0), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fx * cos(angle), -fy, -fx * sin(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	// 6
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fx * cos(angle * 2.0f), +fy, -fx * sin(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fx * cos(angle), +fy, -fx * sin(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fx * cos(angle * 2.0f), -fy, -fx * sin(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fx * cos(angle), +fy, -fx * sin(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fx * cos(angle), -fy, -fx * sin(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fx * cos(angle * 2.0f), -fy, -fx * sin(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	// 7
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fx * cos(angle * 3.0f), +fy, -fx * sin(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fx * cos(angle * 2.0f), +fy, -fx * sin(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fx * cos(angle * 3.0f), -fy, -fx * sin(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fx * cos(angle * 2.0f), +fy, -fx * sin(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fx * cos(angle * 2.0f), -fy, -fx * sin(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fx * cos(angle * 3.0f), -fy, -fx * sin(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	// 8
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(0, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fx * cos(angle * 3.0f), +fy, -fx * sin(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(0, -fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fx * cos(angle * 3.0f), +fy, -fx * sin(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fx * cos(angle * 3.0f), -fy, -fx * sin(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(0, -fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	// 3사분면
+	// 9
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fz * sin(angle), +fy, -fz * cos(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(0, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fz * sin(angle), -fy, -fz * cos(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(0, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(0, -fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fz * sin(angle), -fy, -fz * cos(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	// 10
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fz * sin(angle * 2.0f), +fy, -fz * cos(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fz * sin(angle), +fy, -fz * cos(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fz * sin(angle * 2.0f), -fy, -fz * cos(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fz * sin(angle), +fy, -fz * cos(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fz * sin(angle), -fy, -fz * cos(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fz * sin(angle * 2.0f), -fy, -fz * cos(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	// 11
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fz * sin(angle * 3.0f), +fy, -fz * cos(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fz * sin(angle * 2.0f), +fy, -fz * cos(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fz * sin(angle * 3.0f), -fy, -fz * cos(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fz * sin(angle * 2.0f), +fy, -fz * cos(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fz * sin(angle * 2.0f), -fy, -fz * cos(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fz * sin(angle * 3.0f), -fy, -fz * cos(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	// 12
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, 0), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fz * sin(angle * 3.0f), +fy, -fz * cos(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, -fy, 0), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fz * sin(angle * 3.0f), +fy, -fz * cos(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fz * sin(angle * 3.0f), -fy, -fz * cos(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, -fy, 0), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	// 4사분면
+	// 13
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx * cos(angle), +fy, fx * sin(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, 0), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx * cos(angle), -fy, fx * sin(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, 0), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, -fy, 0), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx * cos(angle), -fy, fx * sin(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	// 14
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx * cos(angle * 2.0f), +fy, fx * sin(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx * cos(angle), +fy, fx * sin(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx * cos(angle * 2.0f), -fy, fx * sin(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx * cos(angle), +fy, fx * sin(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx * cos(angle), -fy, fx * sin(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx * cos(angle * 2.0f), -fy, fx * sin(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	// 15
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx * cos(angle * 3.0f), +fy, fx * sin(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx * cos(angle * 2.0f), +fy, fx * sin(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx * cos(angle * 3.0f), -fy, fx * sin(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx * cos(angle * 2.0f), +fy, fx * sin(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx * cos(angle * 2.0f), -fy, fx * sin(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx * cos(angle * 3.0f), -fy, fx * sin(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	// 16
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(0, +fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx * cos(angle * 3.0f), +fy, fx * sin(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(0, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx * cos(angle * 3.0f), +fy, fx * sin(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx * cos(angle * 3.0f), -fy, fx * sin(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(0, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#pragma endregion
 	
-	// 위
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	// 아래  뚜껑 
+#pragma region UpShape
+	// 1사분면
+	pVertices[i++] = downCenter;		// 0, 1, 2
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(0, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fz * sin(angle), -fy, +fz * cos(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
 
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, +fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = downCenter;		// 0, 2, 3
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fz * sin(angle), -fy, +fz * cos(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fz * sin(angle * 2.0f), -fy, fz * cos(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
 
-	// 아래
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, -fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = downCenter;		//  0, 3, 4
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fz * sin(angle * 2.0f), -fy, fz * cos(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fz * sin(angle * 3.0f), -fy, fz * cos(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
 
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = downCenter;		// 0, 4, 5
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fz * sin(angle * 3.0f), -fy, fz * cos(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, 0), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
 
-	// 오른쪽
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	// 2사분면
+	pVertices[i++] = downCenter;		// 0, 5, 6
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, 0), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fx * cos(angle), -fy, -fx * sin(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
 
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, +fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = downCenter;		// 0, 6, 7
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fx * cos(angle), -fy, -fx * sin(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fx * cos(angle * 2.0f), -fy, -fx * sin(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
 
-	// 왼쪽
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, -fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = downCenter;		// 0, 7, 8
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fx * cos(angle * 2.0f), -fy, -fx * sin(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fx * cos(angle * 3.0f), -fy, -fx * sin(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
 
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	pVertices[i] = CDiffusedVertex(XMFLOAT3(-fx, +fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = downCenter;		// 0, 8, 9
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(fx * cos(angle * 3.0f), -fy, -fx * sin(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(0, -fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
 
+	// 3사분면
+	pVertices[i++] = downCenter;		// 0, 9, 10
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(0, -fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fz * sin(angle), -fy, -fz * cos(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	pVertices[i++] = downCenter;		// 0, 10, 11
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fz * sin(angle), -fy, -fz * cos(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fz * sin(angle * 2.0f), -fy, -fz * cos(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	pVertices[i++] = downCenter;		//  0, 11, 12
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fz * sin(angle * 2.0f), -fy, -fz * cos(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fz * sin(angle * 3.0f), -fy, -fz * cos(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	pVertices[i++] = downCenter;		// 0, 12, 13
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fz * sin(angle * 3.0f), -fy, -fz * cos(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, -fy, 0), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	// 4사분면
+	pVertices[i++] = downCenter;		// 0, 13, 14
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, -fy, 0), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx * cos(angle), -fy, fx * sin(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	pVertices[i++] = downCenter;		// 0, 14, 15
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx * cos(angle), -fy, fx * sin(angle)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx * cos(angle * 2.0f), -fy, fx * sin(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	pVertices[i++] = downCenter;		// 0, 15, 16
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx * cos(angle * 2.0f), -fy, fx * sin(angle * 2.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx * cos(angle * 3.0f), -fy, fx * sin(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+
+	pVertices[i++] = downCenter;		// 0, 16, 1
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx * cos(angle * 3.0f), -fy, fx * sin(angle * 3.0f)), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i] = CDiffusedVertex(XMFLOAT3(0, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#pragma endregion
 
 	m_pd3dVertexBuffer = ::CreateBufferResource(pd3dDevice, pd3dCommandList, pVertices, m_nStride * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dVertexUploadBuffer);
 
