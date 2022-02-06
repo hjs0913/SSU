@@ -25,6 +25,8 @@ protected:
 	STATE	_state;
 	atomic_bool	_active;		// NPC가 가만히 안있고 움직일때
 
+	//skill
+	float _skill_factors[3][10];
 
 public:
 	mutex	state_lock;
@@ -74,5 +76,9 @@ public:
 	float get_right_y();
 	float get_right_z();
 	MONSTER_SPECIES get_mon_spices();
+
+	//skill
+	void set_skill_factor(int skill_type, int skill_num);
+	float get_skill_factor(int skill_type, int skill_num);
 };
 

@@ -12,6 +12,8 @@ SOCKET g_s_socket;
 array <Npc*, MAX_USER + MAX_NPC> players;
 array <Obstacle, MAX_OBSTACLE> obstacles;
 
+typedef pair<int, int> pos;
+
 void do_npc_move(int npc_id, int target);
 void return_npc_position(int npc_id);
 
@@ -32,173 +34,6 @@ struct timer_event {
 };
 
 concurrency::concurrent_priority_queue<timer_event> timer_queue;
-
-//-----------------------------------
-
-//거리계산 함수  //현재 반지름 20
-/*void element_buf(int c_id, int m_id)
-{
-    CLIENT& cl = clients[c_id];
-    MONSTER& mon = monsters[m_id];
-    switch (cl.element)
-    {
-    case E_WATER: {
-        if (mon.element == E_FULLMETAL || mon.element == E_FIRE || mon.element == E_EARTH) {
-            mon.nuff_element.buf_setting(B_MAGATTACK, 10.0f, 10.0f);
-            mon.nuff_element._use = true;
-        }
-        break;
-    }
-    case E_FULLMETAL: {
-        if (mon.element == E_ICE || mon.element == E_TREE || mon.element == E_WIND) {
-            cl.buff_element.buf_setting(B_PHYDEFENCE, 10.0f, 10.0f);
-            cl.buff_element._use = true;
-        }
-        break;
-    }
-    case E_WIND: {
-        if (mon.element == E_WATER || mon.element == E_EARTH || mon.element == E_FIRE) {
-            cl.buff_element.buf_setting(B_SPEED, 5.0f, 6.0f);
-            cl.buff_element._use = true;
-        }
-        break;
-    }
-    case E_FIRE: {
-        if (mon.element == E_ICE || mon.element == E_TREE || mon.element == E_FULLMETAL) {
-            mon.nuff_element.buf_setting(B_BURN, mon.physical_attack * 0.1f, 10.0f);
-            mon.nuff_element._use = true;
-        }
-        break;
-    }
-    case E_TREE: {
-        if (mon.element == E_EARTH || mon.element == E_WATER || mon.element == E_WIND) {
-            mon.nuff_element.buf_setting(B_PHYATTACK, 10.0f, 10.0f);
-            mon.nuff_element._use = true;
-        }
-        break;
-    }
-    case E_EARTH: {
-        if (mon.element == E_ICE || mon.element == E_FULLMETAL || mon.element == E_FIRE) {
-            cl.buff_element.buf_setting(B_MAGDEFENCE, 10.0f, 10.0f);
-            cl.buff_element._use = true;
-        }
-        break;
-    }
-    case E_ICE: {
-        if (mon.element == E_TREE || mon.element == E_WATER || mon.element == E_WIND) {
-            mon.nuff_element.buf_setting(B_SPEED, 10.0f, 10.0f);
-            mon.nuff_element._use = true;
-        }
-        break;
-    }
-
-    default:
-        break;
-    }
-}
-*/
-
-// 전투 계산 공식
-/*
-void send_combat_packet(int c_id, int m_id, TRIBE subject)
-{
-    CLIENT& cl = clients[c_id];
-    MONSTER& mon = monsters[m_id];
-
-    if (subject == T_HUMAN) {	// 주체가 휴먼
-        if (cl.buff_element._use == false)
-            element_buf(c_id, m_id);
-
-        // 데미지 계산 공식
-        mon.do_attack = true;
-        int damage;
-        if (cl.buff_element._type == B_PHYATTACK) damage = (cl.physical_attack*(1+cl.buff_element._effect/100.0f)) * cl.attack_factor;
-        else damage = cl.physical_attack * cl.attack_factor;
-        float def_temp = mon.defense_factor * mon.physical_defense;
-        int real_damage = int(damage * (1.0f - (def_temp) / (1.0f + def_temp)));
-        mon.hp -= real_damage;
-
-        // 화면에 표시
-        cout << "플레이어 -> 몬스터 데미지 : " << real_damage <<  endl;
-        cout << c_id << " 플레이어 Hp : " << cl.hp << endl;
-        cout << "몬스터 Hp : " << mon.hp << endl;
-
-        // 전투에 대한 정보를 패킷에 담아 보내자
-        sc_packet_attack packet;
-        packet.id = c_id;
-        packet.size = sizeof(packet);
-        packet.type = SC_PACKET_ATTACK;
-        packet.damage_size = real_damage;
-        packet.p_hp = cl.hp;
-        packet.m_hp = mon.hp;
-        packet.subject = subject;
-
-        cl.do_send(sizeof(packet), &packet);
-
-        if (mon.hp < 0) {
-            mon._live = false;
-            // 몬스터가 모든 유저에게 삭제가 되어야 한다
-            for (auto& cl : clients)
-                send_remove_object(cl._id, m_id, T_MONSTER, false);
-        }
-    }
-    else {	// 주체가 MONSTER
-
-        if (cl.hp > 0) {   //추가   살아있을 때만 계산하자
-            // 속성부여
-            // 데미지 계산 공식
-            int damage = mon.physical_attack * mon.attack_factor;
-            float def_temp;
-            if(cl.buff_element._type == B_PHYDEFENCE) def_temp = (cl.defense_factor*(1 + cl.buff_element._effect/100.0f)) * cl.physical_defense;
-            else def_temp = cl.defense_factor * cl.physical_defense;
-            int real_damage = int(damage * (1.0f - (def_temp) / (1.0f + def_temp)));
-
-
-            cl.hp -= real_damage;
-
-            if (cl.hp < 0)  //추가 hp가 음수면 0으로 하자
-                cl.hp = 0;
-
-
-            // 화면에 표시
-            cout << "몬스터 -> 플레이어 데미지 : " << real_damage << endl;
-            cout << c_id << "번 플레이어 Hp : " << cl.hp << endl;  //추가 몇번 플레이어가 데미지받는지 수정
-            cout << "몬스터 Hp : " << mon.hp << endl;
-
-            // 전투에 대한 정보를 패킷에 담아 보내자
-            sc_packet_attack packet;
-            packet.id = c_id;
-            packet.size = sizeof(packet);
-            packet.type = SC_PACKET_ATTACK;
-            packet.damage_size = real_damage;
-            packet.p_hp = cl.hp;
-            packet.m_hp = mon.hp;
-            packet.subject = subject;
-
-            cl.do_send(sizeof(packet), &packet);
-
-            if (cl.hp <= 0) {  //추가
-                mon.do_attack = false;
-                //for (auto& cls : clients)
-                //	if(cls._use == true)
-                //		send_remove_object(cls._id, c_id, T_HUMAN, true);   //죽은 클라 보내기
-                cout << c_id << "번 플레이어 사망" << endl;
-                cl.hp = 54000;
-                cl.x = 0;
-                cl.y = 0;
-                for (auto& cls : clients) {
-                    if (cls._use == true)
-                        send_move_packet(cls._id, c_id);
-                }
-            }
-        }
-
-    }
-
-}
-*/
-
-//-----------------------------------
 
 void error_display(int err_no)
 {
@@ -310,6 +145,286 @@ void Activate_Npc_Move_Event(int target, int player_id)
     PostQueuedCompletionStatus(g_h_iocp, 1, target, &exp_over->_wsa_over);
 }
 
+void magical_skill_success(int p_id, int target, float skill_factor)
+{
+
+    float give_damage = players[p_id]->get_magical_attack() * skill_factor;
+    float defence_damage = (players[target]->get_defence_factor() *
+        players[target]->get_magical_defence()) / (1 + (players[target]->get_defence_factor() *
+            players[target]->get_magical_defence()));
+    float damage = give_damage * (1 - defence_damage);
+    int target_hp = players[target]->get_hp() - damage;
+    cout << players[target]->get_defence_factor() << endl;
+    cout << players[target]->get_magical_defence() << endl;
+    cout << "give_damage : " << give_damage << endl;
+    cout << "defence_damage : " << defence_damage << endl;
+    cout << players[target]->get_defence_factor() *
+        players[target]->get_magical_defence() << endl;
+    cout << (1 + (players[target]->get_defence_factor() *
+        players[target]->get_magical_defence())) << endl;
+
+    cout << p_id << "가 " << damage << "을 " << target << "에게 주었다."
+        << target_hp << "남음" << endl;
+
+    players[target]->set_hp(target_hp);
+    if (target_hp <= 0) {
+        players[target]->state_lock.lock();
+        if (players[target]->get_state() != ST_INGAME) {
+            players[target]->state_lock.unlock();
+            return;
+        }
+        players[target]->set_state(ST_DEAD);
+        players[target]->state_lock.unlock();
+        if (target < NPC_ID_START) {
+            players[p_id]->set_active(false);
+
+            sc_packet_dead packet;
+            packet.size = sizeof(packet);
+            packet.type = SC_PACKET_DEAD;
+            packet.attacker_id = p_id;
+            reinterpret_cast<Player*>(players[target])->do_send(sizeof(packet), &packet);
+
+
+            timer_event ev;
+            ev.obj_id = target;
+            ev.start_time = chrono::system_clock::now() + 3s;
+            ev.ev = EVENT_PLAYER_REVIVE;
+            ev.target_id = 0;
+            timer_queue.push(ev);
+        }
+        else {
+            players[target]->set_active(false);
+            timer_event ev;
+            ev.obj_id = target;
+            ev.start_time = chrono::system_clock::now() + 30s;
+            ev.ev = EVENT_NPC_REVIVE;
+            ev.target_id = 0;
+            timer_queue.push(ev);
+
+            int get_exp = players[target]->get_lv() * players[target]->get_lv() * 2;
+            if (players[target]->get_tribe() == BOSS)
+                get_exp = get_exp * 2;
+            char mess[MAX_CHAT_SIZE];
+            sprintf_s(mess, MAX_CHAT_SIZE, "Kill %s, you get %d experience",
+                players[target]->get_name(), get_exp);
+            send_chat_packet(reinterpret_cast<Player*>(players[p_id]), p_id, mess);
+
+            send_status_change_packet(reinterpret_cast<Player*>(players[p_id]));
+
+            int max_exp = 100 * pow(2, (players[p_id]->get_lv() - 1));
+            if (reinterpret_cast<Player*>(players[p_id])->get_exp() + get_exp >= max_exp) {
+                players[p_id]->set_lv(players[p_id]->get_lv() + 1);
+                reinterpret_cast<Player*>(players[p_id])->
+                    set_exp(reinterpret_cast<Player*>(players[p_id])->get_exp() + get_exp - max_exp);
+                sprintf_s(mess, MAX_CHAT_SIZE, "Level up : %d",
+                    players[p_id]->get_lv());
+                send_chat_packet(reinterpret_cast<Player*>(players[p_id]), p_id, mess);
+                send_status_change_packet(reinterpret_cast<Player*>(players[p_id]));
+            }
+            else {
+                reinterpret_cast<Player*>(players[p_id])
+                    ->set_exp(reinterpret_cast<Player*>(players[p_id])->get_exp() + get_exp);
+            }
+            send_status_change_packet(reinterpret_cast<Player*>(players[p_id]));
+        }
+
+        unordered_set <int> nearlist;
+        for (auto& other : players) {
+            if (false == is_near(players[target]->get_id(), other->get_id()))
+                continue;
+            if (ST_INGAME != other->get_state())
+                continue;
+            if (other->get_tribe() != HUMAN) break;
+            nearlist.insert(other->get_id());
+        }
+        nearlist.erase(target);
+
+        for (auto other : nearlist) {
+            Player* other_player = reinterpret_cast<Player*>(players[other]);
+            other_player->vl.lock();
+            if (0 != other_player->viewlist.count(target)) {
+                other_player->viewlist.erase(target);
+                other_player->vl.unlock();
+                send_remove_object_packet(other_player, players[target]);
+            }
+            else other_player->vl.unlock();
+        }
+    }
+    else if (p_id >= NPC_ID_START) {
+
+        send_status_change_packet(reinterpret_cast<Player*>(players[target]));
+
+        char mess[MAX_CHAT_SIZE];
+        sprintf_s(mess, MAX_CHAT_SIZE, "%s -> %s damage : %d",
+            players[p_id]->get_name(), players[target]->get_name(), damage);
+        send_chat_packet(reinterpret_cast<Player*>(players[target]), target, mess);
+
+        if (reinterpret_cast<Player*>(players[target])->_auto_hp == false) {
+            timer_event ev;
+            ev.obj_id = target;
+            ev.start_time = chrono::system_clock::now() + 5s;
+            ev.ev = EVENT_AUTO_PLAYER_HP;
+            ev.target_id = 0;
+            timer_queue.push(ev);
+            reinterpret_cast<Player*>(players[target])->_auto_hp = true;
+        }
+
+
+        timer_event ev;
+        ev.obj_id = p_id;
+        ev.start_time = chrono::system_clock::now() + 3s;
+        ev.ev = EVENT_NPC_ATTACK;
+        ev.target_id = target;
+        timer_queue.push(ev);
+    }
+    else {
+        char mess[MAX_CHAT_SIZE];
+        sprintf_s(mess, MAX_CHAT_SIZE, "%s -> %s damage : %d",
+            players[p_id]->get_name(), players[target]->get_name(), damage);
+        send_chat_packet(reinterpret_cast<Player*>(players[p_id]), p_id, mess);
+    }
+}
+
+void physical_skill_success(int p_id, int target, float skill_factor)
+{
+
+    float give_damage = players[p_id]->get_physical_attack() * skill_factor;
+    float defence_damage = (players[target]->get_defence_factor() *
+        players[target]->get_physical_defence()) / (1 + (players[target]->get_defence_factor() *
+            players[target]->get_physical_defence()));
+    float damage = give_damage * (1 - defence_damage);
+    int target_hp = players[target]->get_hp() - damage;
+    cout << players[target]->get_defence_factor() << endl;
+    cout << players[target]->get_physical_defence() << endl;
+    cout << "give_damage : " << give_damage << endl;
+    cout << "defence_damage : " << defence_damage << endl;
+    cout << players[target]->get_defence_factor() *
+        players[target]->get_physical_defence() << endl;
+    cout << (1 + (players[target]->get_defence_factor() *
+        players[target]->get_physical_defence())) << endl;
+
+    cout << p_id << "가 " << damage << "을 " << target << "에게 주었다."
+        << target_hp << "남음" << endl;
+
+    players[target]->set_hp(target_hp);
+    if (target_hp <= 0) {
+        players[target]->state_lock.lock();
+        if (players[target]->get_state() != ST_INGAME) {
+            players[target]->state_lock.unlock();
+            return;
+        }
+        players[target]->set_state(ST_DEAD);
+        players[target]->state_lock.unlock();
+        if (target < NPC_ID_START) {
+            players[p_id]->set_active(false);
+
+            sc_packet_dead packet;
+            packet.size = sizeof(packet);
+            packet.type = SC_PACKET_DEAD;
+            packet.attacker_id = p_id;
+            reinterpret_cast<Player*>(players[target])->do_send(sizeof(packet), &packet);
+
+
+            timer_event ev;
+            ev.obj_id = target;
+            ev.start_time = chrono::system_clock::now() + 3s;
+            ev.ev = EVENT_PLAYER_REVIVE;
+            ev.target_id = 0;
+            timer_queue.push(ev);
+        }
+        else {
+            players[target]->set_active(false);
+            timer_event ev;
+            ev.obj_id = target;
+            ev.start_time = chrono::system_clock::now() + 30s;
+            ev.ev = EVENT_NPC_REVIVE;
+            ev.target_id = 0;
+            timer_queue.push(ev);
+
+            int get_exp = players[target]->get_lv() * players[target]->get_lv() * 2;
+            if (players[target]->get_tribe() == BOSS)
+                get_exp = get_exp * 2;
+            char mess[MAX_CHAT_SIZE];
+            sprintf_s(mess, MAX_CHAT_SIZE, "Kill %s, you get %d experience",
+                players[target]->get_name(), get_exp);
+            send_chat_packet(reinterpret_cast<Player*>(players[p_id]), p_id, mess);
+
+            send_status_change_packet(reinterpret_cast<Player*>(players[p_id]));
+
+            int max_exp = 100 * pow(2, (players[p_id]->get_lv() - 1));
+            if (reinterpret_cast<Player*>(players[p_id])->get_exp() + get_exp >= max_exp) {
+                players[p_id]->set_lv(players[p_id]->get_lv() + 1);
+                reinterpret_cast<Player*>(players[p_id])->
+                    set_exp(reinterpret_cast<Player*>(players[p_id])->get_exp() + get_exp - max_exp);
+                sprintf_s(mess, MAX_CHAT_SIZE, "Level up : %d",
+                    players[p_id]->get_lv());
+                send_chat_packet(reinterpret_cast<Player*>(players[p_id]), p_id, mess);
+                send_status_change_packet(reinterpret_cast<Player*>(players[p_id]));
+            }
+            else {
+                reinterpret_cast<Player*>(players[p_id])
+                    ->set_exp(reinterpret_cast<Player*>(players[p_id])->get_exp() + get_exp);
+            }
+            send_status_change_packet(reinterpret_cast<Player*>(players[p_id]));
+        }
+
+        unordered_set <int> nearlist;
+        for (auto& other : players) {
+            if (false == is_near(players[target]->get_id(), other->get_id()))
+                continue;
+            if (ST_INGAME != other->get_state())
+                continue;
+            if (other->get_tribe() != HUMAN) break;
+            nearlist.insert(other->get_id());
+        }
+        nearlist.erase(target);
+
+        for (auto other : nearlist) {
+            Player* other_player = reinterpret_cast<Player*>(players[other]);
+            other_player->vl.lock();
+            if (0 != other_player->viewlist.count(target)) {
+                other_player->viewlist.erase(target);
+                other_player->vl.unlock();
+                send_remove_object_packet(other_player, players[target]);
+            }
+            else other_player->vl.unlock();
+        }
+    }
+    else if (p_id >= NPC_ID_START) {
+
+        send_status_change_packet(reinterpret_cast<Player*>(players[target]));
+
+        char mess[MAX_CHAT_SIZE];
+        sprintf_s(mess, MAX_CHAT_SIZE, "%s -> %s damage : %d",
+            players[p_id]->get_name(), players[target]->get_name(), damage);
+        send_chat_packet(reinterpret_cast<Player*>(players[target]), target, mess);
+
+        if (reinterpret_cast<Player*>(players[target])->_auto_hp == false) {
+            timer_event ev;
+            ev.obj_id = target;
+            ev.start_time = chrono::system_clock::now() + 5s;
+            ev.ev = EVENT_AUTO_PLAYER_HP;
+            ev.target_id = 0;
+            timer_queue.push(ev);
+            reinterpret_cast<Player*>(players[target])->_auto_hp = true;
+        }
+
+
+        timer_event ev;
+        ev.obj_id = p_id;
+        ev.start_time = chrono::system_clock::now() + 3s;
+        ev.ev = EVENT_NPC_ATTACK;
+        ev.target_id = target;
+        timer_queue.push(ev);
+    }
+    else {
+        char mess[MAX_CHAT_SIZE];
+        sprintf_s(mess, MAX_CHAT_SIZE, "%s -> %s damage : %d",
+            players[p_id]->get_name(), players[target]->get_name(), damage);
+        send_chat_packet(reinterpret_cast<Player*>(players[p_id]), p_id, mess);
+    }
+}
+
 void attack_success(int p_id, int target, float atk_factor)
 {
     // 현재 물리 공격에 대해서만 생각한다
@@ -319,14 +434,6 @@ void attack_success(int p_id, int target, float atk_factor)
             players[target]->get_physical_defence()));
     float damage = give_damage * (1 - defence_damage);
     int target_hp = players[target]->get_hp() - damage;
-   /* cout << players[target]->get_defence_factor() << endl;
-    cout << players[target]->get_physical_defence() << endl;
-    cout << "give_damage : " << give_damage << endl;
-    cout << "defence_damage : " << defence_damage << endl;
-    cout << players[target]->get_defence_factor() *
-        players[target]->get_physical_defence() << endl;
-    cout << (1 + (players[target]->get_defence_factor() *
-        players[target]->get_physical_defence())) << endl;*/
 
     cout << players[p_id]->get_name() << "가 " << damage << "의 데미지를 " 
         << players[target]->get_name() << "에게 입혀"
@@ -642,6 +749,7 @@ void process_packet(int client_id, unsigned char* p)
         // 유효성 검사
         if (check_move_alright(x, z) == false) {
             // 올바르지 않을경우 위치를 수정을 해주어야 한다
+            // 클라쪽 수정 필요
             send_move_packet(pl, pl);
             break;
         }
@@ -859,35 +967,32 @@ void process_packet(int client_id, unsigned char* p)
         break;
     }
     case CS_PACKET_SKILL:{
-        // 스킬 미구현
-        /*
         cs_packet_skill* packet = reinterpret_cast<cs_packet_skill*>(p);
-        
-        // 스킬 사용 쿨타임 판단
         if (pl->get_skill_active(packet->skill_type) == true) return;
-        pl->set_skill_active(packet->skill_type, true);
-        // 이벤트 추가는 각 타입에서 하자 -> 스킬마다 쿨타임이 다르다
+        pl->set_skill_active(packet->skill_type, true);     //일반공격 계수는 50
         switch (packet->skill_type)
         {
-        case 0: {
-            timer_event ev;
-            ev.obj_id = client_id;
-            ev.start_time = chrono::system_clock::now() + 3s;
-            ev.ev = EVENT_SKILL_COOLTIME;
-            ev.target_id = 0;
-            timer_queue.push(ev);
+        case 0:    // 물리 공격 스킬 
+            switch (packet->skill_num)
+            {
+            case 0:  //물리 공격스킬 중 0번 스킬 -> 십자공격 어택 
+                timer_event ev;
+                ev.obj_id = client_id;
+                ev.start_time = chrono::system_clock::now() + 3s;  //쿨타임
+                ev.ev = EVENT_SKILL_COOLTIME;
+                ev.target_id = 0;
+                timer_queue.push(ev);
 
-            for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
-                players[i]->state_lock.lock();
-                if (players[i]->get_state() != ST_INGAME) {
+                for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
+                    players[i]->state_lock.lock();
+                    if (players[i]->get_state() != ST_INGAME) {
+                        players[i]->state_lock.unlock();
+                        continue;
+                    }
                     players[i]->state_lock.unlock();
-                    continue;
-                }
-                players[i]->state_lock.unlock();
-                if (players[i]->get_x() >= pl->get_x() - 1 && players[i]->get_x() <= pl->get_x() + 1) {
-                    if (players[i]->get_y() >= pl->get_y() - 1 && players[i]->get_y() <= pl->get_y() + 1) {
-                        attack_success(client_id, players[i]->get_id(), );    // 데미지 계산
-                        // 몬스터의 자동공격을 넣어주자
+                    if ((players[i]->get_x() >= pl->get_x() - 10 && players[i]->get_x() <= pl->get_x() + 10) || (players[i]->get_z() >= pl->get_z() - 10 && players[i]->get_z() <= pl->get_z() + 10)) {
+                        physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
+                        cout << "최후의 일격 !!!" << endl;
                         if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
                             players[i]->set_active(true);
                             timer_event ev;
@@ -896,111 +1001,98 @@ void process_packet(int client_id, unsigned char* p)
                             ev.ev = EVENT_NPC_ATTACK;
                             ev.target_id = client_id;
                             timer_queue.push(ev);
-                            // 몬스터의 이동도 넣어주자
+
                             Activate_Npc_Move_Event(i, pl->get_id());
                         }
                     }
                 }
+
+                break;
             }
             break;
-        }
-        case 1: {
-            // 플레이어의 방향을 만들어 줘야 겠네;;
-            timer_event ev;
-            int m_x = pl->get_x();
-            int m_y = pl->get_y();
-            switch (pl->direction) {
-            case 0:
-                m_y -= 5;
-                break;
-            case 1:
-                m_y += 5;
-                break;
-            case 2:
-                m_x -= 5;
-                break;
-            case 3:
-                m_x += 5;
-                break;
-            }
+        case 1:  //마법 공격 스킬  삼각형 범위?
+            switch (packet->skill_num)
+            {
+            case 0:  //물리 공격스킬 중 0번 스킬 -> 십자공격 어택 
+                timer_event ev;
+                ev.obj_id = client_id;
+                ev.start_time = chrono::system_clock::now() + 3s;  //쿨타임
+                ev.ev = EVENT_SKILL_COOLTIME;
+                ev.target_id = 0;
+                timer_queue.push(ev);
+                float x1, z1;
+                float x2, z2;
+                float x3, z3;
+                //look 벡터 따로 설정해줘야하나?
+                x1 = pl->get_x(); z1 = pl->get_z();
+                x2 = pl->get_x() - 20; z2 = pl->get_z() + 40;
+                x3 = pl->get_x() + 20; z3 = pl->get_z() + 40;
 
-            for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
-                players[i]->state_lock.lock();
-                if (players[i]->get_state() != ST_INGAME) {
+                for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
+                    players[i]->state_lock.lock();
+                    if (players[i]->get_state() != ST_INGAME) {
+                        players[i]->state_lock.unlock();
+                        continue;
+                    }
                     players[i]->state_lock.unlock();
-                    continue;
-                }
-                players[i]->state_lock.unlock();
-                if (!(players[i]->get_x() == m_x || players[i]->get_y() == m_y)) continue;
-                bool attack_bool = false;
 
-                switch (pl->direction)
-                {
-                case 0: {
-                    if (players[i]->get_x() != m_x) continue;
-                    if (m_y <= players[i]->get_y() && players[i]->get_y() <= pl->get_y())
-                        attack_bool = true;
-                    else continue;
-                    break;
-                }
-                case 1:
-                    if (players[i]->get_x() != m_x) continue;
-                    if (pl->get_y() <= players[i]->get_y() && players[i]->get_y() <= m_y)
-                        attack_bool = true;
-                    else continue;
-                    break;
-                case 2:
-                    if (players[i]->get_y() != m_y) continue;
-                    if (m_x <= players[i]->get_x() && players[i]->get_x() <= pl->get_x())
-                        attack_bool = true;
-                    else continue;
-                    break;
-                case 3:
-                    if (players[i]->get_y() != m_y) continue;
-                    if (pl->get_x() <= players[i]->get_x() && players[i]->get_x() <= m_x)
-                        attack_bool = true;
-                    else continue;
-                    break;
-                default:
-                    break;
-                }
-                // 공격범위 판단
-                if (attack_bool){
-                    attack_success(client_id, players[i]->get_id());    // 데미지 계산
-                    // 몬스터의 자동공격을 넣어주자
-                    if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
-                        players[i]->set_active(true);
-                        timer_event ev;
-                        ev.obj_id = i;
-                        ev.start_time = chrono::system_clock::now() + 1s;
-                        ev.ev = EVENT_NPC_ATTACK;
-                        ev.target_id = client_id;
-                        timer_queue.push(ev);
-                        // 몬스터의 이동도 넣어주자
-                        Activate_Npc_Move_Event(i, pl->get_id());
+                    float px = players[i]->get_x();
+                    float pz = players[i]->get_z();
+
+                    float alpha = ((z2 - z3) * (px - x3) + (x3 - x2) * (pz - z3)) /
+                        ((z2 - z3) * (x1 - x3) + (x3 - x2) * (z1 - z3));
+                    float beta = ((z3 - z1) * (px - x3) + (x1 - x3) * (pz - z3)) /
+                        ((z2 - z3) * (x1 - x3) + (x3 - x2) * (z1 - z3));
+                    float gamma = 1.0f - alpha - beta;
+
+                    if (alpha > 0 && beta > 0 && gamma > 0) {
+                        magical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
+                        cout << "광야 일격 !!!" << endl;
+                        if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
+                            players[i]->set_active(true);
+                            timer_event ev;
+                            ev.obj_id = i;
+                            ev.start_time = chrono::system_clock::now() + 1s;
+                            ev.ev = EVENT_NPC_ATTACK;
+                            ev.target_id = client_id;
+                            timer_queue.push(ev);
+
+                            Activate_Npc_Move_Event(i, pl->get_id());
+                        }
                     }
                 }
+                break;
             }
-            pl->set_x(m_x);
-            pl->set_y(m_y);
-            send_move_packet(pl, pl);
 
-            // 스킬 쿨타임
-            ev.obj_id = client_id;
-            ev.start_time = chrono::system_clock::now() + 5s;
-            ev.ev = EVENT_SKILL_COOLTIME;
-            ev.target_id = 1;
-            timer_queue.push(ev);
-            
+            break;
+        case 2:  //버프 
+            switch (packet->skill_num)
+            {
+            case 0:
+                timer_event ev;
+                ev.obj_id = client_id;
+                ev.start_time = chrono::system_clock::now() + 10s;  //쿨타임
+                ev.ev = EVENT_SKILL_COOLTIME;
+                ev.target_id = 0;
+                timer_queue.push(ev);
+
+                for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
+                    players[i]->state_lock.lock();
+                    if (players[i]->get_state() != ST_INGAME) {
+                        players[i]->state_lock.unlock();
+                        continue;
+                    }
+                    players[i]->state_lock.unlock();
+                    cout << "아테네의 가호 !!!" << endl;
+                    pl->set_physical_defence(0.48 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv()); //일단 두배 
+                    pl->set_magical_defence(0.34 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv());
+                    //여기 타이머 해야함 
+
+                }
+                break;
+            }
             break;
         }
-        case 2: {
-            break;
-        }
-        default:
-            break;
-        }
-        */
         break;
     }
     case CS_PACKET_LOOK: {
@@ -1026,8 +1118,6 @@ void process_packet(int client_id, unsigned char* p)
             s_packet.y = pl->get_look_y();
             s_packet.z = pl->get_look_z();
             
-
-
 
             reinterpret_cast<Player*>(players[i])->do_send(sizeof(s_packet), &s_packet);
         }
@@ -1265,8 +1355,10 @@ void worker()
                 delete exp_over;
                 break;
             }
+
             int target_id = exp_over->_target;
             players[target_id]->state_lock.lock();
+
             //쫒아가던 타겟이 살아있는가
             if (players[target_id]->get_state() != ST_INGAME) {
                 players[target_id]->state_lock.unlock();
@@ -1414,7 +1506,7 @@ void worker()
                 other_player->vl.lock();
                 other_player->viewlist.insert(client_id);
                 other_player->vl.unlock();
-               send_put_object_packet(other_player, players[client_id]);
+                send_put_object_packet(other_player, players[client_id]);
             }
             delete exp_over;
             break;
@@ -1752,6 +1844,103 @@ void initialise_NPC()
     cout << "NPC로딩 완료" << endl;
 }
 
+#define REAL_DISTANCE 10
+
+int huristic(int t_x, int t_z, int x, int z) 
+{
+    int s_x = abs(t_x - x);
+    int s_z = abs(t_z - z);
+    int score = sqrt(pow(s_x, 2) + pow(s_z, 2));
+    //cout << "huristic : " << score << endl;
+    return score ;
+}
+
+// A*알고리즘
+pos a_star(int t_x, int t_z, int x, int z)
+{
+    vector<pos> mon_load;
+    // 쫒아가는 범위는 한 방향으로 60까지이다
+    int scoreG[25][25] = { 0 };
+    int scoreH[25][25] = { 0 };
+    int scoreF[25][25] = { 0 };
+    pos prior_point[25][25]{ pos(0,0) };
+
+    typedef pair<int, pos> weight;
+
+
+
+    pos now(12, 12);
+    scoreG[now.first][now.second] = 0;
+    scoreH[now.first][now.second] = huristic(t_x, t_z, x, z);
+    scoreF[now.first][now.second] = scoreG[now.first][now.second] + scoreH[now.first][now.second];
+
+    priority_queue < weight, vector<weight>, greater<weight>> open_q;
+    priority_queue < weight, vector<weight>, greater<weight>> close_q;
+    close_q.push(weight(scoreF[now.first][now.second], now));
+
+
+    int dirX[8] = { -1, 0, 1, 0, -1, 1, 1, -1 };
+    int dirZ[8] = { 0, -1, 0, 1, -1, -1, 1, 1 };
+    int cost[8]{ 10, 10, 10, 10, 14, 14, 14, 14 };
+    while (true) {
+        for (int i = 0; i < 8; i++) {
+            pos p(now.first + dirX[i], now.second + dirZ[i]);
+
+            if ((p.first >= 25 || p.first < 0) || (p.second >= 25 || p.second < 0)) continue;
+            // 검색된게 있다면 검색을 해주지 않는다
+            if (scoreF[now.first + dirX[i]][now.second + dirZ[i]] != 0) continue;
+            // 장애물이랑 부딪히는지 확인
+            if (false == check_move_alright(x + (p.first - 12) * REAL_DISTANCE, z + (p.second - 12) * REAL_DISTANCE)) {
+                cout << "장애물 부딪힘" << endl;
+                continue;
+            }
+
+            scoreG[now.first + dirX[i]][now.second + dirZ[i]] = scoreG[now.first][now.second] + cost[i];
+            scoreH[now.first + dirX[i]][now.second + dirZ[i]] = huristic(t_x, t_z, x + (p.first - 12) * REAL_DISTANCE, z + (p.second - 12) * REAL_DISTANCE);
+            scoreF[now.first + dirX[i]][now.second + dirZ[i]] = scoreG[now.first + dirX[i]][now.second + dirZ[i]] +
+                scoreH[now.first + dirX[i]][now.second + dirZ[i]];
+
+            prior_point[now.first + dirX[i]][now.second + dirZ[i]] = pos(now.first, now.second);
+
+            //cout << "scoreG : " << scoreG[now.first + dirX[i]][now.second + dirZ[i]] << endl;
+            //cout << "scoreH : " << scoreH[now.first + dirX[i]][now.second + dirZ[i]] << endl;
+            //cout << "scoreF : " << scoreF[now.first + dirX[i]][now.second + dirZ[i]] << endl << endl;
+
+            weight w(scoreF[now.first + dirX[i]][now.second + dirZ[i]], pos(now.first + dirX[i], now.second + dirZ[i]));
+            //cout << w.first << ", " << w.second.first << ", " << w.second.second << endl;
+            open_q.push(w);
+        }
+        if (open_q.size() == 0) {
+            while (now.first != 12 || now.second != 12) {
+                mon_load.push_back(now);
+                now = prior_point[now.first][now.second];
+            }
+            break;
+        }
+        weight temp = open_q.top();
+        open_q.pop();
+        now = temp.second;
+        close_q.push(temp);
+
+        ///cout << " now : " << now.first << ", " << now.second << endl;
+
+        // 끝내는 조건
+        if (abs((x + (now.first - 12) * REAL_DISTANCE) - t_x) <= 10 && abs((z + (now.second - 12) * REAL_DISTANCE) - t_z) <= 10) {
+            while (now.first != 12 || now.second != 12) {
+                mon_load.push_back(now);
+                now = prior_point[now.first][now.second];
+            }
+            break;
+        }
+    }
+
+    x += (mon_load.back().first - 12) * REAL_DISTANCE;
+    z += (mon_load.back().second - 12) * REAL_DISTANCE;
+    mon_load.pop_back();
+
+    return pos(x, z);
+}
+
 void return_npc_position(int npc_id)
 {
     if (players[npc_id]->get_active() == true) {
@@ -1787,19 +1976,22 @@ void return_npc_position(int npc_id)
     int now_y = players[npc_id]->get_y();
     int now_z = players[npc_id]->get_z();
     bool my_pos_fail = true;
-    if (my_x != now_x) {
-        if (my_x >= now_x) now_x = now_x + 5;
-        else now_x = now_x - 5;
-    }
-    else if (my_z != now_z) {
-        if (my_z >= now_z) now_z = now_z + 5;
-        else now_z = now_z - 5;
-    }
-    else my_pos_fail = false;
 
-    if (false == check_move_alright(now_x, now_z)) {
-        return;
+    pos mv = a_star(my_x, my_z, now_x, now_z);
+    if (now_x == mv.first && now_z == mv.second) {
+        now_x = my_x;
+        now_z = my_z;
+        my_pos_fail = false;
     }
+    else {
+        now_x = mv.first;
+        now_z = mv.second;
+    }
+
+
+    float look_x = players[npc_id]->get_x() - now_x;
+    float look_z = players[npc_id]->get_z() - now_z;
+
     players[npc_id]->set_x(now_x);
     players[npc_id]->set_z(now_z);
 
@@ -1855,19 +2047,11 @@ void return_npc_position(int npc_id)
     }
 }
 
-int huristic(int t_x, int t_z, int x, int z) 
-{
-    int s_x = abs(t_x - x);
-    int s_z = abs(t_z - z);
-    int score = sqrt(pow(s_x, 2) + pow(s_z, 2));
-    cout << "huristic : " << score << endl;
-    return score*10;
-}
-
 void do_npc_move(int npc_id, int target)
 {
     int x = players[npc_id]->get_x();
     int z = players[npc_id]->get_z();
+
     int t_x = players[target]->get_x();
     int t_z = players[target]->get_z();
 
@@ -1907,91 +2091,18 @@ void do_npc_move(int npc_id, int target)
         return;
     }
 
-
-    
-    //cout << "Move : " << x << "," << z << endl;
-
-    typedef pair<int, int> pos;
-    vector<pos> mon_load;
-    
     // A*알고리즘
-    {
-        // 쫒아가는 범위는 한 방향으로 30까지이다 -> (수정필요) 현재 70으로 바뀜
-        int scoreG[61][61] = { 0 };
-        int scoreH[61][61] = { 0 };
-        int scoreF[61][61] = { 0 };
-        pos prior_point[61][61]{ pos(0,0) };
+    pos mv = a_star(t_x, t_z, x, z);
+    x = mv.first;
+    z = mv.second;
 
-        typedef pair<int, pos> weight;
+    float look_x = players[npc_id]->get_x() - x;
+    float look_z = players[npc_id]->get_z() - z;
 
 
-
-        pos now(30, 30);
-        scoreG[now.first][now.second] = 0;
-        scoreH[now.first][now.second] = huristic(t_x, t_z, x, z);
-        scoreF[now.first][now.second] = scoreG[now.first][now.second] + scoreH[now.first][now.second];
-
-        priority_queue < weight, vector<weight>, greater<weight>> open_q;
-        priority_queue < weight, vector<weight>, greater<weight>> close_q;
-        close_q.push(weight(scoreF[now.first][now.second], now));
-
-
-        int dirX[8] = { -1, 0, 1, 0, -1, 1, 1, -1 };
-        int dirZ[8] = { 0, -1, 0, 1, -1, -1, 1, 1 };
-        int cost[8]{ 10, 10, 10, 10, 14, 14, 14, 14 };
-        while (true) {
-            for (int i = 0; i < 8; i++) {
-                //cout << "뭘까뭘까?? : " << scoreF[now.first + dirX[i]][now.second + dirZ[i]] << endl;
-                pos p(now.first + dirX[i], now.second + dirZ[i]);
-
-                if ((p.first > 60 || p.first < 0) || (p.second > 60 || p.second < 0)) continue;
-                // 검색된게 있다면 검색을 해주지 않는다
-                if (scoreF[now.first + dirX[i]][now.second + dirZ[i]] != 0) continue;
-                // 장애물이랑 부딪히는지 확인
-                if (false == check_move_alright(x + p.first - 30, z + p.second - 30)) {
-                    cout << "장애물 부딪힘" << endl;
-                    continue;
-                }
-
-                scoreG[now.first + dirX[i]][now.second + dirZ[i]] = scoreG[now.first][now.second] + cost[i];
-                scoreH[now.first + dirX[i]][now.second + dirZ[i]] = huristic(t_x, t_z, x + p.first - 30, z + p.second - 30);
-                scoreF[now.first + dirX[i]][now.second + dirZ[i]] = scoreG[now.first + dirX[i]][now.second + dirZ[i]] +
-                    scoreH[now.first + dirX[i]][now.second + dirZ[i]];
-                prior_point[now.first + dirX[i]][now.second + dirZ[i]] = pos(now.first, now.second);
-                
-                //cout << "scoreG : " << scoreG[now.first + dirX[i]][now.second + dirZ[i]] << endl;
-                //cout << "scoreH : " << scoreH[now.first + dirX[i]][now.second + dirZ[i]] << endl;
-                //cout << "scoreF : " << scoreF[now.first + dirX[i]][now.second + dirZ[i]] << endl << endl;
-
-                weight w(scoreF[now.first + dirX[i]][now.second + dirZ[i]], pos(now.first + dirX[i], now.second + dirZ[i]));
-                //cout << w.first << ", " << w.second.first << ", " << w.second.second << endl;
-                open_q.push(w);  
-            }
-            if (open_q.size() == 0) {
-                while (now.first != 30 || now.second != 30) {
-                    mon_load.push_back(now);
-                    now = prior_point[now.first][now.second];
-                }
-                break;
-            }
-            weight temp = open_q.top();
-            open_q.pop();
-            now = temp.second;
-            close_q.push(temp);
-
-            ///cout << " now : " << now.first << ", " << now.second << endl;
-
-            if (abs((now.first-30 + x) - t_x) <= 3 && abs((now.second-30 +z) - t_z) <= 3) {
-                while (now.first != 30 || now.second != 30) {
-                    mon_load.push_back(now);
-                    now = prior_point[now.first][now.second];
-                }
-                break;
-            }
-        }
-    }
-
-    for (int i = 0; i < 2; ++i) {
+    players[npc_id]->set_x(x);
+    players[npc_id]->set_z(z);
+   /* for (int i = 0; i < 2; ++i) {
         if (mon_load.size() == 0) break;
         x = x + mon_load.back().first-30;
         z = z + mon_load.back().second - 30;
@@ -2000,7 +2111,9 @@ void do_npc_move(int npc_id, int target)
         players[npc_id]->set_x(x);
         players[npc_id]->set_z(z);
 
-    }
+    }*/
+
+
 
     for (auto& obj : players) {
         if (obj->get_state() != ST_INGAME) continue;   // in game이 아닐때

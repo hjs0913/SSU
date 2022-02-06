@@ -35,11 +35,11 @@ void send_move_packet(XMFLOAT3 position);
 
 void send_look_packet(XMFLOAT3 look, XMFLOAT3 right);
 
+void send_skill_packet(int sk_t, int sk_n);
+
 int netInit();
 
 void process_packet(unsigned char* p);
-
-// void network_check();	// 나중에 iocp바꿀 시 사용
 
 int netclose();
 
