@@ -8,7 +8,7 @@ enum COMP_OP { OP_RECV, OP_SEND, OP_ACCEPT, OP_NPC_MOVE,
 	OP_PLAYER_ATTACK};
 enum EVENT_TYPE { EVENT_NPC_MOVE, EVENT_NPC_ATTACK, EVENT_AUTO_PLAYER_HP,
 	EVENT_PLAYER_REVIVE, EVENT_NPC_REVIVE, EVENT_PLAYER_ATTACK,
-	EVENT_SKILL_COOLTIME};
+	EVENT_SKILL_COOLTIME, EVENT_BUFF_COOLTIME};
 enum TRIBE { HUMAN, MONSTER, AGRO, BOSS, OBSTACLE };
 enum BUF_TYPE { B_NONE, B_PHYATTACK, B_MAGATTACK, B_PHYDEFENCE, 
 	B_MAGDEFENCE, B_SPEED, B_BURN };
@@ -91,10 +91,8 @@ struct cs_packet_teleport {
 struct cs_packet_skill {
 	unsigned char size;
 	char type;
-	char skill_type;
-	// 0 : 대각선까지 범위형 공격
-	// 1 : 직선 쭉 뚫고 가는 공격
-	// 2 : 버프형 공격(공격이 10초동안 50%상승)
+	char skill_type;    //0 : 물리 공격 1: 마법 공격  2 : 버프 
+	char skill_num;    // 0-0, 0-1   ,,,,,   1-0,  1-1  
 };
 
 struct cs_packet_look {

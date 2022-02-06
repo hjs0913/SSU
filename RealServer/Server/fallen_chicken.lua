@@ -27,7 +27,7 @@ function event_npc_move(player)
    player_z = API_get_z(player);
    x = API_get_x(my_id);
    z = API_get_z(my_id);
-   if (math.abs(my_x - x) > 70) or (math.abs(my_z - z) > 70) then
+   if (math.abs(my_x - x) > 120) or (math.abs(my_z - z) > 120) then
       return false;
    else
       -- 쫒아가는 것은 C로 짠다
