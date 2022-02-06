@@ -1110,16 +1110,8 @@ void process_packet(int client_id, unsigned char* p)
             if (is_npc(i) == true) continue;
 
             // Player
-            sc_packet_look s_packet;
-            s_packet.size = sizeof(s_packet);
-            s_packet.type = SC_PACKET_LOOK;
-            s_packet.id = pl->get_id();
-            s_packet.x = pl->get_look_x();
-            s_packet.y = pl->get_look_y();
-            s_packet.z = pl->get_look_z();
-            
-
-            reinterpret_cast<Player*>(players[i])->do_send(sizeof(s_packet), &s_packet);
+            send_look_packet(reinterpret_cast<Player*>(players[i]),
+                pl);
         }
         break;
     }
@@ -1978,7 +1970,7 @@ void return_npc_position(int npc_id)
     bool my_pos_fail = true;
 
     pos mv = a_star(my_x, my_z, now_x, now_z);
-    if (now_x == mv.first && now_z == mv.second) {
+    if (abs(mv.first-my_x) <=10 && abs(mv.second - my_z) <= 10) {
         now_x = my_x;
         now_z = my_z;
         my_pos_fail = false;
@@ -1991,6 +1983,8 @@ void return_npc_position(int npc_id)
 
     float look_x = players[npc_id]->get_x() - now_x;
     float look_z = players[npc_id]->get_z() - now_z;
+
+    players[npc_id]->set_look(look_x, 0.0f, look_z);
 
     players[npc_id]->set_x(now_x);
     players[npc_id]->set_z(now_z);
@@ -2016,7 +2010,7 @@ void return_npc_position(int npc_id)
         }
         else {
             send_move_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id]);
-
+            send_look_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id]);
         }
     }
 
@@ -2049,12 +2043,6 @@ void return_npc_position(int npc_id)
 
 void do_npc_move(int npc_id, int target)
 {
-    int x = players[npc_id]->get_x();
-    int z = players[npc_id]->get_z();
-
-    int t_x = players[target]->get_x();
-    int t_z = players[target]->get_z();
-
     players[npc_id]->lua_lock.lock();
     lua_State* L = players[npc_id]->L;
     lua_getglobal(L, "event_npc_move");
@@ -2091,6 +2079,12 @@ void do_npc_move(int npc_id, int target)
         return;
     }
 
+    int x = players[npc_id]->get_x();
+    int z = players[npc_id]->get_z();
+
+    int t_x = players[target]->get_x();
+    int t_z = players[target]->get_z();
+
     // A*알고리즘
     pos mv = a_star(t_x, t_z, x, z);
     x = mv.first;
@@ -2099,7 +2093,7 @@ void do_npc_move(int npc_id, int target)
     float look_x = players[npc_id]->get_x() - x;
     float look_z = players[npc_id]->get_z() - z;
 
-
+    players[npc_id]->set_look(look_x, 0.0f, look_z);
     players[npc_id]->set_x(x);
     players[npc_id]->set_z(z);
    /* for (int i = 0; i < 2; ++i) {
@@ -2134,6 +2128,7 @@ void do_npc_move(int npc_id, int target)
         }
         else {
             send_move_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id]);
+            send_look_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id]);
         }
     }
 

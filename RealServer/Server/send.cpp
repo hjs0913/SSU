@@ -93,3 +93,15 @@ void send_status_change_packet(Player* pl)
     packet.exp = pl->get_exp();
     pl->do_send(sizeof(packet), &packet);
 }
+
+void send_look_packet(Player* pl, Npc* changer)
+{
+    sc_packet_look packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_LOOK;
+    packet.id = changer->get_id();
+    packet.x = changer->get_look_x();
+    packet.y = changer->get_look_y();
+    packet.z = changer->get_look_z();
+    pl->do_send(sizeof(packet), &packet);
+}
