@@ -274,7 +274,7 @@ CAirplanePlayer::CAirplanePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 	m_pCamera = ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
-
+	
 	CAirplaneMeshDiffused* pAirplaneMesh = new CAirplaneMeshDiffused(pd3dDevice, pd3dCommandList, 5.0f, 10.0f, 5.0f, XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
 	SetMesh(0, pAirplaneMesh);
 
@@ -368,9 +368,13 @@ CTerrainPlayer::CTerrainPlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	m_pCamera = ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
-	//CCubeMeshDiffused* pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 4.0f, 12.0f, 4.0f);
-	Skull* pSkullMesh = new Skull(pd3dDevice, pd3dCommandList, 2.0f, 2.0f, 2.0f);
-	SetMesh(0, pSkullMesh);
+
+
+	CCubeMeshDiffused* pCubeMesh = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 5.0f, 10.0f, 5.0f, XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	//Skull* pSkullMesh = new Skull(pd3dDevice, pd3dCommandList, 2.0f, 2.0f, 2.0f);
+
+	//CAirplaneMeshDiffused* pAirplaneMesh = new CAirplaneMeshDiffused(pd3dDevice, pd3dCommandList, 5.0f, 10.0f, 5.0f, XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	SetMesh(0, /*pSkullMesh*/pCubeMesh);
 
 	UINT ncbElementBytes = ((sizeof(CB_PLAYER_INFO) + 255) & ~255); //256ÀÇ ¹è¼ö
 
