@@ -684,9 +684,9 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		obstacles_read >> x >> y >> z;
 		//	cout << x << "," << y << "," << z << endl;
 		obstacles[i]._id = i;
-		obstacles[i]._x = x + 2500;
-		obstacles[i]._y = y + 200;
-		obstacles[i]._z = z + 2500;
+		obstacles[i]._x = x;
+		obstacles[i]._y = y;
+		obstacles[i]._z = z;
 	}
 
 	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)pContext;
