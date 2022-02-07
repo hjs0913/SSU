@@ -558,6 +558,27 @@ void attack_success(int p_id, int target, float atk_factor)
     }
 }
 
+struct Coord
+{
+    float x;
+    float y;
+
+};
+int calcTriangle(Coord A_TRIANGLE, Coord B_TRIANGLE, Coord C_TRIANGLE)
+{
+    int result = std::abs((A_TRIANGLE.x * (B_TRIANGLE.y - C_TRIANGLE.y)) +
+        (B_TRIANGLE.x * (C_TRIANGLE.y - A_TRIANGLE.y)) +
+        (C_TRIANGLE.x * (A_TRIANGLE.y - B_TRIANGLE.y)));
+    return result;
+}
+bool isInsideTriangle(Coord A_TRIANGLE, Coord B_TRIANGLE, Coord C_TRIANGLE, Coord N)
+{
+    int NN = calcTriangle(A_TRIANGLE, B_TRIANGLE, C_TRIANGLE);
+    int AA = calcTriangle(N, B_TRIANGLE, C_TRIANGLE);
+    int BB = calcTriangle(A_TRIANGLE, N, C_TRIANGLE);
+    int CC = calcTriangle(A_TRIANGLE, B_TRIANGLE, N);
+    return (NN == AA + BB + CC);
+}
 void process_packet(int client_id, unsigned char* p)
 {
     unsigned char packet_type = p[1];
@@ -916,8 +937,8 @@ void process_packet(int client_id, unsigned char* p)
                 continue;
             }
             players[i]->state_lock.unlock();
-            if (players[i]->get_x() >= pl->get_x() - 20 && players[i]->get_x() <= pl->get_x() + 20) {
-                if (players[i]->get_z() >= pl->get_z() - 20 && players[i]->get_z() <= pl->get_z() + 20) {
+            if (players[i]->get_x() >= pl->get_x() -10 && players[i]->get_x() <= pl->get_x() + 10) {
+                if (players[i]->get_z() >= pl->get_z() - 10 && players[i]->get_z() <= pl->get_z() + 10) {
                     attack_success(client_id, players[i]->get_id(), pl->get_basic_attack_factor());    // 데미지 계산
                     // 몬스터의 자동공격을 넣어주자
                     if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
@@ -966,7 +987,7 @@ void process_packet(int client_id, unsigned char* p)
         packet.move_time = pl->last_move_time;
         break;
     }
-    case CS_PACKET_SKILL:{
+    case CS_PACKET_SKILL: {
         cs_packet_skill* packet = reinterpret_cast<cs_packet_skill*>(p);
         if (pl->get_skill_active(packet->skill_type) == true) return;
         pl->set_skill_active(packet->skill_type, true);     //일반공격 계수는 50
@@ -1017,16 +1038,14 @@ void process_packet(int client_id, unsigned char* p)
                 timer_event ev;
                 ev.obj_id = client_id;
                 ev.start_time = chrono::system_clock::now() + 3s;  //쿨타임
-                ev.ev = EVENT_SKILL_COOLTIME;
-                ev.target_id = 0;
+                ev.ev = EVENT_MSKILL_COOLTIME;
+                ev.target_id = 1;
                 timer_queue.push(ev);
-                float x1, z1;
-                float x2, z2;
-                float x3, z3;
-                //look 벡터 따로 설정해줘야하나?
-                x1 = pl->get_x(); z1 = pl->get_z();
-                x2 = pl->get_x() - 20; z2 = pl->get_z() + 40;
-                x3 = pl->get_x() + 20; z3 = pl->get_z() + 40;
+
+                Coord a = { pl->get_x(), pl->get_z() };    //플레이어 기준 전방 삼각형 범위 
+                Coord b = { pl->get_x() - 100, pl->get_z() + 40 };
+                Coord c = { pl->get_x() + 100, pl->get_z() + 40 };
+
 
                 for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
                     players[i]->state_lock.lock();
@@ -1036,16 +1055,11 @@ void process_packet(int client_id, unsigned char* p)
                     }
                     players[i]->state_lock.unlock();
 
+                    Coord n = { players[i]->get_x(), players[i]->get_z() };
                     float px = players[i]->get_x();
                     float pz = players[i]->get_z();
 
-                    float alpha = ((z2 - z3) * (px - x3) + (x3 - x2) * (pz - z3)) /
-                        ((z2 - z3) * (x1 - x3) + (x3 - x2) * (z1 - z3));
-                    float beta = ((z3 - z1) * (px - x3) + (x1 - x3) * (pz - z3)) /
-                        ((z2 - z3) * (x1 - x3) + (x3 - x2) * (z1 - z3));
-                    float gamma = 1.0f - alpha - beta;
-
-                    if (alpha > 0 && beta > 0 && gamma > 0) {
+                    if (isInsideTriangle(a, b, c, n)) {
                         magical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
                         cout << "광야 일격 !!!" << endl;
                         if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
@@ -1056,7 +1070,6 @@ void process_packet(int client_id, unsigned char* p)
                             ev.ev = EVENT_NPC_ATTACK;
                             ev.target_id = client_id;
                             timer_queue.push(ev);
-
                             Activate_Npc_Move_Event(i, pl->get_id());
                         }
                     }
@@ -1076,19 +1089,15 @@ void process_packet(int client_id, unsigned char* p)
                 ev.target_id = 0;
                 timer_queue.push(ev);
 
-                for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
-                    players[i]->state_lock.lock();
-                    if (players[i]->get_state() != ST_INGAME) {
-                        players[i]->state_lock.unlock();
-                        continue;
-                    }
-                    players[i]->state_lock.unlock();
-                    cout << "아테네의 가호 !!!" << endl;
-                    pl->set_physical_defence(0.48 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv()); //일단 두배 
-                    pl->set_magical_defence(0.34 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv());
-                    //여기 타이머 해야함 
+                cout << pl->get_physical_defence() << endl;
+                cout << pl->get_magical_defence() << endl;
+                cout << "아테네의 가호 !!!" << endl;
+                pl->set_physical_defence(0.48 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv()); //일단 두배 
+                pl->set_magical_defence(0.34 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv());
+                send_status_change_packet(pl);
+                cout << pl->get_physical_defence() << endl;
+                cout << pl->get_magical_defence() << endl;
 
-                }
                 break;
             }
             break;
@@ -2191,7 +2200,22 @@ void do_timer()
             if (temp.ev == EVENT_PLAYER_ATTACK) {
                 reinterpret_cast<Player*>(players[temp.obj_id])->set_attack_active(false);
             }
-            else if (temp.ev == EVENT_SKILL_COOLTIME) {
+            else if (temp.ev == EVENT_PSKILL_COOLTIME) {
+                reinterpret_cast<Player*>(players[temp.obj_id])
+                    ->set_skill_active(temp.target_id, false);
+            }
+            else if (temp.ev == EVENT_MSKILL_COOLTIME) {
+                reinterpret_cast<Player*>(players[temp.obj_id])
+                    ->set_skill_active(temp.target_id, false);
+            }
+            else if (temp.ev == EVENT_BUFF_COOLTIME) {
+
+                players[temp.obj_id]->set_physical_defence(0.24 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 10 * players[temp.obj_id]->get_lv());
+                players[temp.obj_id]->set_magical_defence(0.17 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 10 * players[temp.obj_id]->get_lv());
+                send_status_change_packet(reinterpret_cast<Player*>(players[temp.obj_id]));
+
+                cout << players[temp.obj_id]->get_physical_defence() << endl;
+                cout << players[temp.obj_id]->get_magical_defence() << endl;
                 reinterpret_cast<Player*>(players[temp.obj_id])
                     ->set_skill_active(temp.target_id, false);
             }
@@ -2215,9 +2239,20 @@ void do_timer()
                     reinterpret_cast<Player*>(players[ev.obj_id])->set_attack_active(false);
                     continue;
                 }
-                else if (temp.ev == EVENT_SKILL_COOLTIME) {
+                else if (temp.ev == EVENT_PSKILL_COOLTIME) {
                     reinterpret_cast<Player*>(players[temp.obj_id])
                         ->set_skill_active(temp.target_id, false);
+                    continue;
+                }
+                else if (temp.ev == EVENT_MSKILL_COOLTIME) {
+                    reinterpret_cast<Player*>(players[temp.obj_id])
+                        ->set_skill_active(temp.target_id, false);
+                    continue;
+                }
+                else if (temp.ev == EVENT_BUFF_COOLTIME) {
+                    reinterpret_cast<Player*>(players[temp.obj_id])
+                        ->set_skill_active(temp.target_id, false);
+
                     continue;
                 }
                 ex_over->_comp_op = EVtoOP(ev.ev);
