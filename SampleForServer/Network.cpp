@@ -97,6 +97,20 @@ void send_look_packet(XMFLOAT3 look, XMFLOAT3 right)
 	do_send(sizeof(packet), &packet);
 }
 
+
+void send_skill_packet(int sk_t, int sk_n)
+{
+	cs_packet_skill packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_SKILL;
+	packet.skill_type = sk_t;  
+	packet.skill_num = sk_n;
+	do_send(sizeof(packet), &packet);
+
+}
+
+
+
 void do_send(int num_bytes, void* mess)
 {
 	EXP_OVER* ex_over = new EXP_OVER;

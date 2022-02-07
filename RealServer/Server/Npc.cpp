@@ -239,3 +239,28 @@ MONSTER_SPECIES Npc::get_mon_spices()
 {
 	return _mon_species;
 }
+
+//skill
+void Npc::set_skill_factor(int skill_type, int skill_num)
+{
+
+	switch (skill_type)
+	{
+	case 0:  //물리
+		_skill_factors[skill_type][skill_num] = _lv  * 0.5  * (skill_num + 1) + 50;
+	break;
+	case 1:  //마법
+		_skill_factors[skill_type][skill_num] = _lv * 0.24 * (skill_num + 1) + 50;
+		break;
+	case 2:  // 버프 
+		break;
+	default:
+		break;
+	}
+
+	
+}
+float Npc::get_skill_factor(int skill_type, int skill_num)
+{
+	return _skill_factors[skill_type][skill_num];
+}

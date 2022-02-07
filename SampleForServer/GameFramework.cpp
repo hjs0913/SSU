@@ -477,6 +477,22 @@ void CGameFramework::ProcessInput()
 		}
 
 
+		//스킬		
+		if (pKeysBuffer[VK_NUMPAD1] & 0xF0) {     //   1 2 3	
+			send_skill_packet(0, 0); //물리 공격스킬, 0번 
+		}
+
+		if (pKeysBuffer[VK_NUMPAD4] & 0xF0) {     //   4 5 6
+			send_skill_packet(1, 0); //마법 공격스킬, 0번 
+		}
+
+		if (pKeysBuffer[VK_NUMPAD7] & 0xF0) {    // 7 8 9
+			send_skill_packet(2, 0); //버프 스킬, 0번 
+		}
+		
+
+
+
 		if (pKeysBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
 		if (pKeysBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
 

@@ -35,6 +35,9 @@ void send_move_packet(int direction);
 
 void send_look_packet(XMFLOAT3 look, XMFLOAT3 right);
 
+void send_skill_packet(int sk_t, int sk_n);
+
+
 int netInit();
 
 void process_packet(unsigned char* p);
