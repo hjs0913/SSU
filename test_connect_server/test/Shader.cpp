@@ -839,13 +839,22 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 
 #endif
 				// 장애물 인덱스 생각(기윤)
-				float xPosition = obstacles[x + z]._x;
-				float zPosition = obstacles[x + z]._z;
+				float xPosition;
+				float zPosition;
+				if (x * 97 + z >= 609) {
+					xPosition = 0.0f;
+					zPosition = 0.0f;
+				}
+				else {
+					xPosition = obstacles[x * 97 + z]._x + 100;
+					zPosition = obstacles[x * 97 + z]._z + 300;
+				}
+
 				float fHeight = pTerrain->GetHeight(xPosition, zPosition);
 				//cout << xPosition << " " << fHeight << " " << zPosition << endl;
 			//	if (xPosition <= fTerrainWidth / 2 - 200 || xPosition >= fTerrainWidth / 2 + 200 ||   //나무 위치     
 				//	zPosition <= fTerrainLength / 2 - 200 || zPosition >= fTerrainLength / 2 + 200) {
-				pBillboardObject->SetPosition(xPosition, 35, zPosition);         //1028 168 1028
+				pBillboardObject->SetPosition(xPosition, 28, zPosition);         //1028 168 1028
 				//cout << hp_pos.x << hp_pos.y << hp_pos.z << endl;
 
 		//	}
@@ -1087,6 +1096,7 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 		else {
 			m_ppObjects[j]->Animate(pTimer, pCamera, player);
 		}
+
 	}
 }
 
