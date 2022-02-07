@@ -81,10 +81,16 @@ int get_new_id()
     return -1;
 }
 
-bool check_move_alright(int x, int z)
+bool check_move_alright(int x, int z, bool monster)
 {
+    int size = 0;
+    if (monster) size = 15;
+    else size = 5;
+
+
     for (auto& ob : obstacles) {
-        if ((ob.get_x() -2.5 <= x && x <= ob.get_x() + 2.5) && (ob.get_z() - 2.5 <= z && z <= ob.get_z()+2.5 )) {
+        if ((ob.get_x() - size <= x && x <= ob.get_x() + size) && (ob.get_z() - size <= z && z <= ob.get_z()+size )) {
+            cout << "충돌했다" << endl;
             return false;
         }
     }
@@ -768,7 +774,7 @@ void process_packet(int client_id, unsigned char* p)
         float z = packet->z;       
 
         // 유효성 검사
-        if (check_move_alright(x, z) == false) {
+        if (check_move_alright(x, z, false) == false) {
             // 올바르지 않을경우 위치를 수정을 해주어야 한다
             // 클라쪽 수정 필요
             send_move_packet(pl, pl);
@@ -1563,8 +1569,8 @@ void initialise_NPC()
         // 여기서 위치를 받아오자
 
         // 임시 좌표(원래는 몬스터 놓을 곳의 좌표를 뽑아와야한다)
-        players[i]->set_x(2100);
-        players[i]->set_z(2000);
+        players[i]->set_x(1580 + 30*(i-NPC_ID_START));
+        players[i]->set_z(2270 + 30 * (i - NPC_ID_START));
         float temp_x = players[i]->get_x();
         float temp_y = players[i]->get_y();
         float temp_z = players[i]->get_z();
@@ -1613,8 +1619,8 @@ void initialise_NPC()
         // 여기서 위치를 받아오자
 
         // 임시 좌표(원래는 몬스터 놓을 곳의 좌표를 뽑아와야한다)
-        players[i]->set_x(2100);
-        players[i]->set_z(2200);
+        players[i]->set_x(2860 + 30 * (i - (NPC_ID_START + 30)));
+        players[i]->set_z(2190 + 30 * (i - (NPC_ID_START + 30)));
         float temp_x = players[i]->get_x();
         float temp_y = players[i]->get_y();
         float temp_z = players[i]->get_z();
@@ -1662,8 +1668,8 @@ void initialise_NPC()
         // 여기서 위치를 받아오자
 
         // 임시 좌표(원래는 몬스터 놓을 곳의 좌표를 뽑아와야한다)
-        players[i]->set_x(2100);
-        players[i]->set_z(2300);
+        players[i]->set_x(2100 + 30 * (i - (NPC_ID_START + 60)));
+        players[i]->set_z(3280 + 30 * (i - (NPC_ID_START + 60)));
         float temp_x = players[i]->get_x();
         float temp_y = players[i]->get_y();
         float temp_z = players[i]->get_z();
@@ -1709,8 +1715,8 @@ void initialise_NPC()
         // 여기서 위치를 받아오자
 
         // 임시 좌표(원래는 몬스터 놓을 곳의 좌표를 뽑아와야한다)
-        players[i]->set_x(2100);
-        players[i]->set_z(2400);
+        players[i]->set_x(3600 + 30 * (i - (NPC_ID_START + 90)));
+        players[i]->set_z(2775 + 30 * (i - (NPC_ID_START + 90)));
         float temp_x = players[i]->get_x();
         float temp_y = players[i]->get_y();
         float temp_z = players[i]->get_z();
@@ -1756,8 +1762,8 @@ void initialise_NPC()
         // 여기서 위치를 받아오자
 
         // 임시 좌표(원래는 몬스터 놓을 곳의 좌표를 뽑아와야한다)
-        players[i]->set_x(2100);
-        players[i]->set_z(2500);
+        players[i]->set_x(3325 + 30 * (i - (NPC_ID_START + 120)));
+        players[i]->set_z(3410 + 30 * (i - (NPC_ID_START + 120)));
         float temp_x = players[i]->get_x();
         float temp_y = players[i]->get_y();
         float temp_z = players[i]->get_z();
@@ -1805,8 +1811,8 @@ void initialise_NPC()
         // 여기서 위치를 받아오자
 
         // 임시 좌표(원래는 몬스터 놓을 곳의 좌표를 뽑아와야한다)
-        players[i]->set_x(2100);
-        players[i]->set_z(2600);
+        players[i]->set_x(3220 + 30 * (i - (NPC_ID_START + 150)));
+        players[i]->set_z(3822 + 30 * (i - (NPC_ID_START + 150)));
         float temp_x = players[i]->get_x();
         float temp_y = players[i]->get_y();
         float temp_z = players[i]->get_z();
@@ -1891,7 +1897,7 @@ pos a_star(int t_x, int t_z, int x, int z)
             // 검색된게 있다면 검색을 해주지 않는다
             if (scoreF[now.first + dirX[i]][now.second + dirZ[i]] != 0) continue;
             // 장애물이랑 부딪히는지 확인
-            if (false == check_move_alright(x + (p.first - 12) * REAL_DISTANCE, z + (p.second - 12) * REAL_DISTANCE)) {
+            if (false == check_move_alright(x + (p.first - 12) * REAL_DISTANCE, z + (p.second - 12) * REAL_DISTANCE, true)) {
                 cout << "장애물 부딪힘" << endl;
                 continue;
             }
@@ -2324,9 +2330,9 @@ int main()
         float x, y, z;
         obstacles_read >> x >> y >> z;
         obstacles[i].set_id(i);
-        obstacles[i].set_x(x);
+        obstacles[i].set_x(x+100);
         obstacles[i].set_y(y);
-        obstacles[i].set_z(z);
+        obstacles[i].set_z(z+300);
     }
 
     obstacles_read.close();
