@@ -11,12 +11,14 @@
 using namespace std;
 CBillboardObject* pBillboardObject = NULL;
 CMaterial* pMaterials[7];
+CGameObject** m_ppObjects;
 XMFLOAT3 hp_pos;
 XMFLOAT3 POS_PLAYER;
 CTexturedRectMesh* pRectMesh;
 CAirplaneMeshDiffused* pOtherPlayerMesh[7];
  ID3D12Device* pd3dDevice;
-extern ID3D12GraphicsCommandList* pd3dCommandList;
+ID3D12GraphicsCommandList* pd3dCommandList;
+CTexturedRectMesh* pRectMesh_hp;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 CTexture::CTexture(int nTextures, UINT nTextureType, int nSamplers, int nRootParameters)
@@ -533,11 +535,14 @@ CBillboardObject::~CBillboardObject() {
 
 void CBillboardObject::Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject* player) {  //여기 빌보드 회전시킴 -> 그러니까 여기서 빌보드의 위치도 머리위로 조정하자   //계속돌아
 
-	pBillboardObject->SetPosition(player->GetPosition().x, player->GetPosition().y + 20, player->GetPosition().z);
-	pBillboardObject->SetMaterial(pMaterials[0]);  //여기
-	hp_width -= 15;
-	hp_height -= 15;
+	//pBillboardObject->SetPosition(player->GetPosition().x, player->GetPosition().y + 20, player->GetPosition().z);
+	//pBillboardObject->SetMaterial(pMaterials[0]);  //여기
+	m_ppObjects[201]->SetPosition(player->GetPosition().x, player->GetPosition().y + 18, player->GetPosition().z);
+	m_ppObjects[202]->SetPosition(player->GetPosition().x, player->GetPosition().y + 15, player->GetPosition().z);
 
+	hp_width -= 15;
+
+	//m_ppObjects[201]->SetMesh(0, pRectMesh_hp);
 	//pRectMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, hp_width, hp_height, 0.0f);
 
 	XMFLOAT3 xmf3CameraPosition = pCamera->GetPosition();
@@ -550,6 +555,7 @@ void CBillboardObject::Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject*
 	//Sleep(100);
 
 }
+
 
 void CBillboardObject::SetLookAt(XMFLOAT3& xmf3Target) {
 	XMFLOAT3 xmf3Up(0.0f, 1.0f, 0.0f);

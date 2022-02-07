@@ -12,7 +12,7 @@ extern CBillboardObject* pBillboardObject;
 extern CMaterial* pMaterials[7];
 extern CTexturedRectMesh* pRectMesh;
 extern CAirplaneMeshDiffused* pOtherPlayerMesh[7];
-
+extern CGameObject** m_ppObjects;
 extern float hp_width;
 extern float hp_height;
 
@@ -129,6 +129,7 @@ public:
 //
 //#define _WITH_BATCH_MATERIAL
 
+
 class CObjectsShader : public CTexturedShader
 {
 public:
@@ -152,7 +153,7 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 
 protected:
-	CGameObject						**m_ppObjects = 0;
+
 
 
 	int								m_nObjects = 0;

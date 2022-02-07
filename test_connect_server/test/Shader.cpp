@@ -716,7 +716,7 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	pTexture[1]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/tree02.dds", RESOURCE_TEXTURE2D, 0);
 
 	pTexture[2] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
-	pTexture[2]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/tree02.dds", RESOURCE_TEXTURE2D, 0);
+	pTexture[2]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/mp.dds", RESOURCE_TEXTURE2D, 0);
 
 	pTexture[3] = new CTexture(1, RESOURCE_TEXTURE2D_ARRAY, 0, 1);
 	pTexture[3]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/house.dds", RESOURCE_TEXTURE2D, 0);
@@ -826,9 +826,14 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 				pBillboardObject->SetMesh(0, pRectMesh);
 #ifndef _WITH_BATCH_MATERIAL    
 
-				if (i == 201)
+				if (i == 201) //HP
 					pBillboardObject->SetMaterial(pMaterials[0]);  //¿©±â
-				else if (i > 201)
+				else if (i == 202) { // mp
+				
+					pBillboardObject->SetMaterial(pMaterials[2]);
+			
+				}
+				else if (i > 202)
 					pBillboardObject->SetMaterial(pMaterials[1]);
 				//	pBillboardObject->SetMaterial(pMaterials[uid(dre)]);
 
@@ -848,6 +853,7 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 			//pBillboardObject->SetPosition(xPosition, fHeight, zPosition);
 				pBillboardObject->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 				m_ppObjects[i++] = pBillboardObject;
+			
 				tmp = i;
 			}
 			num += 1;
