@@ -15,6 +15,10 @@ CGameObject** m_ppObjects;
 XMFLOAT3 hp_pos;
 XMFLOAT3 POS_PLAYER;
 CTexturedRectMesh* pRectMesh;
+CTexturedRectMesh* pRectMesh1;
+CTexturedRectMesh* pRectMesh_full_hp;
+CTexturedRectMesh* pRectMesh_half_hp;
+
 CAirplaneMeshDiffused* pOtherPlayerMesh[7];
  ID3D12Device* pd3dDevice;
 ID3D12GraphicsCommandList* pd3dCommandList;
@@ -537,6 +541,7 @@ void CBillboardObject::Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject*
 
 	//pBillboardObject->SetPosition(player->GetPosition().x, player->GetPosition().y + 20, player->GetPosition().z);
 	//pBillboardObject->SetMaterial(pMaterials[0]);  //¿©±â
+	
 	m_ppObjects[201]->SetPosition(player->GetPosition().x, player->GetPosition().y + 18, player->GetPosition().z);
 	m_ppObjects[202]->SetPosition(player->GetPosition().x, player->GetPosition().y + 15, player->GetPosition().z);
 

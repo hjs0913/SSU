@@ -11,6 +11,10 @@
 extern CBillboardObject* pBillboardObject;
 extern CMaterial* pMaterials[7];
 extern CTexturedRectMesh* pRectMesh;
+extern CTexturedRectMesh* pRectMesh1;
+extern CTexturedRectMesh* pRectMesh_full_hp;
+extern CTexturedRectMesh* pRectMesh_half_hp;
+extern 	CTexturedRectMesh* newhp[100];
 extern CAirplaneMeshDiffused* pOtherPlayerMesh[7];
 extern CGameObject** m_ppObjects;
 extern float hp_width;

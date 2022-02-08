@@ -467,7 +467,7 @@ void CGameFramework::ReleaseObjects()
 	if (m_pScene) delete m_pScene;
 }
 
-void CGameFramework::ProcessInput()   //¿©±â
+void CGameFramework::ProcessInput()   //ï¿½ï¿½ï¿½ï¿½
 {
 	static UCHAR pKeysBuffer[256];
 	bool bProcessedByScene = false;
@@ -477,6 +477,8 @@ void CGameFramework::ProcessInput()   //¿©±â
 		DWORD dwDirection = 0;
 		if (pKeysBuffer['W'] & 0xF0) {
 			//send_move_packet(0);
+	
+
 			dwDirection |= DIR_FORWARD;
 		}
 		if (pKeysBuffer['S'] & 0xF0) {
@@ -492,17 +494,18 @@ void CGameFramework::ProcessInput()   //¿©±â
 			dwDirection |= DIR_RIGHT;
 		}
 
-		//½ºÅ³---------------------------------
+		//ï¿½ï¿½Å³---------------------------------
 		if ((pKeysBuffer[VK_NUMPAD1] & 0xF0) || (pKeysBuffer['1'] & 0xF0)) {     //   1 2 3	
-			send_skill_packet(0, 0); //¹°¸® °ø°İ½ºÅ³, 0¹ø 
+			send_skill_packet(0, 0); //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½İ½ï¿½Å³, 0ï¿½ï¿½ 
+		
 		}
 
 		if (pKeysBuffer[VK_NUMPAD4] & 0xF0 || (pKeysBuffer['4'] & 0xF0)) {     //   4 5 6
-			send_skill_packet(1, 0); //¸¶¹ı °ø°İ½ºÅ³, 0¹ø 
+			send_skill_packet(1, 0); //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½İ½ï¿½Å³, 0ï¿½ï¿½ 
 		}
 
 		if (pKeysBuffer[VK_NUMPAD7] & 0xF0 || (pKeysBuffer['7'] & 0xF0)) {    // 7 8 9
-			send_skill_packet(2, 0); //¹öÇÁ ½ºÅ³, 0¹ø 
+			send_skill_packet(2, 0); //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å³, 0ï¿½ï¿½ 
 		}
 		if (pKeysBuffer[VK_SPACE] & 0xF0) {
 			send_attack_packet(0);
@@ -512,7 +515,7 @@ void CGameFramework::ProcessInput()   //¿©±â
 
 		static bool pushq = true;
 
-		if (GetAsyncKeyState('Q') & 0x8000) {  //¿ÍÀÌ¾î¸ğµå
+		if (GetAsyncKeyState('Q') & 0x8000) {  //ï¿½ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½
 			if (pushq) {
 				::gbTerrainTessellationWireframe = !::gbTerrainTessellationWireframe;
 				pushq = false;
@@ -524,7 +527,7 @@ void CGameFramework::ProcessInput()   //¿©±â
 
 		static bool pushI = true;
 
-		if (GetAsyncKeyState('I') & 0x8000) { //¹æÀÌµ¿ 
+		if (GetAsyncKeyState('I') & 0x8000) { //ï¿½ï¿½ï¿½Ìµï¿½ 
 			if (pushI) {
 				if (IsIn) {
 					m_pPlayer->SetPosition(tmppos);
@@ -542,14 +545,14 @@ void CGameFramework::ProcessInput()   //¿©±â
 			pushI = true;
 		}
 
-		if (pKeysBuffer[VK_SHIFT] & 0xF0) {  //Ä«¸Ş¶ó ÁÜ µÚ·Î 
+		if (pKeysBuffer[VK_SHIFT] & 0xF0) {  //Ä«ï¿½Ş¶ï¿½ ï¿½ï¿½ ï¿½Ú·ï¿½ 
 			cameradis = 1.05f;
 		}
 		else
 			cameradis = 1.0f;
 
 		static bool pushCTRL = true;
-		if (GetAsyncKeyState(VK_CONTROL) & 0x8000) {  //ctrl Å° ÃÑ¾Ë ¹ß»ç ºÎµúÈ÷¸é ºÒ²É
+		if (GetAsyncKeyState(VK_CONTROL) & 0x8000) {  //ctrl Å° ï¿½Ñ¾ï¿½ ï¿½ß»ï¿½ ï¿½Îµï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ò²ï¿½
 			if (pushCTRL) {
 				++bulletidx;
 				pushCTRL = false;
@@ -598,7 +601,7 @@ void CGameFramework::ProcessInput()   //¿©±â
 					}
 				}
 			}
-			// ÀÌµ¿
+			// ï¿½Ìµï¿½
 			if (dwDirection) m_pPlayer->Move(dwDirection, 50.0f * m_GameTimer.GetTimeElapsed(), true);
 			
 			send_look_packet(m_pPlayer->GetLookVector(), m_pPlayer->GetRightVector());
@@ -654,7 +657,7 @@ void CGameFramework::FrameAdvance()
 	// receive Player position to server
 	// m_pCamera->Move(return_myCamera());
 	//------------------------------------
-
+	
 	AnimateObjects();
 
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();

@@ -66,3 +66,4 @@ XMFLOAT3 get_position_to_server(int id);
 
 XMFLOAT3 get_look_to_server(int id);
 
+void update_hp(int width);
