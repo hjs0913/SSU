@@ -2262,7 +2262,6 @@ void do_timer()
                 
                 if (ev.ev == EVENT_SKILL_COOLTIME) {
                     if (ev.target_id == 2) {  // BUFF
-                        cout << "?????" << endl;
                         players[ev.obj_id]->set_physical_defence(0.24 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 10 * players[ev.obj_id]->get_lv());
                         players[ev.obj_id]->set_magical_defence(0.17 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 10 * players[ev.obj_id]->get_lv());
                         
@@ -2276,26 +2275,8 @@ void do_timer()
                     
                     reinterpret_cast<Player*>(players[ev.obj_id])
                         ->set_skill_active(ev.target_id, false);
-
-
                     continue;
                 }
-                /*else if (temp.ev == EVENT_PSKILL_COOLTIME) {
-                    reinterpret_cast<Player*>(players[temp.obj_id])
-                        ->set_skill_active(temp.target_id, false);
-                    continue;
-                }
-                else if (temp.ev == EVENT_MSKILL_COOLTIME) {
-                    reinterpret_cast<Player*>(players[temp.obj_id])
-                        ->set_skill_active(temp.target_id, false);
-                    continue;
-                }
-                else if (temp.ev == EVENT_BUFF_COOLTIME) {
-                    reinterpret_cast<Player*>(players[temp.obj_id])
-                        ->set_skill_active(temp.target_id, false);
-
-                    continue;
-                }*/
                 ex_over->_comp_op = EVtoOP(ev.ev);
                 ex_over->_target = ev.target_id;
                 PostQueuedCompletionStatus(g_h_iocp, 1, ev.obj_id, &ex_over->_wsa_over);   //0은 소켓취급을 받음
