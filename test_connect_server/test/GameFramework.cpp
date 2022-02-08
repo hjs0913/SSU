@@ -493,8 +493,6 @@ void CGameFramework::ProcessInput()   //����
 		//��ų---------------------------------
 		if ((pKeysBuffer[VK_NUMPAD1] & 0xF0) || (pKeysBuffer['1'] & 0xF0)) {     //   1 2 3	
 			send_skill_packet(0, 0); //���� ���ݽ�ų, 0�� 
-
-		
 		}
 
 		if (pKeysBuffer[VK_NUMPAD4] & 0xF0 || (pKeysBuffer['4'] & 0xF0)) {     //   4 5 6
