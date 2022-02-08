@@ -1024,7 +1024,9 @@ void process_packet(int client_id, unsigned char* p)
                         continue;
                     }
                     players[i]->state_lock.unlock();
+
                     if ((players[i]->get_x() >= pl->get_x() - 10 && players[i]->get_x() <= pl->get_x() + 10) || (players[i]->get_z() >= pl->get_z() - 10 && players[i]->get_z() <= pl->get_z() + 10)) {
+                        pl->set_skill_factor(packet->skill_type, packet->skill_num);
                         physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
                   
                         send_status_change_packet(pl);
@@ -1076,6 +1078,7 @@ void process_packet(int client_id, unsigned char* p)
                     float pz = players[i]->get_z();
      
                     if (isInsideTriangle(a, b, c, n)) {
+                        pl->set_skill_factor(packet->skill_type, packet->skill_num);
                         magical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
                
                         send_status_change_packet(pl);
