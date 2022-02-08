@@ -1014,6 +1014,9 @@ void process_packet(int client_id, unsigned char* p)
                 ev.target_id = 0;
                 timer_queue.push(ev);
 
+                cout << "최후의 일격 !!!" << endl;
+                pl->set_mp(pl->get_mp() - 1000);
+
                 for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
                     players[i]->state_lock.lock();
                     if (players[i]->get_state() != ST_INGAME) {
@@ -1023,8 +1026,7 @@ void process_packet(int client_id, unsigned char* p)
                     players[i]->state_lock.unlock();
                     if ((players[i]->get_x() >= pl->get_x() - 10 && players[i]->get_x() <= pl->get_x() + 10) || (players[i]->get_z() >= pl->get_z() - 10 && players[i]->get_z() <= pl->get_z() + 10)) {
                         physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
-                        cout << "최후의 일격 !!!" << endl;
-                        pl->set_mp(pl->get_mp() - 1000);
+                  
                         send_status_change_packet(pl);
                         if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
                             players[i]->set_active(true);
@@ -1058,6 +1060,8 @@ void process_packet(int client_id, unsigned char* p)
                 Coord b = { pl->get_x() - 100, pl->get_z() + 40 };
                 Coord c = { pl->get_x() + 100, pl->get_z() + 40 };
 
+                cout << "광야 일격 !!!" << endl;
+                pl->set_mp(pl->get_mp() - 1000);
 
                 for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
                     players[i]->state_lock.lock();
@@ -1073,8 +1077,7 @@ void process_packet(int client_id, unsigned char* p)
      
                     if (isInsideTriangle(a, b, c, n)) {
                         magical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
-                        cout << "광야 일격 !!!" << endl;
-                        pl->set_mp(pl->get_mp() - 1000);
+               
                         send_status_change_packet(pl);
                         if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
                             players[i]->set_active(true);
