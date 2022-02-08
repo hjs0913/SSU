@@ -1571,11 +1571,8 @@ int API_get_z(lua_State* L)
 void initialise_NPC()
 {
     default_random_engine dre;
-    uniform_int_distribution<int> rng(-20, 20);
-    int rd[30];
-    for (int& i : rd) {
-        i = rng(dre);
-    }
+    uniform_int_distribution<int> rng_x(1380, 1680);
+    uniform_int_distribution<int> rng_z(2070, 2370);
     
     cout << "NPC 로딩중" << endl;
     char name[MAX_NAME_SIZE];
@@ -1592,8 +1589,8 @@ void initialise_NPC()
         // 여기서 위치를 받아오자
 
         // 임시 좌표(원래는 몬스터 놓을 곳의 좌표를 뽑아와야한다)
-        players[i]->set_x(1580 + 15*rd[i-NPC_ID_START]);
-        players[i]->set_z(2270 + 15 * rd[i - NPC_ID_START]);
+        players[i]->set_x(rng_x(dre));
+        players[i]->set_z(rng_z(dre));
         float temp_x = players[i]->get_x();
         float temp_y = players[i]->get_y();
         float temp_z = players[i]->get_z();
@@ -1631,6 +1628,8 @@ void initialise_NPC()
     }
 
     // 타락한 닭 소환
+    rng_x.param(uniform_int_distribution<int>::param_type(2660, 2960));
+    rng_z.param(uniform_int_distribution<int>::param_type(1990, 2290));
     for (int i = NPC_ID_START+30; i < NPC_ID_START + 60; ++i) {
         players[i] = new Npc(i);
         lua_State* L = players[i]->L = luaL_newstate();
@@ -1642,8 +1641,8 @@ void initialise_NPC()
         // 여기서 위치를 받아오자
 
         // 임시 좌표(원래는 몬스터 놓을 곳의 좌표를 뽑아와야한다)
-        players[i]->set_x(2860 + 15 * rd[i - NPC_ID_START+30]);
-        players[i]->set_z(2190 + 15 * rd[i - NPC_ID_START + 30]);
+        players[i]->set_x(rng_x(dre));
+        players[i]->set_z(rng_z(dre));
         float temp_x = players[i]->get_x();
         float temp_y = players[i]->get_y();
         float temp_z = players[i]->get_z();
@@ -1680,6 +1679,8 @@ void initialise_NPC()
     }
 
     // 타락한 토끼 소환
+    rng_x.param(uniform_int_distribution<int>::param_type(1900, 2200));
+    rng_z.param(uniform_int_distribution<int>::param_type(3080, 3380));
     for (int i = NPC_ID_START + 60; i < NPC_ID_START + 90; ++i) {
         players[i] = new Npc(i);
         lua_State* L = players[i]->L = luaL_newstate();
@@ -1691,8 +1692,8 @@ void initialise_NPC()
         // 여기서 위치를 받아오자
 
         // 임시 좌표(원래는 몬스터 놓을 곳의 좌표를 뽑아와야한다)
-        players[i]->set_x(2100 + 15 * rd[i - NPC_ID_START + 60]);
-        players[i]->set_z(3280 + 15 * rd[i - NPC_ID_START + 60]);
+        players[i]->set_x(rng_x(dre));
+        players[i]->set_z(rng_z(dre));
         float temp_x = players[i]->get_x();
         float temp_y = players[i]->get_y();
         float temp_z = players[i]->get_z();
@@ -1728,6 +1729,8 @@ void initialise_NPC()
         players[i]->set_mon_species(FALLEN_RABBIT);
     }
     // 타락한 바나나 원숭이 소환
+    rng_x.param(uniform_int_distribution<int>::param_type(3400, 3700));
+    rng_z.param(uniform_int_distribution<int>::param_type(2575, 2875));
     for (int i = NPC_ID_START + 90; i < NPC_ID_START + 120; ++i) {
         players[i] = new Npc(i);
         lua_State* L = players[i]->L = luaL_newstate();
@@ -1738,8 +1741,8 @@ void initialise_NPC()
         // 여기서 위치를 받아오자
 
         // 임시 좌표(원래는 몬스터 놓을 곳의 좌표를 뽑아와야한다)
-        players[i]->set_x(3600 + 15 * rd[i - NPC_ID_START + 90]);
-        players[i]->set_z(2775 + 15 * rd[i - NPC_ID_START + 90]);
+        players[i]->set_x(rng_x(dre));
+        players[i]->set_z(rng_z(dre));
         float temp_x = players[i]->get_x();
         float temp_y = players[i]->get_y();
         float temp_z = players[i]->get_z();
@@ -1774,6 +1777,8 @@ void initialise_NPC()
         players[i]->set_mon_species(FALLEN_MONKEY);
     }
     // 늑대 우두머리 소환
+    rng_x.param(uniform_int_distribution<int>::param_type(3125, 3425));
+    rng_z.param(uniform_int_distribution<int>::param_type(3210, 3510));
     for (int i = NPC_ID_START + 120; i < NPC_ID_START + 150; ++i) {
         players[i] = new Npc(i);
         lua_State* L = players[i]->L = luaL_newstate();
@@ -1785,8 +1790,8 @@ void initialise_NPC()
         // 여기서 위치를 받아오자
 
         // 임시 좌표(원래는 몬스터 놓을 곳의 좌표를 뽑아와야한다)
-        players[i]->set_x(3325 + 15 * rd[i - NPC_ID_START + 120]);
-        players[i]->set_z(3410 + 15 * rd[i - NPC_ID_START + 120]);
+        players[i]->set_x(rng_x(dre));
+        players[i]->set_z(rng_z(dre));
         float temp_x = players[i]->get_x();
         float temp_y = players[i]->get_y();
         float temp_z = players[i]->get_z();
@@ -1823,6 +1828,8 @@ void initialise_NPC()
     }
 
     // 타락한 호랑이 소환
+    rng_x.param(uniform_int_distribution<int>::param_type(3020, 3320));
+    rng_z.param(uniform_int_distribution<int>::param_type(3622, 3922));
     for (int i = NPC_ID_START + 150; i < NPC_ID_START + 180; ++i) {
         players[i] = new Npc(i);
         lua_State* L = players[i]->L = luaL_newstate();
@@ -1834,8 +1841,8 @@ void initialise_NPC()
         // 여기서 위치를 받아오자
 
         // 임시 좌표(원래는 몬스터 놓을 곳의 좌표를 뽑아와야한다)
-        players[i]->set_x(3220 + 15 * rd[i - NPC_ID_START + 150]);
-        players[i]->set_z(3822 + 15 * rd[i - NPC_ID_START + 150]);
+        players[i]->set_x(rng_x(dre));
+        players[i]->set_z(rng_z(dre));
         float temp_x = players[i]->get_x();
         float temp_y = players[i]->get_y();
         float temp_z = players[i]->get_z();
@@ -2122,6 +2129,24 @@ void do_npc_move(int npc_id, int target)
 
     int t_x = players[target]->get_x();
     int t_z = players[target]->get_z();
+
+    // 움직일 필요가 없다
+    if ((t_x >= x - 8 && t_x <= x + 8) && (t_z >= z - 8 && t_z <= z + 8)) {
+        players[npc_id]->state_lock.lock();
+        if (players[npc_id]->get_state() != ST_INGAME) {
+            players[npc_id]->state_lock.unlock();
+            return;
+        }
+        players[npc_id]->state_lock.unlock();
+
+        timer_event ev;
+        ev.obj_id = npc_id;
+        ev.start_time = chrono::system_clock::now() + 1s;
+        ev.ev = EVENT_NPC_MOVE;
+        ev.target_id = target;
+        timer_queue.push(ev);
+        return;
+    }
 
     // A*알고리즘
     pos mv = a_star(t_x, t_z, x, z);
