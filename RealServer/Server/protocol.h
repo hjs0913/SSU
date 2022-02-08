@@ -129,6 +129,7 @@ struct sc_packet_put_object {
 	char type;
 	int id;
 	float x, y, z;
+	float look_x, look_y, look_z;
 	char object_type;
 	char object_class;
 	char	name[MAX_NAME_SIZE];

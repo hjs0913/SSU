@@ -782,8 +782,8 @@ void process_packet(int client_id, unsigned char* p)
         }
 
         pl->set_x(x);
+        pl->set_y(y);
         pl->set_z(z);
-
         unordered_set <int> nearlist;
         for (auto& other : players) {
             // if (other._id == client_id) continue;
@@ -810,7 +810,7 @@ void process_packet(int client_id, unsigned char* p)
         }
         nearlist.erase(client_id);  // 내 아이디는 무조건 들어가니 그것을 지워주자
 
-        // send_move_packet(pl, pl); // 내 자신의 움직임을 먼저 보내주자
+        send_move_packet(pl, pl); // 내 자신의 움직임을 먼저 보내주자
 
         pl->vl.lock();
         unordered_set <int> my_vl{ pl->viewlist };
@@ -1092,7 +1092,7 @@ void process_packet(int client_id, unsigned char* p)
                 ev.obj_id = client_id;
                 ev.start_time = chrono::system_clock::now() + 10s;  //쿨타임
                 ev.ev = EVENT_SKILL_COOLTIME;
-                ev.target_id = 0;
+                ev.target_id = 2;
                 timer_queue.push(ev);
 
                 cout << pl->get_physical_defence() << endl;

@@ -493,18 +493,18 @@ void CGameFramework::ProcessInput()   //여기
 		}
 
 		//스킬---------------------------------
-		if (pKeysBuffer[VK_NUMPAD1] & 0xF0) {     //   1 2 3	
+		if ((pKeysBuffer[VK_NUMPAD1] & 0xF0) || (pKeysBuffer['1'] & 0xF0)) {     //   1 2 3	
 			send_skill_packet(0, 0); //물리 공격스킬, 0번 
 		}
 
-		if (pKeysBuffer[VK_NUMPAD4] & 0xF0) {     //   4 5 6
+		if (pKeysBuffer[VK_NUMPAD4] & 0xF0 || (pKeysBuffer['4'] & 0xF0)) {     //   4 5 6
 			send_skill_packet(1, 0); //마법 공격스킬, 0번 
 		}
 
-		if (pKeysBuffer[VK_NUMPAD7] & 0xF0) {    // 7 8 9
+		if (pKeysBuffer[VK_NUMPAD7] & 0xF0 || (pKeysBuffer['7'] & 0xF0)) {    // 7 8 9
 			send_skill_packet(2, 0); //버프 스킬, 0번 
 		}
-		if (pKeysBuffer[RI_MOUSE_LEFT_BUTTON_DOWN] & 0xF0) {
+		if (pKeysBuffer[VK_SPACE] & 0xF0) {
 			send_attack_packet(0);
 		}
 		//---------------------------------
@@ -601,11 +601,13 @@ void CGameFramework::ProcessInput()   //여기
 			// 이동
 			if (dwDirection) m_pPlayer->Move(dwDirection, 50.0f * m_GameTimer.GetTimeElapsed(), true);
 			
-			send_move_packet(m_pPlayer->GetPosition());
 			send_look_packet(m_pPlayer->GetLookVector(), m_pPlayer->GetRightVector());
 		}
 	}
 	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
+
+
+	send_move_packet(m_pPlayer->GetPosition());
 }
 
 void CGameFramework::AnimateObjects()
@@ -646,10 +648,10 @@ void CGameFramework::FrameAdvance()
 {
 	m_GameTimer.Tick(0.0f);
 
+	m_pPlayer->SetPosition(return_myPosition());
 	ProcessInput();
 
 	// receive Player position to server
-	// m_pPlayer->SetPosition(return_myPosition());
 	// m_pCamera->Move(return_myCamera());
 	//------------------------------------
 
