@@ -10,6 +10,8 @@
 #include "../../RealServer/Server/protocol.h"
 extern  XMFLOAT3 hp_pos;
 extern XMFLOAT3 POS_PLAYER; 
+
+extern int nnn;
 class CGameFramework
 {
 public:

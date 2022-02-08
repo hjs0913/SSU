@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Network.h"
 #include "Player.h"
-//#include "GameFramework.h"
+#include "GameFramework.h"
 
 int my_id = 0;
 int m_prev_size = 0;
@@ -12,7 +12,7 @@ WSADATA wsa;
 SOCKET sock;
 SOCKADDR_IN serveraddr;
 int retval = 0;
-
+CTexturedRectMesh* newhp[100];
 SOCKET g_s_socket;
 
 WSABUF mybuf_recv;
@@ -33,6 +33,10 @@ HANDLE g_h_iocp;	// 나중에 iocp바꿀 시 사용
 bool g_client_shutdown = false;
 array<CPlayer*, MAX_USER+MAX_NPC> mPlayer;
 
+void update_hp(int width)
+{
+	m_ppObjects[201]->SetMesh(0, newhp[width]);
+}
 void err_display(int err_no)
 {
 	WCHAR* lpMsgBuf;
@@ -159,7 +163,7 @@ void do_recv()
 		}
 	}
 }
-
+bool hp_ok = false;
 void process_packet(unsigned char* p) 
 {
 
@@ -213,6 +217,21 @@ void process_packet(unsigned char* p)
 	}
 	case SC_PACKET_STATUS_CHANGE: {
 		// 아직 미구현
+		sc_packet_status_change* packet = reinterpret_cast<sc_packet_status_change*> (p);
+		cout << "max hp " << packet->maxhp << endl;
+		short percent =(float)packet->hp / (float)packet->maxhp * 100;
+
+		if (mPlayer[my_id]->m_hp > 0) {
+			mPlayer[my_id]->m_hp = packet->hp;
+			hp_ok = true;
+			update_hp(percent/ 2);
+			cout << "남은 hp " << packet->hp << endl;
+			cout << "남은 퍼센트 " << percent << endl;
+			//m_ppObjects[201]->SetMesh(0, pRectMesh_half_hp);
+		}
+		
+		
+		
 		break;
 	}
 	case SC_PACKET_DEAD: {

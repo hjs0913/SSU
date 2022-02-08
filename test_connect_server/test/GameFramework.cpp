@@ -477,6 +477,8 @@ void CGameFramework::ProcessInput()   //여기
 		DWORD dwDirection = 0;
 		if (pKeysBuffer['W'] & 0xF0) {
 			//send_move_packet(0);
+	
+
 			dwDirection |= DIR_FORWARD;
 		}
 		if (pKeysBuffer['S'] & 0xF0) {
@@ -495,6 +497,7 @@ void CGameFramework::ProcessInput()   //여기
 		//스킬---------------------------------
 		if (pKeysBuffer[VK_NUMPAD1] & 0xF0) {     //   1 2 3	
 			send_skill_packet(0, 0); //물리 공격스킬, 0번 
+		
 		}
 
 		if (pKeysBuffer[VK_NUMPAD4] & 0xF0) {     //   4 5 6
@@ -645,14 +648,14 @@ void CGameFramework::MoveToNextFrame()
 void CGameFramework::FrameAdvance()
 {
 	m_GameTimer.Tick(0.0f);
-
+	//여기서 수정
 	ProcessInput();
 
 	// receive Player position to server
 	// m_pPlayer->SetPosition(return_myPosition());
 	// m_pCamera->Move(return_myCamera());
 	//------------------------------------
-
+	
 	AnimateObjects();
 
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();

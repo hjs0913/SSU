@@ -15,7 +15,7 @@ using namespace std;
 #define ROOMZ 4000
 
 CHeightMapTerrain* map;
- float hp_width = 30;
+ float hp_width = 50;
  float hp_height = 50;
 float start[BULLETCNT];
 
@@ -575,7 +575,7 @@ void CObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 				else if (i > 201)
 					pBillboardObject->SetMaterial(pMaterials[1]);
 				//	pBillboardObject->SetMaterial(pMaterials[uid(dre)]);
-
+		
 #endif
 				// 장애물 인덱스 생각(기윤)
 				float xPosition = obstacles[x  + z]._x;
@@ -749,7 +749,12 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	}
 #endif
 
+	for (int i = 0; i < 100; ++i) {
+		newhp[i] = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, i, hp_height, 0.0f);
+	}
 	pRectMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, hp_width, hp_height, 0.0f);
+	pRectMesh_full_hp = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, hp_width, hp_height, 0.0f);
+	pRectMesh_half_hp = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, hp_width*0.5, hp_height, 0.0f);
 
 	CTexturedRectMesh* part = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 5, 5, 0.0f);
 
@@ -822,8 +827,14 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		{
 			for (int y = 0; y < yObjects; y++)
 			{
-				pBillboardObject = new CBillboardObject(1);
-				pBillboardObject->SetMesh(0, pRectMesh);
+				if (i == 201) {
+					pBillboardObject = new CBillboardObject(1);
+					pBillboardObject->SetMesh(0, pRectMesh_full_hp);
+				}
+				else {
+					pBillboardObject = new CBillboardObject(1);
+					pBillboardObject->SetMesh(0, pRectMesh);
+				}
 #ifndef _WITH_BATCH_MATERIAL    
 
 				if (i == 201) //HP
@@ -1085,6 +1096,11 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 			m_ppObjects[j]->SyncPlayer(pTimer, pCamera, player);
 		}
 		else {
+			if (j == 201) {
+			//	pRectMesh1 = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, hp_width * 0.5, hp_height, 0.0f);
+
+				m_ppObjects[j]->Animate(pTimer, pCamera, player);
+			}
 			m_ppObjects[j]->Animate(pTimer, pCamera, player);
 		}
 	}
