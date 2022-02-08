@@ -13,10 +13,6 @@ using namespace std;
 #define ROOMX 4000
 #define ROOMZ 4000
 
-
-
-
-
 int bulletidx = 1;
 float tmp[BULLETCNT];
 bool IsFire[BULLETCNT] = {};
@@ -497,6 +493,7 @@ void CGameFramework::ProcessInput()   //����
 		//��ų---------------------------------
 		if ((pKeysBuffer[VK_NUMPAD1] & 0xF0) || (pKeysBuffer['1'] & 0xF0)) {     //   1 2 3	
 			send_skill_packet(0, 0); //���� ���ݽ�ų, 0�� 
+
 		
 		}
 

@@ -16,13 +16,10 @@ XMFLOAT3 hp_pos;
 XMFLOAT3 POS_PLAYER;
 CTexturedRectMesh* pRectMesh;
 CTexturedRectMesh* pRectMesh1;
-CTexturedRectMesh* pRectMesh_full_hp;
-CTexturedRectMesh* pRectMesh_half_hp;
-
 CAirplaneMeshDiffused* pOtherPlayerMesh[7];
  ID3D12Device* pd3dDevice;
 ID3D12GraphicsCommandList* pd3dCommandList;
-CTexturedRectMesh* pRectMesh_hp;
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 CTexture::CTexture(int nTextures, UINT nTextureType, int nSamplers, int nRootParameters)

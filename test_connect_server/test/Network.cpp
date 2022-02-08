@@ -13,6 +13,7 @@ SOCKET sock;
 SOCKADDR_IN serveraddr;
 int retval = 0;
 CTexturedRectMesh* newhp[100];
+CTexturedRectMesh* newmp[100];
 SOCKET g_s_socket;
 
 WSABUF mybuf_recv;
@@ -36,6 +37,10 @@ array<CPlayer*, MAX_USER+MAX_NPC> mPlayer;
 void update_hp(int width)
 {
 	m_ppObjects[201]->SetMesh(0, newhp[width]);
+}
+void update_mp(int width)
+{
+	m_ppObjects[202]->SetMesh(0, newmp[width]);
 }
 void err_display(int err_no)
 {
@@ -176,6 +181,7 @@ void process_packet(unsigned char* p)
 		my_position.x = packet->x;
 		my_position.y = packet->y;
 		my_position.z = packet->z;
+		
 		break;
 	}
 	case SC_PACKET_MOVE: {
@@ -220,18 +226,31 @@ void process_packet(unsigned char* p)
 		// 아직 미구현
 		sc_packet_status_change* packet = reinterpret_cast<sc_packet_status_change*> (p);
 		cout << "max hp " << packet->maxhp << endl;
+		cout << "hp " << packet->hp << endl;
+		cout << "max mp " << packet->maxmp << endl;
+		cout << " mp " << packet->mp << endl;
+		mPlayer[my_id]->m_max_mp = packet->maxmp;
+		mPlayer[my_id]->m_mp = packet->mp;
 		short percent =(float)packet->hp / (float)packet->maxhp * 100;
+		short percent2 = (float)packet->mp / (float)packet->maxmp * 100;
 
 		if (mPlayer[my_id]->m_hp > 0) {
 			mPlayer[my_id]->m_hp = packet->hp;
-			hp_ok = true;
+		//	hp_ok = true;
 			update_hp(percent/ 2);
 			cout << "남은 hp " << packet->hp << endl;
 			cout << "남은 퍼센트 " << percent << endl;
-			//m_ppObjects[201]->SetMesh(0, pRectMesh_half_hp);
-		}
 		
-		
+		} 
+		/*
+		if (mPlayer[my_id]->m_mp > 0) {
+			mPlayer[my_id]->m_mp = packet->mp;
+		//	hp_ok = true;
+			update_mp(10 );// 10초 타이머 후에 이상하다 서버부분 cooltime에 status주석 풀면 되긴해  //percent2 / 2)
+			cout << "남은 mp " << packet->mp << endl;
+			cout << "남은 퍼센트 " << percent << endl;
+
+		}*/
 		
 		break;
 	}

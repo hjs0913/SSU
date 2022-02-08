@@ -91,6 +91,16 @@ void Npc::set_maxhp(int m_hp)
 	_maxhp = m_hp;
 }
 
+void Npc::set_mp(int mp)
+{
+	_mp = mp;
+}
+
+void Npc::set_maxmp(int m_mp)
+{
+	_maxmp = m_mp;
+}
+
 void Npc::set_physical_attack(float physical_attack)
 {
 	_physical_attack = physical_attack;
@@ -177,6 +187,15 @@ int Npc::get_maxhp()
 	return _maxhp;
 }
 
+int Npc::get_mp()
+{
+	return _mp;
+}
+
+int Npc::get_maxmp()
+{
+	return _maxmp;
+}
 float Npc::get_physical_attack()
 {
 	return _physical_attack;

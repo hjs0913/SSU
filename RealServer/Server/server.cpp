@@ -632,7 +632,10 @@ void process_packet(int client_id, unsigned char* p)
             int lv = pl->get_lv();
             pl->set_maxhp(20 * lv * lv + 80 * lv);
             pl->set_hp(pl->get_maxhp());
-            //pl->set_maxmp(10*lv*lv + 50*lv);
+           // pl->set_Pmaxmp(10 * lv * lv + 50 * lv);
+        //    pl->set_Pmp(pl->get_maxmp());
+            pl->set_maxmp(10 * lv * lv + 50 * lv);
+            pl->set_mp(pl->get_maxmp());
             pl->set_physical_attack(0.3 * lv * lv + 10 * lv);
             pl->set_magical_attack(0.1 * lv * lv + 5 * lv);
             pl->set_physical_defence(0.24 * lv * lv + 10 * lv);
@@ -936,7 +939,7 @@ void process_packet(int client_id, unsigned char* p)
         ev.ev = EVENT_PLAYER_ATTACK;
         ev.target_id = client_id;
         timer_queue.push(ev);
-
+        
         for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
             players[i]->state_lock.lock();
             if (players[i]->get_state() != ST_INGAME) {
@@ -1021,6 +1024,8 @@ void process_packet(int client_id, unsigned char* p)
                     if ((players[i]->get_x() >= pl->get_x() - 10 && players[i]->get_x() <= pl->get_x() + 10) || (players[i]->get_z() >= pl->get_z() - 10 && players[i]->get_z() <= pl->get_z() + 10)) {
                         physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
                         cout << "최후의 일격 !!!" << endl;
+                        pl->set_mp(pl->get_mp() - 100);
+                        send_status_change_packet(pl);
                         if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
                             players[i]->set_active(true);
                             timer_event ev;
@@ -1065,10 +1070,12 @@ void process_packet(int client_id, unsigned char* p)
                     Coord n = { players[i]->get_x(), players[i]->get_z() };
                     float px = players[i]->get_x();
                     float pz = players[i]->get_z();
-
+     
                     if (isInsideTriangle(a, b, c, n)) {
                         magical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
                         cout << "광야 일격 !!!" << endl;
+                        pl->set_mp(pl->get_mp() - 100);
+                        send_status_change_packet(pl);
                         if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
                             players[i]->set_active(true);
                             timer_event ev;
@@ -1099,6 +1106,9 @@ void process_packet(int client_id, unsigned char* p)
                 cout << pl->get_physical_defence() << endl;
                 cout << pl->get_magical_defence() << endl;
                 cout << "아테네의 가호 !!!" << endl;
+                cout << pl->get_mp() << endl;
+                pl->set_mp(pl->get_mp() - 100);
+       
                 pl->set_physical_defence(0.48 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv()); //일단 두배 
                 pl->set_magical_defence(0.34 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv());
                 send_status_change_packet(pl);
@@ -2220,8 +2230,9 @@ void do_timer()
                 if (temp.target_id == 2) {  // BUFF
                     players[temp.obj_id]->set_physical_defence(0.24 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 10 * players[temp.obj_id]->get_lv());
                     players[temp.obj_id]->set_magical_defence(0.17 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 10 * players[temp.obj_id]->get_lv());
+                 
                     send_status_change_packet(reinterpret_cast<Player*>(players[temp.obj_id]));
-
+                   
                     cout << players[temp.obj_id]->get_physical_defence() << endl;
                     cout << players[temp.obj_id]->get_magical_defence() << endl;
                 }
@@ -2256,8 +2267,9 @@ void do_timer()
                         players[ev.obj_id]->set_magical_defence(0.17 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 10 * players[ev.obj_id]->get_lv());
                         
                         // 일단 이것을 넣으면 안돌아감(이유 모름)
-                        // send_status_change_packet(reinterpret_cast<Player*>(players[ev.obj_id]));
-
+                      //   send_status_change_packet(reinterpret_cast<Player*>(players[ev.obj_id]));
+                        
+                          
                         cout << players[ev.obj_id]->get_physical_defence() << endl;
                         cout << players[ev.obj_id]->get_magical_defence() << endl;
                     }

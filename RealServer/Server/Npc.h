@@ -9,6 +9,8 @@ protected:
 	char	_name[MAX_NAME_SIZE];
 	int		_hp;	
 	int		_maxhp;
+	int		_mp;
+	int		_maxmp;
 	short	_lv;
 	float	_physical_attack;
 	float	_magical_attack;
@@ -46,6 +48,8 @@ public:
 	void set_lv(short lv);
 	void set_hp(int hp);
 	void set_maxhp(int m_hp);
+	void set_mp(int hp);
+	void set_maxmp(int m_hp);
 	void set_physical_attack(float physical_attack);
 	void set_magical_attack(float magical_attack);
 	void set_physical_defence(float physical_defence);
@@ -63,6 +67,8 @@ public:
 	short get_lv();
 	int get_hp();
 	int get_maxhp();
+	int get_mp();
+	int get_maxmp();
 	float get_physical_attack();
 	float get_magical_attack();
 	float get_physical_defence();

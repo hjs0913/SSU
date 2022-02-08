@@ -476,7 +476,7 @@ void CObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 	pTexture[1]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/tree02.dds", RESOURCE_TEXTURE2D, 0);
 
 	pTexture[2] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
-	pTexture[2]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/tree02.dds", RESOURCE_TEXTURE2D, 0);
+	pTexture[2]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/mp.dds", RESOURCE_TEXTURE2D, 0);
 
 	pTexture[3] = new CTexture(1, RESOURCE_TEXTURE2D_ARRAY, 0, 1);
 	pTexture[3]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/house.dds", RESOURCE_TEXTURE2D, 0);
@@ -508,6 +508,10 @@ void CObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 		pMaterials[i]->SetTexture(pTexture[i]);
 	}
 #endif
+	for (int i = 0; i < 100; ++i) {
+		newhp[i] = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, i, hp_height, 0.0f);
+		newmp[i] = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, i, hp_height, 0.0f);
+	}
 
 	pRectMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, hp_width, hp_height, 0.0f);
 	
@@ -566,15 +570,25 @@ void CObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 		{
 			for (int y = 0; y < yObjects; y++)
 			{
-				pBillboardObject = new CBillboardObject(1);
-				pBillboardObject->SetMesh(0, pRectMesh);
+				//pBillboardObject = new CBillboardObject(1);
+				//pBillboardObject->SetMesh(0, pRectMesh);
 #ifndef _WITH_BATCH_MATERIAL    
 
-				if (i == 201)
+				if (i == 201) { // hp
+					pBillboardObject->SetMesh(0, newhp[50]);
 					pBillboardObject->SetMaterial(pMaterials[0]);  //여기
-				else if (i > 201)
+				
+				}
+				else if (i == 202) {// mp
+					pBillboardObject->SetMesh(0, newmp[50]);
+					pBillboardObject->SetMaterial(pMaterials[2]);
+				
+				}
+				else {
+					pBillboardObject->SetMesh(0, pRectMesh);
 					pBillboardObject->SetMaterial(pMaterials[1]);
-				//	pBillboardObject->SetMaterial(pMaterials[uid(dre)]);
+					//	pBillboardObject->SetMaterial(pMaterials[uid(dre)]);
+				}
 		
 #endif
 				// 장애물 인덱스 생각(기윤)
@@ -751,10 +765,10 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 
 	for (int i = 0; i < 100; ++i) {
 		newhp[i] = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, i, hp_height, 0.0f);
+		newmp[i] = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, i, hp_height, 0.0f);
 	}
 	pRectMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, hp_width, hp_height, 0.0f);
-	pRectMesh_full_hp = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, hp_width, hp_height, 0.0f);
-	pRectMesh_half_hp = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, hp_width*0.5, hp_height, 0.0f);
+
 
 	CTexturedRectMesh* part = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 5, 5, 0.0f);
 
@@ -829,7 +843,11 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 			{
 				if (i == 201) {
 					pBillboardObject = new CBillboardObject(1);
-					pBillboardObject->SetMesh(0, pRectMesh_full_hp);
+					pBillboardObject->SetMesh(0, newhp[50]);
+				}
+				else if (i == 202) {
+					pBillboardObject = new CBillboardObject(1);
+					pBillboardObject->SetMesh(0, newmp[50]);
 				}
 				else {
 					pBillboardObject = new CBillboardObject(1);

@@ -159,7 +159,7 @@ struct sc_packet_status_change {
 	unsigned char size;
 	char	type;                           
 	short	level;
-	short	hp, maxhp;
+	short	hp, maxhp, mp, maxmp;
 	int		exp;
 };
 
@@ -184,4 +184,4 @@ struct sc_packet_look {
 	float x, y, z;	// look
 };
 
-#pragma pack(pop)
+#pragma pack(pop);
