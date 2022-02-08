@@ -251,15 +251,15 @@ void process_packet(unsigned char* p)
 			cout << "남은 퍼센트 " << percent << endl;
 		} 
 
-		/*
-		if (mPlayer[my_id]->m_mp > 0) {
+		
+		if (packet->mp > 0) {
 			mPlayer[my_id]->m_mp = packet->mp;
 		//	hp_ok = true;
-			update_mp(10 );// 10초 타이머 후에 이상하다 서버부분 cooltime에 status주석 풀면 되긴해  //percent2 / 2)
+			update_mp(percent2 / 2);// 10초 타이머 후에 이상하다 서버부분 cooltime에 status주석 풀면 되긴해  //percent2 / 2)
 			cout << "남은 mp " << packet->mp << endl;
 			cout << "남은 퍼센트 " << percent << endl;
 
-		}*/
+		}
 		
 		break;
 	}
