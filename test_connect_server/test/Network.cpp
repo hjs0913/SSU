@@ -36,12 +36,15 @@ array<CPlayer*, MAX_USER+MAX_NPC> mPlayer;
 
 void update_hp(int width)
 {
+	cout << "update는 되는가??" << endl;
 	m_ppObjects[201]->SetMesh(0, newhp[width]);
 }
+
 void update_mp(int width)
 {
 	m_ppObjects[202]->SetMesh(0, newmp[width]);
 }
+
 void err_display(int err_no)
 {
 	WCHAR* lpMsgBuf;
@@ -181,7 +184,11 @@ void process_packet(unsigned char* p)
 		my_position.x = packet->x;
 		my_position.y = packet->y;
 		my_position.z = packet->z;
-		
+		mPlayer[my_id]->m_hp = packet->hp;
+		mPlayer[my_id]->m_max_hp = packet->maxhp;
+		mPlayer[my_id]->m_exp = packet->exp;
+		mPlayer[my_id]->m_tribe = static_cast<TRIBE>(packet->tribe);
+
 		break;
 	}
 	case SC_PACKET_MOVE: {
@@ -229,19 +236,21 @@ void process_packet(unsigned char* p)
 		cout << "hp " << packet->hp << endl;
 		cout << "max mp " << packet->maxmp << endl;
 		cout << " mp " << packet->mp << endl;
+		
 		mPlayer[my_id]->m_max_mp = packet->maxmp;
 		mPlayer[my_id]->m_mp = packet->mp;
-		short percent =(float)packet->hp / (float)packet->maxhp * 100;
+
+		short percent = (float)packet->hp / (float)packet->maxhp * 100;
 		short percent2 = (float)packet->mp / (float)packet->maxmp * 100;
 
-		if (mPlayer[my_id]->m_hp > 0) {
+		if (packet->hp > 0) {
 			mPlayer[my_id]->m_hp = packet->hp;
 		//	hp_ok = true;
 			update_hp(percent/ 2);
 			cout << "남은 hp " << packet->hp << endl;
 			cout << "남은 퍼센트 " << percent << endl;
-		
 		} 
+
 		/*
 		if (mPlayer[my_id]->m_mp > 0) {
 			mPlayer[my_id]->m_mp = packet->mp;
