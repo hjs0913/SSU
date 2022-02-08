@@ -1024,7 +1024,7 @@ void process_packet(int client_id, unsigned char* p)
                     if ((players[i]->get_x() >= pl->get_x() - 10 && players[i]->get_x() <= pl->get_x() + 10) || (players[i]->get_z() >= pl->get_z() - 10 && players[i]->get_z() <= pl->get_z() + 10)) {
                         physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
                         cout << "최후의 일격 !!!" << endl;
-                        pl->set_mp(pl->get_mp() - 100);
+                        pl->set_mp(pl->get_mp() - 1000);
                         send_status_change_packet(pl);
                         if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
                             players[i]->set_active(true);
@@ -1074,7 +1074,7 @@ void process_packet(int client_id, unsigned char* p)
                     if (isInsideTriangle(a, b, c, n)) {
                         magical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
                         cout << "광야 일격 !!!" << endl;
-                        pl->set_mp(pl->get_mp() - 100);
+                        pl->set_mp(pl->get_mp() - 1000);
                         send_status_change_packet(pl);
                         if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
                             players[i]->set_active(true);
@@ -1107,7 +1107,7 @@ void process_packet(int client_id, unsigned char* p)
                 cout << pl->get_magical_defence() << endl;
                 cout << "아테네의 가호 !!!" << endl;
                 cout << pl->get_mp() << endl;
-                pl->set_mp(pl->get_mp() - 100);
+                pl->set_mp(pl->get_mp() - 1000);
        
                 pl->set_physical_defence(0.48 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv()); //일단 두배 
                 pl->set_magical_defence(0.34 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv());
