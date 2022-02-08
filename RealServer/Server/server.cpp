@@ -4,6 +4,7 @@
 #include "send.h"
 #include <fstream>
 #include <queue>
+#include <random>
 
 CRITICAL_SECTION cs;
 
@@ -782,8 +783,8 @@ void process_packet(int client_id, unsigned char* p)
         }
 
         pl->set_x(x);
+        pl->set_y(y);
         pl->set_z(z);
-
         unordered_set <int> nearlist;
         for (auto& other : players) {
             // if (other._id == client_id) continue;
@@ -810,7 +811,7 @@ void process_packet(int client_id, unsigned char* p)
         }
         nearlist.erase(client_id);  // 내 아이디는 무조건 들어가니 그것을 지워주자
 
-        // send_move_packet(pl, pl); // 내 자신의 움직임을 먼저 보내주자
+        send_move_packet(pl, pl); // 내 자신의 움직임을 먼저 보내주자
 
         pl->vl.lock();
         unordered_set <int> my_vl{ pl->viewlist };
@@ -1044,7 +1045,7 @@ void process_packet(int client_id, unsigned char* p)
                 timer_event ev;
                 ev.obj_id = client_id;
                 ev.start_time = chrono::system_clock::now() + 3s;  //쿨타임
-                ev.ev = EVENT_MSKILL_COOLTIME;
+                ev.ev = EVENT_SKILL_COOLTIME;
                 ev.target_id = 1;
                 timer_queue.push(ev);
 
@@ -1092,7 +1093,7 @@ void process_packet(int client_id, unsigned char* p)
                 ev.obj_id = client_id;
                 ev.start_time = chrono::system_clock::now() + 10s;  //쿨타임
                 ev.ev = EVENT_SKILL_COOLTIME;
-                ev.target_id = 0;
+                ev.target_id = 2;
                 timer_queue.push(ev);
 
                 cout << pl->get_physical_defence() << endl;
@@ -1406,6 +1407,7 @@ void worker()
             break;
         }
         case OP_NPC_ATTACK: {
+            cout << "???" << endl;
             // 죽은 상태나 공격하는 상태인지 아닌지 확인
             players[client_id]->state_lock.lock();
             if ((players[client_id]->get_state() != ST_INGAME) || (false == players[client_id]->get_active())) {
@@ -1429,6 +1431,7 @@ void worker()
             lua_pop(L, 1);
             if (m) {
                 // 공격처리
+                cout << "???2" << endl;
                 attack_success(client_id, exp_over->_target, players[client_id]->get_basic_attack_factor());
             }
             else {
@@ -1554,6 +1557,13 @@ int API_get_z(lua_State* L)
 
 void initialise_NPC()
 {
+    default_random_engine dre;
+    uniform_int_distribution<int> rng(-20, 20);
+    int rd[30];
+    for (int& i : rd) {
+        i = rng(dre);
+    }
+    
     cout << "NPC 로딩중" << endl;
     char name[MAX_NAME_SIZE];
 
@@ -1569,8 +1579,8 @@ void initialise_NPC()
         // 여기서 위치를 받아오자
 
         // 임시 좌표(원래는 몬스터 놓을 곳의 좌표를 뽑아와야한다)
-        players[i]->set_x(1580 + 30*(i-NPC_ID_START));
-        players[i]->set_z(2270 + 30 * (i - NPC_ID_START));
+        players[i]->set_x(1580 + 15*rd[i-NPC_ID_START]);
+        players[i]->set_z(2270 + 15 * rd[i - NPC_ID_START]);
         float temp_x = players[i]->get_x();
         float temp_y = players[i]->get_y();
         float temp_z = players[i]->get_z();
@@ -1619,8 +1629,8 @@ void initialise_NPC()
         // 여기서 위치를 받아오자
 
         // 임시 좌표(원래는 몬스터 놓을 곳의 좌표를 뽑아와야한다)
-        players[i]->set_x(2860 + 30 * (i - (NPC_ID_START + 30)));
-        players[i]->set_z(2190 + 30 * (i - (NPC_ID_START + 30)));
+        players[i]->set_x(2860 + 15 * rd[i - NPC_ID_START+30]);
+        players[i]->set_z(2190 + 15 * rd[i - NPC_ID_START + 30]);
         float temp_x = players[i]->get_x();
         float temp_y = players[i]->get_y();
         float temp_z = players[i]->get_z();
@@ -1668,8 +1678,8 @@ void initialise_NPC()
         // 여기서 위치를 받아오자
 
         // 임시 좌표(원래는 몬스터 놓을 곳의 좌표를 뽑아와야한다)
-        players[i]->set_x(2100 + 30 * (i - (NPC_ID_START + 60)));
-        players[i]->set_z(3280 + 30 * (i - (NPC_ID_START + 60)));
+        players[i]->set_x(2100 + 15 * rd[i - NPC_ID_START + 60]);
+        players[i]->set_z(3280 + 15 * rd[i - NPC_ID_START + 60]);
         float temp_x = players[i]->get_x();
         float temp_y = players[i]->get_y();
         float temp_z = players[i]->get_z();
@@ -1715,8 +1725,8 @@ void initialise_NPC()
         // 여기서 위치를 받아오자
 
         // 임시 좌표(원래는 몬스터 놓을 곳의 좌표를 뽑아와야한다)
-        players[i]->set_x(3600 + 30 * (i - (NPC_ID_START + 90)));
-        players[i]->set_z(2775 + 30 * (i - (NPC_ID_START + 90)));
+        players[i]->set_x(3600 + 15 * rd[i - NPC_ID_START + 90]);
+        players[i]->set_z(2775 + 15 * rd[i - NPC_ID_START + 90]);
         float temp_x = players[i]->get_x();
         float temp_y = players[i]->get_y();
         float temp_z = players[i]->get_z();
@@ -1762,8 +1772,8 @@ void initialise_NPC()
         // 여기서 위치를 받아오자
 
         // 임시 좌표(원래는 몬스터 놓을 곳의 좌표를 뽑아와야한다)
-        players[i]->set_x(3325 + 30 * (i - (NPC_ID_START + 120)));
-        players[i]->set_z(3410 + 30 * (i - (NPC_ID_START + 120)));
+        players[i]->set_x(3325 + 15 * rd[i - NPC_ID_START + 120]);
+        players[i]->set_z(3410 + 15 * rd[i - NPC_ID_START + 120]);
         float temp_x = players[i]->get_x();
         float temp_y = players[i]->get_y();
         float temp_z = players[i]->get_z();
@@ -1811,8 +1821,8 @@ void initialise_NPC()
         // 여기서 위치를 받아오자
 
         // 임시 좌표(원래는 몬스터 놓을 곳의 좌표를 뽑아와야한다)
-        players[i]->set_x(3220 + 30 * (i - (NPC_ID_START + 150)));
-        players[i]->set_z(3822 + 30 * (i - (NPC_ID_START + 150)));
+        players[i]->set_x(3220 + 15 * rd[i - NPC_ID_START + 150]);
+        players[i]->set_z(3822 + 15 * rd[i - NPC_ID_START + 150]);
         float temp_x = players[i]->get_x();
         float temp_y = players[i]->get_y();
         float temp_z = players[i]->get_z();
@@ -2206,22 +2216,15 @@ void do_timer()
             if (temp.ev == EVENT_PLAYER_ATTACK) {
                 reinterpret_cast<Player*>(players[temp.obj_id])->set_attack_active(false);
             }
-            else if (temp.ev == EVENT_PSKILL_COOLTIME) {
-                reinterpret_cast<Player*>(players[temp.obj_id])
-                    ->set_skill_active(temp.target_id, false);
-            }
-            else if (temp.ev == EVENT_MSKILL_COOLTIME) {
-                reinterpret_cast<Player*>(players[temp.obj_id])
-                    ->set_skill_active(temp.target_id, false);
-            }
-            else if (temp.ev == EVENT_BUFF_COOLTIME) {
+            else if (temp.ev == EVENT_SKILL_COOLTIME) {
+                if (temp.target_id == 2) {  // BUFF
+                    players[temp.obj_id]->set_physical_defence(0.24 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 10 * players[temp.obj_id]->get_lv());
+                    players[temp.obj_id]->set_magical_defence(0.17 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 10 * players[temp.obj_id]->get_lv());
+                    send_status_change_packet(reinterpret_cast<Player*>(players[temp.obj_id]));
 
-                players[temp.obj_id]->set_physical_defence(0.24 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 10 * players[temp.obj_id]->get_lv());
-                players[temp.obj_id]->set_magical_defence(0.17 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 10 * players[temp.obj_id]->get_lv());
-                send_status_change_packet(reinterpret_cast<Player*>(players[temp.obj_id]));
-
-                cout << players[temp.obj_id]->get_physical_defence() << endl;
-                cout << players[temp.obj_id]->get_magical_defence() << endl;
+                    cout << players[temp.obj_id]->get_physical_defence() << endl;
+                    cout << players[temp.obj_id]->get_magical_defence() << endl;
+                }
                 reinterpret_cast<Player*>(players[temp.obj_id])
                     ->set_skill_active(temp.target_id, false);
             }
@@ -2245,7 +2248,27 @@ void do_timer()
                     reinterpret_cast<Player*>(players[ev.obj_id])->set_attack_active(false);
                     continue;
                 }
-                else if (temp.ev == EVENT_PSKILL_COOLTIME) {
+                
+                if (ev.ev == EVENT_SKILL_COOLTIME) {
+                    if (ev.target_id == 2) {  // BUFF
+                        cout << "?????" << endl;
+                        players[ev.obj_id]->set_physical_defence(0.24 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 10 * players[ev.obj_id]->get_lv());
+                        players[ev.obj_id]->set_magical_defence(0.17 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 10 * players[ev.obj_id]->get_lv());
+                        
+                        // 일단 이것을 넣으면 안돌아감(이유 모름)
+                        // send_status_change_packet(reinterpret_cast<Player*>(players[ev.obj_id]));
+
+                        cout << players[ev.obj_id]->get_physical_defence() << endl;
+                        cout << players[ev.obj_id]->get_magical_defence() << endl;
+                    }
+                    
+                    reinterpret_cast<Player*>(players[ev.obj_id])
+                        ->set_skill_active(ev.target_id, false);
+
+
+                    continue;
+                }
+                /*else if (temp.ev == EVENT_PSKILL_COOLTIME) {
                     reinterpret_cast<Player*>(players[temp.obj_id])
                         ->set_skill_active(temp.target_id, false);
                     continue;
@@ -2260,7 +2283,7 @@ void do_timer()
                         ->set_skill_active(temp.target_id, false);
 
                     continue;
-                }
+                }*/
                 ex_over->_comp_op = EVtoOP(ev.ev);
                 ex_over->_target = ev.target_id;
                 PostQueuedCompletionStatus(g_h_iocp, 1, ev.obj_id, &ex_over->_wsa_over);   //0은 소켓취급을 받음

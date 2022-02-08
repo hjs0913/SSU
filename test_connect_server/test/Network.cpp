@@ -195,6 +195,7 @@ void process_packet(unsigned char* p)
 		if (static_cast<TRIBE>(packet->object_type) != OBSTACLE) {
 			mPlayer[p_id]->SetUse(true);
 			mPlayer[p_id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
+			mPlayer[p_id]->SetLook(XMFLOAT3(packet->look_x, packet->look_y, packet->look_z));
 			mPlayer[p_id]->m_tribe = static_cast<TRIBE>(packet->object_type);
 			strcpy(mPlayer[p_id]->m_name, packet->name);
 			mPlayer[p_id]->m_spices = packet->object_class;

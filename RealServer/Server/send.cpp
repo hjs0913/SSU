@@ -40,6 +40,9 @@ void send_put_object_packet(Player* pl, Npc* target)
     packet.x = target->get_x();
     packet.y = target->get_y();
     packet.z = target->get_z();
+    packet.look_x = target->get_look_x();
+    packet.look_y = target->get_look_y();
+    packet.look_z = target->get_look_z();
     packet.object_type = target->get_tribe();
     if (target->get_tribe() == HUMAN) {
         packet.object_class = reinterpret_cast<Player*>(target)->get_job();
