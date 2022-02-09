@@ -45,28 +45,24 @@ end
 
 function attack_range(player)
    player_x = API_get_x(player);
-   player_y = API_get_y(player);
+   player_z = API_get_z(player);
    x = API_get_x(my_id);
-   y = API_get_y(my_id);
-   if (x == player_x) then
-      if (player_y <= (y+1)) then
-         if((y-1) <= player_y) then
-            return true;
-         else
-            return false;
+   z = API_get_z(my_id);
+   if (player_z <= (z+10)) then
+         if((z-10) <= player_z) then
+             if (player_x <= (x+10)) then
+                if((x-10) <= player_x) then
+                    return true;
+                else
+                    return false;
+                end
+             else
+                return false;
+             end
+         else 
+             return false;
          end
-      else 
+   else
          return false;
-      end
-   elseif (y == player_y) then
-      if (player_x <= (x+1)) then
-         if((x-1) <= player_x) then
-            return true;
-         else
-            return false;
-         end
-      else 
-         return false;
-      end
    end
 end

@@ -883,7 +883,7 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 				//cout << xPosition << " " << fHeight << " " << zPosition << endl;
 			//	if (xPosition <= fTerrainWidth / 2 - 200 || xPosition >= fTerrainWidth / 2 + 200 ||   //나무 위치     
 				//	zPosition <= fTerrainLength / 2 - 200 || zPosition >= fTerrainLength / 2 + 200) {
-				pBillboardObject->SetPosition(xPosition, 28, zPosition);         //1028 168 1028
+				pBillboardObject->SetPosition(xPosition, fHeight+23, zPosition);         //1028 168 1028
 				//cout << hp_pos.x << hp_pos.y << hp_pos.z << endl;
 
 		//	}
@@ -969,7 +969,7 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 
 	// 플레이어
 	for (int i = m_nObjects - MAX_NPC - MAX_USER; i < m_nObjects - MAX_NPC; i++) {
-		CAirplanePlayer* pOtherPlayer = new CAirplanePlayer(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+		CAirplanePlayer* pOtherPlayer = new CAirplanePlayer(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, pTerrain);
 		pOtherPlayer->SetMesh(0, pOtherPlayerMesh[2]);
 		pOtherPlayer->SetPosition(XMFLOAT3(0, -100, 0));
 		pOtherPlayer->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr);
@@ -978,7 +978,7 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 
 	// NPC
 	for (int i = m_nObjects - MAX_NPC; i < m_nObjects; i++) {
-		CAirplanePlayer* pNpc = new CAirplanePlayer(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
+		CAirplanePlayer* pNpc = new CAirplanePlayer(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, pTerrain);
 		pNpc->SetMesh(0, pOtherPlayerMesh[1]);
 		pNpc->SetPosition(XMFLOAT3(0, -100, 0));
 		pNpc->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr);
