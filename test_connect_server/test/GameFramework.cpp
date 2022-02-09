@@ -463,7 +463,7 @@ void CGameFramework::ReleaseObjects()
 	if (m_pScene) delete m_pScene;
 }
 
-void CGameFramework::ProcessInput()   //����
+void CGameFramework::ProcessInput()   
 {
 	static UCHAR pKeysBuffer[256];
 	bool bProcessedByScene = false;
@@ -473,8 +473,6 @@ void CGameFramework::ProcessInput()   //����
 		DWORD dwDirection = 0;
 		if (pKeysBuffer['W'] & 0xF0) {
 			//send_move_packet(0);
-	
-
 			dwDirection |= DIR_FORWARD;
 		}
 		if (pKeysBuffer['S'] & 0xF0) {
@@ -492,15 +490,15 @@ void CGameFramework::ProcessInput()   //����
 
 		//��ų---------------------------------
 		if ((pKeysBuffer[VK_NUMPAD1] & 0xF0) || (pKeysBuffer['1'] & 0xF0)) {     //   1 2 3	
-			send_skill_packet(0, 0); //���� ���ݽ�ų, 0�� 
+			send_skill_packet(0, 0); 
 		}
 
 		if (pKeysBuffer[VK_NUMPAD4] & 0xF0 || (pKeysBuffer['4'] & 0xF0)) {     //   4 5 6
-			send_skill_packet(1, 0); //���� ���ݽ�ų, 0�� 
+			send_skill_packet(1, 0);  
 		}
 
 		if (pKeysBuffer[VK_NUMPAD7] & 0xF0 || (pKeysBuffer['7'] & 0xF0)) {    // 7 8 9
-			send_skill_packet(2, 0); //���� ��ų, 0�� 
+			send_skill_packet(2, 0);  
 		}
 		if (pKeysBuffer[VK_SPACE] & 0xF0) {
 			send_attack_packet(0);
@@ -510,7 +508,7 @@ void CGameFramework::ProcessInput()   //����
 
 		static bool pushq = true;
 
-		if (GetAsyncKeyState('Q') & 0x8000) {  //���̾���
+		if (GetAsyncKeyState('Q') & 0x8000) {  
 			if (pushq) {
 				::gbTerrainTessellationWireframe = !::gbTerrainTessellationWireframe;
 				pushq = false;
@@ -522,7 +520,7 @@ void CGameFramework::ProcessInput()   //����
 
 		static bool pushI = true;
 
-		if (GetAsyncKeyState('I') & 0x8000) { //���̵� 
+		if (GetAsyncKeyState('I') & 0x8000) {
 			if (pushI) {
 				if (IsIn) {
 					m_pPlayer->SetPosition(tmppos);
@@ -540,14 +538,14 @@ void CGameFramework::ProcessInput()   //����
 			pushI = true;
 		}
 
-		if (pKeysBuffer[VK_SHIFT] & 0xF0) {  //ī�޶� �� �ڷ� 
+		if (pKeysBuffer[VK_SHIFT] & 0xF0) {  
 			cameradis = 1.05f;
 		}
 		else
 			cameradis = 1.0f;
 
 		static bool pushCTRL = true;
-		if (GetAsyncKeyState(VK_CONTROL) & 0x8000) {  //ctrl Ű �Ѿ� �߻� �ε����� �Ҳ�
+		if (GetAsyncKeyState(VK_CONTROL) & 0x8000) {  
 			if (pushCTRL) {
 				++bulletidx;
 				pushCTRL = false;
@@ -596,7 +594,7 @@ void CGameFramework::ProcessInput()   //����
 					}
 				}
 			}
-			// �̵�
+			
 			if (dwDirection) m_pPlayer->Move(dwDirection, 50.0f * m_GameTimer.GetTimeElapsed(), true);
 			
 			send_look_packet(m_pPlayer->GetLookVector(), m_pPlayer->GetRightVector());
