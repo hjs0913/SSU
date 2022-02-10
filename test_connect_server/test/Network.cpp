@@ -243,7 +243,7 @@ void process_packet(unsigned char* p)
 			mPlayer[my_id]->m_hp = packet->hp;
 			update_hp(percent/ 2);
 			cout << "³²Àº hp " << packet->hp << endl;
-		} 
+		}
 
 		
 		if (packet->mp > 0) {
