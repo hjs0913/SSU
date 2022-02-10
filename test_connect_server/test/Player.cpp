@@ -293,6 +293,11 @@ CAirplanePlayer::CAirplanePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)pContext;
 	SetPlayerUpdatedContext(pTerrain);
 
+	if (!m_pUILayer) {
+		//m_pUILayer = new UILayer(2, pd3dDevice, m_pd3dCommandQueue);
+	}
+	//m_pUILayer->Resize(m_ppd3dSwapChainBackBuffers, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
+
 }
 
 CAirplanePlayer::~CAirplanePlayer()
@@ -364,6 +369,11 @@ void CAirplanePlayer::Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject* 
 	SetPosition(XMFLOAT3(otherplayer->GetPosition().x, fheigth, otherplayer->GetPosition().z));
 	SetLook(otherplayer->GetLook());
 	//pOtherPlayer
+}
+
+float CAirplanePlayer::GetHeightToTerrain(CGameObject* otherplayer) {
+	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)m_pPlayerUpdatedContext;
+	return pTerrain->GetHeight(otherplayer->GetPosition().x, otherplayer->GetPosition().z);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
