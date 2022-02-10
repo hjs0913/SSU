@@ -849,6 +849,10 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 					pBillboardObject = new CBillboardObject(1);
 					pBillboardObject->SetMesh(0, newmp[50]);
 				}
+				else if ((811 < i) && (i < 992)) { // npc hp
+					pBillboardObject = new CBillboardObject(1);
+					pBillboardObject->SetMesh(0, newhp[50]);
+				}
 				else {
 					pBillboardObject = new CBillboardObject(1);
 					pBillboardObject->SetMesh(0, pRectMesh);
@@ -862,14 +866,18 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 					pBillboardObject->SetMaterial(pMaterials[2]);
 			
 				}
-				else if (i > 202)
+				else if ((811 < i) && (i < 992)) { // npc hp
+					pBillboardObject->SetMaterial(pMaterials[0]);
+				}
+				else {
 					pBillboardObject->SetMaterial(pMaterials[1]);
-				//	pBillboardObject->SetMaterial(pMaterials[uid(dre)]);
+				}
+					//	pBillboardObject->SetMaterial(pMaterials[uid(dre)]);
 
 #endif
 				// Àå¾Ö¹° ÀÎµ¦½º »ý°¢(±âÀ±)
-				float xPosition;
-				float zPosition;
+				float xPosition ;
+				float zPosition ;
 				if (x * 97 + z >= 609) {
 					xPosition = 0.0f;
 					zPosition = 0.0f;
@@ -1053,6 +1061,10 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 				m_ppObjects[j]->SetPosition(get_position_to_server(j - MAX_WORLD_SHADER));
 				pPlayer->SetLook(get_look_to_server(j - MAX_WORLD_SHADER));
 				pPlayer->Animate(pTimer, pCamera, m_ppObjects[j]);
+
+				// hp bar ·»´õ¸µ
+				int hp_j = j - MAX_WORLD_SHADER - 1000 + 812;
+				m_ppObjects[hp_j]->Animate2(hp_j,pTimer, pCamera, pPlayer);
 			}
 			else {
 				m_ppObjects[j]->SetPosition(XMFLOAT3(0, -100, 0));
@@ -1122,11 +1134,6 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 			m_ppObjects[j]->SyncPlayer(pTimer, pCamera, player);
 		}
 		else {
-			if (j == 201) {
-			//	pRectMesh1 = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, hp_width * 0.5, hp_height, 0.0f);
-
-				m_ppObjects[j]->Animate(pTimer, pCamera, player);
-			}
 			m_ppObjects[j]->Animate(pTimer, pCamera, player);
 		}
 

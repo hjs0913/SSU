@@ -178,6 +178,7 @@ public:
 	void AnimatePart(CGameTimer pTimer,float start, XMFLOAT3 pos,int type);
 	virtual void SyncPlayer(CGameTimer pTimer, CCamera* pCamera, CGameObject* player);
 	virtual bool Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject* player, void* map) { return false; };
+	virtual void Animate2(int num, CGameTimer pTimer, CCamera* pCamera, CGameObject* player) {};
 	virtual void OnPrepareRender() { }
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera=NULL);
 
@@ -241,6 +242,7 @@ public:
 	virtual ~CBillboardObject();
 
 	void Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject* player);
+	void Animate2(int num,CGameTimer pTimer, CCamera* pCamera, CGameObject* player);
 	void SetLookAt(XMFLOAT3& xmf3Target);
 };
 
