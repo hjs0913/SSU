@@ -559,7 +559,7 @@ void CBillboardObject::Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject*
 }
 void CBillboardObject::Animate2(int num,CGameTimer pTimer, CCamera* pCamera, CGameObject* player) {
 
-	m_ppObjects[num]->SetPosition(player->GetPosition().x, player->GetPosition().y + 18, player->GetPosition().z);
+	m_ppObjects[num]->SetPosition(player->GetPosition().x, reinterpret_cast<CAirplanePlayer*>(player)->GetHeightToTerrain(player) + 18, player->GetPosition().z);
 	
 }
 //void CGameObject::Animate2(int num, CGameTimer pTimer, CCamera* pCamera, CGameObject* player)

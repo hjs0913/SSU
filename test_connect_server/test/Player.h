@@ -9,6 +9,7 @@
 
 #include "Object.h"
 #include "Camera.h"
+#include "UILayer.h"
 #include "../../RealServer/Server/protocol.h"
 
 struct CB_PLAYER_INFO
@@ -141,6 +142,8 @@ protected:
 
 class CAirplanePlayer : public CPlayer
 {
+protected:
+	UILayer  *m_pUILayer = NULL;
 public:
 	CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, ID3D12RootSignature *pd3dGraphicsRootSignature, void *pContext=NULL, int nMeshes=1);
 	virtual ~CAirplanePlayer();
@@ -150,6 +153,8 @@ public:
 	void ChangeColor(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT4 color);
 
 	void Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject* otherplayer);
+
+	float GetHeightToTerrain(CGameObject* otherplayer);
 };
 
 class CTerrainPlayer : public CPlayer
