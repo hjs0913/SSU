@@ -884,11 +884,10 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 			//	if (xPosition <= fTerrainWidth / 2 - 200 || xPosition >= fTerrainWidth / 2 + 200 ||   //나무 위치     
 				//	zPosition <= fTerrainLength / 2 - 200 || zPosition >= fTerrainLength / 2 + 200) {
 				pBillboardObject->SetPosition(xPosition, fHeight+23, zPosition);         //1028 168 1028
-				//cout << hp_pos.x << hp_pos.y << hp_pos.z << endl;
-
-		//	}
-			//if (x == 1)
-			//pBillboardObject->SetPosition(xPosition, fHeight, zPosition);
+				if (pBillboardObject->GetPosition().y >= 50) {
+					pBillboardObject->SetPosition(xPosition, 23, zPosition);
+				}
+				
 				pBillboardObject->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 				m_ppObjects[i++] = pBillboardObject;
 			

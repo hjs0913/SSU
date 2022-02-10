@@ -568,23 +568,31 @@ void attack_success(int p_id, int target, float atk_factor)
 struct Coord
 {
     float x;
-    float y;
+    float z;
 
 };
-int calcTriangle(Coord A_TRIANGLE, Coord B_TRIANGLE, Coord C_TRIANGLE)
-{
-    int result = std::abs((A_TRIANGLE.x * (B_TRIANGLE.y - C_TRIANGLE.y)) +
-        (B_TRIANGLE.x * (C_TRIANGLE.y - A_TRIANGLE.y)) +
-        (C_TRIANGLE.x * (A_TRIANGLE.y - B_TRIANGLE.y)));
-    return result;
+
+bool check_inside(Coord a, Coord b, Coord c, Coord n) {
+    Coord A, B, C;
+    A.x = b.x - a.x;
+    A.z = b.z - a.z;
+    B.x = c.x - a.x;
+    B.z = c.z - a.z;
+    C.x = n.x - a.x;
+    C.z = n.z - a.z;
+
+    if ((A.x * B.z - A.z * B.x) * (A.x * C.z - A.z * C.x) < 0)
+        return false;
+    return true;
 }
-bool isInsideTriangle(Coord A_TRIANGLE, Coord B_TRIANGLE, Coord C_TRIANGLE, Coord N)
+
+bool isInsideTriangle(Coord a, Coord b, Coord c, Coord n)
 {
-    int NN = calcTriangle(A_TRIANGLE, B_TRIANGLE, C_TRIANGLE);
-    int AA = calcTriangle(N, B_TRIANGLE, C_TRIANGLE);
-    int BB = calcTriangle(A_TRIANGLE, N, C_TRIANGLE);
-    int CC = calcTriangle(A_TRIANGLE, B_TRIANGLE, N);
-    return (NN == AA + BB + CC);
+    if (!check_inside(a, b, c, n)) return false;
+    if (!check_inside(b, c, a, n)) return false;
+    if (!check_inside(c, a, b, n)) return false;
+    return true;
+
 }
 void process_packet(int client_id, unsigned char* p)
 {
@@ -1025,7 +1033,7 @@ void process_packet(int client_id, unsigned char* p)
                     }
                     players[i]->state_lock.unlock();
 
-                    if ((players[i]->get_x() >= pl->get_x() - 10 && players[i]->get_x() <= pl->get_x() + 10) || (players[i]->get_z() >= pl->get_z() - 10 && players[i]->get_z() <= pl->get_z() + 10)) {
+                    if ((players[i]->get_x() >= pl->get_x() - 10 && players[i]->get_x() <= pl->get_x() + 10) && (players[i]->get_z() >= pl->get_z() - 10 && players[i]->get_z() <= pl->get_z() + 10)) {
                         pl->set_skill_factor(packet->skill_type, packet->skill_num);
                         physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
                   
@@ -1058,13 +1066,20 @@ void process_packet(int client_id, unsigned char* p)
                 ev.target_id = 1;
                 timer_queue.push(ev);
 
+                cout << "look : " <<  pl->get_look_x() << ", " << pl->get_look_z() << endl;
+                cout << "right : " << pl->get_right_x() << ", " << pl->get_right_z() << endl;
+
                 Coord a = { pl->get_x(), pl->get_z() };    //플레이어 기준 전방 삼각형 범위 
-                Coord b = { pl->get_x() - 100, pl->get_z() + 40 };
-                Coord c = { pl->get_x() + 100, pl->get_z() + 40 };
+                Coord b = { pl->get_x() - pl->get_right_x() * 40 + pl->get_look_x() * 100,
+                    pl->get_z() - pl->get_right_z() * 40 + pl->get_look_z() * 100 };  // 왼쪽 위
+                Coord c = { pl->get_x() + pl->get_right_x()*40 + pl->get_look_x()*100, 
+                    pl->get_z() + pl->get_right_z()*40 + pl->get_look_z() * 100 };  // 오른쪽 위
+                cout << " 원래 좌표 : " << a.x << ", " << a.z << endl;
+                cout << " 왼쪽 좌표 : " << b.x << ", " << b.z << endl;
+                cout << " 오른쪽 좌표 : " << c.x << ", " << c.z << endl;
 
                 cout << "광야 일격 !!!" << endl;
                 pl->set_mp(pl->get_mp() - 1000);
-
                 for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
                     players[i]->state_lock.lock();
                     if (players[i]->get_state() != ST_INGAME) {
@@ -1078,7 +1093,10 @@ void process_packet(int client_id, unsigned char* p)
                     float pz = players[i]->get_z();
      
                     if (isInsideTriangle(a, b, c, n)) {
+                        cout << "여기 들어오는가 1 : " << i << endl;
+                        cout << "맞은놈 좌표 : " << n.x << ", " << n.z << endl;
                         pl->set_skill_factor(packet->skill_type, packet->skill_num);
+                        cout << pl->get_skill_factor(packet->skill_type, packet->skill_num) << endl;
                         magical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
                
                         send_status_change_packet(pl);
