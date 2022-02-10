@@ -536,7 +536,7 @@ CBillboardObject::~CBillboardObject() {
 
 void CBillboardObject::Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject* player) {  //여기 빌보드 회전시킴 -> 그러니까 여기서 빌보드의 위치도 머리위로 조정하자   //계속돌아
 
-	//pBillboardObject->SetPosition(player->GetPosition().x, player->GetPosition().y + 20, player->GetPosition().z);
+	//pBillboardObject->SetPosition(player->GetPosition().x, player->GetPosition().y + 18, player->GetPosition().z);
 	//pBillboardObject->SetMaterial(pMaterials[0]);  //여기
 	
 	m_ppObjects[201]->SetPosition(player->GetPosition().x, player->GetPosition().y + 18, player->GetPosition().z);
@@ -557,7 +557,15 @@ void CBillboardObject::Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject*
 	//Sleep(100);
 
 }
+void CBillboardObject::Animate2(int num,CGameTimer pTimer, CCamera* pCamera, CGameObject* player) {
 
+	m_ppObjects[num]->SetPosition(player->GetPosition().x, player->GetPosition().y + 18, player->GetPosition().z);
+	
+}
+//void CGameObject::Animate2(int num, CGameTimer pTimer, CCamera* pCamera, CGameObject* player)
+//{
+//	m_ppObjects[num]->SetPosition(player->GetPosition().x, player->GetPosition().y + 18, player->GetPosition().z);
+//}
 
 void CBillboardObject::SetLookAt(XMFLOAT3& xmf3Target) {
 	XMFLOAT3 xmf3Up(0.0f, 1.0f, 0.0f);
