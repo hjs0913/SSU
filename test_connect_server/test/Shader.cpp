@@ -19,6 +19,9 @@ CHeightMapTerrain* map;
  float hp_height = 50;
 float start[BULLETCNT];
 
+CTexturedRectMesh* newhp[100];
+CTexturedRectMesh* newmp[100];
+
 
 
 CShader::CShader()
@@ -1064,7 +1067,7 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 
 				// hp bar ·»´õ¸µ
 				int hp_j = j - MAX_WORLD_SHADER - 1000 + 812;
-				m_ppObjects[hp_j]->Animate2(hp_j,pTimer, pCamera, pPlayer);
+				//m_ppObjects[hp_j]->Animate2(hp_j,pTimer, pCamera, pPlayer);
 			}
 			else {
 				m_ppObjects[j]->SetPosition(XMFLOAT3(0, -100, 0));

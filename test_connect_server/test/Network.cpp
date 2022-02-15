@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Network.h"
 #include "Player.h"
-#include "GameFramework.h"
+//#include "GameFramework.h"
 
 int my_id = 0;
 int m_prev_size = 0;
@@ -12,8 +12,7 @@ WSADATA wsa;
 SOCKET sock;
 SOCKADDR_IN serveraddr;
 int retval = 0;
-CTexturedRectMesh* newhp[100];
-CTexturedRectMesh* newmp[100];
+
 SOCKET g_s_socket;
 
 WSABUF mybuf_recv;
@@ -33,17 +32,6 @@ HANDLE g_h_iocp;	// 나중에 iocp바꿀 시 사용
 
 bool g_client_shutdown = false;
 array<CPlayer*, MAX_USER+MAX_NPC> mPlayer;
-
-void update_hp(int width)
-{
-	cout << "update는 되는가??" << endl;
-	m_ppObjects[201]->SetMesh(0, newhp[width]);
-}
-
-void update_mp(int width)
-{
-	m_ppObjects[202]->SetMesh(0, newmp[width]);
-}
 
 void err_display(int err_no)
 {
@@ -184,11 +172,6 @@ void process_packet(unsigned char* p)
 		my_position.x = packet->x;
 		my_position.y = packet->y;
 		my_position.z = packet->z;
-		mPlayer[my_id]->m_hp = packet->hp;
-		mPlayer[my_id]->m_max_hp = packet->maxhp;
-		mPlayer[my_id]->m_exp = packet->exp;
-		mPlayer[my_id]->m_tribe = static_cast<TRIBE>(packet->tribe);
-
 		break;
 	}
 	case SC_PACKET_MOVE: {
@@ -212,7 +195,6 @@ void process_packet(unsigned char* p)
 		if (static_cast<TRIBE>(packet->object_type) != OBSTACLE) {
 			mPlayer[p_id]->SetUse(true);
 			mPlayer[p_id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
-			mPlayer[p_id]->SetLook(XMFLOAT3(packet->look_x, packet->look_y, packet->look_z));
 			mPlayer[p_id]->m_tribe = static_cast<TRIBE>(packet->object_type);
 			strcpy(mPlayer[p_id]->m_name, packet->name);
 			mPlayer[p_id]->m_spices = packet->object_class;
@@ -231,27 +213,6 @@ void process_packet(unsigned char* p)
 	}
 	case SC_PACKET_STATUS_CHANGE: {
 		// 아직 미구현
-		sc_packet_status_change* packet = reinterpret_cast<sc_packet_status_change*> (p);
-		
-		mPlayer[my_id]->m_max_mp = packet->maxmp;
-		mPlayer[my_id]->m_mp = packet->mp;
-
-		short percent = (float)packet->hp / (float)packet->maxhp * 100;
-		short percent2 = (float)packet->mp / (float)packet->maxmp * 100;
-
-		if (packet->hp > 0) {
-			mPlayer[my_id]->m_hp = packet->hp;
-			update_hp(percent/ 2);
-			cout << "남은 hp " << packet->hp << endl;
-		}
-
-		
-		if (packet->mp > 0) {
-			mPlayer[my_id]->m_mp = packet->mp;
-			update_mp(percent2 / 2);
-			cout << "남은 mp " << packet->mp << endl;
-		}
-		
 		break;
 	}
 	case SC_PACKET_DEAD: {
