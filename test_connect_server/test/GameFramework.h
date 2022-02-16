@@ -2,6 +2,7 @@
 
 #define FRAME_BUFFER_WIDTH		640
 #define FRAME_BUFFER_HEIGHT		480
+#define UICOUNT 2
 
 //#include "Timer.h"
 #include "Player.h"
@@ -46,6 +47,7 @@ public:
 	void OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	LRESULT CALLBACK OnProcessingWindowMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 
+	void UpdateUI(int i);
 private:
 	/////////////////
 	bool IsIn = false;
@@ -99,5 +101,7 @@ private:
 	POINT						m_ptOldCursorPos;
 
 	_TCHAR						m_pszFrameRate[50];
+
+	UILayer						** m_ppUILayer = NULL;
 };
 

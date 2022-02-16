@@ -435,6 +435,16 @@ void CGameFramework::OnDestroy()
 
 void CGameFramework::BuildObjects()
 {
+	if (!m_ppUILayer) {
+		m_ppUILayer = new UILayer * [UICOUNT];
+
+		m_ppUILayer[0] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue);
+		m_ppUILayer[1] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue);
+	}
+	for (int i = 0; i < UICOUNT; i++) {
+		m_ppUILayer[i]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight);
+	}
+
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
 
 	m_pScene = new CScene();
@@ -457,6 +467,11 @@ void CGameFramework::BuildObjects()
 
 void CGameFramework::ReleaseObjects()
 {
+	for (int i = 0; i < UICOUNT; i++) {
+		if(!m_ppUILayer[i]) m_ppUILayer[i]->ReleaseResources();
+	}
+	if(m_ppUILayer)delete m_ppUILayer;
+
 	if (m_pPlayer) delete m_pPlayer;
 
 	if (m_pScene) m_pScene->ReleaseObjects();
@@ -640,6 +655,22 @@ void CGameFramework::MoveToNextFrame()
 
 //#define _WITH_PLAYER_TOP
 
+void CGameFramework::UpdateUI(int i)
+{
+	/*setlocale(LC_ALL, "korean");
+	wcout.imbue(locale("korean"));*/
+	vector<wstring> labels;
+	labels.push_back(L"한글 수정 필요 \n");
+	labels.push_back(m_pszFrameRate);
+
+	wstring uiText = L"";
+	for (auto s : labels)
+	{
+		uiText += s;
+	}
+	m_ppUILayer[i]->UpdateLabels(uiText);
+}
+
 void CGameFramework::FrameAdvance()
 {
 	m_GameTimer.Tick(0.0f);
@@ -652,6 +683,8 @@ void CGameFramework::FrameAdvance()
 	//------------------------------------
 	
 	AnimateObjects();
+
+	for (int i = 0; i < UICOUNT; i++) UpdateUI(i);
 
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
@@ -706,6 +739,8 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
 
 	WaitForGpuComplete();
+
+	for (int i = 0; i < UICOUNT; i++) m_ppUILayer[i]->Render(m_nSwapChainBufferIndex);
 
 #ifdef _WITH_PRESENT_PARAMETERS
 	DXGI_PRESENT_PARAMETERS dxgiPresentParameters;
