@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "UILayer.h"
+#include "Network.h"
 
 using namespace std;
 
@@ -69,11 +70,22 @@ void UILayer::Initialize(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dComma
     pdxgiDevice->Release();
 }
 
-void UILayer::UpdateLabels(const wstring& strUIText)
+void UILayer::UpdateLabels()
 {
+    wstring msg;
+    for (auto m : g_msg) {
+        //wstring temp = wstring(m.begin(), m.end());
+        wchar_t* temp;
+        const char* all = m.c_str();
+        int len = 1 + strlen(all);
+        temp = new TCHAR[len];
+        mbstowcs(temp, all, len);
+        msg.append(temp);
+        msg += L"\n";
+    }
     float left_x = 0.0f;
     float left_y = 340.0f;
-    m_vTextBlocks[0] = { strUIText, D2D1::RectF(left_x, left_y, left_x+(m_fWidth/4), left_y+(m_fHeight/3)-40), m_pdwTextFormat };
+    m_vTextBlocks[0] = { msg, D2D1::RectF(left_x, left_y, left_x+(m_fWidth/2), left_y+(m_fHeight/3)-40), m_pdwTextFormat };
 }
 
 void UILayer::Render(UINT nFrame)

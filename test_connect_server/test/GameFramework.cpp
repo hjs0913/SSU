@@ -655,22 +655,6 @@ void CGameFramework::MoveToNextFrame()
 
 //#define _WITH_PLAYER_TOP
 
-void CGameFramework::UpdateUI(int i)
-{
-	/*setlocale(LC_ALL, "korean");
-	wcout.imbue(locale("korean"));*/
-	vector<wstring> labels;
-	labels.push_back(L"한글 수정 필요 \n");
-	labels.push_back(m_pszFrameRate);
-
-	wstring uiText = L"";
-	for (auto s : labels)
-	{
-		uiText += s;
-	}
-	m_ppUILayer[i]->UpdateLabels(uiText);
-}
-
 void CGameFramework::FrameAdvance()
 {
 	m_GameTimer.Tick(0.0f);
@@ -684,7 +668,7 @@ void CGameFramework::FrameAdvance()
 	
 	AnimateObjects();
 
-	for (int i = 0; i < UICOUNT; i++) UpdateUI(i);
+	for (int i = 0; i < UICOUNT; i++) m_ppUILayer[i]->UpdateLabels();;
 
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);

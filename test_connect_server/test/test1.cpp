@@ -20,6 +20,8 @@ INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
 
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
 {
+	setlocale(LC_ALL, "");
+
 	// connect network
 	netInit();
 	thread hThread{ worker };

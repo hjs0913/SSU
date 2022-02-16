@@ -18,6 +18,8 @@ SOCKET g_s_socket;
 WSABUF mybuf_recv;
 WSABUF mybuf;
 
+vector<string> g_msg;
+
 struct EXP_OVER {
 	WSAOVERLAPPED m_wsa_over;
 	WSABUF m_wsa_buf;
@@ -197,7 +199,7 @@ void process_packet(unsigned char* p)
 			mPlayer[p_id]->SetUse(true);
 			mPlayer[p_id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
 			mPlayer[p_id]->m_tribe = static_cast<TRIBE>(packet->object_type);
-			strcpy(mPlayer[p_id]->m_name, packet->name);
+			strcpy_s(mPlayer[p_id]->m_name, packet->name);
 			mPlayer[p_id]->m_spices = packet->object_class;
 		}
 		break;
@@ -209,7 +211,18 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_CHAT: {
-		// 아직 미구현
+		sc_packet_chat* packet = reinterpret_cast<sc_packet_chat*>(p);
+		string msg = "";
+		msg += packet->message;
+		//cout << "msg : " << msg << endl;
+		
+		wstring w_msg = L"";
+		w_msg.assign(msg.begin(), msg.end());
+		
+		if (g_msg.size() >= 5) g_msg.erase(g_msg.begin());
+	
+		g_msg.push_back(msg);
+
 		break;
 	}
 	case SC_PACKET_STATUS_CHANGE: {

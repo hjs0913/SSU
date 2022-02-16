@@ -50,6 +50,9 @@
 
 #include <random>
 
+#include <locale.h>
+#include <wchar.h>
+
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 

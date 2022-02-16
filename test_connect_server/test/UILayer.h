@@ -12,7 +12,7 @@ class UILayer
 public:
     UILayer(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue);
 
-    void UpdateLabels(const std::wstring& strUIText);
+    void UpdateLabels();
     void Render(UINT nFrame);
     void ReleaseResources();
     void Resize(ID3D12Resource** ppd3dRenderTargets, UINT width, UINT height);

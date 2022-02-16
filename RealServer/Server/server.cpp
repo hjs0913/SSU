@@ -642,6 +642,7 @@ void process_packet(int client_id, unsigned char* p)
         pl->set_z(1940);
         pl->set_job(J_TANKER);
         pl->set_lv(25);
+        pl->set_name("Á¤ÀÇ¹ü");
         switch (pl->get_job()) {
         case J_DILLER: {
             int lv = pl->get_lv();
