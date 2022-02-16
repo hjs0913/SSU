@@ -4,7 +4,7 @@ class Npc : public Obstacle
 {
 private:
 	MONSTER_SPECIES _mon_species;
-
+	int _target_id;
 protected:
 	char	_name[MAX_NAME_SIZE];
 	int		_hp;	
@@ -39,7 +39,7 @@ public:
 	Npc(int id, const char* name);
 	~Npc();
 
-	void set_pos(int x, int y);
+	void set_pos(int x, int z);
 	void set_state(STATE s);
 	void set_name(const char* name);
 
@@ -59,6 +59,9 @@ public:
 	void set_look(float look_x, float look_y, float look_z);
 	void set_right(float right_x, float right_y, float right_z);	// _look_x, y, z로 만들자
 	void set_mon_species(int s);
+
+	void set_target_id(int target);
+	int get_target_id();
 
 	char* get_name();
 	STATE get_state();

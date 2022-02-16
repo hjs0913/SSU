@@ -5,11 +5,12 @@
 enum STATE { ST_FREE, ST_ACCEPT, ST_INGAME, ST_DEAD };
 enum COMP_OP { OP_RECV, OP_SEND, OP_ACCEPT, OP_NPC_MOVE,
 	OP_NPC_ATTACK, OP_AUTO_PLAYER_HP, OP_PLAYER_REVIVE, OP_NPC_REVIVE,
-	OP_PLAYER_ATTACK};
+	OP_PLAYER_ATTACK, OP_NPC_AGRO
+};
 enum EVENT_TYPE {
 	EVENT_NPC_MOVE, EVENT_NPC_ATTACK, EVENT_AUTO_PLAYER_HP,
 	EVENT_PLAYER_REVIVE, EVENT_NPC_REVIVE, EVENT_PLAYER_ATTACK,
-	EVENT_SKILL_COOLTIME
+	EVENT_SKILL_COOLTIME, EVENT_NPC_AGRO
 };
 enum TRIBE { HUMAN, MONSTER, AGRO, BOSS, OBSTACLE };
 enum BUF_TYPE { B_NONE, B_PHYATTACK, B_MAGATTACK, B_PHYDEFENCE, 
@@ -93,6 +94,7 @@ struct cs_packet_teleport {
 struct cs_packet_skill {
 	unsigned char size;
 	char type;
+	char job;
 	char skill_type;    //0 : 물리 공격 1: 마법 공격  2 : 버프 
 	char skill_num;    // 0-0, 0-1   ,,,,,   1-0,  1-1  
 };

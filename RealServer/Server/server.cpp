@@ -151,6 +151,13 @@ void Activate_Npc_Move_Event(int target, int player_id)
     exp_over->_target = player_id;
     PostQueuedCompletionStatus(g_h_iocp, 1, target, &exp_over->_wsa_over);
 }
+void Activate_Npc_AGRO_Event(int target, int player_id)
+{
+    EXP_OVER* exp_over = new EXP_OVER;
+    exp_over->_comp_op = OP_NPC_AGRO;
+    exp_over->_target = player_id;
+    PostQueuedCompletionStatus(g_h_iocp, 1, target, &exp_over->_wsa_over);
+}
 
 void magical_skill_success(int p_id, int target, float skill_factor)
 {
@@ -633,15 +640,13 @@ void process_packet(int client_id, unsigned char* p)
         pl->set_x(2100);
         pl->set_y(0);
         pl->set_z(1940);
-        pl->set_job(J_DILLER);
+        pl->set_job(J_TANKER);
         pl->set_lv(25);
         switch (pl->get_job()) {
         case J_DILLER: {
             int lv = pl->get_lv();
             pl->set_maxhp(20 * lv * lv + 80 * lv);
             pl->set_hp(pl->get_maxhp());
-           // pl->set_Pmaxmp(10 * lv * lv + 50 * lv);
-        //    pl->set_Pmp(pl->get_maxmp());
             pl->set_maxmp(10 * lv * lv + 50 * lv);
             pl->set_mp(pl->get_maxmp());
             pl->set_physical_attack(0.3 * lv * lv + 10 * lv);
@@ -652,6 +657,21 @@ void process_packet(int client_id, unsigned char* p)
             pl->set_defence_factor(0.0002);
             break;
         }
+        case J_TANKER: {
+            int lv = pl->get_lv();
+            pl->set_maxhp(22 * lv * lv + 80 * lv);
+            pl->set_hp(pl->get_maxhp());
+            pl->set_maxmp(8.5 * lv * lv + 50 * lv);
+            pl->set_mp(pl->get_maxmp());
+            pl->set_physical_attack(0.25 * lv * lv + 10 * lv);
+            pl->set_magical_attack(0.08 * lv * lv + 5 * lv);
+            pl->set_physical_defence(0.27 * lv * lv + 10 * lv);
+            pl->set_magical_defence(0.2 * lv * lv + 10 * lv);
+            pl->set_basic_attack_factor(50.0f);
+            pl->set_defence_factor(0.0002);
+            break;
+        }
+
         default: {
             cout << "없는 직업" << endl;
             break;
@@ -959,15 +979,16 @@ void process_packet(int client_id, unsigned char* p)
                 if (players[i]->get_z() >= pl->get_z() - 10 && players[i]->get_z() <= pl->get_z() + 10) {
                     attack_success(client_id, players[i]->get_id(), pl->get_basic_attack_factor());    // 데미지 계산
                     // 몬스터의 자동공격을 넣어주자
+                    players[i]->set_target_id(pl->get_id());
                     if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
                         players[i]->set_active(true);
                         ev.obj_id = i;
                         ev.start_time = chrono::system_clock::now() + 1s;
                         ev.ev = EVENT_NPC_ATTACK;
-                        ev.target_id = client_id;
+                        ev.target_id = players[i]->get_target_id();
                         timer_queue.push(ev);
                         // 몬스터의 이동도 넣어주자
-                        Activate_Npc_Move_Event(i, pl->get_id());
+                        Activate_Npc_Move_Event(i, players[i]->get_target_id());
                     }
                 }
             }
@@ -1008,140 +1029,279 @@ void process_packet(int client_id, unsigned char* p)
     case CS_PACKET_SKILL: {
         cs_packet_skill* packet = reinterpret_cast<cs_packet_skill*>(p);
         if (pl->get_skill_active(packet->skill_type) == true) return;
-        pl->set_skill_active(packet->skill_type, true);     //일반공격 계수는 50
-        switch (packet->skill_type)
+        pl->set_skill_active(packet->skill_type, true);     //일반공격 계수는 5
+        cout << "직업은 " << pl->get_job() << endl;
+        switch (pl->get_job())
         {
-        case 0:    // 물리 공격 스킬 
-            switch (packet->skill_num)
+        case J_DILLER:
+            switch (packet->skill_type)
             {
-            case 0:  //물리 공격스킬 중 0번 스킬 -> 십자공격 어택 
-                timer_event ev;
-                ev.obj_id = client_id;
-                ev.start_time = chrono::system_clock::now() + 3s;  //쿨타임
-                ev.ev = EVENT_SKILL_COOLTIME;
-                ev.target_id = 0;
-                timer_queue.push(ev);
+            case 0:    // 물리 공격 스킬 
+                switch (packet->skill_num)
+                {
+                case 0:  //물리 공격스킬 중 0번 스킬 -> 십자공격 어택 
+                    timer_event ev;
+                    ev.obj_id = client_id;
+                    ev.start_time = chrono::system_clock::now() + 3s;  //쿨타임
+                    ev.ev = EVENT_SKILL_COOLTIME;
+                    ev.target_id = 0;
+                    timer_queue.push(ev);
 
-                cout << "최후의 일격 !!!" << endl;
-                pl->set_mp(pl->get_mp() - 1000);
+                    cout << "최후의 일격 !!!" << endl;
+                    pl->set_mp(pl->get_mp() - 1000);
 
-                for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
-                    players[i]->state_lock.lock();
-                    if (players[i]->get_state() != ST_INGAME) {
+                    for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
+                        players[i]->state_lock.lock();
+                        if (players[i]->get_state() != ST_INGAME) {
+                            players[i]->state_lock.unlock();
+                            continue;
+                        }
                         players[i]->state_lock.unlock();
-                        continue;
-                    }
-                    players[i]->state_lock.unlock();
 
-                    if ((players[i]->get_x() >= pl->get_x() - 10 && players[i]->get_x() <= pl->get_x() + 10) && (players[i]->get_z() >= pl->get_z() - 10 && players[i]->get_z() <= pl->get_z() + 10)) {
-                        pl->set_skill_factor(packet->skill_type, packet->skill_num);
-                        physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
-                  
-                        send_status_change_packet(pl);
-                        if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
-                            players[i]->set_active(true);
-                            timer_event ev;
-                            ev.obj_id = i;
-                            ev.start_time = chrono::system_clock::now() + 1s;
-                            ev.ev = EVENT_NPC_ATTACK;
-                            ev.target_id = client_id;
-                            timer_queue.push(ev);
+                        if ((players[i]->get_x() >= pl->get_x() - 10 && players[i]->get_x() <= pl->get_x() + 10) && (players[i]->get_z() >= pl->get_z() - 10 && players[i]->get_z() <= pl->get_z() + 10)) {
+                            pl->set_skill_factor(packet->skill_type, packet->skill_num);
+                            physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
 
-                            Activate_Npc_Move_Event(i, pl->get_id());
+                            send_status_change_packet(pl);
+                            if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
+                                players[i]->set_active(true);
+                                timer_event ev;
+                                ev.obj_id = i;
+                                ev.start_time = chrono::system_clock::now() + 1s;
+                                ev.ev = EVENT_NPC_ATTACK;
+                                ev.target_id = client_id;
+                                timer_queue.push(ev);
+
+                                Activate_Npc_Move_Event(i, pl->get_id());
+                            }
                         }
                     }
+
+                    break;
+                }
+                break;
+            case 1:  //마법 공격 스킬  삼각형 범위?
+                switch (packet->skill_num)
+                {
+                case 0:  //물리 공격스킬 중 0번 스킬 -> 십자공격 어택 
+                    timer_event ev;
+                    ev.obj_id = client_id;
+                    ev.start_time = chrono::system_clock::now() + 3s;  //쿨타임
+                    ev.ev = EVENT_SKILL_COOLTIME;
+                    ev.target_id = 1;
+                    timer_queue.push(ev);
+
+                    cout << "look : " << pl->get_look_x() << ", " << pl->get_look_z() << endl;
+                    cout << "right : " << pl->get_right_x() << ", " << pl->get_right_z() << endl;
+
+                    Coord a = { pl->get_x(), pl->get_z() };    //플레이어 기준 전방 삼각형 범위 
+                    Coord b = { pl->get_x() - pl->get_right_x() * 40 + pl->get_look_x() * 100,
+                        pl->get_z() - pl->get_right_z() * 40 + pl->get_look_z() * 100 };  // 왼쪽 위
+                    Coord c = { pl->get_x() + pl->get_right_x() * 40 + pl->get_look_x() * 100,
+                        pl->get_z() + pl->get_right_z() * 40 + pl->get_look_z() * 100 };  // 오른쪽 위
+                    cout << " 원래 좌표 : " << a.x << ", " << a.z << endl;
+                    cout << " 왼쪽 좌표 : " << b.x << ", " << b.z << endl;
+                    cout << " 오른쪽 좌표 : " << c.x << ", " << c.z << endl;
+
+                    cout << "광야 일격 !!!" << endl;
+                    pl->set_mp(pl->get_mp() - 1000);
+                    for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
+                        players[i]->state_lock.lock();
+                        if (players[i]->get_state() != ST_INGAME) {
+                            players[i]->state_lock.unlock();
+                            continue;
+                        }
+                        players[i]->state_lock.unlock();
+
+                        Coord n = { players[i]->get_x(), players[i]->get_z() };
+                        float px = players[i]->get_x();
+                        float pz = players[i]->get_z();
+
+                        if (isInsideTriangle(a, b, c, n)) {
+                            cout << "여기 들어오는가 1 : " << i << endl;
+                            cout << "맞은놈 좌표 : " << n.x << ", " << n.z << endl;
+                            pl->set_skill_factor(packet->skill_type, packet->skill_num);
+                            cout << pl->get_skill_factor(packet->skill_type, packet->skill_num) << endl;
+                            magical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
+
+                            send_status_change_packet(pl);
+                            if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
+                                players[i]->set_active(true);
+                                timer_event ev;
+                                ev.obj_id = i;
+                                ev.start_time = chrono::system_clock::now() + 1s;
+                                ev.ev = EVENT_NPC_ATTACK;
+                                ev.target_id = client_id;
+                                timer_queue.push(ev);
+                                Activate_Npc_Move_Event(i, pl->get_id());
+                            }
+                        }
+                    }
+                    break;
                 }
 
                 break;
-            }
-            break;
-        case 1:  //마법 공격 스킬  삼각형 범위?
-            switch (packet->skill_num)
-            {
-            case 0:  //물리 공격스킬 중 0번 스킬 -> 십자공격 어택 
-                timer_event ev;
-                ev.obj_id = client_id;
-                ev.start_time = chrono::system_clock::now() + 3s;  //쿨타임
-                ev.ev = EVENT_SKILL_COOLTIME;
-                ev.target_id = 1;
-                timer_queue.push(ev);
+            case 2:  //버프   //공격력 증가로 변경 
+                switch (packet->skill_num)
+                {
+                case 0:
+                    timer_event ev;
+                    ev.obj_id = client_id;
+                    ev.start_time = chrono::system_clock::now() + 10s;  //쿨타임
+                    ev.ev = EVENT_SKILL_COOLTIME;
+                    ev.target_id = 2;
+                    timer_queue.push(ev);
 
-                cout << "look : " <<  pl->get_look_x() << ", " << pl->get_look_z() << endl;
-                cout << "right : " << pl->get_right_x() << ", " << pl->get_right_z() << endl;
 
-                Coord a = { pl->get_x(), pl->get_z() };    //플레이어 기준 전방 삼각형 범위 
-                Coord b = { pl->get_x() - pl->get_right_x() * 40 + pl->get_look_x() * 100,
-                    pl->get_z() - pl->get_right_z() * 40 + pl->get_look_z() * 100 };  // 왼쪽 위
-                Coord c = { pl->get_x() + pl->get_right_x()*40 + pl->get_look_x()*100, 
-                    pl->get_z() + pl->get_right_z()*40 + pl->get_look_z() * 100 };  // 오른쪽 위
-                cout << " 원래 좌표 : " << a.x << ", " << a.z << endl;
-                cout << " 왼쪽 좌표 : " << b.x << ", " << b.z << endl;
-                cout << " 오른쪽 좌표 : " << c.x << ", " << c.z << endl;
 
-                cout << "광야 일격 !!!" << endl;
-                pl->set_mp(pl->get_mp() - 1000);
-                for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
-                    players[i]->state_lock.lock();
-                    if (players[i]->get_state() != ST_INGAME) {
-                        players[i]->state_lock.unlock();
-                        continue;
-                    }
-                    players[i]->state_lock.unlock();
+                    cout << pl->get_physical_attack() << endl;
+                    cout << pl->get_magical_attack() << endl;
+                    cout << "아레스의 가호 !!!" << endl;
+                    cout << pl->get_mp() << endl;
+                    pl->set_mp(pl->get_mp() - 1000);
 
-                    Coord n = { players[i]->get_x(), players[i]->get_z() };
-                    float px = players[i]->get_x();
-                    float pz = players[i]->get_z();
-     
-                    if (isInsideTriangle(a, b, c, n)) {
-                        cout << "여기 들어오는가 1 : " << i << endl;
-                        cout << "맞은놈 좌표 : " << n.x << ", " << n.z << endl;
-                        pl->set_skill_factor(packet->skill_type, packet->skill_num);
-                        cout << pl->get_skill_factor(packet->skill_type, packet->skill_num) << endl;
-                        magical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
-               
-                        send_status_change_packet(pl);
-                        if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
-                            players[i]->set_active(true);
-                            timer_event ev;
-                            ev.obj_id = i;
-                            ev.start_time = chrono::system_clock::now() + 1s;
-                            ev.ev = EVENT_NPC_ATTACK;
-                            ev.target_id = client_id;
-                            timer_queue.push(ev);
-                            Activate_Npc_Move_Event(i, pl->get_id());
-                        }
-                    }
+                    pl->set_physical_attack(0.6 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv()); //일단 두배 
+                    pl->set_magical_attack(0.2 * pl->get_lv() * pl->get_lv() + 5 * pl->get_lv());
+                    send_status_change_packet(pl);
+                    cout << pl->get_physical_attack() << endl;
+                    cout << pl->get_magical_attack() << endl;
+
+                   
+
+                    break;
                 }
                 break;
             }
-
             break;
-        case 2:  //버프 
-            switch (packet->skill_num)
-            {
-            case 0:
-                timer_event ev;
-                ev.obj_id = client_id;
-                ev.start_time = chrono::system_clock::now() + 10s;  //쿨타임
-                ev.ev = EVENT_SKILL_COOLTIME;
-                ev.target_id = 2;
-                timer_queue.push(ev);
+          
+            case J_TANKER:
+                switch (packet->skill_type)
+                {
+                case 0:    // 물리 공격 스킬 // 방패 
+                    switch (packet->skill_num)
+                    {
+                    case 0:  //물리 공격스킬 중 0번 스킬 -> 십자공격 어택 
+                        timer_event ev;
+                        ev.obj_id = client_id;
+                        ev.start_time = chrono::system_clock::now() + 3s;  //쿨타임
+                        ev.ev = EVENT_SKILL_COOLTIME;
+                        ev.target_id = 0;
+                        timer_queue.push(ev);
 
-                cout << pl->get_physical_defence() << endl;
-                cout << pl->get_magical_defence() << endl;
-                cout << "아테네의 가호 !!!" << endl;
-                cout << pl->get_mp() << endl;
-                pl->set_mp(pl->get_mp() - 1000);
-       
-                pl->set_physical_defence(0.48 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv()); //일단 두배 
-                pl->set_magical_defence(0.34 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv());
-                send_status_change_packet(pl);
-                cout << pl->get_physical_defence() << endl;
-                cout << pl->get_magical_defence() << endl;
+                        cout << "밀어내기 !!!" << endl;
+                        pl->set_mp(pl->get_mp() - 1000);
 
+                        for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
+                            players[i]->state_lock.lock();
+                            if (players[i]->get_state() != ST_INGAME) {
+                                players[i]->state_lock.unlock();
+                                continue;
+                            }
+                            players[i]->state_lock.unlock();
+
+                            if ((players[i]->get_x() >= pl->get_x() - 15 && players[i]->get_x() <= pl->get_x() + 15) && (players[i]->get_z() >= pl->get_z() - 15 && players[i]->get_z() <= pl->get_z() + 15)) {
+                                pl->set_skill_factor(packet->skill_type, packet->skill_num);
+                                physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
+
+                                players[i]->set_pos(players[i]->get_x() + pl->get_look_x()*40, players[i]->get_z() + pl->get_look_z() * 40);
+                                send_move_packet(pl, players[i]);
+                                send_status_change_packet(pl);
+                               if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
+                                    players[i]->set_active(true);
+                                    timer_event ev;
+                                    ev.obj_id = i;
+                                    ev.start_time = chrono::system_clock::now() + 3s;
+                                    ev.ev = EVENT_NPC_ATTACK;
+                                    ev.target_id = client_id;
+                                    timer_queue.push(ev);
+
+                                    Activate_Npc_Move_Event(i, pl->get_id());
+                                }
+                            }
+                        }
+
+                        break;
+                    }
+                    break;
+                case 1:  //마법 공격 스킬:  어그로 
+                    switch (packet->skill_num)
+                    {
+                    case 0:  //물리 공격스킬 중 0번 스킬 -> 십자공격 어택 
+                        timer_event ev;
+                        ev.obj_id = client_id;
+                        ev.start_time = chrono::system_clock::now() + 3s;  //쿨타임
+                        ev.ev = EVENT_SKILL_COOLTIME;
+                        ev.target_id = 1;
+                        timer_queue.push(ev);
+
+                        cout << "look : " << pl->get_look_x() << ", " << pl->get_look_z() << endl;
+                        cout << "right : " << pl->get_right_x() << ", " << pl->get_right_z() << endl;
+
+                        cout << "어그로 끌기!!!" << endl;
+                        pl->set_mp(pl->get_mp() - 1000);
+                        for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
+                            players[i]->state_lock.lock();
+                            if (players[i]->get_state() != ST_INGAME) {
+                                players[i]->state_lock.unlock();
+                                continue;
+                            }
+                            players[i]->state_lock.unlock();
+
+
+
+                            if ((players[i]->get_x() >= pl->get_x() - 20 && players[i]->get_x() <= pl->get_x() + 20) && (players[i]->get_z() >= pl->get_z() - 20 && players[i]->get_z() <= pl->get_z() + 20)) {
+                                pl->set_skill_factor(packet->skill_type, packet->skill_num);
+                              //  physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
+                                players[i]->set_target_id(pl->get_id());
+                                send_status_change_packet(pl);
+                                if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
+                                    players[i]->set_active(true);
+                                   
+                                    timer_event ev;
+                                     ev.obj_id = i;
+                                    ev.start_time = chrono::system_clock::now() + 1s;
+                                     ev.ev = EVENT_NPC_MOVE;
+                                     ev.target_id = players[i]->get_id();
+                                     timer_queue.push(ev);
+
+                                    Activate_Npc_Move_Event(i, players[i]->get_target_id());
+                                }
+                            }
+
+
+                        }
+                        break;
+                    }
+
+                    break;
+                case 2:  //버프 
+                    switch (packet->skill_num)
+                    {
+                    case 0:
+                        timer_event ev;
+                        ev.obj_id = client_id;
+                        ev.start_time = chrono::system_clock::now() + 10s;  //쿨타임
+                        ev.ev = EVENT_SKILL_COOLTIME;
+                        ev.target_id = 2;
+                        timer_queue.push(ev);
+
+                        cout << pl->get_physical_defence() << endl;
+                        cout << pl->get_magical_defence() << endl;
+                        cout << "아테네의 가호 !!!" << endl;
+                        cout << pl->get_mp() << endl;
+                        pl->set_mp(pl->get_mp() - 1000);
+
+                        pl->set_physical_defence(0.54 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv()); //일단 두배 
+                        pl->set_magical_defence(0.4 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv());
+                        send_status_change_packet(pl);
+                        cout << pl->get_physical_defence() << endl;
+                        cout << pl->get_magical_defence() << endl;
+
+                        break;
+                    }
+                    break;
+                }
                 break;
-            }
-            break;
         }
         break;
     }
@@ -1411,7 +1571,8 @@ void worker()
             }
             players[target_id]->state_lock.unlock();
 
-            do_npc_move(client_id, exp_over->_target);
+            if(players[client_id]->get_target_id() != -1)
+               do_npc_move(client_id, exp_over->_target);
 
             /*
             players[client_id]->lua_lock.lock();
@@ -1483,6 +1644,7 @@ void worker()
             delete exp_over;
             break;
         }
+       
         case OP_AUTO_PLAYER_HP: {
             /*
             Player* pl = reinterpret_cast<Player*>(players[client_id]);
@@ -1555,6 +1717,42 @@ void worker()
             delete exp_over;
             break;
         }
+        case OP_NPC_AGRO:
+            players[client_id]->state_lock.lock();
+            if ((players[client_id]->get_state() != ST_INGAME)) {
+                players[client_id]->state_lock.unlock();
+                players[client_id]->set_active(false);
+                delete exp_over;
+                break;
+            }
+            players[client_id]->state_lock.unlock();
+            // 제자리로 돌아가는 것인가
+            if (exp_over->_target == -1) {
+                return_npc_position(client_id);
+                delete exp_over;
+                break;
+            }
+
+            int target_id = exp_over->_target;
+            players[target_id]->state_lock.lock();
+
+            //쫒아가던 타겟이 살아있는가
+            if (players[target_id]->get_state() != ST_INGAME) {
+                players[target_id]->state_lock.unlock();
+                players[client_id]->set_active(false);
+                return_npc_position(client_id);
+                delete exp_over;
+                break;
+            }
+            players[target_id]->state_lock.unlock();
+
+            if (players[client_id]->get_target_id() != -1)
+                do_npc_move(client_id, exp_over->_target);
+
+   
+            delete exp_over;
+
+
         }
     }
 }
@@ -1637,6 +1835,7 @@ void initialise_NPC()
         players[i]->set_magical_defence(lua_tonumber(L, -3));
         players[i]->set_basic_attack_factor(lua_tointeger(L, -2));
         players[i]->set_defence_factor(lua_tonumber(L, -1));
+
         lua_pop(L, 10);// eliminate set_uid from stack after call
 
         // 나중에 어떻게 이용할 것인지 생각
@@ -2001,6 +2200,9 @@ pos a_star(int t_x, int t_z, int x, int z)
 
 void return_npc_position(int npc_id)
 {
+    players[npc_id]->set_target_id(-1); //추가
+    
+
     if (players[npc_id]->get_active() == true) {
         return;
     }
@@ -2109,6 +2311,7 @@ void return_npc_position(int npc_id)
 
 void do_npc_move(int npc_id, int target)
 {
+  
     players[npc_id]->lua_lock.lock();
     lua_State* L = players[npc_id]->L;
     lua_getglobal(L, "event_npc_move");
@@ -2164,7 +2367,7 @@ void do_npc_move(int npc_id, int target)
         ev.obj_id = npc_id;
         ev.start_time = chrono::system_clock::now() + 1s;
         ev.ev = EVENT_NPC_MOVE;
-        ev.target_id = target;
+        ev.target_id = target;  //target
         timer_queue.push(ev);
         return;
     }
@@ -2180,18 +2383,6 @@ void do_npc_move(int npc_id, int target)
     players[npc_id]->set_look(look_x, 0.0f, look_z);
     players[npc_id]->set_x(x);
     players[npc_id]->set_z(z);
-   /* for (int i = 0; i < 2; ++i) {
-        if (mon_load.size() == 0) break;
-        x = x + mon_load.back().first-30;
-        z = z + mon_load.back().second - 30;
-        mon_load.pop_back();
-
-        players[npc_id]->set_x(x);
-        players[npc_id]->set_z(z);
-
-    }*/
-
-
 
     for (auto& obj : players) {
         if (obj->get_state() != ST_INGAME) continue;   // in game이 아닐때
@@ -2260,7 +2451,12 @@ COMP_OP EVtoOP(EVENT_TYPE ev) {
     case EVENT_NPC_REVIVE:
         return OP_NPC_REVIVE;
         break;
+
+    case EVENT_NPC_AGRO:
+        return OP_NPC_AGRO;
+        break;
     }
+
 }
 
 void do_timer()
@@ -2276,15 +2472,17 @@ void do_timer()
                 reinterpret_cast<Player*>(players[temp.obj_id])->set_attack_active(false);
             }
             else if (temp.ev == EVENT_SKILL_COOLTIME) {
-                if (temp.target_id == 2) {  // BUFF
-                    players[temp.obj_id]->set_physical_defence(0.24 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 10 * players[temp.obj_id]->get_lv());
-                    players[temp.obj_id]->set_magical_defence(0.17 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 10 * players[temp.obj_id]->get_lv());
+                if (temp.target_id == 2) {  // 전사 BUFF
+                    players[temp.obj_id]->set_physical_attack(0.3 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 10 * players[temp.obj_id]->get_lv());
+                    players[temp.obj_id]->set_magical_attack(0.1 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 5 * players[temp.obj_id]->get_lv());
                  
                     send_status_change_packet(reinterpret_cast<Player*>(players[temp.obj_id]));
                    
-                    cout << players[temp.obj_id]->get_physical_defence() << endl;
-                    cout << players[temp.obj_id]->get_magical_defence() << endl;
+                    cout << players[temp.obj_id]->get_physical_attack() << endl;
+                    cout << players[temp.obj_id]->get_magical_attack() << endl;
                 }
+       
+             
                 reinterpret_cast<Player*>(players[temp.obj_id])
                     ->set_skill_active(temp.target_id, false);
             }
@@ -2310,18 +2508,19 @@ void do_timer()
                 }
                 
                 if (ev.ev == EVENT_SKILL_COOLTIME) {
-                    if (ev.target_id == 2) {  // BUFF
-                        players[ev.obj_id]->set_physical_defence(0.24 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 10 * players[ev.obj_id]->get_lv());
-                        players[ev.obj_id]->set_magical_defence(0.17 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 10 * players[ev.obj_id]->get_lv());
+                    if (ev.target_id == 2) {  // 전사 BUFF
+                        players[ev.obj_id]->set_physical_attack(0.3 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 10 * players[ev.obj_id]->get_lv());
+                        players[temp.obj_id]->set_magical_attack(0.1 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 5 * players[ev.obj_id]->get_lv());
+
                         
                         // 일단 이것을 넣으면 안돌아감(이유 모름)
-                      //   send_status_change_packet(reinterpret_cast<Player*>(players[ev.obj_id]));
+                      //  send_status_change_packet(reinterpret_cast<Player*>(players[ev.obj_id]));
                         
                           
-                        cout << players[ev.obj_id]->get_physical_defence() << endl;
+                        cout << players[ev.obj_id]->get_physical_attack() << endl;
                         cout << players[ev.obj_id]->get_magical_defence() << endl;
                     }
-                    
+                 
                     reinterpret_cast<Player*>(players[ev.obj_id])
                         ->set_skill_active(ev.target_id, false);
                     continue;

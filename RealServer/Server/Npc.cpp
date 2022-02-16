@@ -21,6 +21,7 @@ Npc::Npc(int id)
 
 	// _x = rand() % WORLD_WIDTH;
 	// _y = rand() % WORLD_HEIGHT;
+	_target_id = -1;
 }
 
 Npc::Npc(int id, const char* name)
@@ -42,16 +43,18 @@ Npc::Npc(int id, const char* name)
 	_right_x = 1.0f;
 	_right_y = 0.0f;
 	_right_z = 0.0f;
+
+	_target_id = -1;
 }
 
 Npc::~Npc() 
 {
 }
 
-void Npc::set_pos(int x, int y)
+void Npc::set_pos(int x, int z)
 {
 	_x = x;
-	_y = y;
+	_z = z;
 }
 
 
@@ -282,4 +285,14 @@ void Npc::set_skill_factor(int skill_type, int skill_num)
 float Npc::get_skill_factor(int skill_type, int skill_num)
 {
 	return _skill_factors[skill_type][skill_num];
+}
+
+void  Npc::set_target_id(int target)
+{
+	_target_id = target;
+}
+
+int  Npc::get_target_id()
+{
+	return _target_id;
 }
