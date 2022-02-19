@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <DirectXMath.h>
 #include <array>
+#include <queue>
 
 #include "../../RealServer/Server/protocol.h"
 #include "stdafx.h"
@@ -22,7 +23,7 @@ using namespace std;
 
 extern int my_id;
 extern int m_prev_recv;
-
+extern vector<string> g_msg;
 
 
 void err_quit(const char* msg);
@@ -36,6 +37,8 @@ void send_move_packet(XMFLOAT3 position);
 void send_look_packet(XMFLOAT3 look, XMFLOAT3 right);
 
 void send_skill_packet(int sk_t, int sk_n);
+
+void send_chat_packet(const char* send_str);
 
 int netInit();
 

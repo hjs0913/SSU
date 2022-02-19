@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "UILayer.h"
+#include "Network.h"
 
 using namespace std;
 
@@ -69,9 +70,9 @@ void UILayer::Initialize(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dComma
     pdxgiDevice->Release();
 }
 
-void UILayer::UpdateLabels(const wstring& strUIText)
+void UILayer::UpdateLabels(const std::wstring& strUIText, UINT LeftTop_x, UINT LeftTop_y, UINT RightBottom_x, UINT RightBottom_y)
 {
-    m_vTextBlocks[0] = { strUIText, D2D1::RectF(0.0f, 0.0f, m_fWidth, m_fHeight), m_pdwTextFormat };
+    m_vTextBlocks[0] = { strUIText, D2D1::RectF(LeftTop_x, LeftTop_y, RightBottom_x, RightBottom_y), m_pdwTextFormat };
 }
 
 void UILayer::Render(UINT nFrame)
@@ -117,7 +118,7 @@ void UILayer::ReleaseResources()
     m_pd3d11On12Device->Release();
 }
 
-void UILayer::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT nHeight)
+void UILayer::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT nHeight, UINT TextAlignment, UINT ParagraphAlignment)
 {
     m_fWidth = static_cast<float>(nWidth);
     m_fHeight = static_cast<float>(nHeight);
@@ -143,9 +144,9 @@ void UILayer::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT nHei
     const float fFontSize = m_fHeight / 25.0f;
     const float fSmallFontSize = m_fHeight / 40.0f;
 
-    m_pd2dWriteFactory->CreateTextFormat(L"궁서체", nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fFontSize, L"en-us", &m_pdwTextFormat);
+    //m_pd2dWriteFactory->CreateTextFormat(L"궁서체", nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fFontSize, L"en-us", &m_pdwTextFormat);
+    m_pd2dWriteFactory->CreateTextFormat(L"Arial", nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fSmallFontSize, L"en-us", &m_pdwTextFormat);
 
-    m_pdwTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
-    m_pdwTextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
-//    m_pd2dWriteFactory->CreateTextFormat(L"Arial", nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fSmallFontSize, L"en-us", &m_pdwTextFormat);
+    m_pdwTextFormat->SetTextAlignment(static_cast<DWRITE_TEXT_ALIGNMENT>(TextAlignment));
+    m_pdwTextFormat->SetParagraphAlignment(static_cast<DWRITE_PARAGRAPH_ALIGNMENT>(ParagraphAlignment));
 }

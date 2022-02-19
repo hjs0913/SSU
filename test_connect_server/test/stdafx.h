@@ -50,6 +50,11 @@
 
 #include <random>
 
+#include <locale.h>
+#include <wchar.h>
+
+#include <imm.h>
+
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 
@@ -70,6 +75,8 @@ using Microsoft::WRL::ComPtr;
 #pragma comment(lib, "d2d1.lib")
 #pragma comment(lib, "dwrite.lib")
 #pragma comment(lib, "dxguid.lib")
+
+#pragma comment(lib, "Imm32.lib")
 
 /*#pragma comment(lib, "DirectXTex.lib") */
 

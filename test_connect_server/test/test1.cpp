@@ -20,6 +20,8 @@ INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
 
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
 {
+	setlocale(LC_ALL, "");
+
 	// connect network
 	netInit();
 	thread hThread{ worker };
@@ -109,6 +111,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	PAINTSTRUCT ps;
 	HDC hdc;
 
+	static HIMC imeID = nullptr;
+	
 	switch (message)
 	{
 	case WM_SIZE:
@@ -141,8 +145,36 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		EndPaint(hWnd, &ps);
 		break;
 	case WM_DESTROY:
+		ImmDestroyContext(imeID);
 		::PostQuitMessage(0);
 		break;
+
+	case WM_ACTIVATE:
+		if (imeID == nullptr)
+		{
+			imeID = ImmCreateContext();
+			ImmAssociateContext(hWnd, imeID);
+		}
+	case WM_IME_STARTCOMPOSITION:
+		break;
+	case WM_IME_CHAR:
+	case WM_CHAR: {
+		if (Chatting_On) {
+			if ((wchar_t)wParam == '\b') {
+				if (Chatting_Str.size() > 0) {
+					Chatting_Str.pop_back();
+				}
+			}
+			else {
+				if (Chatting_Str.size() <= 20)
+				{
+					Chatting_Str.push_back((wchar_t)wParam);
+				}
+			}
+		}
+	}
+		break;
+
 	default:
 		return(::DefWindowProc(hWnd, message, wParam, lParam));
 	}
