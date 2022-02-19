@@ -196,7 +196,7 @@ public:
 	void MoveStrafe(float fDistance = 1.0f);
 	void MoveUp(float fDistance = 1.0f);
 	void MoveForward(float fDistance = 1.0f);
-
+	void MoveDown(float fDistance = 1.0f);
 	void Rotate(float fPitch = 10.0f, float fYaw = 10.0f, float fRoll = 10.0f);
 	void Rotate(XMFLOAT3 *pxmf3Axis, float fAngle);
 };
@@ -252,9 +252,12 @@ public:
 	virtual ~CBulletObject();
 
 	void Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject* player);
-	bool Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject* player,void* b);
+	bool Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject* player,void* b);  //볼 날아가는 것
+	
+	
+	bool check(void* map); //맵에 닿았는지 
 
-	bool check(void* map);
+	//bool check2(CGameObject** m_ppObjects); //몬스터에 닿았는지 
 
 };
 
