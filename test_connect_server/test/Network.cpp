@@ -221,10 +221,6 @@ void process_packet(unsigned char* p)
 		sc_packet_chat* packet = reinterpret_cast<sc_packet_chat*>(p);
 		string msg = "";
 		msg += packet->message;
-		//cout << "msg : " << msg << endl;
-		
-		wstring w_msg = L"";
-		w_msg.assign(msg.begin(), msg.end());
 		
 		if (g_msg.size() >= 5) g_msg.erase(g_msg.begin());
 	

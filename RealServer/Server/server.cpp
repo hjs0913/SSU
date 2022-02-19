@@ -219,7 +219,7 @@ void magical_skill_success(int p_id, int target, float skill_factor)
             if (players[target]->get_tribe() == BOSS)
                 get_exp = get_exp * 2;
             char mess[MAX_CHAT_SIZE];
-            sprintf_s(mess, MAX_CHAT_SIZE, "Kill %s, you get %d experience",
+            sprintf_s(mess, MAX_CHAT_SIZE, "%sÀ» Á×¿´½À´Ï´Ù, %dÀÇ °æÇèÄ¡¸¦ È¹µæÇÕ´Ï´Ù",
                 players[target]->get_name(), get_exp);
             send_chat_packet(reinterpret_cast<Player*>(players[p_id]), p_id, mess);
 
@@ -271,7 +271,7 @@ void magical_skill_success(int p_id, int target, float skill_factor)
         char mess[MAX_CHAT_SIZE];
         sprintf_s(mess, MAX_CHAT_SIZE, "%s -> %s damage : %d",
             players[p_id]->get_name(), players[target]->get_name(), damage);
-        send_chat_packet(reinterpret_cast<Player*>(players[target]), target, mess);
+        //send_chat_packet(reinterpret_cast<Player*>(players[target]), target, mess);
 
         if (reinterpret_cast<Player*>(players[target])->_auto_hp == false) {
             timer_event ev;
@@ -295,7 +295,7 @@ void magical_skill_success(int p_id, int target, float skill_factor)
         char mess[MAX_CHAT_SIZE];
         sprintf_s(mess, MAX_CHAT_SIZE, "%s -> %s damage : %d",
             players[p_id]->get_name(), players[target]->get_name(), damage);
-        send_chat_packet(reinterpret_cast<Player*>(players[p_id]), p_id, mess);
+        //send_chat_packet(reinterpret_cast<Player*>(players[p_id]), p_id, mess);
     }
 }
 
@@ -359,7 +359,7 @@ void physical_skill_success(int p_id, int target, float skill_factor)
             if (players[target]->get_tribe() == BOSS)
                 get_exp = get_exp * 2;
             char mess[MAX_CHAT_SIZE];
-            sprintf_s(mess, MAX_CHAT_SIZE, "Kill %s, you get %d experience",
+            sprintf_s(mess, MAX_CHAT_SIZE, "%sÀ» Á×¿´½À´Ï´Ù, %dÀÇ °æÇèÄ¡¸¦ È¹µæÇÕ´Ï´Ù",
                 players[target]->get_name(), get_exp);
             send_chat_packet(reinterpret_cast<Player*>(players[p_id]), p_id, mess);
 
@@ -411,7 +411,7 @@ void physical_skill_success(int p_id, int target, float skill_factor)
         char mess[MAX_CHAT_SIZE];
         sprintf_s(mess, MAX_CHAT_SIZE, "%s -> %s damage : %d",
             players[p_id]->get_name(), players[target]->get_name(), damage);
-        send_chat_packet(reinterpret_cast<Player*>(players[target]), target, mess);
+        //send_chat_packet(reinterpret_cast<Player*>(players[target]), target, mess);
 
         if (reinterpret_cast<Player*>(players[target])->_auto_hp == false) {
             timer_event ev;
@@ -435,7 +435,7 @@ void physical_skill_success(int p_id, int target, float skill_factor)
         char mess[MAX_CHAT_SIZE];
         sprintf_s(mess, MAX_CHAT_SIZE, "%s -> %s damage : %d",
             players[p_id]->get_name(), players[target]->get_name(), damage);
-        send_chat_packet(reinterpret_cast<Player*>(players[p_id]), p_id, mess);
+       // send_chat_packet(reinterpret_cast<Player*>(players[p_id]), p_id, mess);
     }
 }
 
@@ -493,7 +493,7 @@ void attack_success(int p_id, int target, float atk_factor)
             if (players[target]->get_tribe() == BOSS)
                 get_exp = get_exp * 2;
             char mess[MAX_CHAT_SIZE];
-            sprintf_s(mess, MAX_CHAT_SIZE, "Kill %s, you get %d experience",
+            sprintf_s(mess, MAX_CHAT_SIZE, "%sÀ» Á×¿´½À´Ï´Ù, %dÀÇ °æÇèÄ¡¸¦ È¹µæÇÕ´Ï´Ù",
                  players[target]->get_name(), get_exp);
             send_chat_packet(reinterpret_cast<Player*>(players[p_id]), p_id, mess);
 
@@ -566,9 +566,9 @@ void attack_success(int p_id, int target, float atk_factor)
     }
     else {  // ÇÃ·¹ÀÌ¾î°¡ °ø°İÀ» ÀÔÈû
         char mess[MAX_CHAT_SIZE];
-        sprintf_s(mess, MAX_CHAT_SIZE, "%s -> %s damage : %d",
+        sprintf_s(mess, MAX_CHAT_SIZE, "%s -> %s damage : %f",
             players[p_id]->get_name(), players[target]->get_name(), damage);
-        send_chat_packet(reinterpret_cast<Player*>(players[p_id]), p_id, mess);
+        //send_chat_packet(reinterpret_cast<Player*>(players[p_id]), p_id, mess);
     }
 }
 
@@ -576,7 +576,6 @@ struct Coord
 {
     float x;
     float z;
-
 };
 
 bool check_inside(Coord a, Coord b, Coord c, Coord n) {

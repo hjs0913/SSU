@@ -17,8 +17,9 @@ int bulletidx = 1;
 float tmp[BULLETCNT];
 bool IsFire[BULLETCNT] = {};
 
-wstring Chatting_Str;
+wstring Chatting_Str = L"";
 bool Chatting_On = false;
+wstring Send_str = L"";
 
 CGameFramework::CGameFramework()
 {
@@ -364,11 +365,12 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			Chatting_On = !Chatting_On;
 			if (Chatting_On == false) {
 				len = 1 + Chatting_Str.length();
-				send_str = new char[len];
+				send_str = new char[len*4];
 				temp = Chatting_Str.c_str();
 				wcstombs(send_str, temp, MAX_CHAT_SIZE);
 				send_chat_packet(send_str);
 				Chatting_Str=L"";
+				delete send_str;
 			}
 			break;
 		case VK_F1:
@@ -705,30 +707,6 @@ void CGameFramework::FrameAdvance()
 	
 	AnimateObjects();
 
-	wstring msg;
-	for (int i = 0; i < UICOUNT; i++) {
-		switch (i) {
-		case 0: {
-			// 메시지 창
-			for (auto m : g_msg) {
-				//wstring temp = wstring(m.begin(), m.end());
-				wchar_t* temp;
-				const char* all = m.c_str();
-				int len = 1 + strlen(all);
-				temp = new TCHAR[len];
-				mbstowcs(temp, all, len);
-				msg.append(temp);
-				msg += L"\n";
-			}
-			m_ppUILayer[i]->UpdateLabels(msg, 0, 340, m_nWndClientWidth / 2, 300 + (m_nWndClientHeight / 3));
-		}
-			  break;
-		case 1: // 메시지 입력창
-			m_ppUILayer[i]->UpdateLabels(Chatting_Str, 0, 300 + (m_nWndClientHeight / 3), m_nWndClientWidth / 2, 300 + (m_nWndClientHeight / 3)+20);
-			break;
-		}
-	}
-
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
 
@@ -747,6 +725,7 @@ void CGameFramework::FrameAdvance()
 
 	float pfClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f };
 	m_pd3dCommandList->ClearRenderTargetView(d3dRtvCPUDescriptorHandle, pfClearColor/*Colors::Azure*/, 0, NULL);
+
 
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dDsvCPUDescriptorHandle = m_pd3dDsvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
@@ -783,8 +762,36 @@ void CGameFramework::FrameAdvance()
 
 	WaitForGpuComplete();
 
-	for (int i = 0; i < UICOUNT; i++) m_ppUILayer[i]->Render(m_nSwapChainBufferIndex);
+	Send_str = L"";
+	for (int i = 0; i < UICOUNT; i++) {
+		switch (i) {
+		case 0: {
+			// 메시지 창
+			for (auto& m : g_msg) {
+				wchar_t* temp;
+				//wstring temp = wstring(m.begin(), m.end());
+				const char* all = m.c_str();
+				int len = 1 + strlen(all);
+				temp = new TCHAR[len];
+				mbstowcs(temp, all, len);
+				Send_str.append(temp);
+				Send_str += L"\n";
+				delete temp;
+			}
+			m_ppUILayer[i]->UpdateLabels(Send_str, 0, 340, m_nWndClientWidth / 2, 300 + (m_nWndClientHeight / 3));
+		}
+			break;
+		case 1: // 메시지 입력창
+			m_ppUILayer[i]->UpdateLabels(Chatting_Str, 0, 300 + (m_nWndClientHeight / 3), m_nWndClientWidth / 2, 300 + (m_nWndClientHeight / 3) + 20);
+			break;
+		}
+	}
 
+	for (int i = 0; i < UICOUNT; i++) {
+		cout << i << endl;
+		m_ppUILayer[i]->Render(m_nSwapChainBufferIndex);
+		cout << "씨발" << endl;
+	}
 #ifdef _WITH_PRESENT_PARAMETERS
 	DXGI_PRESENT_PARAMETERS dxgiPresentParameters;
 	dxgiPresentParameters.DirtyRectsCount = 0;
