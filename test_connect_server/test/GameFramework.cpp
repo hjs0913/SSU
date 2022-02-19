@@ -17,6 +17,9 @@ int bulletidx = 1;
 float tmp[BULLETCNT];
 bool IsFire[BULLETCNT] = {};
 
+wstring Chatting_Str;
+bool Chatting_On = false;
+
 CGameFramework::CGameFramework()
 {
 	m_pdxgiFactory = NULL;
@@ -344,6 +347,10 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 
 void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 {
+	char* send_str;
+	const wchar_t* temp;
+	int len = 0;
+
 	if (m_pScene) m_pScene->OnProcessingKeyboardMessage(hWnd, nMessageID, wParam, lParam);
 	switch (nMessageID)
 	{
@@ -354,6 +361,15 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			::PostQuitMessage(0);
 			break;
 		case VK_RETURN:
+			Chatting_On = !Chatting_On;
+			if (Chatting_On == false) {
+				len = 1 + Chatting_Str.length();
+				send_str = new char[len];
+				temp = Chatting_Str.c_str();
+				wcstombs(send_str, temp, MAX_CHAT_SIZE);
+				send_chat_packet(send_str);
+				Chatting_Str=L"";
+			}
 			break;
 		case VK_F1:
 		case VK_F2:
@@ -441,14 +457,17 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[0] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue);
 		m_ppUILayer[1] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue);
 	}
-	for (int i = 0; i < UICOUNT; i++) {
-		m_ppUILayer[i]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight);
-	}
+	m_ppUILayer[0]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+		DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_FAR);
+	m_ppUILayer[1]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+		DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+	
+
 
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
 
 	m_pScene = new CScene();
-	m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
+	m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList, m_pd3dCommandQueue, m_ppd3dSwapChainBackBuffers);
 
 	m_pPlayer = new CTerrainPlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->GetTerrain(), 1);
 	m_pCamera = m_pPlayer->GetCamera();
@@ -668,7 +687,29 @@ void CGameFramework::FrameAdvance()
 	
 	AnimateObjects();
 
-	for (int i = 0; i < UICOUNT; i++) m_ppUILayer[i]->UpdateLabels();;
+	wstring msg;
+	for (int i = 0; i < UICOUNT; i++) {
+		switch (i) {
+		case 0: {
+			// 메시지 창
+			for (auto m : g_msg) {
+				//wstring temp = wstring(m.begin(), m.end());
+				wchar_t* temp;
+				const char* all = m.c_str();
+				int len = 1 + strlen(all);
+				temp = new TCHAR[len];
+				mbstowcs(temp, all, len);
+				msg.append(temp);
+				msg += L"\n";
+			}
+			m_ppUILayer[i]->UpdateLabels(msg, 0, 340, m_nWndClientWidth / 2, 300 + (m_nWndClientHeight / 3));
+		}
+			  break;
+		case 1: // 메시지 입력창
+			m_ppUILayer[i]->UpdateLabels(Chatting_Str, 0, 300 + (m_nWndClientHeight / 3), m_nWndClientWidth / 2, 300 + (m_nWndClientHeight / 3)+20);
+			break;
+		}
+	}
 
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);

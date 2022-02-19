@@ -14,5 +14,5 @@ void send_chat_packet(Player* pl, int my_id, char* mess);
 void send_login_fail_packet(Player* pl, int reason);
 
 void send_status_change_packet(Player* pl);
-
+d
 void send_look_packet(Player* pl, Npc* changer);

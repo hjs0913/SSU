@@ -70,22 +70,9 @@ void UILayer::Initialize(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dComma
     pdxgiDevice->Release();
 }
 
-void UILayer::UpdateLabels()
+void UILayer::UpdateLabels(const std::wstring& strUIText, UINT LeftTop_x, UINT LeftTop_y, UINT RightBottom_x, UINT RightBottom_y)
 {
-    wstring msg;
-    for (auto m : g_msg) {
-        //wstring temp = wstring(m.begin(), m.end());
-        wchar_t* temp;
-        const char* all = m.c_str();
-        int len = 1 + strlen(all);
-        temp = new TCHAR[len];
-        mbstowcs(temp, all, len);
-        msg.append(temp);
-        msg += L"\n";
-    }
-    float left_x = 0.0f;
-    float left_y = 340.0f;
-    m_vTextBlocks[0] = { msg, D2D1::RectF(left_x, left_y, left_x+(m_fWidth/2), left_y+(m_fHeight/3)-40), m_pdwTextFormat };
+    m_vTextBlocks[0] = { strUIText, D2D1::RectF(LeftTop_x, LeftTop_y, RightBottom_x, RightBottom_y), m_pdwTextFormat };
 }
 
 void UILayer::Render(UINT nFrame)
@@ -131,7 +118,7 @@ void UILayer::ReleaseResources()
     m_pd3d11On12Device->Release();
 }
 
-void UILayer::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT nHeight)
+void UILayer::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT nHeight, UINT TextAlignment, UINT ParagraphAlignment)
 {
     m_fWidth = static_cast<float>(nWidth);
     m_fHeight = static_cast<float>(nHeight);
@@ -160,6 +147,6 @@ void UILayer::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT nHei
     //m_pd2dWriteFactory->CreateTextFormat(L"궁서체", nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fFontSize, L"en-us", &m_pdwTextFormat);
     m_pd2dWriteFactory->CreateTextFormat(L"Arial", nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fSmallFontSize, L"en-us", &m_pdwTextFormat);
 
-    m_pdwTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
-    m_pdwTextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_FAR);
+    m_pdwTextFormat->SetTextAlignment(static_cast<DWRITE_TEXT_ALIGNMENT>(TextAlignment));
+    m_pdwTextFormat->SetParagraphAlignment(static_cast<DWRITE_PARAGRAPH_ALIGNMENT>(ParagraphAlignment));
 }

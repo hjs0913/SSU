@@ -12,6 +12,10 @@
 extern  XMFLOAT3 hp_pos;
 extern XMFLOAT3 POS_PLAYER; 
 
+extern wstring Chatting_Str;
+extern bool Chatting_On;
+
+
 extern int nnn;
 class CGameFramework
 {

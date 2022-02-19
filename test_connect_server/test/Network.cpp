@@ -114,6 +114,15 @@ void send_skill_packet(int sk_t, int sk_n)
 
 }
 
+void send_chat_packet(const char* send_str)
+{
+	cs_packet_chat packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_CHAT;
+	strcpy_s(packet.message, send_str);
+	do_send(sizeof(packet), &packet);
+}
+
 void do_send(int num_bytes, void* mess)
 {
 	EXP_OVER* ex_over = new EXP_OVER;
@@ -186,14 +195,12 @@ void process_packet(unsigned char* p)
 			my_position.z = packet->z;
 		}
 		else {
-			cout << "packet [" << packet->id << "] :" << packet->x << "," << packet->y << ", " << packet->z << endl;
 			mPlayer[packet->id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
 		}
 		break;
 	}
 	case SC_PACKET_PUT_OBJECT: {
 		sc_packet_put_object* packet = reinterpret_cast<sc_packet_put_object*> (p);
-		cout << packet->id << endl;
 		int p_id = packet->id;
 		if (static_cast<TRIBE>(packet->object_type) != OBSTACLE) {
 			mPlayer[p_id]->SetUse(true);
