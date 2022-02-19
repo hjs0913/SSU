@@ -324,7 +324,7 @@ void CGameObject::AnimatePart(CGameTimer pTimer, float start, XMFLOAT3 pos, int 
 	float t = (pTimer.GetTotalTime() - start);
 	if (type == 0)
 		SetPosition(pos.x + t * 30, pos.y + (-t * 10 * t * 10 + 8 * t * 10), pos.z);
-	else if (type == 1)
+	 if (type == 1)
 		SetPosition(pos.x - t * 30, pos.y + (-t * 10 * t * 10 + 8 * t * 10), pos.z);
 	else if (type == 2)
 		SetPosition(pos.x, pos.y + (-t * 10 * t * 10 + 8 * t * 10), pos.z + t * 30);
@@ -439,6 +439,13 @@ void CGameObject::MoveForward(float fDistance)
 	xmf3Position = Vector3::Add(xmf3Position, xmf3Look, fDistance);
 	CGameObject::SetPosition(xmf3Position);
 }
+void CGameObject::MoveDown(float fDistance)
+{
+	XMFLOAT3 xmf3Position = GetPosition();
+	XMFLOAT3 xmf3Down = GetUp();
+	xmf3Position = Vector3::Add(xmf3Position, xmf3Down, -fDistance);
+	CGameObject::SetPosition(xmf3Position);
+}
 
 void CGameObject::Rotate(float fPitch, float fYaw, float fRoll)
 {
@@ -511,12 +518,13 @@ bool CBulletObject::check(void* map) {
 	return false;
 }
 
-bool CBulletObject::Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject* player, void* map) {
+bool CBulletObject::Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject* m_ppObjects, void* map) {
 	XMFLOAT3 tmp;
-	if (check(map)) {
+	if (check(map)) {  //∏ ø° ¥Í¿∏∏È ≈Õ¡¸ 
 		return true;
 	}
-	MoveForward(3);
+	//MoveDown(2);
+	MoveForward(2); //∫º øÚ¡˜¿”
 	return false;
 }
 

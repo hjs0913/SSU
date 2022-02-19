@@ -20,7 +20,7 @@ extern CAirplaneMeshDiffused* pOtherPlayerMesh[7];
 extern CGameObject** m_ppObjects;
 extern float hp_width;
 extern float hp_height;
-
+extern CCubeMeshDiffused* bullet;
 
 extern ID3D12Device* pd3dDevice;
 extern ID3D12GraphicsCommandList* pd3dCommandList;

@@ -640,7 +640,7 @@ void process_packet(int client_id, unsigned char* p)
         pl->set_x(2100);
         pl->set_y(0);
         pl->set_z(1940);
-        pl->set_job(J_TANKER);
+        pl->set_job(J_SUPPORTER);
         pl->set_lv(25);
         pl->set_name("정의범");
         switch (pl->get_job()) {
@@ -659,6 +659,20 @@ void process_packet(int client_id, unsigned char* p)
             break;
         }
         case J_TANKER: {
+            int lv = pl->get_lv();
+            pl->set_maxhp(22 * lv * lv + 80 * lv);
+            pl->set_hp(pl->get_maxhp());
+            pl->set_maxmp(8.5 * lv * lv + 50 * lv);
+            pl->set_mp(pl->get_maxmp());
+            pl->set_physical_attack(0.25 * lv * lv + 10 * lv);
+            pl->set_magical_attack(0.08 * lv * lv + 5 * lv);
+            pl->set_physical_defence(0.27 * lv * lv + 10 * lv);
+            pl->set_magical_defence(0.2 * lv * lv + 10 * lv);
+            pl->set_basic_attack_factor(50.0f);
+            pl->set_defence_factor(0.0002);
+            break;
+        }
+        case J_SUPPORTER: {  //값은 바꿔야함 
             int lv = pl->get_lv();
             pl->set_maxhp(22 * lv * lv + 80 * lv);
             pl->set_hp(pl->get_maxhp());
@@ -1224,10 +1238,10 @@ void process_packet(int client_id, unsigned char* p)
                         break;
                     }
                     break;
-                case 1:  //마법 공격 스킬:  어그로 
+                case 1:  //마법 공격 스킬:  어그로   다른 플레이어가 공격 도중 쓰면 대상이 나로 안바뀐다 수정 필요 
                     switch (packet->skill_num)
                     {
-                    case 0:  //물리 공격스킬 중 0번 스킬 -> 십자공격 어택 
+                    case 0:   //어그로
                         timer_event ev;
                         ev.obj_id = client_id;
                         ev.start_time = chrono::system_clock::now() + 3s;  //쿨타임
@@ -1247,8 +1261,6 @@ void process_packet(int client_id, unsigned char* p)
                                 continue;
                             }
                             players[i]->state_lock.unlock();
-
-
 
                             if ((players[i]->get_x() >= pl->get_x() - 20 && players[i]->get_x() <= pl->get_x() + 20) && (players[i]->get_z() >= pl->get_z() - 20 && players[i]->get_z() <= pl->get_z() + 20)) {
                                 pl->set_skill_factor(packet->skill_type, packet->skill_num);
@@ -1275,7 +1287,7 @@ void process_packet(int client_id, unsigned char* p)
                     }
 
                     break;
-                case 2:  //버프 
+                case 2:  //버프  방어력 증가 
                     switch (packet->skill_num)
                     {
                     case 0:
@@ -1303,6 +1315,52 @@ void process_packet(int client_id, unsigned char* p)
                     break;
                 }
                 break;
+                case J_SUPPORTER://서포터 
+                    switch (packet->skill_type)
+                    {
+                    case 2: //버프
+                        switch (packet->skill_num)
+                        {
+                        case 0:  // 사각형 내부 범위 플레이어 hp 회복  
+
+                            timer_event ev;
+                            ev.obj_id = client_id;
+                            ev.start_time = chrono::system_clock::now() + 3s;  //쿨타임
+                            ev.ev = EVENT_SKILL_COOLTIME;
+                            ev.target_id = 2;
+                            timer_queue.push(ev);
+
+                            cout << "천사의 치유!!!" << endl;
+                            pl->set_mp(pl->get_mp() - 1000);
+                            send_status_change_packet(pl);
+
+                            for (int i = 0; i <= MAX_USER; ++i) {
+                                players[i]->state_lock.lock();
+                                if (players[i]->get_state() != ST_INGAME) {
+                                    players[i]->state_lock.unlock();
+                                    continue;
+                                }
+                                players[i]->state_lock.unlock();
+                                if ((players[i]->get_x() >= pl->get_x() - 15 && players[i]->get_x() <= pl->get_x() + 15) && (players[i]->get_z() >= pl->get_z() - 15 && players[i]->get_z() <= pl->get_z() + 15)) {
+                                    cout << "아이디 " <<i<<"의 이전 hp" << players[i]->get_hp() << endl;
+                                    players[i]->set_hp(players[i]->get_hp() + players[i]->get_maxhp() / 10);
+                                    send_status_change_packet(reinterpret_cast<Player*>(players[i]));
+                                    
+                                    cout << "체력 회복" << endl;
+                                    cout << "아이디 " << i << "의 이후 hp" << players[i]->get_hp() << endl;
+                                 
+                                }
+                            }
+                            break;
+                       // case 1: // 전방으로 보호막을 날려 닿는 사람만 보호막 생성 
+
+                        }
+                        break;
+                    }
+                    break;
+
+
+
         }
         break;
     }

@@ -21,7 +21,7 @@ float start[BULLETCNT];
 
 CTexturedRectMesh* newhp[100];
 CTexturedRectMesh* newmp[100];
-
+CCubeMeshDiffused* bullet;
 
 
 CShader::CShader()
@@ -488,7 +488,7 @@ void CObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 	pTexture[4]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/roof.dds", RESOURCE_TEXTURE2D, 0);
 
 	pTexture[5] = new CTexture(1, RESOURCE_TEXTURE2D_ARRAY, 0, 1);
-	pTexture[5]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/flare.dds", RESOURCE_TEXTURE2D, 0);
+	pTexture[5]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/guard.dds", RESOURCE_TEXTURE2D, 0);
 
 	pTexture[6] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
 	pTexture[6]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/mirror.dds", RESOURCE_TEXTURE2D, 0);
@@ -720,10 +720,10 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	int yObjects = 1;
 	int zObjects = int(fTerrainLength / fzPitch);
 	m_nObjects = (xObjects * yObjects * zObjects);  //97
-
+	
 	// m_nObjects += 1 + 2 * BULLETCNT + 1 + 4;
 	m_nObjects += 1 + 2 * BULLETCNT + 1 + 4 + MAX_NPC + MAX_USER;
-#define TEXTURES 7
+#define TEXTURES 8
 	CTexture* pTexture[TEXTURES];
 	pTexture[0] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
 	pTexture[0] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
@@ -742,10 +742,14 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	pTexture[4]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/roof.dds", RESOURCE_TEXTURE2D, 0);
 
 	pTexture[5] = new CTexture(1, RESOURCE_TEXTURE2D_ARRAY, 0, 1);
-	pTexture[5]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/flare.dds", RESOURCE_TEXTURE2D, 0);
+	pTexture[5]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/snow.dds", RESOURCE_TEXTURE2D, 0);
 
 	pTexture[6] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
 	pTexture[6]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/mirror.dds", RESOURCE_TEXTURE2D, 0);
+
+
+	pTexture[7] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
+	pTexture[7]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/guard.dds", RESOURCE_TEXTURE2D, 0);
 
 	UINT ncbElementBytes = ((sizeof(CB_GAMEOBJECT_INFO) + 255) & ~255);
 
@@ -773,11 +777,11 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	pRectMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, hp_width, hp_height, 0.0f);
 
 
-	CTexturedRectMesh* part = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 5, 5, 0.0f);
+	CTexturedRectMesh* part = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 30, 30, 0.0f);  //ÆÄÆ¼Å¬ 
 
 	CReverseCubeMeshTextured* room = new CReverseCubeMeshTextured(pd3dDevice, pd3dCommandList, 300.0f, 100.0f, 300.0f);
 
-	CCubeMeshDiffused* bullet = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 1.0f, 1.0f, 1.0f);
+	 bullet = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 3.0f, 3.0f, 3.0f);
 
 	Car* car = new Car(pd3dDevice, pd3dCommandList, 5.0f, 5.0f, 5.0f);
 
@@ -816,7 +820,7 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	for (int i = 1; i < 1 + BULLETCNT; ++i) {
 		bulletmesh = new CBulletObject(1);
 		bulletmesh->SetMesh(0, bullet);
-		//bulletmesh->SetMaterial(pMaterials[(i - 2) % 2 + 3]);
+	//	bulletmesh->SetMaterial(pMaterials[7]);
 
 		bulletmesh->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 		m_ppObjects[i] = bulletmesh;
@@ -1086,27 +1090,27 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 
 				m_ppObjects[j + BULLETCNT]->SetPosition(
 					(m_ppObjects[j]->GetPosition().x - player->GetPosition().x) * 0.9 + player->GetPosition().x,
-					(m_ppObjects[j]->GetPosition().y - player->GetPosition().y) * 0.9 + player->GetPosition().y,
+					(m_ppObjects[j]->GetPosition().y - player->GetPosition().y) * 0.9 + player->GetPosition().y  ,
 					(m_ppObjects[j]->GetPosition().z - player->GetPosition().z) * 0.9 + player->GetPosition().z);
 					m_ppObjects[j + BULLETCNT]->AnimatePart(pTimer, start[j], m_ppObjects[j + BULLETCNT]->GetPosition(), 0);
 
 					if (j < 70) {
 						m_ppObjects[j + BULLETCNT+30]->SetPosition(
-							(m_ppObjects[j]->GetPosition().x - player->GetPosition().x) * 0.9 + player->GetPosition().x,
-							(m_ppObjects[j]->GetPosition().y - player->GetPosition().y) * 0.9 + player->GetPosition().y,
+							(m_ppObjects[j]->GetPosition().x - player->GetPosition().x) * 0.9 + player->GetPosition().x ,
+							(m_ppObjects[j]->GetPosition().y - player->GetPosition().y) * 0.9 + player->GetPosition().y ,
 							(m_ppObjects[j]->GetPosition().z - player->GetPosition().z) * 0.9 + player->GetPosition().z);
 						m_ppObjects[j + BULLETCNT + 31]->SetPosition(
 							(m_ppObjects[j]->GetPosition().x - player->GetPosition().x) * 0.9 + player->GetPosition().x,
-							(m_ppObjects[j]->GetPosition().y - player->GetPosition().y) * 0.9 + player->GetPosition().y,
+							(m_ppObjects[j]->GetPosition().y - player->GetPosition().y) * 0.9 + player->GetPosition().y ,
 							(m_ppObjects[j]->GetPosition().z - player->GetPosition().z) * 0.9 + player->GetPosition().z);
 						m_ppObjects[j + BULLETCNT + 32]->SetPosition(
-							(m_ppObjects[j]->GetPosition().x - player->GetPosition().x) * 0.9 + player->GetPosition().x,
-							(m_ppObjects[j]->GetPosition().y - player->GetPosition().y) * 0.9 + player->GetPosition().y,
+							(m_ppObjects[j]->GetPosition().x - player->GetPosition().x) * 0.9 + player->GetPosition().x ,
+							(m_ppObjects[j]->GetPosition().y - player->GetPosition().y) * 0.9 + player->GetPosition().y ,
 							(m_ppObjects[j]->GetPosition().z - player->GetPosition().z) * 0.9 + player->GetPosition().z);
 
-					m_ppObjects[j + BULLETCNT + 32]->AnimatePart(pTimer, start[j], m_ppObjects[j + BULLETCNT + 32]->GetPosition(), 1);
-					m_ppObjects[j + BULLETCNT + 31]->AnimatePart(pTimer, start[j], m_ppObjects[j + BULLETCNT + 31]->GetPosition(), 2);
-					m_ppObjects[j + BULLETCNT + 30]->AnimatePart(pTimer, start[j], m_ppObjects[j + BULLETCNT + 30]->GetPosition(), 3);
+					   m_ppObjects[j + BULLETCNT + 32]->AnimatePart(pTimer, start[j], m_ppObjects[j + BULLETCNT + 32]->GetPosition(), 1);
+						m_ppObjects[j + BULLETCNT + 31]->AnimatePart(pTimer, start[j], m_ppObjects[j + BULLETCNT + 31]->GetPosition(), 2);
+						m_ppObjects[j + BULLETCNT + 30]->AnimatePart(pTimer, start[j], m_ppObjects[j + BULLETCNT + 30]->GetPosition(), 3);
 					}
 					else {
 						m_ppObjects[j + BULLETCNT -30]->SetPosition(
