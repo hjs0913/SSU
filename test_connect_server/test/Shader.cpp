@@ -720,10 +720,8 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	int yObjects = 1;
 	int zObjects = int(fTerrainLength / fzPitch);
 	m_nObjects = (xObjects * yObjects * zObjects);  //97
-	cout << "m_nObject : " << m_nObjects << endl;
 	// m_nObjects += 1 + 2 * BULLETCNT + 1 + 4;
 	m_nObjects += 1 + 2 * BULLETCNT + 1 + 4 + MAX_NPC + MAX_USER;
-	cout << "m_nObject : " << m_nObjects << endl;
 #define TEXTURES 8
 	CTexture* pTexture[TEXTURES];
 	pTexture[0] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
@@ -843,9 +841,6 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 
 	int tmp;
 	int num = 0;
-	cout << "xObjects : " << xObjects << endl;
-	cout << "yObjects : " << yObjects << endl;
-	cout << "zObjects : " << zObjects << endl;
 	for (int i = 1 + 2 * BULLETCNT, x = 0; x < xObjects; x++)
 	{
 		for (int z = 0; z < zObjects; z++)
@@ -918,7 +913,6 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		}
 
 	}
-	cout << "tmp : " << tmp << endl;
 
 	phouseObject = new CGameObject(1);
 	phouseObject->SetMesh(0, car);
