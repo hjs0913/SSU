@@ -151,13 +151,7 @@ void Activate_Npc_Move_Event(int target, int player_id)
     exp_over->_target = player_id;
     PostQueuedCompletionStatus(g_h_iocp, 1, target, &exp_over->_wsa_over);
 }
-void Activate_Npc_AGRO_Event(int target, int player_id)
-{
-    EXP_OVER* exp_over = new EXP_OVER;
-    exp_over->_comp_op = OP_NPC_AGRO;
-    exp_over->_target = player_id;
-    PostQueuedCompletionStatus(g_h_iocp, 1, target, &exp_over->_wsa_over);
-}
+
 
 void magical_skill_success(int p_id, int target, float skill_factor)
 {
@@ -639,7 +633,7 @@ void process_packet(int client_id, unsigned char* p)
         pl->set_x(2100);
         pl->set_y(0);
         pl->set_z(1940);
-        pl->set_job(J_SUPPORTER);
+        pl->set_job(J_TANKER);
         pl->set_lv(25);
         pl->set_name("정의범");
         switch (pl->get_job()) {
@@ -1075,7 +1069,7 @@ void process_packet(int client_id, unsigned char* p)
                         if ((players[i]->get_x() >= pl->get_x() - 10 && players[i]->get_x() <= pl->get_x() + 10) && (players[i]->get_z() >= pl->get_z() - 10 && players[i]->get_z() <= pl->get_z() + 10)) {
                             pl->set_skill_factor(packet->skill_type, packet->skill_num);
                             physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
-
+                            players[i]->set_target_id(pl->get_id());
                             send_status_change_packet(pl);
                             if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
                                 players[i]->set_active(true);
@@ -1083,7 +1077,7 @@ void process_packet(int client_id, unsigned char* p)
                                 ev.obj_id = i;
                                 ev.start_time = chrono::system_clock::now() + 1s;
                                 ev.ev = EVENT_NPC_ATTACK;
-                                ev.target_id = client_id;
+                                ev.target_id = players[i]->get_target_id();
                                 timer_queue.push(ev);
 
                                 Activate_Npc_Move_Event(i, pl->get_id());
@@ -1137,7 +1131,7 @@ void process_packet(int client_id, unsigned char* p)
                             pl->set_skill_factor(packet->skill_type, packet->skill_num);
                             cout << pl->get_skill_factor(packet->skill_type, packet->skill_num) << endl;
                             magical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
-
+                            players[i]->set_target_id(pl->get_id());
                             send_status_change_packet(pl);
                             if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
                                 players[i]->set_active(true);
@@ -1145,7 +1139,7 @@ void process_packet(int client_id, unsigned char* p)
                                 ev.obj_id = i;
                                 ev.start_time = chrono::system_clock::now() + 1s;
                                 ev.ev = EVENT_NPC_ATTACK;
-                                ev.target_id = client_id;
+                                ev.target_id = players[i]->get_target_id();
                                 timer_queue.push(ev);
                                 Activate_Npc_Move_Event(i, pl->get_id());
                             }
@@ -1218,15 +1212,16 @@ void process_packet(int client_id, unsigned char* p)
                                 physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
 
                                 players[i]->set_pos(players[i]->get_x() + pl->get_look_x()*40, players[i]->get_z() + pl->get_look_z() * 40);
-                                send_move_packet(pl, players[i]);
+                                send_move_packet(pl, players[i]);  //나중에 수정필요 
                                 send_status_change_packet(pl);
+                                players[i]->set_target_id(pl->get_id());
                                if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
                                     players[i]->set_active(true);
                                     timer_event ev;
                                     ev.obj_id = i;
                                     ev.start_time = chrono::system_clock::now() + 3s;
                                     ev.ev = EVENT_NPC_ATTACK;
-                                    ev.target_id = client_id;
+                                    ev.target_id = players[i]->get_target_id();
                                     timer_queue.push(ev);
 
                                     Activate_Npc_Move_Event(i, pl->get_id());
@@ -1261,7 +1256,7 @@ void process_packet(int client_id, unsigned char* p)
                             }
                             players[i]->state_lock.unlock();
 
-                            if ((players[i]->get_x() >= pl->get_x() - 20 && players[i]->get_x() <= pl->get_x() + 20) && (players[i]->get_z() >= pl->get_z() - 20 && players[i]->get_z() <= pl->get_z() + 20)) {
+                            if ((players[i]->get_x() >= pl->get_x() - 40 && players[i]->get_x() <= pl->get_x() + 40) && (players[i]->get_z() >= pl->get_z() - 40 && players[i]->get_z() <= pl->get_z() + 40)) {
                                 pl->set_skill_factor(packet->skill_type, packet->skill_num);
                               //  physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
                                 players[i]->set_target_id(pl->get_id());
@@ -1273,10 +1268,12 @@ void process_packet(int client_id, unsigned char* p)
                                      ev.obj_id = i;
                                     ev.start_time = chrono::system_clock::now() + 1s;
                                      ev.ev = EVENT_NPC_MOVE;
-                                     ev.target_id = players[i]->get_id();
+                                 
+                                    ev.target_id = players[i]->get_id();
+                                   //  ev.target_id = client_id;
                                      timer_queue.push(ev);
 
-                                    Activate_Npc_Move_Event(i, players[i]->get_target_id());
+                                    Activate_Npc_Move_Event(i,  players[i]->get_target_id());
                                 }
                             }
 
@@ -1469,7 +1466,9 @@ void player_revive(int client_id)
                     ev.obj_id = other->get_id();
                     ev.start_time = chrono::system_clock::now() + 1s;
                     ev.ev = EVENT_NPC_ATTACK;
-                    ev.target_id = client_id;
+
+                  //  ev.target_id = client_id;
+                    ev.target_id = other->get_target_id(); //임시 수정 
                     timer_queue.push(ev);
                     Activate_Npc_Move_Event(other->get_id(), pl->get_id());
                 }
@@ -1665,7 +1664,7 @@ void worker()
             players[client_id]->state_lock.lock();
             if ((players[client_id]->get_state() != ST_INGAME) || (false == players[client_id]->get_active())) {
                 players[client_id]->state_lock.unlock();
-                delete exp_over;
+                delete exp_over; EVENT_PLAYER_ATTACK;
                 break;
             }
             players[client_id]->state_lock.unlock();
