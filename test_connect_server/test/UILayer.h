@@ -12,10 +12,10 @@ class UILayer
 public:
     UILayer(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue);
 
-    void UpdateLabels(const std::wstring& strUIText);
+    void UpdateLabels(const std::wstring& strUIText, UINT LeftTop_x, UINT LeftTop_y, UINT RightBottom_x, UINT RightBottom_y);
     void Render(UINT nFrame);
     void ReleaseResources();
-    void Resize(ID3D12Resource** ppd3dRenderTargets, UINT width, UINT height);
+    void Resize(ID3D12Resource** ppd3dRenderTargets, UINT width, UINT height, UINT TextAlignment, UINT ParagraphAlignment);
 
 private:
     UINT GetRenderTargetsCount() { return static_cast<UINT>(m_vWrappedRenderTargets.size()); }
