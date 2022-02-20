@@ -507,118 +507,121 @@ void CGameFramework::ProcessInput()
 	if (!bProcessedByScene)
 	{
 		DWORD dwDirection = 0;
-		if (pKeysBuffer['W'] & 0xF0) {
-			//send_move_packet(0);
-			dwDirection |= DIR_FORWARD;
-		}
-		if (pKeysBuffer['S'] & 0xF0) {
-			//send_move_packet(1);
-			dwDirection |= DIR_BACKWARD;
-		}
-		if (pKeysBuffer['A'] & 0xF0) {
-			//send_move_packet(2);
-			dwDirection |= DIR_LEFT;
-		}
-		if (pKeysBuffer['D'] & 0xF0) {
-			//send_move_packet(3);
-			dwDirection |= DIR_RIGHT;
-		}
-
-		//ï¿½ï¿½Å³---------------------------------
-		if ((pKeysBuffer[VK_NUMPAD1] & 0xF0) || (pKeysBuffer['1'] & 0xF0)) {     //   1 
-			send_skill_packet(0, 0); 
-		}
-		if ((pKeysBuffer[VK_NUMPAD2] & 0xF0) || (pKeysBuffer['2'] & 0xF0)) {     //   2 
-			send_skill_packet(0, 1);
-		}
-		if ((pKeysBuffer[VK_NUMPAD3] & 0xF0) || (pKeysBuffer['3'] & 0xF0)) {     //   3	
-			send_skill_packet(0, 2);
-		}
-
-		if (pKeysBuffer[VK_NUMPAD4] & 0xF0 || (pKeysBuffer['4'] & 0xF0)) {     //   4 
-			send_skill_packet(1, 0);  
-		}
-		if (pKeysBuffer[VK_NUMPAD5] & 0xF0 || (pKeysBuffer['5'] & 0xF0)) {     //   5 
-			send_skill_packet(1, 1);
-		}
-		if (pKeysBuffer[VK_NUMPAD4] & 0xF0 || (pKeysBuffer['4'] & 0xF0)) {     //   6
-			send_skill_packet(1, 2);
-		}
-
-		if (pKeysBuffer[VK_NUMPAD7] & 0xF0 || (pKeysBuffer['7'] & 0xF0)) {    // 7 
-			send_skill_packet(2, 0);  
-		}
-		if (pKeysBuffer[VK_NUMPAD8] & 0xF0 || (pKeysBuffer['8'] & 0xF0)) {    // 8 
-			send_skill_packet(2, 1);
-		}
-		if (pKeysBuffer[VK_NUMPAD9] & 0xF0 || (pKeysBuffer['9'] & 0xF0)) {    // 9
-			send_skill_packet(2, 2);
-		}
-		if (pKeysBuffer[VK_SPACE] & 0xF0) {
-			send_attack_packet(0);
-		}
-		//---------------------------------
-
-
-		static bool pushq = true;
-
-		if (GetAsyncKeyState('Q') & 0x8000) {  
-			if (pushq) {
-				::gbTerrainTessellationWireframe = !::gbTerrainTessellationWireframe;
-				pushq = false;
+		if (!Chatting_On) {
+			if (pKeysBuffer['W'] & 0xF0) {
+				//send_move_packet(0);
+				dwDirection |= DIR_FORWARD;
 			}
-		}
-		else {
-			pushq = true;
-		}
+			if (pKeysBuffer['S'] & 0xF0) {
+				//send_move_packet(1);
+				dwDirection |= DIR_BACKWARD;
+			}
+			if (pKeysBuffer['A'] & 0xF0) {
+				//send_move_packet(2);
+				dwDirection |= DIR_LEFT;
+			}
+			if (pKeysBuffer['D'] & 0xF0) {
+				//send_move_packet(3);
+				dwDirection |= DIR_RIGHT;
+			}
 
-		static bool pushI = true;
+			//ï¿½ï¿½Å³---------------------------------
+			if ((pKeysBuffer[VK_NUMPAD1] & 0xF0) || (pKeysBuffer['1'] & 0xF0)) {     //   1 
+				send_skill_packet(0, 0);
+			}
+			if ((pKeysBuffer[VK_NUMPAD2] & 0xF0) || (pKeysBuffer['2'] & 0xF0)) {     //   2 
+				send_skill_packet(0, 1);
+			}
+			if ((pKeysBuffer[VK_NUMPAD3] & 0xF0) || (pKeysBuffer['3'] & 0xF0)) {     //   3	
+				send_skill_packet(0, 2);
+			}
 
-		if (GetAsyncKeyState('I') & 0x8000) {
-			if (pushI) {
-				if (IsIn) {
-					m_pPlayer->SetPosition(tmppos);
-					IsIn = false;
+			if (pKeysBuffer[VK_NUMPAD4] & 0xF0 || (pKeysBuffer['4'] & 0xF0)) {     //   4 
+				send_skill_packet(1, 0);
+			}
+			if (pKeysBuffer[VK_NUMPAD5] & 0xF0 || (pKeysBuffer['5'] & 0xF0)) {     //   5 
+				send_skill_packet(1, 1);
+			}
+			if (pKeysBuffer[VK_NUMPAD4] & 0xF0 || (pKeysBuffer['4'] & 0xF0)) {     //   6
+				send_skill_packet(1, 2);
+			}
+
+			if (pKeysBuffer[VK_NUMPAD7] & 0xF0 || (pKeysBuffer['7'] & 0xF0)) {    // 7 
+				send_skill_packet(2, 0);
+			}
+			if (pKeysBuffer[VK_NUMPAD8] & 0xF0 || (pKeysBuffer['8'] & 0xF0)) {    // 8 
+				send_skill_packet(2, 1);
+			}
+			if (pKeysBuffer[VK_NUMPAD9] & 0xF0 || (pKeysBuffer['9'] & 0xF0)) {    // 9
+				send_skill_packet(2, 2);
+			}
+			if (pKeysBuffer[VK_SPACE] & 0xF0) {
+				send_attack_packet(0);
+			}
+			//---------------------------------
+
+
+			static bool pushq = true;
+
+			if (GetAsyncKeyState('Q') & 0x8000) {
+				if (pushq) {
+					::gbTerrainTessellationWireframe = !::gbTerrainTessellationWireframe;
+					pushq = false;
 				}
-				else {
-					tmppos = m_pPlayer->GetPosition();
-					m_pPlayer->SetPosition(XMFLOAT3{ ROOMX, 0, ROOMZ });
-					IsIn = true;
+			}
+			else {
+				pushq = true;
+			}
+
+			static bool pushI = true;
+
+			if (GetAsyncKeyState('I') & 0x8000) {
+				if (pushI) {
+					if (IsIn) {
+						m_pPlayer->SetPosition(tmppos);
+						IsIn = false;
+					}
+					else {
+						tmppos = m_pPlayer->GetPosition();
+						m_pPlayer->SetPosition(XMFLOAT3{ ROOMX, 0, ROOMZ });
+						IsIn = true;
+					}
+					pushI = false;
 				}
-				pushI = false;
 			}
-		}
-		else {
-			pushI = true;
-		}
-
-		if (pKeysBuffer[VK_SHIFT] & 0xF0) {  
-			cameradis = 1.05f;
-		}
-		else
-			cameradis = 1.0f;
-
-		static bool pushCTRL = true;
-		if (GetAsyncKeyState(VK_CONTROL) & 0x8000) {  
-			if (pushCTRL) {
-				++bulletidx;
-				pushCTRL = false;
+			else {
+				pushI = true;
 			}
-		}
-		else {
-			pushCTRL = true;
-		}
 
-		if (bulletidx >= BULLETCNT + 2) {
-			bulletidx = 2;
-			for (int i = 0; i < BULLETCNT; ++i) {
-				if (IsFire[i]) {
-					m_pScene->Rotate(2 + i, 0, tmp[i], 0.0f);
+			if (pKeysBuffer[VK_SHIFT] & 0xF0) {
+				cameradis = 1.05f;
+			}
+			else
+				cameradis = 1.0f;
+
+			static bool pushCTRL = true;
+			if (GetAsyncKeyState(VK_CONTROL) & 0x8000) {
+				if (pushCTRL) {
+					++bulletidx;
+					pushCTRL = false;
 				}
-				IsFire[i] = false;
 			}
+			else {
+				pushCTRL = true;
+			}
+
+			if (bulletidx >= BULLETCNT + 2) {
+				bulletidx = 2;
+				for (int i = 0; i < BULLETCNT; ++i) {
+					if (IsFire[i]) {
+						m_pScene->Rotate(2 + i, 0, tmp[i], 0.0f);
+					}
+					IsFire[i] = false;
+				}
+			}
+			IsFire[bulletidx - 2] = true;
 		}
-		IsFire[bulletidx - 2] = true;
+
 		float cxDelta = 0.0f, cyDelta = 0.0f;
 		POINT ptCursorPos;
 		if (GetCapture() == m_hWnd)
@@ -788,9 +791,7 @@ void CGameFramework::FrameAdvance()
 	}
 
 	for (int i = 0; i < UICOUNT; i++) {
-		cout << i << endl;
 		m_ppUILayer[i]->Render(m_nSwapChainBufferIndex);
-		cout << "¾¾¹ß" << endl;
 	}
 #ifdef _WITH_PRESENT_PARAMETERS
 	DXGI_PRESENT_PARAMETERS dxgiPresentParameters;
