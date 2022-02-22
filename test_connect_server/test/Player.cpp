@@ -5,6 +5,9 @@
 #include "stdafx.h"
 #include "Player.h"
 #include "Shader.h"
+
+#include <iostream>
+using namespace std;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -293,11 +296,7 @@ CAirplanePlayer::CAirplanePlayer(ID3D12Device* pd3dDevice, ID3D12GraphicsCommand
 	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)pContext;
 	SetPlayerUpdatedContext(pTerrain);
 
-	if (!m_pUILayer) {
-		//m_pUILayer = new UILayer(2, pd3dDevice, m_pd3dCommandQueue);
-	}
-	//m_pUILayer->Resize(m_ppd3dSwapChainBackBuffers, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
-
+	m_pHpUI = new CBillboardObject(1);
 }
 
 CAirplanePlayer::~CAirplanePlayer()
@@ -355,6 +354,15 @@ CCamera* CAirplanePlayer::ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed)
 	return(m_pCamera);
 }
 
+void CAirplanePlayer::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+{
+	DWORD nCameraMode = (pCamera) ? pCamera->GetMode() : 0x00;
+	if (nCameraMode == THIRD_PERSON_CAMERA) {
+		CGameObject::Render(pd3dCommandList, pCamera);
+		m_pHpUI->Render(pd3dCommandList, pCamera);
+	}
+}
+
 void CAirplanePlayer::ChangeColor(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT4 color)
 {
 	// CMesh **m_ppMeshes
@@ -368,12 +376,41 @@ void CAirplanePlayer::Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject* 
 	float fheigth = pTerrain->GetHeight(otherplayer->GetPosition().x, otherplayer->GetPosition().z);
 	SetPosition(XMFLOAT3(otherplayer->GetPosition().x, fheigth, otherplayer->GetPosition().z));
 	SetLook(otherplayer->GetLook());
-	//pOtherPlayer
+
+	m_pHpUI->SetPosition(2048, 50, 2048);
+	m_pHpUI->Animate3(pTimer, pCamera, otherplayer);
 }
 
 float CAirplanePlayer::GetHeightToTerrain(CGameObject* otherplayer) {
 	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)m_pPlayerUpdatedContext;
 	return pTerrain->GetHeight(otherplayer->GetPosition().x, otherplayer->GetPosition().z);
+}
+
+void CAirplanePlayer::SetMeshHp(int nIndex, CMesh* pMesh)
+{
+	if (m_pHpUI->m_ppMeshes)
+	{
+		if (m_pHpUI->m_ppMeshes[nIndex]) m_pHpUI->m_ppMeshes[nIndex]->Release();
+		m_pHpUI->m_ppMeshes[nIndex] = pMesh;
+		if (pMesh) pMesh->AddRef();
+	}
+}
+
+void CAirplanePlayer::SetMaterialHp(CMaterial* pMaterial)
+{
+	if (m_pHpUI->m_pMaterial) m_pHpUI->m_pMaterial->Release();
+	m_pHpUI->m_pMaterial = pMaterial;
+	if (m_pHpUI->m_pMaterial) m_pHpUI->m_pMaterial->AddRef();
+}
+
+void CAirplanePlayer::SetPositionHp()
+{
+	m_pHpUI->SetPosition(m_xmf3Position.x, m_xmf3Position.y + 30, m_xmf3Position.z);
+}
+
+void CAirplanePlayer::SetCbvGPUDescriptorHandlePtr_Hp(UINT64 nCbvGPUDescriptorHandlePtr)
+{
+	m_pHpUI->SetCbvGPUDescriptorHandlePtr(nCbvGPUDescriptorHandlePtr);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

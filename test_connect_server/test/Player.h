@@ -143,18 +143,30 @@ protected:
 class CAirplanePlayer : public CPlayer
 {
 protected:
-	UILayer  *m_pUILayer = NULL;
+	UILayer  *m_pUILayer = NULL;	// 플레이어 이름을 띄워주기 위한것
+	CBillboardObject* m_pHpUI;
+
 public:
 	CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, ID3D12RootSignature *pd3dGraphicsRootSignature, void *pContext=NULL, int nMeshes=1);
 	virtual ~CAirplanePlayer();
 
 	virtual CCamera *ChangeCamera(DWORD nNewCameraMode, float fTimeElapsed);
+	virtual void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL);
 
 	void ChangeColor(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, XMFLOAT4 color);
 
 	void Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject* otherplayer);
 
 	float GetHeightToTerrain(CGameObject* otherplayer);
+
+	//---------------------------------------------------
+	void SetMeshHp(int nIndex, CMesh* pMesh);
+
+	void SetMaterialHp(CMaterial* pMaterial);
+
+	void SetPositionHp();
+
+	void SetCbvGPUDescriptorHandlePtr_Hp(UINT64 nCbvGPUDescriptorHandlePtr);
 };
 
 class CTerrainPlayer : public CPlayer

@@ -570,6 +570,16 @@ void CBillboardObject::Animate2(int num,CGameTimer pTimer, CCamera* pCamera, CGa
 	m_ppObjects[num]->SetPosition(player->GetPosition().x, reinterpret_cast<CAirplanePlayer*>(player)->GetHeightToTerrain(player) + 18, player->GetPosition().z);
 	
 }
+
+void CBillboardObject::Animate3(CGameTimer pTimer, CCamera* pCamera, CGameObject* player) 
+{
+	pBillboardObject->SetPosition(2048, 50, 2048);
+	//pBillboardObject->SetPosition(player->GetPosition().x, player->GetPosition().y + 200, player->GetPosition().z);
+	//pBillboardObject->SetMaterial(pMaterials[0]); 
+	XMFLOAT3 xmf3CameraPosition = pCamera->GetPosition();
+	SetLookAt(xmf3CameraPosition);
+}
+
 //void CGameObject::Animate2(int num, CGameTimer pTimer, CCamera* pCamera, CGameObject* player)
 //{
 //	m_ppObjects[num]->SetPosition(player->GetPosition().x, player->GetPosition().y + 18, player->GetPosition().z);

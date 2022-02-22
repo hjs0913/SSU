@@ -243,6 +243,7 @@ public:
 
 	void Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject* player);
 	void Animate2(int num,CGameTimer pTimer, CCamera* pCamera, CGameObject* player);
+	void Animate3(CGameTimer pTimer, CCamera* pCamera, CGameObject* player);
 	void SetLookAt(XMFLOAT3& xmf3Target);
 };
 

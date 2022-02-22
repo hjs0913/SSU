@@ -984,7 +984,13 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		CAirplanePlayer* pOtherPlayer = new CAirplanePlayer(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, pTerrain);
 		pOtherPlayer->SetMesh(0, pOtherPlayerMesh[2]);
 		pOtherPlayer->SetPosition(XMFLOAT3(0, -100, 0));
+
+		pOtherPlayer->SetMeshHp(0, newhp[50]);
+		pOtherPlayer->SetMaterialHp(pMaterials[0]);
+		pOtherPlayer->SetPositionHp();
+
 		pOtherPlayer->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr);
+		pOtherPlayer->SetCbvGPUDescriptorHandlePtr_Hp(m_d3dCbvGPUDescriptorStartHandle.ptr);
 		m_ppObjects[i] = pOtherPlayer;
 	}
 
@@ -993,7 +999,13 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		CAirplanePlayer* pNpc = new CAirplanePlayer(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, pTerrain);
 		pNpc->SetMesh(0, pOtherPlayerMesh[1]);
 		pNpc->SetPosition(XMFLOAT3(0, -100, 0));
+
+		pNpc->SetMeshHp(0, newhp[50]);
+		pNpc->SetMaterialHp(pMaterials[0]);
+		pNpc->SetPositionHp();
+
 		pNpc->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr);
+		pNpc->SetCbvGPUDescriptorHandlePtr_Hp(m_d3dCbvGPUDescriptorStartHandle.ptr);
 		m_ppObjects[i] = pNpc;
 	}
 }
@@ -1069,7 +1081,6 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 
 				// hp bar ·»´õ¸µ
 				int hp_j = j - MAX_WORLD_SHADER - 1000 + 812;
-				//m_ppObjects[hp_j]->Animate2(hp_j,pTimer, pCamera, pPlayer);
 			}
 			else {
 				m_ppObjects[j]->SetPosition(XMFLOAT3(0, -100, 0));
