@@ -14,6 +14,7 @@ extern XMFLOAT3 POS_PLAYER;
 
 extern wstring Chatting_Str;
 extern bool Chatting_On;
+extern bool Mouse_On;
 
 
 extern int nnn;
@@ -54,8 +55,6 @@ public:
 	void UpdateUI(int i);
 private:
 	/////////////////
-	bool IsIn = false;
-	XMFLOAT3 tmppos;
 	/////////////////
 	float cameradis = 1.0f;
 	float savedis = 1.0f;
@@ -106,6 +105,6 @@ private:
 
 	_TCHAR						m_pszFrameRate[50];
 
-	UILayer						** m_ppUILayer = NULL;
+	UILayer						** m_ppUILayer = NULL;	
 };
 

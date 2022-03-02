@@ -19,6 +19,7 @@ bool IsFire[BULLETCNT] = {};
 
 wstring Chatting_Str = L"";
 bool Chatting_On = false;
+bool Mouse_On = false;
 wstring Send_str = L"";
 
 CGameFramework::CGameFramework()
@@ -327,6 +328,7 @@ void CGameFramework::ChangeSwapChainState()
 
 void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 {
+
 	if (m_pScene) m_pScene->OnProcessingMouseMessage(hWnd, nMessageID, wParam, lParam);
 	switch (nMessageID)
 	{
@@ -508,7 +510,7 @@ void CGameFramework::ProcessInput()
 	{
 		DWORD dwDirection = 0;
 
-		if (!Chatting_On) {
+		if (!Chatting_On && Mouse_On) {
 			if (pKeysBuffer['W'] & 0xF0) {
 				//send_move_packet(0);
 				dwDirection |= DIR_FORWARD;
@@ -572,26 +574,6 @@ void CGameFramework::ProcessInput()
 			}
 			else {
 				pushq = true;
-			}
-
-			static bool pushI = true;
-
-			if (GetAsyncKeyState('I') & 0x8000) {
-				if (pushI) {
-					if (IsIn) {
-						m_pPlayer->SetPosition(tmppos);
-						IsIn = false;
-					}
-					else {
-						tmppos = m_pPlayer->GetPosition();
-						m_pPlayer->SetPosition(XMFLOAT3{ ROOMX, 0, ROOMZ });
-						IsIn = true;
-					}
-					pushI = false;
-				}
-			}
-			else {
-				pushI = true;
 			}
 
 			if (pKeysBuffer[VK_SHIFT] & 0xF0) {
