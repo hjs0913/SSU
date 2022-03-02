@@ -110,11 +110,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	int wmId, wmEvent;
 	PAINTSTRUCT ps;
 	HDC hdc;
+	TRACKMOUSEEVENT tme;
 
 	static HIMC imeID = nullptr;
-	
 	switch (message)
 	{
+	case WM_MOUSELEAVE:
+		tme.cbSize = sizeof(TRACKMOUSEEVENT);
+		tme.hwndTrack = hWnd;
+		tme.dwFlags = TME_HOVER;
+		tme.dwHoverTime = 1;
+		TrackMouseEvent(&tme);
+		Mouse_On = false;
+		cout << "¶°³²" << endl;
+		break;
+	case WM_MOUSEHOVER:
 	case WM_SIZE:
 	case WM_LBUTTONDOWN:
 	case WM_LBUTTONUP:
@@ -123,6 +133,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_MOUSEMOVE:
 	case WM_KEYDOWN:
 	case WM_KEYUP:
+		tme.cbSize = sizeof(TRACKMOUSEEVENT);
+		tme.hwndTrack = hWnd;
+		tme.dwFlags = TME_LEAVE;
+		tme.dwHoverTime = 1;
+		TrackMouseEvent(&tme);
+		cout << "µé¾î¿È" << endl;
+		Mouse_On = true;
 		gGameFramework.OnProcessingWindowMessage(hWnd, message, wParam, lParam);
 		break;
 	case WM_COMMAND:
