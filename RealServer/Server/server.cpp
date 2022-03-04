@@ -2635,21 +2635,15 @@ COMP_OP EVtoOP(EVENT_TYPE ev) {
 
 void do_timer()
 {
+    cout << "??" << endl;
     chrono::system_clock::duration dura;
     const chrono::milliseconds waittime = 10ms;
     timer_event temp;
     bool temp_bool = false;
     while (true) {
+        cout << "??2" << endl;
         if (temp_bool) {
             temp_bool = false;
-
-     //   else if (temp.ev == EVENT_ELEMENT_COOLTIME) {
-      //      superposition = false;
-      //      players[temp.target_id]->set_magical_attack(players[temp.target_id]->get_magical_attack() / 9 + players[temp.target_id]->get_magical_attack());
-      //      cout << "원래의 마법공격력 " << players[temp.target_id]->get_magical_attack() << endl;
-
-     //   }
-
             if (temp.ev == EVENT_PLAYER_ATTACK) {
                 reinterpret_cast<Player*>(players[temp.obj_id])->set_attack_active(false);
             }
@@ -2658,15 +2652,11 @@ void do_timer()
                     players[temp.obj_id]->set_physical_attack(0.3 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 10 * players[temp.obj_id]->get_lv());
                     players[temp.obj_id]->set_magical_attack(0.1 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 5 * players[temp.obj_id]->get_lv());
                  
-                    send_status_change_packet(reinterpret_cast<Player*>(players[temp.obj_id]));
-                   
-                    cout << players[temp.obj_id]->get_physical_attack() << endl;
-                    cout << players[temp.obj_id]->get_magical_attack() << endl;
+                    //send_status_change_packet(reinterpret_cast<Player*>(players[temp.obj_id]));
                 }
        
              
-                reinterpret_cast<Player*>(players[temp.obj_id])
-                    ->set_skill_active(temp.target_id, false);
+                reinterpret_cast<Player*>(players[temp.obj_id])->set_skill_active(temp.target_id, false);
             }
 
            
@@ -2680,7 +2670,7 @@ void do_timer()
 
         while (true) {
             timer_event ev;
-            if (timer_queue.size() == 0) break;
+            if (timer_queue.size() == 0) continue;
             timer_queue.try_pop(ev);
 
             dura = ev.start_time - chrono::system_clock::now();
@@ -2695,16 +2685,10 @@ void do_timer()
                     if (ev.target_id == 2) {  // 전사 BUFF
                         players[ev.obj_id]->set_physical_attack(0.3 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 10 * players[ev.obj_id]->get_lv());
                         players[ev.obj_id]->set_magical_attack(0.1 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 5 * players[ev.obj_id]->get_lv());
-
-                        
                         // 일단 이것을 넣으면 안돌아감(이유 모름)
-                      //  send_status_change_packet(reinterpret_cast<Player*>(players[ev.obj_id]));
-                        
-                          
-                        cout << players[ev.obj_id]->get_physical_attack() << endl;
-                        cout << players[ev.obj_id]->get_magical_defence() << endl;
+                        //send_status_change_packet(reinterpret_cast<Player*>(players[ev.obj_id]));
                     }
-                 
+            
                     reinterpret_cast<Player*>(players[ev.obj_id])
                         ->set_skill_active(ev.target_id, false);
                     continue;

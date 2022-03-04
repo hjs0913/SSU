@@ -517,8 +517,8 @@ void CGameFramework::BuildObjects()
 
 		// PlayerInfo( 2 : Info, 3: BasicHp, 4 : BasicMp, 3: Hp, 4 : Mp)
 		m_ppUILayer[2] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::Black);
-		m_ppUILayer[3] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::Black);
-		m_ppUILayer[4] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Blue, D2D1::ColorF::Black);
+		m_ppUILayer[3] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
+		m_ppUILayer[4] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Blue, D2D1::ColorF::White);
 		//m_ppUILayer[5] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::Black);
 		//m_ppUILayer[6] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Blue, D2D1::ColorF::Black);
 
@@ -535,7 +535,7 @@ void CGameFramework::BuildObjects()
 	m_ppUILayer[1]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 		DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 	m_ppUILayer[2]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
-		DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_FAR);
+		DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 	m_ppUILayer[3]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 		DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 	m_ppUILayer[4]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
@@ -831,7 +831,6 @@ void CGameFramework::FrameAdvance()
 
 
 	Send_str = L"";
-	Info_str = L"";
 	Hp_str = L"";
 	Mp_str = L"";
 	string temp_str;
@@ -857,14 +856,8 @@ void CGameFramework::FrameAdvance()
 			break;
 
 		case 2:
-			m_ppUILayer[i]->UpdateLabels(Info_str, 0, 0, (m_nWndClientWidth / 10)*3 + 10, (m_nWndClientHeight / 4));
+			m_ppUILayer[i]->UpdateLabels(Info_str, 0, 0, (m_nWndClientWidth / 10)*3 + 30, (m_nWndClientHeight / 4));
 			break;
-		/*case 3:
-			m_ppUILayer[i]->UpdateLabels(L"", 20, 40, (m_nWndClientWidth / 10) * 3, 60);
-			break;
-		case 4:
-			m_ppUILayer[i]->UpdateLabels(L"", 20, 60, (m_nWndClientWidth / 10) * 3, 80);
-			break;*/
 		case 3: {
 			Hp_str.append(L" Hp : ");
 			Hp_str.append(to_wstring(m_pPlayer->m_hp));

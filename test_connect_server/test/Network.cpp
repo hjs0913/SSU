@@ -23,8 +23,8 @@ WSABUF mybuf;
 vector<string> g_msg;
 
 wstring my_name = L"";
-wstring my_job = L"";
-wstring my_element = L"";
+wstring my_job_str = L"";
+wstring my_element_str = L"";
 wstring Info_str = L"";
 
 
@@ -217,9 +217,40 @@ void process_packet(unsigned char* p)
 		mPlayer[my_id]->m_max_mp = packet->maxmp;
 		mPlayer[my_id]->m_exp = packet->exp;
 		mPlayer[my_id]->m_tribe = static_cast<TRIBE>(packet->tribe);
+		my_element = packet->element;
+		my_job = packet->job;
+		
 
-		Info_str = L"sex";
+		wchar_t* temp;;
+		int len = 1 + strlen(mPlayer[my_id]->m_name);
+		temp = new TCHAR[len];
+		mbstowcs(temp, mPlayer[my_id]->m_name, len);
+		my_name.append(temp);
+		delete temp;
 
+		switch (my_element) {
+		case E_NONE: my_element_str = L"무속성"; break;
+		case E_WATER: my_element_str = L"물"; break;
+		case E_FULLMETAL: my_element_str = L"강철"; break;
+		case E_WIND: my_element_str = L"바람"; break;
+		case E_FIRE: my_element_str = L"불"; break;
+		case E_TREE: my_element_str = L"나무"; break;
+		case E_EARTH: my_element_str = L"땅"; break;
+		case E_ICE: my_element_str = L"얼음"; break;
+		}
+		switch (my_job) {
+		case J_DILLER: my_job_str = L"전사"; break;
+		case J_MAGISIAN: my_job_str = L"마법사"; break;
+		case J_SUPPORTER: my_job_str = L"서포터"; break;
+		case J_TANKER: my_job_str = L"탱커"; break;
+		}
+
+		Info_str.append(L"이름 : ");
+		Info_str.append(my_name);
+		Info_str.append(L"\n직업 : ");
+		Info_str.append(my_job_str);
+		Info_str.append(L"  속성 : ");
+		Info_str.append(my_element_str);
 
 		break;
 	}
@@ -275,6 +306,32 @@ void process_packet(unsigned char* p)
 		mPlayer[my_id]->m_exp = packet->exp;
 		my_element = packet->element;
 		my_job = packet->job;
+
+		Info_str = L"";
+		switch (my_element) {
+		case E_NONE: my_element_str = L"무속성"; break;
+		case E_WATER: my_element_str = L"물"; break;
+		case E_FULLMETAL: my_element_str = L"강철"; break;
+		case E_WIND: my_element_str = L"바람"; break;
+		case E_FIRE: my_element_str = L"불"; break;
+		case E_TREE: my_element_str = L"나무"; break;
+		case E_EARTH: my_element_str = L"땅"; break;
+		case E_ICE: my_element_str = L"얼음"; break;
+		}
+		switch (my_job) {
+		case J_DILLER: my_job_str = L"전사"; break;
+		case J_MAGISIAN: my_job_str = L"마법사"; break;
+		case J_SUPPORTER: my_job_str = L"서포터"; break;
+		case J_TANKER: my_job_str = L"탱커"; break;
+		}
+
+		Info_str.append(L"이름 : ");
+		Info_str.append(my_name);
+		Info_str.append(L"\n직업 : ");
+		Info_str.append(my_job_str);
+		Info_str.append(L"  속성 : ");
+		Info_str.append(my_element_str);
+
 		break;
 	}
 	case SC_PACKET_DEAD: {
