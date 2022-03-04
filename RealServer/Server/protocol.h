@@ -129,6 +129,7 @@ struct sc_packet_login_ok {
 	float	x, y, z;
 	short	level;
 	short	hp, maxhp;
+	short	mp, maxmp;
 	int		exp;
 	short	tribe;					// 기존 프로토콜에 없어서 추가해주었습니다
 	JOB job;
@@ -176,7 +177,8 @@ struct sc_packet_login_fail {
 
 struct sc_packet_status_change {
 	unsigned char size;
-	char	type;                           
+	char	type;         
+	int		id;
 	short	level;
 	short	hp, maxhp, mp, maxmp;
 	int		exp;
@@ -187,12 +189,14 @@ struct sc_packet_status_change {
 struct sc_packet_dead {
 	unsigned char size;
 	char type;
+	int id;
 	int attacker_id;
 };
 
 struct sc_packet_revive {
 	unsigned char size;
 	char type;
+	int id;
 	float	x, y, z;
 	int		hp;
 	int		exp;

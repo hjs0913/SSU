@@ -189,6 +189,7 @@ void magical_skill_success(int p_id, int target, float skill_factor)
             sc_packet_dead packet;
             packet.size = sizeof(packet);
             packet.type = SC_PACKET_DEAD;
+            packet.id = target;
             packet.attacker_id = p_id;
             reinterpret_cast<Player*>(players[target])->do_send(sizeof(packet), &packet);
 
@@ -543,6 +544,7 @@ void attack_success(int p_id, int target, float atk_factor)
             sc_packet_dead packet;
             packet.size = sizeof(packet);
             packet.type = SC_PACKET_DEAD;
+            packet.id = target;
             packet.attacker_id = p_id;
             reinterpret_cast<Player*>(players[target]) ->do_send(sizeof(packet), &packet);
             
@@ -1504,6 +1506,7 @@ void player_revive(int client_id)
     sc_packet_revive packet;
     packet.size = sizeof(packet);
     packet.type = SC_PACKET_REVIVE;
+    packet.id = client_id;
     packet.x = pl->get_x();
     packet.y = pl->get_y();
     packet.z = pl->get_z();

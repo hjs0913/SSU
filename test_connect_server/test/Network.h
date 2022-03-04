@@ -27,6 +27,11 @@ extern vector<string> g_msg;
 extern JOB my_job;
 extern ELEMENT my_element;
 
+extern wstring my_name;
+extern wstring my_job;
+extern wstring my_element;
+extern wstring Info_str;
+
 void err_quit(const char* msg);
 
 void err_display(const char* msg);
