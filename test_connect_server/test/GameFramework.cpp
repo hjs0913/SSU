@@ -380,7 +380,56 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			}
 			break;
 		case VK_F1:
+			switch (my_job)
+			{
+			case J_DILLER:
+				my_job = J_TANKER;
+				break;
+			case J_TANKER:
+				my_job = J_MAGISIAN;
+				break;
+			case J_MAGISIAN:
+				my_job = J_SUPPORTER;
+				break;
+			case J_SUPPORTER:
+				my_job = J_DILLER;
+				break;
+			default:
+				break;
+			}
+			send_change_job_packet(my_job);
+			break;
 		case VK_F2:
+			switch (my_element)
+			{
+			case E_NONE:
+				my_element = E_WATER;
+				break;
+			case E_WATER:
+				my_element = E_FULLMETAL;
+				break;
+			case E_FULLMETAL:
+				my_element = E_WIND;
+				break;
+			case E_WIND:
+				my_element = E_FIRE;
+				break;
+			case E_FIRE:
+				my_element = E_TREE;
+				break;
+			case E_TREE:
+				my_element = E_EARTH;
+				break;
+			case E_EARTH:
+				my_element = E_ICE;
+			case E_ICE:
+				my_element = E_NONE;
+				break;
+			default:
+				break;
+			}
+			send_change_element_packet(my_element);
+			break;
 		case VK_F3:
 				m_pCamera = m_pPlayer->ChangeCamera((DWORD)(wParam - VK_F1 + 1), m_GameTimer.GetTimeElapsed());
 			break;

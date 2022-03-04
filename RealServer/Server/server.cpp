@@ -434,8 +434,13 @@ void physical_skill_success(int p_id, int target, float skill_factor)
     }
 }
 
+bool superposition = false; //이거를 npc마다 다 주자 
+
 void attack_success(int p_id, int target, float atk_factor)
 {
+
+
+
     // 현재 물리 공격에 대해서만 생각한다
     float give_damage = players[p_id]->get_physical_attack() * atk_factor;
     float defence_damage = (players[target]->get_defence_factor() *
@@ -448,7 +453,83 @@ void attack_success(int p_id, int target, float atk_factor)
         << players[target]->get_name() << "에게 입혀"
         << target_hp << "의 피가 남음" << endl;
 
+
     players[target]->set_hp(target_hp);
+
+    timer_event ev;
+    ev.obj_id = p_id;
+    ev.start_time = chrono::system_clock::now() + 10s;  //쿨타임
+    ev.ev = EVENT_ELEMENT_COOLTIME;;
+    ev.target_id = target;
+    timer_queue.push(ev);
+
+    cout << "공격자  속성" << reinterpret_cast<Player*>(players[p_id])->get_element() << endl;
+
+    
+    switch (reinterpret_cast<Player*>(players[p_id])->get_element())
+    {
+     if(superposition)
+    case E_WATER:
+        if (players[target]->get_element() == E_FULLMETAL || players[target]->get_element() == E_FIRE
+            || players[target]->get_element() == E_EARTH) {
+            players[target]->set_magical_attack(players[target]->get_magical_attack() / 10 * 9);
+            superposition = true;//npc안에 별도로 만들자 
+        }
+        cout << "타켓의 마공:" << players[target]->get_magical_attack() << endl;
+        break;
+    case E_FULLMETAL:
+        if (players[target]->get_element() == E_ICE || players[target]->get_element() == E_TREE
+            || players[target]->get_element() == E_WIND) {
+            reinterpret_cast<Player*>(players[p_id])->set_physical_defence(reinterpret_cast<Player*>(players[p_id])->get_physical_defence() + reinterpret_cast<Player*>(players[p_id])->get_physical_defence() / 10);
+            superposition = true;
+        }
+        break;
+    case E_WIND:
+        if (players[target]->get_element() == E_WATER || players[target]->get_element() == E_EARTH
+            || players[target]->get_element() == E_FIRE) {
+           //공속 시전속도 상승 , 쿨타임 감소 
+            superposition = true;//npc안에 별도로 만들자 
+        }
+        break;
+    case E_FIRE:
+        if (players[target]->get_element() == E_ICE || players[target]->get_element() == E_TREE
+            || players[target]->get_element() == E_FULLMETAL) {
+        //10초 공격력 10프로의 화상 피해 
+            superposition = true;//npc안에 별도로 만들자 
+        }
+        break;
+    case E_TREE:
+        if (players[target]->get_element() == E_EARTH || players[target]->get_element() == E_WATER
+            || players[target]->get_element() == E_WIND) {
+            players[target]->set_physical_attack(players[target]->get_physical_attack() / 10 * 9);
+            superposition = true;//npc안에 별도로 만들자 
+        }
+        break;
+    case E_EARTH:
+        if (players[target]->get_element() == E_ICE || players[target]->get_element() == E_FULLMETAL
+            || players[target]->get_element() == E_FIRE) {
+            reinterpret_cast<Player*>(players[p_id])->set_magical_defence(reinterpret_cast<Player*>(players[p_id])->get_magical_defence() + reinterpret_cast<Player*>(players[p_id])->get_magical_defence() / 10);
+            superposition = true;//npc안에 별도로 만들자 
+        }
+        break;
+    case E_ICE:
+        if (players[target]->get_element() == E_TREE || players[target]->get_element() == E_WATER
+            || players[target]->get_element() == E_WIND) {
+         //동결 and  10초동안 공속, 시전속도, 이동속도 10프로감소 
+            superposition = true;//npc안에 별도로 만들자 
+        }
+        break;
+    default:
+        break;
+    }
+
+    ;
+  //  EXP_OVER* exp_over = new EXP_OVER;
+   // exp_over->_comp_op = OP_ELEMENT_COOLTIME;
+  //  exp_over->_target = target;
+  //  PostQueuedCompletionStatus(g_h_iocp, p_id, target, &exp_over->_wsa_over);
+
+
     if (target_hp <= 0) {
         players[target]->state_lock.lock();
         if(players[target]->get_state()!=ST_INGAME){
@@ -598,6 +679,7 @@ bool isInsideTriangle(Coord a, Coord b, Coord c, Coord n)
 }
 void process_packet(int client_id, unsigned char* p)
 {
+   
     unsigned char packet_type = p[1];
     Player* pl = reinterpret_cast<Player*>(players[client_id]);
     switch (packet_type) {
@@ -637,6 +719,7 @@ void process_packet(int client_id, unsigned char* p)
         pl->set_z(1940);
         pl->set_job(J_TANKER);
         pl->set_lv(25);
+        pl->set_element(E_WATER);
         pl->set_name("정의범");
         switch (pl->get_job()) {
         case J_DILLER: {
@@ -665,6 +748,7 @@ void process_packet(int client_id, unsigned char* p)
             pl->set_magical_defence(0.2 * lv * lv + 10 * lv);
             pl->set_basic_attack_factor(50.0f);
             pl->set_defence_factor(0.0002);
+            pl->set_element(E_WATER);
             break;
         }
         case J_SUPPORTER: {  //값은 바꿔야함 
@@ -968,6 +1052,8 @@ void process_packet(int client_id, unsigned char* p)
     case CS_PACKET_ATTACK: {
         // cs_packet_attack* packet = reinterpret_cast<cs_packet_attack*>(p);
         // 플레이어가 공격하고 반경 1칸 이내에 몬스터가 있다면 전투
+
+
         if (pl->get_attack_active()) break;
         pl->set_attack_active(true);
 
@@ -1382,7 +1468,20 @@ void process_packet(int client_id, unsigned char* p)
         }
         break;
     }
-
+    case CS_PACKET_CHANGE_JOB: {
+        cs_packet_change_job* packet = reinterpret_cast<cs_packet_change_job*>(p);
+        pl->set_job(packet->job);
+        cout << "내 직업은" << packet->job << "번 입니다." << endl;
+        send_status_change_packet(pl);
+        break;
+    }
+    case CS_PACKET_CHANGE_ELEMENT: {
+        cs_packet_change_element* packet = reinterpret_cast<cs_packet_change_element*>(p);
+        pl->set_element(packet->element);
+        cout << "내 속성은" << packet->element << "번 입니다." << endl;
+        send_status_change_packet(pl);
+        break;
+    }
     }
 }
 
@@ -1704,7 +1803,7 @@ void worker()
             delete exp_over;
             break;
         }
-       
+                        
         case OP_AUTO_PLAYER_HP: {
             /*
             Player* pl = reinterpret_cast<Player*>(players[client_id]);
@@ -1777,7 +1876,13 @@ void worker()
             delete exp_over;
             break;
         }
-        case OP_NPC_AGRO:
+        case OP_ELEMENT_COOLTIME:
+
+            timer_event ev;
+
+            cout << "여기" << endl;
+            cout << "클라 속성 " << players[ev.obj_id]->get_element() << endl;
+            cout << "타켓 속성 " << players[ev.target_id]->get_element() << endl;
             players[client_id]->state_lock.lock();
             if ((players[client_id]->get_state() != ST_INGAME)) {
                 players[client_id]->state_lock.unlock();
@@ -1786,32 +1891,34 @@ void worker()
                 break;
             }
             players[client_id]->state_lock.unlock();
-            // 제자리로 돌아가는 것인가
-            if (exp_over->_target == -1) {
-                return_npc_position(client_id);
-                delete exp_over;
+            
+            switch (players[client_id]->get_element())  
+            {
+            case E_WATER:
+             
+                if(players[exp_over->_target]->get_element() == E_FULLMETAL || players[exp_over->_target]->get_element() == E_FIRE
+                    || players[exp_over->_target]->get_element() == E_EARTH)
+                players[exp_over->_target]->set_magical_attack(players[exp_over->_target]->get_magical_attack() / 10 * 9);
+
+                cout << "타켓의 마공:"<< players[exp_over->_target]->get_magical_attack() << endl;
+                break;
+            case E_FULLMETAL:
+                break;
+            case E_WIND:
+                break;
+            case E_FIRE:
+                break;
+            case E_TREE:
+                break;
+            case E_EARTH:
+                break;
+            case E_ICE:
+                break;
+            default:
                 break;
             }
-
-            int target_id = exp_over->_target;
-            players[target_id]->state_lock.lock();
-
-            //쫒아가던 타겟이 살아있는가
-            if (players[target_id]->get_state() != ST_INGAME) {
-                players[target_id]->state_lock.unlock();
-                players[client_id]->set_active(false);
-                return_npc_position(client_id);
-                delete exp_over;
-                break;
-            }
-            players[target_id]->state_lock.unlock();
-
-            if (players[client_id]->get_target_id() != -1)
-                do_npc_move(client_id, exp_over->_target);
-
-   
-            delete exp_over;
-
+             delete exp_over;
+            break;
 
         }
     }
@@ -1881,11 +1988,12 @@ void initialise_NPC()
         lua_pushnumber(L, temp_x);
         lua_pushnumber(L, temp_y);
         lua_pushnumber(L, temp_z);
-        error = lua_pcall(L, 4, 9, 0);
+        error = lua_pcall(L, 4, 10, 0);
 
         if (error != 0) {
             cout << "초기화 오류" << endl;
         }
+        players[i]->set_element(static_cast<ELEMENT>(lua_tointeger(L, -10)));
         players[i]->set_lv(lua_tointeger(L, -9));
         players[i]->set_name(lua_tostring(L, -8));
         players[i]->set_hp(lua_tointeger(L, -7));
@@ -1934,11 +2042,12 @@ void initialise_NPC()
         lua_pushnumber(L, temp_x);
         lua_pushnumber(L, temp_y);
         lua_pushnumber(L, temp_z);
-        error = lua_pcall(L, 4, 9, 0);
+        error = lua_pcall(L, 4, 10, 0);
 
         if (error != 0) {
             cout << "초기화 오류" << endl;
         }
+        players[i]->set_element(static_cast<ELEMENT>(lua_tointeger(L, -10)));
         players[i]->set_lv(lua_tointeger(L, -9));
         players[i]->set_name(lua_tostring(L, -8));
         players[i]->set_hp(lua_tointeger(L, -7));
@@ -1985,11 +2094,12 @@ void initialise_NPC()
         lua_pushnumber(L, temp_x);
         lua_pushnumber(L, temp_y);
         lua_pushnumber(L, temp_z);
-        error = lua_pcall(L, 4, 9, 0);
+        error = lua_pcall(L, 4, 10, 0);
 
         if (error != 0) {
             cout << "초기화 오류" << endl;
         }
+        players[i]->set_element(static_cast<ELEMENT>(lua_tointeger(L, -10)));
         players[i]->set_lv(lua_tointeger(L, -9));
         players[i]->set_name(lua_tostring(L, -8));
         players[i]->set_hp(lua_tointeger(L, -7));
@@ -2034,10 +2144,11 @@ void initialise_NPC()
         lua_pushnumber(L, temp_x);
         lua_pushnumber(L, temp_y);
         lua_pushnumber(L, temp_z);
-        error = lua_pcall(L, 4, 9, 0);
+        error = lua_pcall(L, 4, 10, 0);
         if (error != 0) {
             cout << "초기화 오류" << endl;
         }
+        players[i]->set_element(static_cast<ELEMENT>(lua_tointeger(L, -10)));
         players[i]->set_lv(lua_tointeger(L, -9));
         players[i]->set_name(lua_tostring(L, -8));
         players[i]->set_hp(lua_tointeger(L, -7));
@@ -2083,11 +2194,12 @@ void initialise_NPC()
         lua_pushnumber(L, temp_x);
         lua_pushnumber(L, temp_y);
         lua_pushnumber(L, temp_z);
-        error = lua_pcall(L, 4, 9, 0);
+        error = lua_pcall(L, 4, 10, 0);
 
         if (error != 0) {
             cout << "초기화 오류" << endl;
         }
+        players[i]->set_element(static_cast<ELEMENT>(lua_tointeger(L, -10)));
         players[i]->set_lv(lua_tointeger(L, -9));
         players[i]->set_name(lua_tostring(L, -8));
         players[i]->set_hp(lua_tointeger(L, -7));
@@ -2134,11 +2246,12 @@ void initialise_NPC()
         lua_pushnumber(L, temp_x);
         lua_pushnumber(L, temp_y);
         lua_pushnumber(L, temp_z);
-        error = lua_pcall(L, 4, 9, 0);
+        error = lua_pcall(L, 4, 10, 0);
 
         if (error != 0) {
             cout << "초기화 오류" << endl;
         }
+        players[i]->set_element(static_cast<ELEMENT>(lua_tointeger(L, -10)));
         players[i]->set_lv(lua_tointeger(L, -9));
         players[i]->set_name(lua_tostring(L, -8));
         players[i]->set_hp(lua_tointeger(L, -7));
@@ -2148,6 +2261,7 @@ void initialise_NPC()
         players[i]->set_magical_defence(lua_tonumber(L, -3));
         players[i]->set_basic_attack_factor(lua_tointeger(L, -2));
         players[i]->set_defence_factor(lua_tonumber(L, -1));
+
         lua_pop(L, 10);// eliminate set_uid from stack after call
 
         // 여기는 나중에 생각하자
@@ -2512,8 +2626,8 @@ COMP_OP EVtoOP(EVENT_TYPE ev) {
         return OP_NPC_REVIVE;
         break;
 
-    case EVENT_NPC_AGRO:
-        return OP_NPC_AGRO;
+    case EVENT_ELEMENT_COOLTIME:
+       // return OP_ELEMENT_COOLTIME;
         break;
     }
 
@@ -2528,6 +2642,14 @@ void do_timer()
     while (true) {
         if (temp_bool) {
             temp_bool = false;
+
+     //   else if (temp.ev == EVENT_ELEMENT_COOLTIME) {
+      //      superposition = false;
+      //      players[temp.target_id]->set_magical_attack(players[temp.target_id]->get_magical_attack() / 9 + players[temp.target_id]->get_magical_attack());
+      //      cout << "원래의 마법공격력 " << players[temp.target_id]->get_magical_attack() << endl;
+
+     //   }
+
             if (temp.ev == EVENT_PLAYER_ATTACK) {
                 reinterpret_cast<Player*>(players[temp.obj_id])->set_attack_active(false);
             }
@@ -2546,6 +2668,8 @@ void do_timer()
                 reinterpret_cast<Player*>(players[temp.obj_id])
                     ->set_skill_active(temp.target_id, false);
             }
+
+           
             else {
                 EXP_OVER* ex_over = new EXP_OVER;
                 ex_over->_comp_op = EVtoOP(temp.ev);
@@ -2566,11 +2690,11 @@ void do_timer()
                     reinterpret_cast<Player*>(players[ev.obj_id])->set_attack_active(false);
                     continue;
                 }
-                
+        
                 if (ev.ev == EVENT_SKILL_COOLTIME) {
                     if (ev.target_id == 2) {  // 전사 BUFF
                         players[ev.obj_id]->set_physical_attack(0.3 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 10 * players[ev.obj_id]->get_lv());
-                        players[temp.obj_id]->set_magical_attack(0.1 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 5 * players[ev.obj_id]->get_lv());
+                        players[ev.obj_id]->set_magical_attack(0.1 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 5 * players[ev.obj_id]->get_lv());
 
                         
                         // 일단 이것을 넣으면 안돌아감(이유 모름)
