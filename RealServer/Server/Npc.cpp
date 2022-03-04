@@ -296,3 +296,12 @@ int  Npc::get_target_id()
 {
 	return _target_id;
 }
+
+void Npc::set_element(ELEMENT element)
+{
+	_element = element;
+}
+ELEMENT Npc::get_element()
+{
+	return _element;
+}

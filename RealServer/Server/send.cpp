@@ -15,6 +15,8 @@ void send_login_ok_packet(Player* pl)
     packet.maxhp = pl->get_maxhp();
     packet.exp = pl->get_exp();
     packet.tribe = pl->get_tribe();
+    packet.job = pl->get_job();
+    packet.element = pl->get_element();
     pl->do_send(sizeof(packet), &packet);
 }
 
@@ -96,6 +98,8 @@ void send_status_change_packet(Player* pl)
     packet.mp = pl->get_mp();
     packet.maxmp = pl->get_maxmp();
     packet.exp = pl->get_exp();
+    packet.job = pl->get_job();
+    packet.element = pl->get_element();
     pl->do_send(sizeof(packet), &packet);
 }
 

@@ -1,4 +1,5 @@
 my_id = 99999;
+my_element = 1;
 my_lv = 12;
 my_name = "타락한 개구리";
 my_hp = 100000;
@@ -17,7 +18,7 @@ function set_uid(id, x, y, z)
    my_x = x;
    my_y = y;
    my_z = z;
-   return my_lv, my_name, my_hp, my_physical_attack, my_magical_attck, 
+   return my_element, my_lv, my_name, my_hp, my_physical_attack, my_magical_attck, 
         my_phsical_defence, my_magical_defence, my_basic_attack_factor, my_defence_factor;
 end
 

@@ -8,6 +8,7 @@ protected:
     int                 _login_id;
     int		            _exp;
     JOB                 _job;
+    ELEMENT             _element;
     int                 _mp;
     int                 _max_mp;
 
@@ -116,5 +117,7 @@ public:
     void set_Pmp(int mp);
     int get_Pmaxmp();
     void set_Pmaxmp(int mp);
- 
+
+    void set_element(ELEMENT element);
+    ELEMENT get_element();
 };
