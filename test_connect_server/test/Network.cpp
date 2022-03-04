@@ -5,6 +5,8 @@
 
 int my_id = 0;
 int m_prev_size = 0;
+JOB my_job = J_DILLER;
+ELEMENT my_element = E_NONE;
 
 XMFLOAT3 my_position(-1.0f, 5.0f, -1.0f);
 XMFLOAT3 my_camera(0.0f, 0.0f, 0.0f);
@@ -113,7 +115,24 @@ void send_skill_packet(int sk_t, int sk_n)
 	do_send(sizeof(packet), &packet);
 
 }
+void send_change_job_packet(JOB my_job)
+{
+	cs_packet_change_job packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_CHANGE_JOB;
+	packet.job = my_job;
+	do_send(sizeof(packet), &packet);
 
+}
+void send_change_element_packet(ELEMENT my_element)
+{
+	cs_packet_change_element packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_CHANGE_ELEMENT;
+	packet.element = my_element;
+	do_send(sizeof(packet), &packet);
+
+}
 void send_chat_packet(const char* send_str)
 {
 	cs_packet_chat packet;
@@ -184,6 +203,9 @@ void process_packet(unsigned char* p)
 		my_position.x = packet->x;
 		my_position.y = packet->y;
 		my_position.z = packet->z;
+		my_job = packet->job;
+		my_element = packet->element;
+	
 		break;
 	}
 	case SC_PACKET_MOVE: {
@@ -230,6 +252,11 @@ void process_packet(unsigned char* p)
 	}
 	case SC_PACKET_STATUS_CHANGE: {
 		// 아직 미구현
+		sc_packet_status_change* packet = reinterpret_cast<sc_packet_status_change*>(p);
+
+		
+		my_element = packet->element;
+		my_job = packet->job;
 		break;
 	}
 	case SC_PACKET_DEAD: {

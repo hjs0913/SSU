@@ -5,18 +5,18 @@
 enum STATE { ST_FREE, ST_ACCEPT, ST_INGAME, ST_DEAD };
 enum COMP_OP { OP_RECV, OP_SEND, OP_ACCEPT, OP_NPC_MOVE,
 	OP_NPC_ATTACK, OP_AUTO_PLAYER_HP, OP_PLAYER_REVIVE, OP_NPC_REVIVE,
-	OP_PLAYER_ATTACK, OP_NPC_AGRO
+	OP_PLAYER_ATTACK, OP_NPC_AGRO, OP_ELEMENT_COOLTIME
 };
 enum EVENT_TYPE {
 	EVENT_NPC_MOVE, EVENT_NPC_ATTACK, EVENT_AUTO_PLAYER_HP,
 	EVENT_PLAYER_REVIVE, EVENT_NPC_REVIVE, EVENT_PLAYER_ATTACK,
-	EVENT_SKILL_COOLTIME, EVENT_NPC_AGRO
+	EVENT_SKILL_COOLTIME, EVENT_NPC_AGRO, EVENT_ELEMENT_COOLTIME
 };
 enum TRIBE { HUMAN, MONSTER, AGRO, BOSS, OBSTACLE };
 enum BUF_TYPE { B_NONE, B_PHYATTACK, B_MAGATTACK, B_PHYDEFENCE, 
 	B_MAGDEFENCE, B_SPEED, B_BURN };
-enum ELEMENT { E_NONE, E_WATER, E_FULLMETAL, E_WIND, E_FIRE, E_TREE, E_EARTH, E_ICE };
-enum JOB {J_DILLER, J_TANKER, J_MAGISIAN, J_SUPPORTER};
+enum ELEMENT { E_NONE = 0, E_WATER, E_FULLMETAL, E_WIND, E_FIRE, E_TREE, E_EARTH, E_ICE = 7};
+enum JOB { J_DILLER = 0, J_TANKER, J_MAGISIAN, J_SUPPORTER = 3 };
 enum MONSTER_SPECIES{FALLEN_FLOG, FALLEN_CHICKEN, FALLEN_RABBIT, 
 	FALLEN_MONKEY, WOLF_BOSS, FALLEN_TIGER};
 
@@ -46,6 +46,9 @@ const char CS_PACKET_CHAT = 4;
 const char CS_PACKET_TELEPORT = 5;
 const char CS_PACKET_SKILL = 6;
 const char CS_PACKET_LOOK = 7;
+const char CS_PACKET_CHANGE_JOB = 8;
+const char CS_PACKET_CHANGE_ELEMENT = 9;
+
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -57,6 +60,8 @@ const char SC_PACKET_STATUS_CHANGE = 7;
 const char SC_PACKET_DEAD = 8;
 const char SC_PACKET_REVIVE = 9;
 const char SC_PACKET_LOOK = 10;
+const char SC_PACKET_CHANGE_JOB = 11;
+const char SX_PACKET_CHANGE_ELEMENT = 12;
 //---------------------------------------------------
 #pragma pack (push, 1)
 struct cs_packet_login {
@@ -106,6 +111,16 @@ struct cs_packet_look {
 	float right_x, right_y, right_z;	// right
 };
 
+struct cs_packet_change_job {
+	unsigned char size;
+	char type;
+	JOB job;
+};
+struct cs_packet_change_element {
+	unsigned char size;
+	char type;
+	ELEMENT element;
+};
 struct sc_packet_login_ok {
 	unsigned char size;
 	char type;
@@ -116,6 +131,8 @@ struct sc_packet_login_ok {
 	short	hp, maxhp;
 	int		exp;
 	short	tribe;					// 기존 프로토콜에 없어서 추가해주었습니다
+	JOB job;
+	ELEMENT element;
 };
 
 struct sc_packet_move {
@@ -163,6 +180,8 @@ struct sc_packet_status_change {
 	short	level;
 	short	hp, maxhp, mp, maxmp;
 	int		exp;
+	JOB job;
+	ELEMENT element;
 };
 
 struct sc_packet_dead {
