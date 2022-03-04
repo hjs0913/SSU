@@ -2,7 +2,7 @@
 
 #define FRAME_BUFFER_WIDTH		640
 #define FRAME_BUFFER_HEIGHT		480
-#define UICOUNT 2
+#define UICOUNT 5
 
 //#include "Timer.h"
 #include "Player.h"

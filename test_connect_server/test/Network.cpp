@@ -4,6 +4,7 @@
 //#include "GameFramework.h"
 
 int my_id = 0;
+
 int m_prev_size = 0;
 
 XMFLOAT3 my_position(-1.0f, 5.0f, -1.0f);
@@ -19,6 +20,12 @@ WSABUF mybuf_recv;
 WSABUF mybuf;
 
 vector<string> g_msg;
+
+wstring my_name = L"";
+wstring my_job = L"";
+wstring my_element = L"";
+wstring Info_str = L"";
+
 
 struct EXP_OVER {
 	WSAOVERLAPPED m_wsa_over;
@@ -184,6 +191,18 @@ void process_packet(unsigned char* p)
 		my_position.x = packet->x;
 		my_position.y = packet->y;
 		my_position.z = packet->z;
+		mPlayer[my_id]->m_lv = packet->level;
+		strcpy_s(mPlayer[my_id]->m_name, MAX_NAME_SIZE, packet->name);
+		mPlayer[my_id]->m_hp = packet->hp;
+		mPlayer[my_id]->m_max_hp = packet->maxhp;
+		mPlayer[my_id]->m_mp = packet->mp;
+		mPlayer[my_id]->m_max_mp = packet->maxmp;
+		mPlayer[my_id]->m_exp = packet->exp;
+		mPlayer[my_id]->m_tribe = static_cast<TRIBE>(packet->tribe);
+
+		Info_str = L"sex";
+
+
 		break;
 	}
 	case SC_PACKET_MOVE: {
@@ -229,7 +248,13 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_STATUS_CHANGE: {
-		// 아직 미구현
+		sc_packet_status_change* packet = reinterpret_cast<sc_packet_status_change*>(p);
+		mPlayer[packet->id]->m_lv = packet->level;
+		mPlayer[my_id]->m_hp = packet->hp;
+		mPlayer[my_id]->m_mp = packet->mp;
+		mPlayer[my_id]->m_max_hp = packet->maxhp;
+		mPlayer[my_id]->m_max_mp = packet->maxmp;
+		mPlayer[my_id]->m_exp = packet->exp;
 		break;
 	}
 	case SC_PACKET_DEAD: {
@@ -381,6 +406,8 @@ void get_basic_information(CPlayer* m_otherPlayer, int id)
 	//m_otherPlayer->m_name = ;
 	m_otherPlayer->m_hp = mPlayer[id]->m_hp;
 	m_otherPlayer->m_max_hp = mPlayer[id]->m_max_hp;
+	m_otherPlayer->m_mp = mPlayer[id]->m_mp;
+	m_otherPlayer->m_max_mp = mPlayer[id]->m_max_mp;
 	m_otherPlayer->m_lv = mPlayer[id]->m_lv;
 	m_otherPlayer->m_tribe = mPlayer[id]->m_tribe;
 	m_otherPlayer->m_spices = mPlayer[id]->m_spices;

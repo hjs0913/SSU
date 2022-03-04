@@ -111,10 +111,4 @@ public:
     int get_exp();
 
     JOB get_job();
-
-    int get_Pmp();
-    void set_Pmp(int mp);
-    int get_Pmaxmp();
-    void set_Pmaxmp(int mp);
- 
 };

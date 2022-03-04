@@ -25,6 +25,10 @@ extern int my_id;
 extern int m_prev_recv;
 extern vector<string> g_msg;
 
+extern wstring my_name;
+extern wstring my_job;
+extern wstring my_element;
+extern wstring Info_str;
 
 void err_quit(const char* msg);
 

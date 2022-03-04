@@ -33,20 +33,3 @@ JOB Player::get_job()
 {
     return _job;
 }
-
-int Player::get_Pmp()
-{
-    return _mp;
-}
-void Player::set_Pmp(int mp) 
-{
-    _mp = mp;
-}
-int Player::get_Pmaxmp()
-{
-    return _max_mp;
-}
-void Player::set_Pmaxmp(int mp)
-{
-    _max_mp = mp;
-}
