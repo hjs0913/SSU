@@ -28,8 +28,8 @@ extern JOB my_job;
 extern ELEMENT my_element;
 
 extern wstring my_name;
-extern wstring my_job;
-extern wstring my_element;
+extern wstring my_job_str;
+extern wstring my_element_str;
 extern wstring Info_str;
 
 void err_quit(const char* msg);

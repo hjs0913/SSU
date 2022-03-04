@@ -72,6 +72,7 @@ void UILayer::Initialize(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dComma
     m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(LayoutColor), (ID2D1SolidColorBrush**)&m_pBrush);
     m_pBrush->SetColor(D2D1::ColorF(LayoutColor));
     m_pBrush->SetOpacity(0.5);
+    m_TextColor = TextColor;
 }
 
 void UILayer::UpdateLabels(const std::wstring& strUIText, UINT LeftTop_x, UINT LeftTop_y, UINT RightBottom_x, UINT RightBottom_y)
@@ -146,7 +147,7 @@ void UILayer::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT nHei
     m_pd2dDevice->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, &m_pd2dDeviceContext);
     m_pd2dDeviceContext->SetTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE);
     if (m_pd2dTextBrush) m_pd2dTextBrush->Release();
-    m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &m_pd2dTextBrush);
+    m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(m_TextColor), &m_pd2dTextBrush);
 
     const float fFontSize = m_fHeight / 25.0f;
     const float fSmallFontSize = m_fHeight / 40.0f;

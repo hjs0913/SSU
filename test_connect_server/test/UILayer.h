@@ -24,6 +24,7 @@ protected:
 
     float m_fWidth;
     float m_fHeight;
+    D2D1::ColorF m_TextColor = D2D1::ColorF::White;
 
     ID3D11DeviceContext*            m_pd3d11DeviceContext = NULL;
     ID3D11On12Device*               m_pd3d11On12Device = NULL;
