@@ -5,6 +5,8 @@
 
 int my_id = 0;
 int m_prev_size = 0;
+JOB my_job = J_DILLER;
+ELEMENT my_element = E_NONE;
 
 XMFLOAT3 my_position(-1.0f, 5.0f, -1.0f);
 XMFLOAT3 my_camera(0.0f, 0.0f, 0.0f);
@@ -19,6 +21,12 @@ WSABUF mybuf_recv;
 WSABUF mybuf;
 
 vector<string> g_msg;
+
+wstring my_name = L"";
+wstring my_job_str = L"";
+wstring my_element_str = L"";
+wstring Info_str = L"";
+
 
 struct EXP_OVER {
 	WSAOVERLAPPED m_wsa_over;
@@ -113,7 +121,24 @@ void send_skill_packet(int sk_t, int sk_n)
 	do_send(sizeof(packet), &packet);
 
 }
+void send_change_job_packet(JOB my_job)
+{
+	cs_packet_change_job packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_CHANGE_JOB;
+	packet.job = my_job;
+	do_send(sizeof(packet), &packet);
 
+}
+void send_change_element_packet(ELEMENT my_element)
+{
+	cs_packet_change_element packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_CHANGE_ELEMENT;
+	packet.element = my_element;
+	do_send(sizeof(packet), &packet);
+
+}
 void send_chat_packet(const char* send_str)
 {
 	cs_packet_chat packet;
@@ -184,6 +209,49 @@ void process_packet(unsigned char* p)
 		my_position.x = packet->x;
 		my_position.y = packet->y;
 		my_position.z = packet->z;
+		mPlayer[my_id]->m_lv = packet->level;
+		strcpy_s(mPlayer[my_id]->m_name, MAX_NAME_SIZE, packet->name);
+		mPlayer[my_id]->m_hp = packet->hp;
+		mPlayer[my_id]->m_max_hp = packet->maxhp;
+		mPlayer[my_id]->m_mp = packet->mp;
+		mPlayer[my_id]->m_max_mp = packet->maxmp;
+		mPlayer[my_id]->m_exp = packet->exp;
+		mPlayer[my_id]->m_tribe = static_cast<TRIBE>(packet->tribe);
+		my_element = packet->element;
+		my_job = packet->job;
+		
+
+		wchar_t* temp;;
+		int len = 1 + strlen(mPlayer[my_id]->m_name);
+		temp = new TCHAR[len];
+		mbstowcs(temp, mPlayer[my_id]->m_name, len);
+		my_name.append(temp);
+		delete temp;
+
+		switch (my_element) {
+		case E_NONE: my_element_str = L"무속성"; break;
+		case E_WATER: my_element_str = L"물"; break;
+		case E_FULLMETAL: my_element_str = L"강철"; break;
+		case E_WIND: my_element_str = L"바람"; break;
+		case E_FIRE: my_element_str = L"불"; break;
+		case E_TREE: my_element_str = L"나무"; break;
+		case E_EARTH: my_element_str = L"땅"; break;
+		case E_ICE: my_element_str = L"얼음"; break;
+		}
+		switch (my_job) {
+		case J_DILLER: my_job_str = L"전사"; break;
+		case J_MAGISIAN: my_job_str = L"마법사"; break;
+		case J_SUPPORTER: my_job_str = L"서포터"; break;
+		case J_TANKER: my_job_str = L"탱커"; break;
+		}
+
+		Info_str.append(L"이름 : ");
+		Info_str.append(my_name);
+		Info_str.append(L"\n직업 : ");
+		Info_str.append(my_job_str);
+		Info_str.append(L"  속성 : ");
+		Info_str.append(my_element_str);
+
 		break;
 	}
 	case SC_PACKET_MOVE: {
@@ -229,7 +297,41 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_STATUS_CHANGE: {
-		// 아직 미구현
+		sc_packet_status_change* packet = reinterpret_cast<sc_packet_status_change*>(p);
+		mPlayer[packet->id]->m_lv = packet->level;
+		mPlayer[my_id]->m_hp = packet->hp;
+		mPlayer[my_id]->m_mp = packet->mp;
+		mPlayer[my_id]->m_max_hp = packet->maxhp;
+		mPlayer[my_id]->m_max_mp = packet->maxmp;
+		mPlayer[my_id]->m_exp = packet->exp;
+		my_element = packet->element;
+		my_job = packet->job;
+
+		Info_str = L"";
+		switch (my_element) {
+		case E_NONE: my_element_str = L"무속성"; break;
+		case E_WATER: my_element_str = L"물"; break;
+		case E_FULLMETAL: my_element_str = L"강철"; break;
+		case E_WIND: my_element_str = L"바람"; break;
+		case E_FIRE: my_element_str = L"불"; break;
+		case E_TREE: my_element_str = L"나무"; break;
+		case E_EARTH: my_element_str = L"땅"; break;
+		case E_ICE: my_element_str = L"얼음"; break;
+		}
+		switch (my_job) {
+		case J_DILLER: my_job_str = L"전사"; break;
+		case J_MAGISIAN: my_job_str = L"마법사"; break;
+		case J_SUPPORTER: my_job_str = L"서포터"; break;
+		case J_TANKER: my_job_str = L"탱커"; break;
+		}
+
+		Info_str.append(L"이름 : ");
+		Info_str.append(my_name);
+		Info_str.append(L"\n직업 : ");
+		Info_str.append(my_job_str);
+		Info_str.append(L"  속성 : ");
+		Info_str.append(my_element_str);
+
 		break;
 	}
 	case SC_PACKET_DEAD: {
@@ -381,6 +483,8 @@ void get_basic_information(CPlayer* m_otherPlayer, int id)
 	//m_otherPlayer->m_name = ;
 	m_otherPlayer->m_hp = mPlayer[id]->m_hp;
 	m_otherPlayer->m_max_hp = mPlayer[id]->m_max_hp;
+	m_otherPlayer->m_mp = mPlayer[id]->m_mp;
+	m_otherPlayer->m_max_mp = mPlayer[id]->m_max_mp;
 	m_otherPlayer->m_lv = mPlayer[id]->m_lv;
 	m_otherPlayer->m_tribe = mPlayer[id]->m_tribe;
 	m_otherPlayer->m_spices = mPlayer[id]->m_spices;

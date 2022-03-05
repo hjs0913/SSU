@@ -6,6 +6,7 @@
 #include "GameFramework.h"
 #include <iostream>
 #include <fstream>
+#include <format>
 
 #include <array>
 using namespace std;
@@ -18,8 +19,12 @@ float tmp[BULLETCNT];
 bool IsFire[BULLETCNT] = {};
 
 wstring Chatting_Str = L"";
-bool Chatting_On = false;
 wstring Send_str = L"";
+wstring Hp_str = L"";
+wstring Mp_str = L"";
+
+bool Chatting_On = false;
+bool Mouse_On = false;
 
 CGameFramework::CGameFramework()
 {
@@ -327,6 +332,7 @@ void CGameFramework::ChangeSwapChainState()
 
 void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 {
+
 	if (m_pScene) m_pScene->OnProcessingMouseMessage(hWnd, nMessageID, wParam, lParam);
 	switch (nMessageID)
 	{
@@ -374,7 +380,56 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			}
 			break;
 		case VK_F1:
+			switch (my_job)
+			{
+			case J_DILLER:
+				my_job = J_TANKER;
+				break;
+			case J_TANKER:
+				my_job = J_MAGISIAN;
+				break;
+			case J_MAGISIAN:
+				my_job = J_SUPPORTER;
+				break;
+			case J_SUPPORTER:
+				my_job = J_DILLER;
+				break;
+			default:
+				break;
+			}
+			send_change_job_packet(my_job);
+			break;
 		case VK_F2:
+			switch (my_element)
+			{
+			case E_NONE:
+				my_element = E_WATER;
+				break;
+			case E_WATER:
+				my_element = E_FULLMETAL;
+				break;
+			case E_FULLMETAL:
+				my_element = E_WIND;
+				break;
+			case E_WIND:
+				my_element = E_FIRE;
+				break;
+			case E_FIRE:
+				my_element = E_TREE;
+				break;
+			case E_TREE:
+				my_element = E_EARTH;
+				break;
+			case E_EARTH:
+				my_element = E_ICE;
+			case E_ICE:
+				my_element = E_NONE;
+				break;
+			default:
+				break;
+			}
+			send_change_element_packet(my_element);
+			break;
 		case VK_F3:
 				m_pCamera = m_pPlayer->ChangeCamera((DWORD)(wParam - VK_F1 + 1), m_GameTimer.GetTimeElapsed());
 			break;
@@ -456,14 +511,43 @@ void CGameFramework::BuildObjects()
 	if (!m_ppUILayer) {
 		m_ppUILayer = new UILayer * [UICOUNT];
 
-		m_ppUILayer[0] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue);
-		m_ppUILayer[1] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue);
+		// Chatting(0 : read, 1 : Write)
+		m_ppUILayer[0] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::White);
+		m_ppUILayer[1] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::White);
+
+		// PlayerInfo( 2 : Info, 3: BasicHp, 4 : BasicMp, 3: Hp, 4 : Mp)
+		m_ppUILayer[2] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::Black);
+		m_ppUILayer[3] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
+		m_ppUILayer[4] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Blue, D2D1::ColorF::White);
+		//m_ppUILayer[5] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::Black);
+		//m_ppUILayer[6] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Blue, D2D1::ColorF::Black);
+
+		m_ppUILayer[0]->setAlpha(0.5, 1.0);
+		m_ppUILayer[1]->setAlpha(0.5, 1.0);
+		m_ppUILayer[2]->setAlpha(0.5, 1.0);
+		m_ppUILayer[3]->setAlpha(0.0, 1.0);
+		m_ppUILayer[4]->setAlpha(0.0, 1.0);
+		//m_ppUILayer[5]->setAlpha(1.0, 1.0);
+		//m_ppUILayer[6]->setAlpha(1.0, 1.0);
 	}
 	m_ppUILayer[0]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 		DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_FAR);
 	m_ppUILayer[1]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 		DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-	
+	m_ppUILayer[2]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+		DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+	m_ppUILayer[3]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+		DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+	m_ppUILayer[4]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+		DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+	//m_ppUILayer[5]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+	//	DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+	//m_ppUILayer[6]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+	//	DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+	reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, 40, 20 + (m_nWndClientWidth / 10) * 3, 60);
+	reinterpret_cast<UIBar*>(m_ppUILayer[4])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, 60, 20 + (m_nWndClientWidth / 10) * 3, 80);
+	reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetColorBrush(D2D1::ColorF::Red, 1.0, 20, 40, 20 + (m_nWndClientWidth / 10) * 3, 60);
+	reinterpret_cast<UIBar*>(m_ppUILayer[4])->SetColorBrush(D2D1::ColorF::Blue, 1.0, 20, 60, 20 + (m_nWndClientWidth / 10) * 3, 80);
 
 
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
@@ -508,7 +592,7 @@ void CGameFramework::ProcessInput()
 	{
 		DWORD dwDirection = 0;
 
-		if (!Chatting_On) {
+		if (!Chatting_On && Mouse_On) {
 			if (pKeysBuffer['W'] & 0xF0) {
 				//send_move_packet(0);
 				dwDirection |= DIR_FORWARD;
@@ -572,26 +656,6 @@ void CGameFramework::ProcessInput()
 			}
 			else {
 				pushq = true;
-			}
-
-			static bool pushI = true;
-
-			if (GetAsyncKeyState('I') & 0x8000) {
-				if (pushI) {
-					if (IsIn) {
-						m_pPlayer->SetPosition(tmppos);
-						IsIn = false;
-					}
-					else {
-						tmppos = m_pPlayer->GetPosition();
-						m_pPlayer->SetPosition(XMFLOAT3{ ROOMX, 0, ROOMZ });
-						IsIn = true;
-					}
-					pushI = false;
-				}
-			}
-			else {
-				pushI = true;
 			}
 
 			if (pKeysBuffer[VK_SHIFT] & 0xF0) {
@@ -700,6 +764,7 @@ void CGameFramework::FrameAdvance()
 {
 	m_GameTimer.Tick(0.0f);
 
+	get_basic_information(m_pPlayer, my_id);
 	m_pPlayer->SetPosition(return_myPosition());
 	ProcessInput();
 
@@ -764,11 +829,14 @@ void CGameFramework::FrameAdvance()
 
 	WaitForGpuComplete();
 
+
 	Send_str = L"";
+	Hp_str = L"";
+	Mp_str = L"";
+	string temp_str;
 	for (int i = 0; i < UICOUNT; i++) {
 		switch (i) {
 		case 0: {
-			// 硫붿떆吏 李?
 			for (auto& m : g_msg) {
 				wchar_t* temp;
 				//wstring temp = wstring(m.begin(), m.end());
@@ -782,9 +850,28 @@ void CGameFramework::FrameAdvance()
 			}
 			m_ppUILayer[i]->UpdateLabels(Send_str, 0, 340, m_nWndClientWidth / 2, 300 + (m_nWndClientHeight / 3));
 		}
-			break;
-		case 1: // 硫붿떆吏 ?낅젰李?
+			  break;
+		case 1:
 			m_ppUILayer[i]->UpdateLabels(Chatting_Str, 0, 300 + (m_nWndClientHeight / 3), m_nWndClientWidth / 2, 300 + (m_nWndClientHeight / 3) + 20);
+			break;
+
+		case 2:
+			m_ppUILayer[i]->UpdateLabels(Info_str, 0, 0, (m_nWndClientWidth / 10)*3 + 30, (m_nWndClientHeight / 4));
+			break;
+		case 3: {
+			Hp_str.append(L" Hp : ");
+			Hp_str.append(to_wstring(m_pPlayer->m_hp));
+			Hp_str.append(L" / ");
+			Hp_str.append(to_wstring(m_pPlayer->m_max_hp));
+			m_ppUILayer[i]->UpdateLabels(Hp_str, 20, 40, 20 + ((float)m_pPlayer->m_hp/ m_pPlayer->m_max_hp)*(m_nWndClientWidth / 10) * 3, 60);
+			break;
+		}
+		case 4:
+			Mp_str.append(L" Mp : ");
+			Mp_str.append(to_wstring(m_pPlayer->m_mp));
+			Mp_str.append(L" / ");
+			Mp_str.append(to_wstring(m_pPlayer->m_max_mp));
+			m_ppUILayer[i]->UpdateLabels(Mp_str, 20, 60, 20 + ((float)m_pPlayer->m_mp / m_pPlayer->m_max_mp) * (m_nWndClientWidth / 10) * 3, 80);
 			break;
 		}
 	}

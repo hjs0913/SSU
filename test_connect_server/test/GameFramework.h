@@ -2,7 +2,7 @@
 
 #define FRAME_BUFFER_WIDTH		640
 #define FRAME_BUFFER_HEIGHT		480
-#define UICOUNT 2
+#define UICOUNT 5
 
 //#include "Timer.h"
 #include "Player.h"
@@ -14,6 +14,7 @@ extern XMFLOAT3 POS_PLAYER;
 
 extern wstring Chatting_Str;
 extern bool Chatting_On;
+extern bool Mouse_On;
 
 
 extern int nnn;
@@ -54,8 +55,6 @@ public:
 	void UpdateUI(int i);
 private:
 	/////////////////
-	bool IsIn = false;
-	XMFLOAT3 tmppos;
 	/////////////////
 	float cameradis = 1.0f;
 	float savedis = 1.0f;
@@ -106,6 +105,6 @@ private:
 
 	_TCHAR						m_pszFrameRate[50];
 
-	UILayer						** m_ppUILayer = NULL;
+	UILayer						** m_ppUILayer = NULL;	
 };
 

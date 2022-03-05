@@ -60,6 +60,9 @@ public:
 	void set_right(float right_x, float right_y, float right_z);	// _look_x, y, z로 만들자
 	void set_mon_species(int s);
 
+	void set_element(ELEMENT element);
+	ELEMENT get_element();
+
 	void set_target_id(int target);
 	int get_target_id();
 

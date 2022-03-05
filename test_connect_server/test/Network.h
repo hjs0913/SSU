@@ -24,7 +24,13 @@ using namespace std;
 extern int my_id;
 extern int m_prev_recv;
 extern vector<string> g_msg;
+extern JOB my_job;
+extern ELEMENT my_element;
 
+extern wstring my_name;
+extern wstring my_job_str;
+extern wstring my_element_str;
+extern wstring Info_str;
 
 void err_quit(const char* msg);
 
@@ -39,6 +45,10 @@ void send_look_packet(XMFLOAT3 look, XMFLOAT3 right);
 void send_skill_packet(int sk_t, int sk_n);
 
 void send_chat_packet(const char* send_str);
+
+void send_change_job_packet(JOB my_job);
+
+void send_change_element_packet(ELEMENT my_element);
 
 int netInit();
 
