@@ -261,7 +261,13 @@ void magical_skill_success(int p_id, int target, float skill_factor)
     }
     else if (p_id >= NPC_ID_START) {
 
-        send_status_change_packet(reinterpret_cast<Player*>(players[target]));
+        //send_status_change_packet(reinterpret_cast<Player*>(players[target]));
+
+        reinterpret_cast<Player*>(players[target])->vl.lock();
+        for (auto id : reinterpret_cast<Player*>(players[target])->viewlist) {
+            send_change_hp_packet(reinterpret_cast<Player*>(players[id]), players[target]);
+        }
+        reinterpret_cast<Player*>(players[target])->vl.unlock();
 
         char mess[MAX_CHAT_SIZE];
         sprintf_s(mess, MAX_CHAT_SIZE, "%s -> %s damage : %d",
@@ -287,6 +293,14 @@ void magical_skill_success(int p_id, int target, float skill_factor)
         timer_queue.push(ev);
     }
     else {
+        for (auto& obj : players) {
+            if (obj->get_state() != ST_INGAME) continue;
+            if (true == is_npc(obj->get_id())) break;   // npc가 아닐때
+            if (true == is_near(target, obj->get_id())) {      // 근처에 있을때
+                send_change_hp_packet(reinterpret_cast<Player*>(obj), players[target]);
+            }
+        }
+
         char mess[MAX_CHAT_SIZE];
         sprintf_s(mess, MAX_CHAT_SIZE, "%s -> %s damage : %d",
             players[p_id]->get_name(), players[target]->get_name(), damage);
@@ -401,7 +415,13 @@ void physical_skill_success(int p_id, int target, float skill_factor)
     }
     else if (p_id >= NPC_ID_START) {
 
-        send_status_change_packet(reinterpret_cast<Player*>(players[target]));
+        //send_status_change_packet(reinterpret_cast<Player*>(players[target]));
+
+        reinterpret_cast<Player*>(players[target])->vl.lock();
+        for (auto id : reinterpret_cast<Player*>(players[target])->viewlist) {
+            send_change_hp_packet(reinterpret_cast<Player*>(players[id]), players[target]);
+        }
+        reinterpret_cast<Player*>(players[target])->vl.unlock();
 
         char mess[MAX_CHAT_SIZE];
         sprintf_s(mess, MAX_CHAT_SIZE, "%s -> %s damage : %d",
@@ -427,6 +447,14 @@ void physical_skill_success(int p_id, int target, float skill_factor)
         timer_queue.push(ev);
     }
     else {
+        for (auto& obj : players) {
+            if (obj->get_state() != ST_INGAME) continue;
+            if (true == is_npc(obj->get_id())) break;   // npc가 아닐때
+            if (true == is_near(target, obj->get_id())) {      // 근처에 있을때
+                send_change_hp_packet(reinterpret_cast<Player*>(obj), players[target]);
+            }
+        }
+
         char mess[MAX_CHAT_SIZE];
         sprintf_s(mess, MAX_CHAT_SIZE, "%s -> %s damage : %d",
             players[p_id]->get_name(), players[target]->get_name(), damage);
@@ -617,7 +645,15 @@ void attack_success(int p_id, int target, float atk_factor)
     }
     else if(p_id >= NPC_ID_START){
         // 플레이어가 공격을 당한 것이므로 hp정보가 바뀌었으므로 그것을 보내주자
-        send_status_change_packet(reinterpret_cast<Player*>(players[target]));
+        // send_status_change_packet(reinterpret_cast<Player*>(players[target]));
+        
+        // 플레이어의 ViewList에 있는 플레이어들에게 보내주자
+        reinterpret_cast<Player*>(players[target])->vl.lock();
+        for (auto id : reinterpret_cast<Player*>(players[target])->viewlist) {
+            send_change_hp_packet(reinterpret_cast<Player*>(players[id]), players[target]);
+        }
+        reinterpret_cast<Player*>(players[target])->vl.unlock();
+
 
         char mess[MAX_CHAT_SIZE];
         //send_chat_packet(reinterpret_cast<Player*>(players[target]), target, mess);
@@ -642,6 +678,14 @@ void attack_success(int p_id, int target, float atk_factor)
         timer_queue.push(ev);
     }
     else {  // 플레이어가 공격을 입힘
+        for (auto& obj : players) {
+            if (obj->get_state() != ST_INGAME) continue;
+            if (true == is_npc(obj->get_id())) break;   // npc가 아닐때
+            if (true == is_near(target, obj->get_id())) {      // 근처에 있을때
+                send_change_hp_packet(reinterpret_cast<Player*>(obj), players[target]);
+            }
+        }
+        
         char mess[MAX_CHAT_SIZE];
         sprintf_s(mess, MAX_CHAT_SIZE, "%s -> %s damage : %f",
             players[p_id]->get_name(), players[target]->get_name(), damage);
@@ -812,7 +856,10 @@ void process_packet(int client_id, unsigned char* p)
             other_player->vl.lock();
             other_player->viewlist.insert(client_id);
             other_player->vl.unlock();
-            sc_packet_put_object packet;
+            
+            send_put_object_packet(other_player, pl);
+
+            /*sc_packet_put_object packet;
             packet.id = client_id;
             strcpy_s(packet.name, pl->get_name());
             packet.object_type = pl->get_tribe();
@@ -821,7 +868,7 @@ void process_packet(int client_id, unsigned char* p)
             packet.x = pl->get_x();
             packet.y = pl->get_y();
             packet.z = pl->get_z();
-            other_player->do_send(sizeof(packet), &packet);
+            other_player->do_send(sizeof(packet), &packet);*/
         }
         // 새로 접속한 플레이어에게 기존 정보를 보내중
         for (auto& other : players) {
@@ -857,7 +904,8 @@ void process_packet(int client_id, unsigned char* p)
             pl->viewlist.insert(other->get_id());
             pl->vl.unlock();
 
-            sc_packet_put_object packet;
+            send_put_object_packet(pl, other);
+            /*sc_packet_put_object packet;
             packet.id = other->get_id();
             strcpy_s(packet.name, other->get_name());
             packet.object_type = other->get_tribe();
@@ -866,7 +914,7 @@ void process_packet(int client_id, unsigned char* p)
             packet.x = other->get_x();
             packet.y = other->get_y();
             packet.z = other->get_z();
-            pl->do_send(sizeof(packet), &packet);
+            pl->do_send(sizeof(packet), &packet);*/
         }
         // 장애물 정보
         for (auto& ob : obstacles) {
@@ -878,6 +926,7 @@ void process_packet(int client_id, unsigned char* p)
             pl->ob_viewlist.insert(ob.get_id());
             pl->ob_vl.unlock();
 
+            //send_put_object_packet(pl, ob);
             sc_packet_put_object packet;
             packet.id = ob.get_id();
             strcpy_s(packet.name, "");
@@ -1534,7 +1583,9 @@ void player_revive(int client_id)
         other_player->vl.lock();
         other_player->viewlist.insert(client_id);
         other_player->vl.unlock();
-        sc_packet_put_object packet;
+
+        send_put_object_packet(other_player, pl);
+        /*sc_packet_put_object packet;
         packet.id = client_id;
         strcpy_s(packet.name, pl->get_name());
         packet.object_type = 0;
@@ -1543,7 +1594,7 @@ void player_revive(int client_id)
         packet.x = pl->get_x();
         packet.y = pl->get_y();
         packet.z = pl->get_z();
-        other_player->do_send(sizeof(packet), &packet);
+        other_player->do_send(sizeof(packet), &packet);*/
     }
 
     // 새로 접속한 플레이어에게 기존 정보를 보내중
@@ -1581,7 +1632,8 @@ void player_revive(int client_id)
         pl->viewlist.insert(other->get_id());
         pl->vl.unlock();
 
-        sc_packet_put_object packet;
+        send_put_object_packet(pl, other);
+       /* sc_packet_put_object packet;
         packet.id = other->get_id();
         strcpy_s(packet.name, other->get_name());
         packet.object_type = 0;
@@ -1590,7 +1642,7 @@ void player_revive(int client_id)
         packet.x = other->get_x();
         packet.y = other->get_y();
         packet.z = other->get_z();
-        pl->do_send(sizeof(packet), &packet);
+        pl->do_send(sizeof(packet), &packet);*/
     }
     // 장애물 정보
     pl->ob_vl.lock();
@@ -1997,6 +2049,7 @@ void initialise_NPC()
         players[i]->set_lv(lua_tointeger(L, -9));
         players[i]->set_name(lua_tostring(L, -8));
         players[i]->set_hp(lua_tointeger(L, -7));
+        players[i]->set_maxhp(lua_tointeger(L, -7));
         players[i]->set_physical_attack(lua_tonumber(L, -6));
         players[i]->set_magical_attack(lua_tonumber(L, -5));
         players[i]->set_physical_defence(lua_tonumber(L, -4));
@@ -2051,6 +2104,7 @@ void initialise_NPC()
         players[i]->set_lv(lua_tointeger(L, -9));
         players[i]->set_name(lua_tostring(L, -8));
         players[i]->set_hp(lua_tointeger(L, -7));
+        players[i]->set_maxhp(lua_tointeger(L, -7));
         players[i]->set_physical_attack(lua_tonumber(L, -6));
         players[i]->set_magical_attack(lua_tonumber(L, -5));
         players[i]->set_physical_defence(lua_tonumber(L, -4));
@@ -2103,6 +2157,7 @@ void initialise_NPC()
         players[i]->set_lv(lua_tointeger(L, -9));
         players[i]->set_name(lua_tostring(L, -8));
         players[i]->set_hp(lua_tointeger(L, -7));
+        players[i]->set_maxhp(lua_tointeger(L, -7));
         players[i]->set_physical_attack(lua_tonumber(L, -6));
         players[i]->set_magical_attack(lua_tonumber(L, -5));
         players[i]->set_physical_defence(lua_tonumber(L, -4));
@@ -2152,6 +2207,7 @@ void initialise_NPC()
         players[i]->set_lv(lua_tointeger(L, -9));
         players[i]->set_name(lua_tostring(L, -8));
         players[i]->set_hp(lua_tointeger(L, -7));
+        players[i]->set_maxhp(lua_tointeger(L, -7));
         players[i]->set_physical_attack(lua_tonumber(L, -6));
         players[i]->set_magical_attack(lua_tonumber(L, -5));
         players[i]->set_physical_defence(lua_tonumber(L, -4));
@@ -2203,6 +2259,7 @@ void initialise_NPC()
         players[i]->set_lv(lua_tointeger(L, -9));
         players[i]->set_name(lua_tostring(L, -8));
         players[i]->set_hp(lua_tointeger(L, -7));
+        players[i]->set_maxhp(lua_tointeger(L, -7));
         players[i]->set_physical_attack(lua_tonumber(L, -6));
         players[i]->set_magical_attack(lua_tonumber(L, -5));
         players[i]->set_physical_defence(lua_tonumber(L, -4));
@@ -2255,6 +2312,7 @@ void initialise_NPC()
         players[i]->set_lv(lua_tointeger(L, -9));
         players[i]->set_name(lua_tostring(L, -8));
         players[i]->set_hp(lua_tointeger(L, -7));
+        players[i]->set_maxhp(lua_tointeger(L, -7));
         players[i]->set_physical_attack(lua_tonumber(L, -6));
         players[i]->set_magical_attack(lua_tonumber(L, -5));
         players[i]->set_physical_defence(lua_tonumber(L, -4));
@@ -2635,13 +2693,11 @@ COMP_OP EVtoOP(EVENT_TYPE ev) {
 
 void do_timer()
 {
-    cout << "??" << endl;
     chrono::system_clock::duration dura;
     const chrono::milliseconds waittime = 10ms;
     timer_event temp;
     bool temp_bool = false;
     while (true) {
-        cout << "??2" << endl;
         if (temp_bool) {
             temp_bool = false;
             if (temp.ev == EVENT_PLAYER_ATTACK) {

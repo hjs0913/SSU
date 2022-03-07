@@ -273,6 +273,15 @@ void process_packet(unsigned char* p)
 		if (static_cast<TRIBE>(packet->object_type) != OBSTACLE) {
 			mPlayer[p_id]->SetUse(true);
 			mPlayer[p_id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
+
+			mPlayer[p_id]->SetLook(XMFLOAT3(packet->look_x, packet->look_y, packet->look_z));
+			mPlayer[p_id]->m_lv = packet->level;
+			mPlayer[p_id]->m_hp = packet->hp;
+			mPlayer[p_id]->m_max_hp = packet->maxhp;
+			mPlayer[p_id]->m_mp = packet->mp;
+			mPlayer[p_id]->m_max_mp = packet->maxmp;
+			mPlayer[p_id]->m_element = packet->element;
+
 			mPlayer[p_id]->m_tribe = static_cast<TRIBE>(packet->object_type);
 			strcpy_s(mPlayer[p_id]->m_name, packet->name);
 			mPlayer[p_id]->m_spices = packet->object_class;
@@ -350,6 +359,11 @@ void process_packet(unsigned char* p)
 		sc_packet_look* packet = reinterpret_cast<sc_packet_look*>(p);
 		XMFLOAT3 xmf3Look(packet->x, packet->y, packet->z);
 		mPlayer[packet->id]->SetLook(xmf3Look);
+		break;
+	}
+	case SC_PACKET_CHANGE_HP: {
+		sc_packet_change_hp* packet = reinterpret_cast<sc_packet_change_hp*>(p);
+		mPlayer[packet->id]->m_hp = packet->hp;
 		break;
 	}
 	default:
@@ -523,5 +537,10 @@ XMFLOAT3 get_position_to_server(int id)
 XMFLOAT3 get_look_to_server(int id)
 {
 	return mPlayer[id]->GetLookVector();
+}
+
+int get_hp_to_server(int id)
+{
+	return mPlayer[id]->m_hp;
 }
 
