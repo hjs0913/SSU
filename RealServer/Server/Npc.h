@@ -23,7 +23,7 @@ protected:
 	float	_attack_speed;
 	float	_look_x, _look_y, _look_z;
 	float	_right_x, _right_y, _right_z;
-
+	bool superposition;
 	STATE	_state;
 	atomic_bool	_active;		// NPC가 가만히 안있고 움직일때
 
@@ -92,5 +92,9 @@ public:
 	//skill
 	void set_skill_factor(int skill_type, int skill_num);
 	float get_skill_factor(int skill_type, int skill_num);
+
+	void set_element_cooltime(bool yn);
+	bool get_element_cooltime();
+	
 };
 

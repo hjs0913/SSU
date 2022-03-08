@@ -117,3 +117,29 @@ void send_look_packet(Player* pl, Npc* changer)
     packet.z = changer->get_look_z();
     pl->do_send(sizeof(packet), &packet);
 }
+
+void send_play_shoot_packet(Player* pl)
+{
+    sc_packet_play_shoot packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_PLAY_SHOOT;
+
+  
+
+    pl->do_send(sizeof(packet), &packet);
+}
+
+void send_play_effect_packet(Player* pl, Npc* npc )
+{
+    sc_packet_play_effect packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_PLAY_EFFECT;
+    
+    packet.hit = true;
+    packet.x = npc->get_x();
+    packet.y = npc->get_y();
+    packet.z = npc->get_z();
+    packet.id = npc->get_id();
+
+    pl->do_send(sizeof(packet), &packet);
+}

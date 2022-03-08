@@ -8,7 +8,7 @@ protected:
     int                 _login_id;
     int		            _exp;
     JOB                 _job;
-    ELEMENT             _element;
+
     int                 _mp;
     int                 _max_mp;
 
@@ -27,6 +27,7 @@ public:
     unordered_set<int>  ob_viewlist;
 
     int                 last_move_time;
+    bool    superposition;
 public:
     Player(int id);
 
@@ -120,4 +121,5 @@ public:
 
     void set_element(ELEMENT element);
     ELEMENT get_element();
+
 };

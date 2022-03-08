@@ -321,6 +321,7 @@ void CGameObject::Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject* play
 }
 
 void CGameObject::AnimatePart(CGameTimer pTimer, float start, XMFLOAT3 pos, int type) {
+
 	float t = (pTimer.GetTotalTime() - start);
 	if (type == 0)
 		SetPosition(pos.x + t * 30, pos.y + (-t * 10 * t * 10 + 8 * t * 10), pos.z);
@@ -509,6 +510,19 @@ CBulletObject::~CBulletObject() {
 
 }
 
+bool CBulletObject::check2(void* m_ppObjects) {
+
+	CGameObject* monster = (CGameObject*)m_ppObjects;
+	
+	if (hit_check == true) {
+		hit_check = false;
+		cout << "È÷¶Ç´Ù È÷¶Ç" << endl;
+		return true;
+	}
+	return false;
+	
+}
+
 bool CBulletObject::check(void* map) {
 	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)map;
 	XMFLOAT3 loca = GetPosition();
@@ -520,7 +534,7 @@ bool CBulletObject::check(void* map) {
 
 bool CBulletObject::Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject* m_ppObjects, void* map) {
 	XMFLOAT3 tmp;
-	if (check(map)) {  //¸Ê¿¡ ´êÀ¸¸é ÅÍÁü 
+	if (check2(m_ppObjects)) {  //¸Ê¿¡ ´êÀ¸¸é ÅÍÁü 
 		return true;
 	}
 	//MoveDown(2);
@@ -547,10 +561,10 @@ void CBillboardObject::Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject*
 	//pBillboardObject->SetPosition(player->GetPosition().x, player->GetPosition().y + 18, player->GetPosition().z);
 	//pBillboardObject->SetMaterial(pMaterials[0]);  //¿©±â
 	
-	m_ppObjects[201]->SetPosition(player->GetPosition().x, player->GetPosition().y + 18, player->GetPosition().z);
-	m_ppObjects[202]->SetPosition(player->GetPosition().x, player->GetPosition().y + 15, player->GetPosition().z);
+	//m_ppObjects[201]->SetPosition(player->GetPosition().x, player->GetPosition().y + 18, player->GetPosition().z);
+	//m_ppObjects[202]->SetPosition(player->GetPosition().x, player->GetPosition().y + 15, player->GetPosition().z);
 
-	hp_width -= 15;
+	//hp_width -= 15;
 
 	//m_ppObjects[201]->SetMesh(0, pRectMesh_hp);
 	//pRectMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, hp_width, hp_height, 0.0f);

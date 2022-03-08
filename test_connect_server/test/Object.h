@@ -256,7 +256,7 @@ public:
 	
 	
 	bool check(void* map); //맵에 닿았는지 
-
+	bool check2(void* m_ppObjects);
 	//bool check2(CGameObject** m_ppObjects); //몬스터에 닿았는지 
 
 };

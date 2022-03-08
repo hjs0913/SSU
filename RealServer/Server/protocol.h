@@ -3,7 +3,8 @@
 // --------------------------------------------------------
 // 개인 추가
 enum STATE { ST_FREE, ST_ACCEPT, ST_INGAME, ST_DEAD };
-enum COMP_OP { OP_RECV, OP_SEND, OP_ACCEPT, OP_NPC_MOVE,
+enum COMP_OP {
+	OP_RECV, OP_SEND, OP_ACCEPT, OP_NPC_MOVE,
 	OP_NPC_ATTACK, OP_AUTO_PLAYER_HP, OP_PLAYER_REVIVE, OP_NPC_REVIVE,
 	OP_PLAYER_ATTACK, OP_NPC_AGRO, OP_ELEMENT_COOLTIME
 };
@@ -13,12 +14,16 @@ enum EVENT_TYPE {
 	EVENT_SKILL_COOLTIME, EVENT_NPC_AGRO, EVENT_ELEMENT_COOLTIME
 };
 enum TRIBE { HUMAN, MONSTER, AGRO, BOSS, OBSTACLE };
-enum BUF_TYPE { B_NONE, B_PHYATTACK, B_MAGATTACK, B_PHYDEFENCE, 
-	B_MAGDEFENCE, B_SPEED, B_BURN };
-enum ELEMENT { E_NONE = 0, E_WATER, E_FULLMETAL, E_WIND, E_FIRE, E_TREE, E_EARTH, E_ICE = 7};
-enum JOB { J_DILLER = 0, J_TANKER, J_MAGISIAN, J_SUPPORTER = 3 };
-enum MONSTER_SPECIES{FALLEN_FLOG, FALLEN_CHICKEN, FALLEN_RABBIT, 
-	FALLEN_MONKEY, WOLF_BOSS, FALLEN_TIGER};
+enum BUF_TYPE {
+	B_NONE, B_PHYATTACK, B_MAGATTACK, B_PHYDEFENCE,
+	B_MAGDEFENCE, B_SPEED, B_BURN
+};
+enum ELEMENT { E_NONE = 0, E_WATER, E_FULLMETAL, E_WIND, E_FIRE, E_TREE, E_EARTH, E_ICE = 7 };
+enum JOB { J_DILLER = 0, J_TANKER, J_MAGICIAN, J_SUPPORTER = 3 };
+enum MONSTER_SPECIES {
+	FALLEN_FLOG, FALLEN_CHICKEN, FALLEN_RABBIT,
+	FALLEN_MONKEY, WOLF_BOSS, FALLEN_TIGER
+};
 
 const int BUFSIZE = 256;
 const int RANGE = 600;
@@ -61,7 +66,9 @@ const char SC_PACKET_DEAD = 8;
 const char SC_PACKET_REVIVE = 9;
 const char SC_PACKET_LOOK = 10;
 const char SC_PACKET_CHANGE_JOB = 11;
-const char SX_PACKET_CHANGE_ELEMENT = 12;
+const char SC_PACKET_PLAY_SHOOT = 12;
+const char SC_PACKET_PLAY_EFFECT = 13;
+
 //---------------------------------------------------
 #pragma pack (push, 1)
 struct cs_packet_login {
@@ -89,7 +96,7 @@ struct cs_packet_chat {
 	char	message[MAX_CHAT_SIZE];
 };
 
-struct cs_packet_teleport { 
+struct cs_packet_teleport {
 	// 서버에서 장애물이 없는 랜덤 좌표로 텔레포트 시킨다.
 	// 더미 클라이언트에서 동접 테스트용으로 사용.
 	unsigned char size;
@@ -177,7 +184,7 @@ struct sc_packet_login_fail {
 
 struct sc_packet_status_change {
 	unsigned char size;
-	char	type;         
+	char	type;
 	int		id;
 	short	level;
 	short	hp, maxhp, mp, maxmp;
@@ -208,5 +215,20 @@ struct sc_packet_look {
 	int id;
 	float x, y, z;	// look
 };
+
+struct sc_packet_play_shoot {
+	unsigned char size;
+	char type;
+	bool hit;
+	int id;
+};
+struct sc_packet_play_effect {
+	unsigned char size;
+	char type;
+	bool hit;
+	float	x, y, z;
+	int id;
+};
+
 
 #pragma pack(pop)

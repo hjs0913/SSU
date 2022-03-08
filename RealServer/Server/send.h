@@ -16,3 +16,7 @@ void send_login_fail_packet(Player* pl, int reason);
 void send_status_change_packet(Player* pl);
 
 void send_look_packet(Player* pl, Npc* changer);
+
+
+void send_play_shoot_packet(Player* pl);
+void send_play_effect_packet(Player* pl, Npc* npc);

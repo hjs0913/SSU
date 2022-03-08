@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "Network.h"
 #include "Player.h"
-//#include "GameFramework.h"
+
+#include "GameFramework.h"
+
 
 int my_id = 0;
 int m_prev_size = 0;
@@ -26,6 +28,7 @@ wstring my_name = L"";
 wstring my_job_str = L"";
 wstring my_element_str = L"";
 wstring Info_str = L"";
+
 
 
 struct EXP_OVER {
@@ -240,7 +243,7 @@ void process_packet(unsigned char* p)
 		}
 		switch (my_job) {
 		case J_DILLER: my_job_str = L"전사"; break;
-		case J_MAGISIAN: my_job_str = L"마법사"; break;
+		case J_MAGICIAN: my_job_str = L"마법사"; break;
 		case J_SUPPORTER: my_job_str = L"서포터"; break;
 		case J_TANKER: my_job_str = L"탱커"; break;
 		}
@@ -320,7 +323,7 @@ void process_packet(unsigned char* p)
 		}
 		switch (my_job) {
 		case J_DILLER: my_job_str = L"전사"; break;
-		case J_MAGISIAN: my_job_str = L"마법사"; break;
+		case J_MAGICIAN: my_job_str = L"마법사"; break;
 		case J_SUPPORTER: my_job_str = L"서포터"; break;
 		case J_TANKER: my_job_str = L"탱커"; break;
 		}
@@ -350,6 +353,20 @@ void process_packet(unsigned char* p)
 		sc_packet_look* packet = reinterpret_cast<sc_packet_look*>(p);
 		XMFLOAT3 xmf3Look(packet->x, packet->y, packet->z);
 		mPlayer[packet->id]->SetLook(xmf3Look);
+		break;
+	}
+	case SC_PACKET_PLAY_SHOOT: {
+		sc_packet_play_shoot* packet = reinterpret_cast<sc_packet_play_shoot*>(p);
+		shoot = true;	
+		break;
+	}
+	case SC_PACKET_PLAY_EFFECT: {
+		sc_packet_play_effect* packet = reinterpret_cast<sc_packet_play_effect*>(p);
+		hit_check = true;
+		effect_x = packet->x;
+		effect_y = packet->y;
+		effect_z = packet->z;
+	
 		break;
 	}
 	default:

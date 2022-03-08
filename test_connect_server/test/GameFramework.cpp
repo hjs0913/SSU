@@ -17,6 +17,8 @@ using namespace std;
 int bulletidx = 1;
 float tmp[BULLETCNT];
 bool IsFire[BULLETCNT] = {};
+bool shoot = false;
+bool hit_check = false;
 
 wstring Chatting_Str = L"";
 wstring Send_str = L"";
@@ -25,6 +27,11 @@ wstring Mp_str = L"";
 
 bool Chatting_On = false;
 bool Mouse_On = false;
+
+
+int effect_x = 0;
+int effect_y = 0;
+int effect_z = 0;
 
 CGameFramework::CGameFramework()
 {
@@ -386,9 +393,9 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 				my_job = J_TANKER;
 				break;
 			case J_TANKER:
-				my_job = J_MAGISIAN;
+				my_job = J_MAGICIAN;
 				break;
-			case J_MAGISIAN:
+			case J_MAGICIAN:
 				my_job = J_SUPPORTER;
 				break;
 			case J_SUPPORTER:
@@ -590,6 +597,10 @@ void CGameFramework::ProcessInput()
 	if (GetKeyboardState(pKeysBuffer) && m_pScene) bProcessedByScene = m_pScene->ProcessInput(pKeysBuffer);
 	if (!bProcessedByScene)
 	{
+
+
+		static bool pushCTRL = true;
+
 		DWORD dwDirection = 0;
 
 		if (!Chatting_On && Mouse_On) {
@@ -624,9 +635,29 @@ void CGameFramework::ProcessInput()
 			if (pKeysBuffer[VK_NUMPAD4] & 0xF0 || (pKeysBuffer['4'] & 0xF0)) {     //   4 
 				send_skill_packet(1, 0);
 			}
-			//	if (pKeysBuffer[VK_NUMPAD5] & 0xF0 || (pKeysBuffer['5'] & 0xF0)) {     //   5 
-			//		send_skill_packet(1, 1);
-			//	}
+			if (pKeysBuffer[VK_NUMPAD5] & 0xF0 || (pKeysBuffer['5'] & 0xF0)) {     //   5 
+				send_skill_packet(1, 1);
+			
+					if (pushCTRL && my_job == J_MAGICIAN) {
+
+						if (shoot) {
+							++bulletidx;
+							pushCTRL = false;
+							shoot = false;
+						}
+					}
+					if (bulletidx >= BULLETCNT + 2) {
+						bulletidx = 2;
+						for (int i = 0; i < BULLETCNT; ++i) {
+							if (IsFire[i]) {
+								m_pScene->Rotate(2 + i, 0, tmp[i], 0.0f);
+							}
+							IsFire[i] = false;
+						}
+					}
+					IsFire[bulletidx - 2] = true;
+				
+			}
 			//	if (pKeysBuffer[VK_NUMPAD6] & 0xF0 || (pKeysBuffer['6'] & 0xF0)) {     //   6
 			//		send_skill_packet(1, 2);
 			//	}
@@ -644,7 +675,9 @@ void CGameFramework::ProcessInput()
 				send_attack_packet(0);
 			}
 			//---------------------------------
-
+			else {
+				pushCTRL = true;
+			}
 
 			static bool pushq = true;
 
@@ -664,7 +697,7 @@ void CGameFramework::ProcessInput()
 			else
 				cameradis = 1.0f;
 
-			static bool pushCTRL = true;
+		/*	static bool pushCTRL = true;
 			if (GetAsyncKeyState(VK_CONTROL) & 0x8000) {
 				if (pushCTRL) {
 					++bulletidx;
@@ -673,18 +706,9 @@ void CGameFramework::ProcessInput()
 			}
 			else {
 				pushCTRL = true;
-			}
+			}*/
 		}
-		if (bulletidx >= BULLETCNT + 2) {
-			bulletidx = 2;
-			for (int i = 0; i < BULLETCNT; ++i) {
-				if (IsFire[i]) {
-					m_pScene->Rotate(2 + i, 0, tmp[i], 0.0f);
-				}
-				IsFire[i] = false;
-			}
-		}
-		IsFire[bulletidx - 2] = true;
+	
 		float cxDelta = 0.0f, cyDelta = 0.0f;
 		POINT ptCursorPos;
 		if (GetCapture() == m_hWnd)
