@@ -367,6 +367,8 @@ void CAirplanePlayer::Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject* 
 	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)m_pPlayerUpdatedContext;
 	float fheigth = pTerrain->GetHeight(otherplayer->GetPosition().x, otherplayer->GetPosition().z);
 	SetPosition(XMFLOAT3(otherplayer->GetPosition().x, fheigth, otherplayer->GetPosition().z));
+
+
 	SetLook(otherplayer->GetLook());
 	//pOtherPlayer
 }

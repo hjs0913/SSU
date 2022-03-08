@@ -63,6 +63,7 @@ const char SC_PACKET_LOOK = 10;
 const char SC_PACKET_CHANGE_JOB = 11;
 const char SC_PACKET_CHANGE_ELEMENT = 12;
 const char SC_PACKET_CHANGE_HP = 13;
+const char SC_PACKET_COMBAT_ID = 14;
 //---------------------------------------------------
 #pragma pack (push, 1)
 struct cs_packet_login {
@@ -221,6 +222,12 @@ struct sc_packet_change_hp {
 	char type;
 	int id;
 	int hp;
+};
+
+struct sc_packet_combat_id {
+	unsigned char size;
+	char type;
+	int id;
 };
 
 #pragma pack(pop)

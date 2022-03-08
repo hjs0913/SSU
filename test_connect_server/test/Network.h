@@ -31,6 +31,8 @@ extern wstring my_name;
 extern wstring my_job_str;
 extern wstring my_element_str;
 extern wstring Info_str;
+extern wstring Combat_str;
+extern bool Combat_On;
 
 void err_quit(const char* msg);
 

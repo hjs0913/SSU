@@ -3,11 +3,21 @@
 #include "Player.h"
 //#include "GameFramework.h"
 
+// extern variable
 int my_id = 0;
 int m_prev_size = 0;
+vector<string> g_msg;
 JOB my_job = J_DILLER;
 ELEMENT my_element = E_NONE;
 
+wstring my_name = L"";
+wstring my_job_str = L"";
+wstring my_element_str = L"";
+wstring Info_str = L"";
+wstring Combat_str = L"";
+bool Combat_On = false;
+
+// locale variable
 XMFLOAT3 my_position(-1.0f, 5.0f, -1.0f);
 XMFLOAT3 my_camera(0.0f, 0.0f, 0.0f);
 WSADATA wsa;
@@ -20,13 +30,7 @@ SOCKET g_s_socket;
 WSABUF mybuf_recv;
 WSABUF mybuf;
 
-vector<string> g_msg;
-
-wstring my_name = L"";
-wstring my_job_str = L"";
-wstring my_element_str = L"";
-wstring Info_str = L"";
-
+int combat_id = -1;
 
 struct EXP_OVER {
 	WSAOVERLAPPED m_wsa_over;
@@ -292,6 +296,11 @@ void process_packet(unsigned char* p)
 		sc_packet_remove_object* packet = reinterpret_cast<sc_packet_remove_object*>(p);
 		int p_id = packet->id;
 		if (static_cast<TRIBE>(packet->object_type) != OBSTACLE) mPlayer[p_id]->SetUse(false);
+		if (p_id == combat_id) {
+			combat_id = -1;
+			Combat_On = false;
+		}
+
 		break;
 	}
 	case SC_PACKET_CHAT: {
@@ -366,6 +375,19 @@ void process_packet(unsigned char* p)
 		mPlayer[packet->id]->m_hp = packet->hp;
 		break;
 	}
+	case SC_PACKET_COMBAT_ID: {
+		sc_packet_combat_id* packet = reinterpret_cast<sc_packet_combat_id*>(p);
+		if (combat_id != packet->id) {
+			Combat_On = true;
+			combat_id = packet->id;
+
+			Combat_str = L"";
+			Combat_str.append(L"SEX");
+
+		}
+		break;
+	}
+
 	default:
 		cout << "Process packet ¿À·ù" << endl;
 		break;

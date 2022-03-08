@@ -265,6 +265,7 @@ void magical_skill_success(int p_id, int target, float skill_factor)
 
         reinterpret_cast<Player*>(players[target])->vl.lock();
         for (auto id : reinterpret_cast<Player*>(players[target])->viewlist) {
+            if (true == is_npc(id)) continue;
             send_change_hp_packet(reinterpret_cast<Player*>(players[id]), players[target]);
         }
         reinterpret_cast<Player*>(players[target])->vl.unlock();
@@ -419,6 +420,7 @@ void physical_skill_success(int p_id, int target, float skill_factor)
 
         reinterpret_cast<Player*>(players[target])->vl.lock();
         for (auto id : reinterpret_cast<Player*>(players[target])->viewlist) {
+            if (true == is_npc(id)) continue;
             send_change_hp_packet(reinterpret_cast<Player*>(players[id]), players[target]);
         }
         reinterpret_cast<Player*>(players[target])->vl.unlock();
@@ -454,6 +456,8 @@ void physical_skill_success(int p_id, int target, float skill_factor)
                 send_change_hp_packet(reinterpret_cast<Player*>(obj), players[target]);
             }
         }
+
+        
 
         char mess[MAX_CHAT_SIZE];
         sprintf_s(mess, MAX_CHAT_SIZE, "%s -> %s damage : %d",
@@ -491,10 +495,10 @@ void attack_success(int p_id, int target, float atk_factor)
     ev.target_id = target;
     timer_queue.push(ev);
 
-    cout << "공격자  속성" << reinterpret_cast<Player*>(players[p_id])->get_element() << endl;
+    cout << "공격자  속성" << players[p_id]->get_element() << endl;
 
     
-    switch (reinterpret_cast<Player*>(players[p_id])->get_element())
+    switch (players[p_id]->get_element())
     {
      if(superposition)
     case E_WATER:
@@ -650,6 +654,7 @@ void attack_success(int p_id, int target, float atk_factor)
         // 플레이어의 ViewList에 있는 플레이어들에게 보내주자
         reinterpret_cast<Player*>(players[target])->vl.lock();
         for (auto id : reinterpret_cast<Player*>(players[target])->viewlist) {
+            if (true == is_npc(id)) continue;
             send_change_hp_packet(reinterpret_cast<Player*>(players[id]), players[target]);
         }
         reinterpret_cast<Player*>(players[target])->vl.unlock();
@@ -686,6 +691,13 @@ void attack_success(int p_id, int target, float atk_factor)
             }
         }
         
+        sc_packet_combat_id packet;
+        packet.size = sizeof(packet);
+        packet.type = SC_PACKET_COMBAT_ID;
+        packet.id = target;
+        
+        reinterpret_cast<Player*>(players[p_id])->do_send(sizeof(packet), &packet);
+
         char mess[MAX_CHAT_SIZE];
         sprintf_s(mess, MAX_CHAT_SIZE, "%s -> %s damage : %f",
             players[p_id]->get_name(), players[target]->get_name(), damage);
@@ -1857,7 +1869,6 @@ void worker()
         }
                         
         case OP_AUTO_PLAYER_HP: {
-            /*
             Player* pl = reinterpret_cast<Player*>(players[client_id]);
             pl->state_lock.lock();
             if (pl->get_state() != ST_INGAME) {
@@ -1878,8 +1889,8 @@ void worker()
                 ev.target_id = 0;
                 timer_queue.push(ev);
             }
-            send_status_change_packet(pl);
-            */
+            send_change_hp_packet(pl, pl);
+            //send_status_change_packet(pl);
             break;
         }
         case OP_PLAYER_REVIVE: {
@@ -2056,7 +2067,6 @@ void initialise_NPC()
         players[i]->set_magical_defence(lua_tonumber(L, -3));
         players[i]->set_basic_attack_factor(lua_tointeger(L, -2));
         players[i]->set_defence_factor(lua_tonumber(L, -1));
-
         lua_pop(L, 10);// eliminate set_uid from stack after call
 
         // 나중에 어떻게 이용할 것인지 생각
@@ -2479,7 +2489,6 @@ void return_npc_position(int npc_id)
         now_x = mv.first;
         now_z = mv.second;
     }
-
 
     float look_x = players[npc_id]->get_x() - now_x;
     float look_z = players[npc_id]->get_z() - now_z;
