@@ -83,3 +83,7 @@ XMFLOAT3 get_position_to_server(int id);
 
 XMFLOAT3 get_look_to_server(int id);
 
+float get_combat_id_hp();
+
+float get_combat_id_max_hp();
+

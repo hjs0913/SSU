@@ -249,7 +249,9 @@ void process_packet(unsigned char* p)
 		case J_TANKER: my_job_str = L"탱커"; break;
 		}
 
-		Info_str.append(L"이름 : ");
+		Info_str.append(L"Lv : ");
+		Info_str.append(to_wstring(packet->level));
+		Info_str.append(L"  이름 : ");
 		Info_str.append(my_name);
 		Info_str.append(L"\n직업 : ");
 		Info_str.append(my_job_str);
@@ -343,7 +345,9 @@ void process_packet(unsigned char* p)
 		case J_TANKER: my_job_str = L"탱커"; break;
 		}
 
-		Info_str.append(L"이름 : ");
+		Info_str.append(L"Lv : ");
+		Info_str.append(to_wstring(packet->level));
+		Info_str.append(L"  이름 : ");
 		Info_str.append(my_name);
 		Info_str.append(L"\n직업 : ");
 		Info_str.append(my_job_str);
@@ -356,6 +360,8 @@ void process_packet(unsigned char* p)
 		
 		sc_packet_dead* packet = reinterpret_cast<sc_packet_dead*> (p);
 		mPlayer[my_id]->SetUse(false);
+		combat_id = -1;
+		Combat_On = false;
 		cout << "died" << endl;
 		break;
 		
@@ -382,8 +388,27 @@ void process_packet(unsigned char* p)
 			combat_id = packet->id;
 
 			Combat_str = L"";
-			Combat_str.append(L"SEX");
+			Combat_str.append(L"LV.");
+			Combat_str.append(to_wstring(mPlayer[combat_id]->m_lv));
+			Combat_str.append(L"  ");
+			wchar_t* temp;;
+			int len = 1 + strlen(mPlayer[combat_id]->m_name);
+			temp = new TCHAR[len];
+			mbstowcs(temp, mPlayer[combat_id]->m_name, len);
+			Combat_str.append(temp);
+			delete temp;
 
+			Combat_str.append(L"\n속성 : ");
+			switch (mPlayer[combat_id]->m_element) {
+			case E_NONE: my_element_str = Combat_str.append(L"무속성"); break;
+			case E_WATER: my_element_str = Combat_str.append(L"물"); break;
+			case E_FULLMETAL: my_element_str = Combat_str.append(L"강철"); break;
+			case E_WIND: my_element_str = Combat_str.append(L"바람"); break;
+			case E_FIRE: my_element_str = Combat_str.append(L"불"); break;
+			case E_TREE: my_element_str = Combat_str.append(L"나무"); break;
+			case E_EARTH: my_element_str = Combat_str.append(L"땅"); break;
+			case E_ICE: my_element_str = Combat_str.append(L"얼음"); break;
+			}
 		}
 		break;
 	}
@@ -566,3 +591,12 @@ int get_hp_to_server(int id)
 	return mPlayer[id]->m_hp;
 }
 
+float get_combat_id_hp()
+{
+	return mPlayer[combat_id]->m_hp;
+}
+
+float get_combat_id_max_hp()
+{
+	return mPlayer[combat_id]->m_max_hp;
+}

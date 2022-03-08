@@ -488,12 +488,12 @@ void attack_success(int p_id, int target, float atk_factor)
 
     players[target]->set_hp(target_hp);
 
-    timer_event ev;
-    ev.obj_id = p_id;
-    ev.start_time = chrono::system_clock::now() + 10s;  //쿨타임
-    ev.ev = EVENT_ELEMENT_COOLTIME;;
-    ev.target_id = target;
-    timer_queue.push(ev);
+    //timer_event ev;
+    //ev.obj_id = p_id;
+    //ev.start_time = chrono::system_clock::now() + 10s;  //쿨타임
+    //ev.ev = EVENT_ELEMENT_COOLTIME;;
+    //ev.target_id = target;
+    //timer_queue.push(ev);
 
     cout << "공격자  속성" << players[p_id]->get_element() << endl;
 
@@ -652,6 +652,7 @@ void attack_success(int p_id, int target, float atk_factor)
         // send_status_change_packet(reinterpret_cast<Player*>(players[target]));
         
         // 플레이어의 ViewList에 있는 플레이어들에게 보내주자
+        send_change_hp_packet(reinterpret_cast<Player*>(players[target]), players[target]);
         reinterpret_cast<Player*>(players[target])->vl.lock();
         for (auto id : reinterpret_cast<Player*>(players[target])->viewlist) {
             if (true == is_npc(id)) continue;
@@ -830,7 +831,7 @@ void process_packet(int client_id, unsigned char* p)
         // -- DB 대체 끝 --
 
         // Hp회복
-        if (pl->get_hp() <= pl->get_maxhp()) {
+        if (pl->get_hp() < pl->get_maxhp()) {
             // hp가 깎이였으므로 hp자동회복을 해주도록 하자
             if (reinterpret_cast<Player*>(players[client_id])->_auto_hp == false) {
                 timer_event ev;

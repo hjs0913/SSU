@@ -516,21 +516,21 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[1] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::White);
 
 		// PlayerInfo( 2 : Info, 3: Hp, 4 : Mp)
-		m_ppUILayer[2] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::Black);
+		m_ppUILayer[2] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::White, D2D1::ColorF::Black);
 		m_ppUILayer[3] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
 		m_ppUILayer[4] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Blue, D2D1::ColorF::White);
 
 		// Combat Npc Info( 5: info, 6 : Hp)
-		m_ppUILayer[5] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::Black);
+		m_ppUILayer[5] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::White, D2D1::ColorF::Black);
 		m_ppUILayer[6] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
 
 
 		m_ppUILayer[0]->setAlpha(0.5, 1.0);
 		m_ppUILayer[1]->setAlpha(0.5, 1.0);
-		m_ppUILayer[2]->setAlpha(0.5, 1.0);
+		m_ppUILayer[2]->setAlpha(0.3, 1.0);
 		m_ppUILayer[3]->setAlpha(0.0, 1.0);
 		m_ppUILayer[4]->setAlpha(0.0, 1.0);
-		m_ppUILayer[5]->setAlpha(0.5, 1.0);
+		m_ppUILayer[5]->setAlpha(0.3, 1.0);
 		m_ppUILayer[6]->setAlpha(0.0, 1.0);
 
 		m_ppUILayer[0]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
@@ -553,8 +553,8 @@ void CGameFramework::BuildObjects()
 		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetColorBrush(D2D1::ColorF::Red, 1.0, 20, 40, 20 + (m_nWndClientWidth / 10) * 3, 60);
 		reinterpret_cast<UIBar*>(m_ppUILayer[4])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, 60, 20 + (m_nWndClientWidth / 10) * 3, 80);
 		reinterpret_cast<UIBar*>(m_ppUILayer[4])->SetColorBrush(D2D1::ColorF::Blue, 1.0, 20, 60, 20 + (m_nWndClientWidth / 10) * 3, 80);
-		reinterpret_cast<UIBar*>(m_ppUILayer[6])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, 40, 20 + (m_nWndClientWidth / 10) * 3, 60);
-		reinterpret_cast<UIBar*>(m_ppUILayer[6])->SetColorBrush(D2D1::ColorF::Red, 1.0, 20, 40, 20 + (m_nWndClientWidth / 10) * 3, 60);
+		reinterpret_cast<UIBar*>(m_ppUILayer[6])->SetBehindBrush(D2D1::ColorF::Black, 1.0, (m_nWndClientWidth / 2) - 70, 40, (m_nWndClientWidth / 2) + 70, (m_nWndClientHeight / 6) - 20);
+		reinterpret_cast<UIBar*>(m_ppUILayer[6])->SetColorBrush(D2D1::ColorF::Red, 1.0, (m_nWndClientWidth / 2) - 70, 40, (m_nWndClientWidth / 2) + 70, (m_nWndClientHeight / 6) - 20);
 	}
 
 
@@ -865,7 +865,7 @@ void CGameFramework::FrameAdvance()
 			break;
 
 		case 2:
-			m_ppUILayer[i]->UpdateLabels(Info_str, 0, 0, (m_nWndClientWidth / 10) * 3 + 30, (m_nWndClientHeight / 4));
+			m_ppUILayer[i]->UpdateLabels(Info_str, 0, 0, (m_nWndClientWidth / 10) * 3 + 30, 90);
 			break;
 		case 3: {
 			Hp_str.append(L" Hp : ");
@@ -884,11 +884,17 @@ void CGameFramework::FrameAdvance()
 			break;
 		}
 		case 5: {
-			m_ppUILayer[i]->UpdateLabels(Combat_str, (m_nWndClientWidth / 2) - 60, 0, (m_nWndClientWidth / 2) + 60, (m_nWndClientHeight / 6));
+			if (!Combat_On) break;
+			m_ppUILayer[i]->UpdateLabels(Combat_str, (m_nWndClientWidth / 2) - 80, 0, (m_nWndClientWidth / 2) + 80, (m_nWndClientHeight / 6));
 			break;
 		}
 		case 6: {
-			m_ppUILayer[i]->UpdateLabels(L"", (m_nWndClientWidth / 2) - 30, 20, (m_nWndClientWidth / 2) + 30, (m_nWndClientHeight / 6) + 20);
+			if (!Combat_On) break;
+			wstring ang = L"HP : ";
+			ang.append(to_wstring((int)get_combat_id_hp()));
+			ang.append(L"/");
+			ang.append(to_wstring((int)get_combat_id_max_hp()));
+			m_ppUILayer[i]->UpdateLabels(ang, (m_nWndClientWidth / 2) - 70, 40, 140*((get_combat_id_hp()/get_combat_id_max_hp()))+((m_nWndClientWidth / 2) - 70), (m_nWndClientHeight / 6) - 20);
 			break;
 		}
 		}
