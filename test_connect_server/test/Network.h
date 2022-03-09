@@ -31,6 +31,8 @@ extern wstring my_name;
 extern wstring my_job_str;
 extern wstring my_element_str;
 extern wstring Info_str;
+extern wstring Combat_str;
+extern bool Combat_On;
 
 void err_quit(const char* msg);
 
@@ -71,6 +73,8 @@ XMFLOAT3 return_myCamera();
 #include "Object.h"
 void get_basic_information(CPlayer* m_otherPlayer, int id);
 
+int get_hp_to_server(int id);
+
 void get_player_information(CPlayer* m_otherPlayer, int id);
 
 bool get_use_to_server(int id);
@@ -78,4 +82,8 @@ bool get_use_to_server(int id);
 XMFLOAT3 get_position_to_server(int id);
 
 XMFLOAT3 get_look_to_server(int id);
+
+float get_combat_id_hp();
+
+float get_combat_id_max_hp();
 

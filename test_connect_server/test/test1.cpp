@@ -122,7 +122,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		tme.dwHoverTime = 1;
 		TrackMouseEvent(&tme);
 		Mouse_On = false;
-		cout << "¶°³²" << endl;
 		break;
 	case WM_MOUSEHOVER:
 	case WM_SIZE:
@@ -138,7 +137,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		tme.dwFlags = TME_LEAVE;
 		tme.dwHoverTime = 1;
 		TrackMouseEvent(&tme);
-		cout << "µé¾î¿È" << endl;
 		Mouse_On = true;
 		gGameFramework.OnProcessingWindowMessage(hWnd, message, wParam, lParam);
 		break;

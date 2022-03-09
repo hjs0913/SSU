@@ -3,11 +3,21 @@
 #include "Player.h"
 //#include "GameFramework.h"
 
+// extern variable
 int my_id = 0;
 int m_prev_size = 0;
+vector<string> g_msg;
 JOB my_job = J_DILLER;
 ELEMENT my_element = E_NONE;
 
+wstring my_name = L"";
+wstring my_job_str = L"";
+wstring my_element_str = L"";
+wstring Info_str = L"";
+wstring Combat_str = L"";
+bool Combat_On = false;
+
+// locale variable
 XMFLOAT3 my_position(-1.0f, 5.0f, -1.0f);
 XMFLOAT3 my_camera(0.0f, 0.0f, 0.0f);
 WSADATA wsa;
@@ -20,13 +30,7 @@ SOCKET g_s_socket;
 WSABUF mybuf_recv;
 WSABUF mybuf;
 
-vector<string> g_msg;
-
-wstring my_name = L"";
-wstring my_job_str = L"";
-wstring my_element_str = L"";
-wstring Info_str = L"";
-
+int combat_id = -1;
 
 struct EXP_OVER {
 	WSAOVERLAPPED m_wsa_over;
@@ -245,7 +249,9 @@ void process_packet(unsigned char* p)
 		case J_TANKER: my_job_str = L"탱커"; break;
 		}
 
-		Info_str.append(L"이름 : ");
+		Info_str.append(L"Lv : ");
+		Info_str.append(to_wstring(packet->level));
+		Info_str.append(L"  이름 : ");
 		Info_str.append(my_name);
 		Info_str.append(L"\n직업 : ");
 		Info_str.append(my_job_str);
@@ -273,6 +279,15 @@ void process_packet(unsigned char* p)
 		if (static_cast<TRIBE>(packet->object_type) != OBSTACLE) {
 			mPlayer[p_id]->SetUse(true);
 			mPlayer[p_id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
+
+			mPlayer[p_id]->SetLook(XMFLOAT3(packet->look_x, packet->look_y, packet->look_z));
+			mPlayer[p_id]->m_lv = packet->level;
+			mPlayer[p_id]->m_hp = packet->hp;
+			mPlayer[p_id]->m_max_hp = packet->maxhp;
+			mPlayer[p_id]->m_mp = packet->mp;
+			mPlayer[p_id]->m_max_mp = packet->maxmp;
+			mPlayer[p_id]->m_element = packet->element;
+
 			mPlayer[p_id]->m_tribe = static_cast<TRIBE>(packet->object_type);
 			strcpy_s(mPlayer[p_id]->m_name, packet->name);
 			mPlayer[p_id]->m_spices = packet->object_class;
@@ -283,6 +298,11 @@ void process_packet(unsigned char* p)
 		sc_packet_remove_object* packet = reinterpret_cast<sc_packet_remove_object*>(p);
 		int p_id = packet->id;
 		if (static_cast<TRIBE>(packet->object_type) != OBSTACLE) mPlayer[p_id]->SetUse(false);
+		if (p_id == combat_id) {
+			combat_id = -1;
+			Combat_On = false;
+		}
+
 		break;
 	}
 	case SC_PACKET_CHAT: {
@@ -325,7 +345,9 @@ void process_packet(unsigned char* p)
 		case J_TANKER: my_job_str = L"탱커"; break;
 		}
 
-		Info_str.append(L"이름 : ");
+		Info_str.append(L"Lv : ");
+		Info_str.append(to_wstring(packet->level));
+		Info_str.append(L"  이름 : ");
 		Info_str.append(my_name);
 		Info_str.append(L"\n직업 : ");
 		Info_str.append(my_job_str);
@@ -338,6 +360,8 @@ void process_packet(unsigned char* p)
 		
 		sc_packet_dead* packet = reinterpret_cast<sc_packet_dead*> (p);
 		mPlayer[my_id]->SetUse(false);
+		combat_id = -1;
+		Combat_On = false;
 		cout << "died" << endl;
 		break;
 		
@@ -352,6 +376,43 @@ void process_packet(unsigned char* p)
 		mPlayer[packet->id]->SetLook(xmf3Look);
 		break;
 	}
+	case SC_PACKET_CHANGE_HP: {
+		sc_packet_change_hp* packet = reinterpret_cast<sc_packet_change_hp*>(p);
+		mPlayer[packet->id]->m_hp = packet->hp;
+		break;
+	}
+	case SC_PACKET_COMBAT_ID: {
+		sc_packet_combat_id* packet = reinterpret_cast<sc_packet_combat_id*>(p);
+		if (combat_id != packet->id) {
+			Combat_On = true;
+			combat_id = packet->id;
+
+			Combat_str = L"";
+			Combat_str.append(L"LV.");
+			Combat_str.append(to_wstring(mPlayer[combat_id]->m_lv));
+			Combat_str.append(L"  ");
+			wchar_t* temp;;
+			int len = 1 + strlen(mPlayer[combat_id]->m_name);
+			temp = new TCHAR[len];
+			mbstowcs(temp, mPlayer[combat_id]->m_name, len);
+			Combat_str.append(temp);
+			delete temp;
+
+			Combat_str.append(L"\n속성 : ");
+			switch (mPlayer[combat_id]->m_element) {
+			case E_NONE: my_element_str = Combat_str.append(L"무속성"); break;
+			case E_WATER: my_element_str = Combat_str.append(L"물"); break;
+			case E_FULLMETAL: my_element_str = Combat_str.append(L"강철"); break;
+			case E_WIND: my_element_str = Combat_str.append(L"바람"); break;
+			case E_FIRE: my_element_str = Combat_str.append(L"불"); break;
+			case E_TREE: my_element_str = Combat_str.append(L"나무"); break;
+			case E_EARTH: my_element_str = Combat_str.append(L"땅"); break;
+			case E_ICE: my_element_str = Combat_str.append(L"얼음"); break;
+			}
+		}
+		break;
+	}
+
 	default:
 		cout << "Process packet 오류" << endl;
 		break;
@@ -525,3 +586,17 @@ XMFLOAT3 get_look_to_server(int id)
 	return mPlayer[id]->GetLookVector();
 }
 
+int get_hp_to_server(int id)
+{
+	return mPlayer[id]->m_hp;
+}
+
+float get_combat_id_hp()
+{
+	return mPlayer[combat_id]->m_hp;
+}
+
+float get_combat_id_max_hp()
+{
+	return mPlayer[combat_id]->m_max_hp;
+}

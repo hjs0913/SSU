@@ -1063,12 +1063,14 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 					}
 				}
 				// ¿Ã∂ß∏∏ ∑ª¥ı∏µ
+				
+				reinterpret_cast<CAirplanePlayer*>(m_ppObjects[j])->m_hp = get_hp_to_server(j - MAX_WORLD_SHADER);
 				m_ppObjects[j]->SetPosition(get_position_to_server(j - MAX_WORLD_SHADER));
 				pPlayer->SetLook(get_look_to_server(j - MAX_WORLD_SHADER));
 				pPlayer->Animate(pTimer, pCamera, m_ppObjects[j]);
 
 				// hp bar ∑ª¥ı∏µ
-				int hp_j = j - MAX_WORLD_SHADER - 1000 + 812;
+				//int hp_j = j - MAX_WORLD_SHADER - 1000 + 812;
 				//m_ppObjects[hp_j]->Animate2(hp_j,pTimer, pCamera, pPlayer);
 			}
 			else {
@@ -1137,6 +1139,14 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 		}
 		else if (j == m_nObjects-2) {
 			m_ppObjects[j]->SyncPlayer(pTimer, pCamera, player);
+		}
+		else if (j >= 812 && j < 992) {
+			pPlayer = reinterpret_cast<CAirplanePlayer*>(m_ppObjects[MAX_WORLD_SHADER + MAX_USER + j - 812]);
+			if (pPlayer->GetUse()) {
+				int width = ((float)pPlayer->m_hp / pPlayer->m_max_hp) * 50.0f;
+				m_ppObjects[j]->SetMesh(0, newhp[width]);
+			}
+			m_ppObjects[j]->Animate2(j, pTimer, pCamera, pPlayer);
 		}
 		else {
 			m_ppObjects[j]->Animate(pTimer, pCamera, player);

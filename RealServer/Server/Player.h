@@ -8,10 +8,6 @@ protected:
     int                 _login_id;
     int		            _exp;
     JOB                 _job;
-    ELEMENT             _element;
-    int                 _mp;
-    int                 _max_mp;
-
     atomic_bool	        _attack_active;		// NPC가 가만히 안있고 움직일때
     atomic_bool         _skill_active[3] = { false };
 public:
@@ -51,6 +47,7 @@ public:
                     NULL, error_num,
                     MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
                     (LPTSTR)&lpMsgBuf, 0, 0);
+                cout << "받기 실패" << endl;
                 wcout << lpMsgBuf << endl;
                 //while (true);
                 LocalFree(lpMsgBuf);
@@ -71,6 +68,7 @@ public:
                     NULL, error_num,
                     MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
                     (LPTSTR)&lpMsgBuf, 0, 0);
+                cout << "전송 실패" << endl;
                 wcout << lpMsgBuf << endl;
                 LocalFree(lpMsgBuf);
             }
@@ -112,12 +110,4 @@ public:
     int get_exp();
 
     JOB get_job();
-
-    int get_Pmp();
-    void set_Pmp(int mp);
-    int get_Pmaxmp();
-    void set_Pmaxmp(int mp);
-
-    void set_element(ELEMENT element);
-    ELEMENT get_element();
 };

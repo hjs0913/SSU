@@ -47,6 +47,14 @@ void send_put_object_packet(Player* pl, Npc* target)
     packet.look_x = target->get_look_x();
     packet.look_y = target->get_look_y();
     packet.look_z = target->get_look_z();
+
+    packet.level = target->get_lv();
+    packet.hp = target->get_hp();
+    packet.maxhp = target->get_maxhp();
+    packet.mp = target->get_mp();
+    packet.maxmp = target->get_maxmp();
+    packet.element = target->get_element();
+
     packet.object_type = target->get_tribe();
     if (target->get_tribe() == HUMAN) {
         packet.object_class = reinterpret_cast<Player*>(target)->get_job();
@@ -117,3 +125,14 @@ void send_look_packet(Player* pl, Npc* changer)
     packet.z = changer->get_look_z();
     pl->do_send(sizeof(packet), &packet);
 }
+
+void send_change_hp_packet(Player* pl, Npc* victim)
+{
+    sc_packet_change_hp packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_CHANGE_HP;
+    packet.id = victim->get_id();
+    packet.hp = victim->get_hp();
+    pl->do_send(sizeof(packet), &packet);
+}
+    

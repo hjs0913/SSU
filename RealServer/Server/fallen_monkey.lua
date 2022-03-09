@@ -20,7 +20,7 @@ function set_uid(id, x, y, z)
    my_y = y;
    my_z = z;
    return my_element,my_lv, my_name, my_hp, my_physical_attack, my_magical_attck, 
-        my_phsical_defence, my_magical_defence, my_basic_attack_factor, my_defence_factor;
+        my_physical_defence, my_magical_defence, my_basic_attack_factor, my_defence_factor;
 end
 
 function event_npc_move(player)
