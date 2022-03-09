@@ -518,7 +518,7 @@ void CObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 
 	pRectMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, hp_width, hp_height, 0.0f);
 	
-	CTexturedRectMesh* part = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 5, 5, 0.0f);
+	CTexturedRectMesh* part = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 2,2, 0.0f);
 
 	CReverseCubeMeshTextured* room = new CReverseCubeMeshTextured(pd3dDevice, pd3dCommandList, 300.0f, 100.0f, 300.0f);
 
@@ -776,7 +776,7 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	pRectMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, hp_width, hp_height, 0.0f);
 
 
-	CTexturedRectMesh* part = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 30, 30, 0.0f);  //파티클 
+	CTexturedRectMesh* part = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 10, 10, 0.0f);  //파티클 
 
 	CReverseCubeMeshTextured* room = new CReverseCubeMeshTextured(pd3dDevice, pd3dCommandList, 300.0f, 100.0f, 300.0f);
 
@@ -1076,68 +1076,64 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 				pPlayer->Animate(pTimer, pCamera, m_ppObjects[j]);
 			}
 		}
-		else if ( j <= bulletidx&&  j > 0) { //총알 원위치 
-			if (m_ppObjects[j]->GetPosition().x < 0 || m_ppObjects[j]->GetPosition().x>5000 ||
+		else if ( j <= bulletidx) { //총알 원위치 
+			if (m_ppObjects[j]->GetPosition().x <  0 || m_ppObjects[j]->GetPosition().x>5000 ||
 				m_ppObjects[j]->GetPosition().z < 0 || m_ppObjects[j]->GetPosition().z>5000) {
 				m_ppObjects[j]->SetPosition(0, 100, 0);
-			
+
 			}
-
-			else if (m_ppObjects[j]->Animate(pTimer, pCamera, player, map)) { // 구체 이펙트 
 			
-				if (start[j] == 0)
-					start[j] = pTimer.GetTotalTime();
-
+			else if (reinterpret_cast<CBulletObject*>(m_ppObjects[j])->Animate(pTimer, pCamera, player, map)) { // 구체 이펙트 
+	
 			
-				m_ppObjects[j + BULLETCNT]->SetPosition(
-					(effect_x),
-					(effect_y),
-					(effect_z));
+					if (start[j] == 0)
+						start[j] = pTimer.GetTotalTime();
+
+
+					//m_ppObjects[j + BULLETCNT]->SetPosition(effect_x, effect_y + 10, effect_z);
+
 					m_ppObjects[j + BULLETCNT]->AnimatePart(pTimer, start[j], XMFLOAT3(effect_x, effect_y + 10,effect_z), 0);
 
-					if (j < 70) {
-					
-						m_ppObjects[j + BULLETCNT+30]->SetPosition(
-							(effect_x - 10),
-							(effect_y ) ,
-							(effect_z)  );
-						m_ppObjects[j + BULLETCNT + 31]->SetPosition(
-							(effect_x),
-							(effect_y),
-							(effect_z));
-						m_ppObjects[j + BULLETCNT + 32]->SetPosition(
-							(effect_x +10),
-							(effect_y),
-							(effect_z));
 
-					   m_ppObjects[j + BULLETCNT + 32]->AnimatePart(pTimer, start[j], XMFLOAT3(effect_x, effect_y+10, effect_z), 1);
+					if (j < 70) {
+
+						//m_ppObjects[j + BULLETCNT + 30]->SetPosition(effect_x - 10, effect_y, effect_z);
+						//m_ppObjects[j + BULLETCNT + 31]->SetPosition(effect_x, effect_y , effect_z);
+						//m_ppObjects[j + BULLETCNT + 32]->SetPosition(effect_x - 10, effect_y , effect_z);
+
+						m_ppObjects[j + BULLETCNT + 32]->AnimatePart(pTimer, start[j], XMFLOAT3(effect_x, effect_y + 10, effect_z), 1);
 						m_ppObjects[j + BULLETCNT + 31]->AnimatePart(pTimer, start[j], XMFLOAT3(effect_x, effect_y + 10, effect_z), 2);
 						m_ppObjects[j + BULLETCNT + 30]->AnimatePart(pTimer, start[j], XMFLOAT3(effect_x, effect_y + 10, effect_z), 3);
+
+			
+
 					}
 					else {
-					
-						m_ppObjects[j + BULLETCNT -30]->SetPosition(
-							(effect_x - 10),
-							(effect_y),
-							(effect_z));
-						m_ppObjects[j + BULLETCNT - 31]->SetPosition(
-							(effect_x),
-							(effect_y),
-							(effect_z));
-						m_ppObjects[j + BULLETCNT - 32]->SetPosition(
-							(effect_x + 10),
-							(effect_y),
-							(effect_z));
+						cout << "우아2" << endl;
+						//m_ppObjects[j + BULLETCNT - 30]->SetPosition(effect_x - 10, effect_y + 10, effect_z);
+						//m_ppObjects[j + BULLETCNT - 31]->SetPosition(effect_x, effect_y , effect_z);
+						//m_ppObjects[j + BULLETCNT - 32]->SetPosition(effect_x - 10, effect_y + 10, effect_z);
 
-						m_ppObjects[j + BULLETCNT - 32]->AnimatePart(pTimer, start[j], XMFLOAT3(effect_x, effect_y + 10, effect_z), 1);
-						m_ppObjects[j + BULLETCNT - 31]->AnimatePart(pTimer, start[j], XMFLOAT3(effect_x, effect_y + 10, effect_z), 2);
-						m_ppObjects[j + BULLETCNT - 30]->AnimatePart(pTimer, start[j], XMFLOAT3(effect_x, effect_y + 10, effect_z), 3);
+						//m_ppObjects[j + BULLETCNT - 32]->AnimatePart(pTimer, start[j], XMFLOAT3(effect_x, effect_y + 10, effect_z), 1);
+						//m_ppObjects[j + BULLETCNT - 31]->AnimatePart(pTimer, start[j], XMFLOAT3(effect_x, effect_y + 10, effect_z), 2);
+						//m_ppObjects[j + BULLETCNT - 30]->AnimatePart(pTimer, start[j], XMFLOAT3(effect_x, effect_y + 10, effect_z), 3);
 					}
 
-				if (pTimer.GetTotalTime() - start[j] >= 2) {
-					m_ppObjects[j]->SetPosition(0, -100, 0);
-					start[j] = 0;
-				}
+
+
+					if (pTimer.GetTotalTime() - start[j] >= 2) {
+
+					
+
+					
+						hit_check = false;
+
+					
+						start[j] = 0;
+					}
+					
+					
+				
 			}
 		}
 		else if (j == m_nObjects-2) {

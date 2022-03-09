@@ -456,12 +456,12 @@ void attack_success(int p_id, int target, float atk_factor)
 
     players[target]->set_hp(target_hp);
 
-    timer_event ev;
-    ev.obj_id = p_id;
-    ev.start_time = chrono::system_clock::now() + 10s;  //쿨타임
-    ev.ev = EVENT_ELEMENT_COOLTIME;;
-    ev.target_id = target;
-    timer_queue.push(ev);
+    //timer_event ev;
+    //ev.obj_id = p_id;
+    //ev.start_time = chrono::system_clock::now() + 10s;  //쿨타임
+    //ev.ev = EVENT_ELEMENT_COOLTIME;;
+    //ev.target_id = target;
+    //timer_queue.push(ev);
 
     cout << "공격자  속성" << players[p_id]->get_element() << endl;
 
@@ -2210,7 +2210,7 @@ void initialise_NPC()
         players[i]->set_basic_attack_factor(lua_tointeger(L, -2));
         players[i]->set_defence_factor(lua_tonumber(L, -1));
 
-        lua_pop(L, 10);// eliminate set_uid from stack after call
+        lua_pop(L, 11);// eliminate set_uid from stack after call
 
         // 나중에 어떻게 이용할 것인지 생각
         lua_register(L, "API_get_x", API_get_x);
@@ -2263,7 +2263,7 @@ void initialise_NPC()
         players[i]->set_magical_defence(lua_tonumber(L, -3));
         players[i]->set_basic_attack_factor(lua_tointeger(L, -2));
         players[i]->set_defence_factor(lua_tonumber(L, -1));
-        lua_pop(L, 10);// eliminate set_uid from stack after call
+        lua_pop(L, 11);// eliminate set_uid from stack after call
 
         // 여기는 나중에 생각하자
         lua_register(L, "API_get_x", API_get_x);
@@ -2315,7 +2315,7 @@ void initialise_NPC()
         players[i]->set_magical_defence(lua_tonumber(L, -3));
         players[i]->set_basic_attack_factor(lua_tointeger(L, -2));
         players[i]->set_defence_factor(lua_tonumber(L, -1));
-        lua_pop(L, 10);// eliminate set_uid from stack after call
+        lua_pop(L, 11);// eliminate set_uid from stack after call
 
         // 여기는 나중에 생각하자
         lua_register(L, "API_get_x", API_get_x);
@@ -2364,7 +2364,7 @@ void initialise_NPC()
         players[i]->set_magical_defence(lua_tonumber(L, -3));
         players[i]->set_basic_attack_factor(lua_tointeger(L, -2));
         players[i]->set_defence_factor(lua_tonumber(L, -1));
-        lua_pop(L, 10);// eliminate set_uid from stack after call
+        lua_pop(L, 11);// eliminate set_uid from stack after call
 
         // 여기는 나중에 생각하자
         lua_register(L, "API_get_x", API_get_x);
@@ -2415,7 +2415,7 @@ void initialise_NPC()
         players[i]->set_magical_defence(lua_tonumber(L, -3));
         players[i]->set_basic_attack_factor(lua_tointeger(L, -2));
         players[i]->set_defence_factor(lua_tonumber(L, -1));
-        lua_pop(L, 10);// eliminate set_uid from stack after call
+        lua_pop(L, 11);// eliminate set_uid from stack after call
 
         // 여기는 나중에 생각하자
         lua_register(L, "API_get_x", API_get_x);
@@ -2468,7 +2468,7 @@ void initialise_NPC()
         players[i]->set_basic_attack_factor(lua_tointeger(L, -2));
         players[i]->set_defence_factor(lua_tonumber(L, -1));
 
-        lua_pop(L, 10);// eliminate set_uid from stack after call
+        lua_pop(L, 11);// eliminate set_uid from stack after call
 
         // 여기는 나중에 생각하자
         lua_register(L, "API_get_x", API_get_x);

@@ -358,6 +358,7 @@ void process_packet(unsigned char* p)
 	case SC_PACKET_PLAY_SHOOT: {
 		sc_packet_play_shoot* packet = reinterpret_cast<sc_packet_play_shoot*>(p);
 		shoot = true;	
+		hit_check = false;
 		break;
 	}
 	case SC_PACKET_PLAY_EFFECT: {
@@ -366,7 +367,9 @@ void process_packet(unsigned char* p)
 		effect_x = packet->x;
 		effect_y = packet->y;
 		effect_z = packet->z;
-	
+		cout << effect_x << endl;
+		cout << effect_y << endl;
+		cout << effect_z << endl;
 		break;
 	}
 	default:
