@@ -13,6 +13,7 @@ Player::Player(int id) : Npc(id)
     _element = E_NONE;
     _attack_active = false;
     last_move_time = 0;
+    superposition = false;
 }
 
 void Player::set_exp(int exp)

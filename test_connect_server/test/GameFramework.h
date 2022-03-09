@@ -9,6 +9,8 @@
 #include "Scene.h"
 #include "Network.h"
 #include "../../RealServer/Server/protocol.h"
+
+extern bool shoot;
 extern  XMFLOAT3 hp_pos;
 extern XMFLOAT3 POS_PLAYER; 
 
@@ -16,6 +18,10 @@ extern wstring Chatting_Str;
 extern bool Chatting_On;
 extern bool Mouse_On;
 
+extern int effect_x;
+extern int effect_y;
+extern int effect_z;
+extern bool hit_check;
 
 extern int nnn;
 class CGameFramework

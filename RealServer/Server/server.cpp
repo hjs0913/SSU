@@ -466,7 +466,7 @@ void physical_skill_success(int p_id, int target, float skill_factor)
     }
 }
 
-bool superposition = false; //이거를 npc마다 다 주자 
+//bool superposition = false; //이거를 npc마다 다 주자 
 
 void attack_success(int p_id, int target, float atk_factor)
 {
@@ -500,12 +500,13 @@ void attack_success(int p_id, int target, float atk_factor)
     
     switch (players[p_id]->get_element())
     {
-     if(superposition)
+   
+     if(players[target]->get_element_cooltime() == false)
     case E_WATER:
         if (players[target]->get_element() == E_FULLMETAL || players[target]->get_element() == E_FIRE
             || players[target]->get_element() == E_EARTH) {
             players[target]->set_magical_attack(players[target]->get_magical_attack() / 10 * 9);
-            superposition = true;//npc안에 별도로 만들자 
+            players[target]->set_element_cooltime(true);
         }
         cout << "타켓의 마공:" << players[target]->get_magical_attack() << endl;
         break;
@@ -513,42 +514,43 @@ void attack_success(int p_id, int target, float atk_factor)
         if (players[target]->get_element() == E_ICE || players[target]->get_element() == E_TREE
             || players[target]->get_element() == E_WIND) {
             reinterpret_cast<Player*>(players[p_id])->set_physical_defence(reinterpret_cast<Player*>(players[p_id])->get_physical_defence() + reinterpret_cast<Player*>(players[p_id])->get_physical_defence() / 10);
-            superposition = true;
+            players[target]->set_element_cooltime(true);
         }
         break;
     case E_WIND:
         if (players[target]->get_element() == E_WATER || players[target]->get_element() == E_EARTH
             || players[target]->get_element() == E_FIRE) {
+
            //공속 시전속도 상승 , 쿨타임 감소 
-            superposition = true;//npc안에 별도로 만들자 
+            players[target]->set_element_cooltime(true);
         }
         break;
     case E_FIRE:
         if (players[target]->get_element() == E_ICE || players[target]->get_element() == E_TREE
             || players[target]->get_element() == E_FULLMETAL) {
         //10초 공격력 10프로의 화상 피해 
-            superposition = true;//npc안에 별도로 만들자 
+            players[target]->set_element_cooltime(true);
         }
         break;
     case E_TREE:
         if (players[target]->get_element() == E_EARTH || players[target]->get_element() == E_WATER
             || players[target]->get_element() == E_WIND) {
             players[target]->set_physical_attack(players[target]->get_physical_attack() / 10 * 9);
-            superposition = true;//npc안에 별도로 만들자 
+            players[target]->set_element_cooltime(true);
         }
         break;
     case E_EARTH:
         if (players[target]->get_element() == E_ICE || players[target]->get_element() == E_FULLMETAL
             || players[target]->get_element() == E_FIRE) {
             reinterpret_cast<Player*>(players[p_id])->set_magical_defence(reinterpret_cast<Player*>(players[p_id])->get_magical_defence() + reinterpret_cast<Player*>(players[p_id])->get_magical_defence() / 10);
-            superposition = true;//npc안에 별도로 만들자 
+            players[target]->set_element_cooltime(true);
         }
         break;
     case E_ICE:
         if (players[target]->get_element() == E_TREE || players[target]->get_element() == E_WATER
             || players[target]->get_element() == E_WIND) {
          //동결 and  10초동안 공속, 시전속도, 이동속도 10프로감소 
-            superposition = true;//npc안에 별도로 만들자 
+            players[target]->set_element_cooltime(true);
         }
         break;
     default:
@@ -808,21 +810,34 @@ void process_packet(int client_id, unsigned char* p)
             pl->set_element(E_WATER);
             break;
         }
-        case J_SUPPORTER: {  //값은 바꿔야함 
+        case J_SUPPORTER: { 
             int lv = pl->get_lv();
-            pl->set_maxhp(22 * lv * lv + 80 * lv);
+            pl->set_maxhp(18 * lv * lv + 70 * lv);
             pl->set_hp(pl->get_maxhp());
-            pl->set_maxmp(8.5 * lv * lv + 50 * lv);
+            pl->set_maxmp(15 * lv * lv + 60 * lv);
             pl->set_mp(pl->get_maxmp());
-            pl->set_physical_attack(0.25 * lv * lv + 10 * lv);
-            pl->set_magical_attack(0.08 * lv * lv + 5 * lv);
-            pl->set_physical_defence(0.27 * lv * lv + 10 * lv);
-            pl->set_magical_defence(0.2 * lv * lv + 10 * lv);
+            pl->set_physical_attack(0.1 * lv * lv + 5 * lv);
+            pl->set_magical_attack(0.25 * lv * lv + 8 * lv);
+            pl->set_physical_defence(0.17 * lv * lv + 10 * lv);
+            pl->set_magical_defence(0.24 * lv * lv + 10 * lv);
             pl->set_basic_attack_factor(50.0f);
             pl->set_defence_factor(0.0002);
             break;
         }
-
+        case J_MAGICIAN: { 
+            int lv = pl->get_lv();
+            pl->set_maxhp(16 * lv * lv + 70 * lv);
+            pl->set_hp(pl->get_maxhp());
+            pl->set_maxmp(17 * lv * lv + 60 * lv);
+            pl->set_mp(pl->get_maxmp());
+            pl->set_physical_attack(0.1 * lv * lv + 5 * lv);
+            pl->set_magical_attack(0.3 * lv * lv + 10 * lv);
+            pl->set_physical_defence(0.17 * lv * lv + 10 * lv);
+            pl->set_magical_defence(0.24 * lv * lv + 10 * lv);
+            pl->set_basic_attack_factor(50.0f);
+            pl->set_defence_factor(0.0002);
+            break;
+        }
         default: {
             cout << "없는 직업" << endl;
             break;
@@ -1361,11 +1376,11 @@ void process_packet(int client_id, unsigned char* p)
                                 pl->set_skill_factor(packet->skill_type, packet->skill_num);
                                 physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
 
-                                players[i]->set_pos(players[i]->get_x() + pl->get_look_x()*40, players[i]->get_z() + pl->get_look_z() * 40);
+                                players[i]->set_pos(players[i]->get_x() + pl->get_look_x() * 40, players[i]->get_z() + pl->get_look_z() * 40);
                                 send_move_packet(pl, players[i]);  //나중에 수정필요 
                                 send_status_change_packet(pl);
                                 players[i]->set_target_id(pl->get_id());
-                               if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
+                                if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
                                     players[i]->set_active(true);
                                     timer_event ev;
                                     ev.obj_id = i;
@@ -1504,7 +1519,141 @@ void process_packet(int client_id, unsigned char* p)
                         break;
                     }
                     break;
+                case J_MAGICIAN:
+    
+                    switch (packet->skill_type)
+                    {
+                    case 0:
+                        break;
+                    case 1: //마법
+                        switch (packet->skill_num)
+                        {
+                     /*   case 0: // mp흡수 
+                            timer_event ev;
+                            ev.obj_id = client_id;
+                            ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
+                            ev.ev = EVENT_SKILL_COOLTIME;
+                            ev.target_id = 1;
+                            timer_queue.push(ev);
 
+                            cout << "마나 드레인!!!" << endl;
+                            pl->set_hp(pl->get_hp() - 300);
+                            send_status_change_packet(pl);
+
+                            for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
+                                players[i]->state_lock.lock();
+                                if (players[i]->get_state() != ST_INGAME) {
+                                    players[i]->state_lock.unlock();
+                                    continue;
+                                }
+                                players[i]->state_lock.unlock();
+
+
+
+                                if ((players[i]->get_x() >= pl->get_x() - 10 && players[i]->get_x() <= pl->get_x() + 10) && (players[i]->get_z() >= pl->get_z() - 10 && players[i]->get_z() <= pl->get_z() + 10)) {
+
+                                    pl->set_mp(pl->get_mp() + players[i]->get_hp() / 10);
+                                    if (pl->get_mp() > pl->get_maxmp())
+                                        pl->set_mp(pl->get_maxmp());
+
+
+                                    pl->set_skill_factor(packet->skill_type, packet->skill_num);
+                                    magical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
+                                    players[i]->set_target_id(pl->get_id());
+                                    send_status_change_packet(pl);
+                                    send_status_change_packet(reinterpret_cast<Player*>(players[i]));
+                                    if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
+                                        players[i]->set_active(true);
+                                        timer_event ev;
+                                        ev.obj_id = i;
+                                        ev.start_time = chrono::system_clock::now() + 1s;
+                                        ev.ev = EVENT_NPC_ATTACK;
+                                        ev.target_id = players[i]->get_target_id();
+                                        timer_queue.push(ev);
+
+                                        Activate_Npc_Move_Event(i, pl->get_id());
+                                    }
+                                }
+                            }
+                            break;*/
+                        case 1:
+                      
+                            timer_event ev;
+                            ev.obj_id = client_id;
+                            ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
+                            ev.ev = EVENT_SKILL_COOLTIME;
+                            ev.target_id = 1;
+                            timer_queue.push(ev);
+
+
+                            cout << "에너지 볼!!!" << endl;
+                            send_play_shoot_packet(pl); // 쏘라고 보내줘야 쏘자 
+
+                            pl->set_mp(pl->get_mp() - 1500);
+                            send_status_change_packet(pl);
+
+                            Coord a = { pl->get_x() + pl->get_right_x() * -10, pl->get_z() + pl->get_right_z() * -10 };    
+                            Coord b = { pl->get_x() + pl->get_right_x() * 10, pl->get_z() + pl->get_right_z() * 10 };
+                            Coord c = { (pl->get_x() + pl->get_right_x() * -10) + pl->get_look_x() * 100,
+                           (pl->get_z() + pl->get_right_z() * -10) + pl->get_look_z() * 100, };
+                            
+
+                            Coord d = { pl->get_x() + pl->get_right_x() * 10, pl->get_z() + pl->get_right_z() * 10 };
+                            Coord e = { (pl->get_x() + pl->get_right_x() * 10) + pl->get_look_x() * 100
+                                , (pl->get_z() + pl->get_right_z() * 10) + pl->get_look_x() * 100 };
+                            Coord f = { (pl->get_x() + pl->get_right_x() * -10) + pl->get_look_x() * 100,
+                           (pl->get_z() + pl->get_right_z() * -10) + pl->get_look_z() * 100, };
+
+                     
+
+
+                            for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
+                                players[i]->state_lock.lock();
+                                if (players[i]->get_state() != ST_INGAME) {
+                                    players[i]->state_lock.unlock();
+                                    continue;
+                                }
+                                players[i]->state_lock.unlock();
+
+                                Coord n = { players[i]->get_x(), players[i]->get_z() };
+                               //  players[i]->set_pos(players[i]->get_x() + pl->get_look_x() * 40 , players[i]->get_z() + pl->get_look_z() * 40);
+
+                                
+                                //if (players[i]->get_x() < pl->get_x() + pl->get_look_x() * 20 &&  players[i]->get_z() < pl->get_z()  + pl->get_look_z() * 100) {
+                                if (isInsideTriangle(a,b,c,n) || isInsideTriangle(d, e, f, n)){
+
+                                
+                                        cout << "적중!" << endl;
+                                        pl->set_skill_factor(packet->skill_type, packet->skill_num);
+                                        players[i]->set_target_id(pl->get_id());
+                                        magical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
+                                        send_play_effect_packet(pl, players[i]); // 이펙트 터트릴 위치 
+
+
+
+                                        if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
+                                            players[i]->set_active(true);
+                                            timer_event ev;
+                                            ev.obj_id = i;
+                                            ev.start_time = chrono::system_clock::now() + 1s;
+                                            ev.ev = EVENT_NPC_ATTACK;
+                                            ev.target_id = players[i]->get_target_id();
+                                            timer_queue.push(ev);
+
+                                            Activate_Npc_Move_Event(i, pl->get_id());
+                                        }
+                                    
+                                }
+                            }
+                        
+                            break;
+                        }
+                        break;
+                    case 2: 
+                        break;
+                 
+                    }
+                    break;
 
 
         }
@@ -1533,6 +1682,66 @@ void process_packet(int client_id, unsigned char* p)
     case CS_PACKET_CHANGE_JOB: {
         cs_packet_change_job* packet = reinterpret_cast<cs_packet_change_job*>(p);
         pl->set_job(packet->job);
+
+        switch (pl->get_job()) {
+        case J_DILLER: {
+            int lv = pl->get_lv();
+            pl->set_maxhp(20 * lv * lv + 80 * lv);
+            pl->set_hp(pl->get_maxhp());
+            pl->set_maxmp(10 * lv * lv + 50 * lv);
+            pl->set_mp(pl->get_maxmp());
+            pl->set_physical_attack(0.3 * lv * lv + 10 * lv);
+            pl->set_magical_attack(0.1 * lv * lv + 5 * lv);
+            pl->set_physical_defence(0.24 * lv * lv + 10 * lv);
+            pl->set_magical_defence(0.17 * lv * lv + 10 * lv);
+            pl->set_basic_attack_factor(50.0f);
+            pl->set_defence_factor(0.0002);
+            break;
+        }
+        case J_TANKER: {
+            int lv = pl->get_lv();
+            pl->set_maxhp(22 * lv * lv + 80 * lv);
+            pl->set_hp(pl->get_maxhp());
+            pl->set_maxmp(8.5 * lv * lv + 50 * lv);
+            pl->set_mp(pl->get_maxmp());
+            pl->set_physical_attack(0.25 * lv * lv + 10 * lv);
+            pl->set_magical_attack(0.08 * lv * lv + 5 * lv);
+            pl->set_physical_defence(0.27 * lv * lv + 10 * lv);
+            pl->set_magical_defence(0.2 * lv * lv + 10 * lv);
+            pl->set_basic_attack_factor(50.0f);
+            pl->set_defence_factor(0.0002);
+            pl->set_element(E_WATER);
+            break;
+        }
+        case J_SUPPORTER: {
+            int lv = pl->get_lv();
+            pl->set_maxhp(18 * lv * lv + 70 * lv);
+            pl->set_hp(pl->get_maxhp());
+            pl->set_maxmp(15 * lv * lv + 60 * lv);
+            pl->set_mp(pl->get_maxmp());
+            pl->set_physical_attack(0.1 * lv * lv + 5 * lv);
+            pl->set_magical_attack(0.25 * lv * lv + 8 * lv);
+            pl->set_physical_defence(0.17 * lv * lv + 10 * lv);
+            pl->set_magical_defence(0.24 * lv * lv + 10 * lv);
+            pl->set_basic_attack_factor(50.0f);
+            pl->set_defence_factor(0.0002);
+            break;
+        }
+        case J_MAGICIAN: {
+            int lv = pl->get_lv();
+            pl->set_maxhp(16 * lv * lv + 70 * lv);
+            pl->set_hp(pl->get_maxhp());
+            pl->set_maxmp(17 * lv * lv + 60 * lv);
+            pl->set_mp(pl->get_maxmp());
+            pl->set_physical_attack(0.1 * lv * lv + 5 * lv);
+            pl->set_magical_attack(0.3 * lv * lv + 10 * lv);
+            pl->set_physical_defence(0.17 * lv * lv + 10 * lv);
+            pl->set_magical_defence(0.24 * lv * lv + 10 * lv);
+            pl->set_basic_attack_factor(50.0f);
+            pl->set_defence_factor(0.0002);
+            break;
+        }
+        }
         cout << "내 직업은" << packet->job << "번 입니다." << endl;
         send_status_change_packet(pl);
         break;
@@ -1959,12 +2168,9 @@ void worker()
             switch (players[client_id]->get_element())  
             {
             case E_WATER:
-             
                 if(players[exp_over->_target]->get_element() == E_FULLMETAL || players[exp_over->_target]->get_element() == E_FIRE
                     || players[exp_over->_target]->get_element() == E_EARTH)
                 players[exp_over->_target]->set_magical_attack(players[exp_over->_target]->get_magical_attack() / 10 * 9);
-
-                cout << "타켓의 마공:"<< players[exp_over->_target]->get_magical_attack() << endl;
                 break;
             case E_FULLMETAL:
                 break;
@@ -2068,7 +2274,8 @@ void initialise_NPC()
         players[i]->set_magical_defence(lua_tonumber(L, -3));
         players[i]->set_basic_attack_factor(lua_tointeger(L, -2));
         players[i]->set_defence_factor(lua_tonumber(L, -1));
-        lua_pop(L, 10);// eliminate set_uid from stack after call
+
+        lua_pop(L, 11);// eliminate set_uid from stack after call
 
         // 나중에 어떻게 이용할 것인지 생각
         lua_register(L, "API_get_x", API_get_x);
@@ -2122,7 +2329,7 @@ void initialise_NPC()
         players[i]->set_magical_defence(lua_tonumber(L, -3));
         players[i]->set_basic_attack_factor(lua_tointeger(L, -2));
         players[i]->set_defence_factor(lua_tonumber(L, -1));
-        lua_pop(L, 10);// eliminate set_uid from stack after call
+        lua_pop(L, 11);// eliminate set_uid from stack after call
 
         // 여기는 나중에 생각하자
         lua_register(L, "API_get_x", API_get_x);
@@ -2175,7 +2382,7 @@ void initialise_NPC()
         players[i]->set_magical_defence(lua_tonumber(L, -3));
         players[i]->set_basic_attack_factor(lua_tointeger(L, -2));
         players[i]->set_defence_factor(lua_tonumber(L, -1));
-        lua_pop(L, 10);// eliminate set_uid from stack after call
+        lua_pop(L, 11);// eliminate set_uid from stack after call
 
         // 여기는 나중에 생각하자
         lua_register(L, "API_get_x", API_get_x);
@@ -2225,7 +2432,7 @@ void initialise_NPC()
         players[i]->set_magical_defence(lua_tonumber(L, -3));
         players[i]->set_basic_attack_factor(lua_tointeger(L, -2));
         players[i]->set_defence_factor(lua_tonumber(L, -1));
-        lua_pop(L, 10);// eliminate set_uid from stack after call
+        lua_pop(L, 11);// eliminate set_uid from stack after call
 
         // 여기는 나중에 생각하자
         lua_register(L, "API_get_x", API_get_x);
@@ -2277,7 +2484,7 @@ void initialise_NPC()
         players[i]->set_magical_defence(lua_tonumber(L, -3));
         players[i]->set_basic_attack_factor(lua_tointeger(L, -2));
         players[i]->set_defence_factor(lua_tonumber(L, -1));
-        lua_pop(L, 10);// eliminate set_uid from stack after call
+        lua_pop(L, 11);// eliminate set_uid from stack after call
 
         // 여기는 나중에 생각하자
         lua_register(L, "API_get_x", API_get_x);
@@ -2331,7 +2538,7 @@ void initialise_NPC()
         players[i]->set_basic_attack_factor(lua_tointeger(L, -2));
         players[i]->set_defence_factor(lua_tonumber(L, -1));
 
-        lua_pop(L, 10);// eliminate set_uid from stack after call
+        lua_pop(L, 11);// eliminate set_uid from stack after call
 
         // 여기는 나중에 생각하자
         lua_register(L, "API_get_x", API_get_x);

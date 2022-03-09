@@ -8,6 +8,7 @@
 #include "Camera.h"
 #include "Timer.h"
 
+
 #define DIR_FORWARD					0x01
 #define DIR_BACKWARD				0x02
 #define DIR_LEFT					0x04
@@ -177,7 +178,10 @@ public:
 	virtual void Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject* player);
 	void AnimatePart(CGameTimer pTimer,float start, XMFLOAT3 pos,int type);
 	virtual void SyncPlayer(CGameTimer pTimer, CCamera* pCamera, CGameObject* player);
-	virtual bool Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject* player, void* map) { return false; };
+	virtual bool Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject* player, void* map) {
+
+		 return true;
+	};
 	virtual void Animate2(int num, CGameTimer pTimer, CCamera* pCamera, CGameObject* player) {};
 	virtual void OnPrepareRender() { }
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera=NULL);
@@ -252,11 +256,11 @@ public:
 	virtual ~CBulletObject();
 
 	void Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject* player);
-	bool Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject* player,void* b);  //볼 날아가는 것
+	bool Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject* player,void* map);  //볼 날아가는 것
 	
 	
 	bool check(void* map); //맵에 닿았는지 
-
+	bool check2();
 	//bool check2(CGameObject** m_ppObjects); //몬스터에 닿았는지 
 
 };

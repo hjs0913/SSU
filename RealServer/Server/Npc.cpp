@@ -18,7 +18,7 @@ Npc::Npc(int id)
 	_right_x = 1.0f;
 	_right_y = 0.0f;
 	_right_z = 0.0f;
-
+	superposition = false;
 	// _x = rand() % WORLD_WIDTH;
 	// _y = rand() % WORLD_HEIGHT;
 	_target_id = -1;
@@ -32,6 +32,7 @@ Npc::Npc(int id, const char* name)
 	_y = rand() % WORLD_HEIGHT;
 	_lv = 1;
 	_hp = 100;
+	_mp = 50;
 	_tribe = MONSTER;
 	_state = ST_INGAME;
 	_active = false;
@@ -45,6 +46,7 @@ Npc::Npc(int id, const char* name)
 	_right_z = 0.0f;
 
 	_target_id = -1;
+	superposition = false;
 }
 
 Npc::~Npc() 
@@ -304,4 +306,13 @@ void Npc::set_element(ELEMENT element)
 ELEMENT Npc::get_element()
 {
 	return _element;
+}
+
+void Npc::set_element_cooltime(bool yn)
+{
+	superposition = yn;
+}
+bool Npc::get_element_cooltime()
+{
+	return superposition;
 }
