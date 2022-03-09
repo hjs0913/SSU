@@ -522,39 +522,47 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[0] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::White);
 		m_ppUILayer[1] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::White);
 
-		// PlayerInfo( 2 : Info, 3: BasicHp, 4 : BasicMp, 3: Hp, 4 : Mp)
-		m_ppUILayer[2] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::Black);
+		// PlayerInfo( 2 : Info, 3: Hp, 4 : Mp)
+		m_ppUILayer[2] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::White, D2D1::ColorF::Black);
 		m_ppUILayer[3] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
 		m_ppUILayer[4] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Blue, D2D1::ColorF::White);
-		//m_ppUILayer[5] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::Black);
-		//m_ppUILayer[6] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Blue, D2D1::ColorF::Black);
+
+		// Combat Npc Info( 5: info, 6 : Hp)
+		m_ppUILayer[5] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::White, D2D1::ColorF::Black);
+		m_ppUILayer[6] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
+
 
 		m_ppUILayer[0]->setAlpha(0.5, 1.0);
 		m_ppUILayer[1]->setAlpha(0.5, 1.0);
-		m_ppUILayer[2]->setAlpha(0.5, 1.0);
+		m_ppUILayer[2]->setAlpha(0.3, 1.0);
 		m_ppUILayer[3]->setAlpha(0.0, 1.0);
 		m_ppUILayer[4]->setAlpha(0.0, 1.0);
-		//m_ppUILayer[5]->setAlpha(1.0, 1.0);
-		//m_ppUILayer[6]->setAlpha(1.0, 1.0);
+		m_ppUILayer[5]->setAlpha(0.3, 1.0);
+		m_ppUILayer[6]->setAlpha(0.0, 1.0);
+
+		m_ppUILayer[0]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_FAR);
+		m_ppUILayer[1]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[2]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+		m_ppUILayer[3]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[4]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[5]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+		m_ppUILayer[6]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+		// UIBar Setting
+		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, 40, 20 + (m_nWndClientWidth / 10) * 3, 60);
+		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetColorBrush(D2D1::ColorF::Red, 1.0, 20, 40, 20 + (m_nWndClientWidth / 10) * 3, 60);
+		reinterpret_cast<UIBar*>(m_ppUILayer[4])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, 60, 20 + (m_nWndClientWidth / 10) * 3, 80);
+		reinterpret_cast<UIBar*>(m_ppUILayer[4])->SetColorBrush(D2D1::ColorF::Blue, 1.0, 20, 60, 20 + (m_nWndClientWidth / 10) * 3, 80);
+		reinterpret_cast<UIBar*>(m_ppUILayer[6])->SetBehindBrush(D2D1::ColorF::Black, 1.0, (m_nWndClientWidth / 2) - 70, 40, (m_nWndClientWidth / 2) + 70, (m_nWndClientHeight / 6) - 20);
+		reinterpret_cast<UIBar*>(m_ppUILayer[6])->SetColorBrush(D2D1::ColorF::Red, 1.0, (m_nWndClientWidth / 2) - 70, 40, (m_nWndClientWidth / 2) + 70, (m_nWndClientHeight / 6) - 20);
 	}
-	m_ppUILayer[0]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
-		DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_FAR);
-	m_ppUILayer[1]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
-		DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-	m_ppUILayer[2]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
-		DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
-	m_ppUILayer[3]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
-		DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-	m_ppUILayer[4]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
-		DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-	//m_ppUILayer[5]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
-	//	DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-	//m_ppUILayer[6]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
-	//	DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-	reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, 40, 20 + (m_nWndClientWidth / 10) * 3, 60);
-	reinterpret_cast<UIBar*>(m_ppUILayer[4])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, 60, 20 + (m_nWndClientWidth / 10) * 3, 80);
-	reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetColorBrush(D2D1::ColorF::Red, 1.0, 20, 40, 20 + (m_nWndClientWidth / 10) * 3, 60);
-	reinterpret_cast<UIBar*>(m_ppUILayer[4])->SetColorBrush(D2D1::ColorF::Blue, 1.0, 20, 60, 20 + (m_nWndClientWidth / 10) * 3, 80);
 
 
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
@@ -854,6 +862,7 @@ void CGameFramework::FrameAdvance()
 	WaitForGpuComplete();
 
 
+	// UIRender
 	Send_str = L"";
 	Hp_str = L"";
 	Mp_str = L"";
@@ -880,17 +889,17 @@ void CGameFramework::FrameAdvance()
 			break;
 
 		case 2:
-			m_ppUILayer[i]->UpdateLabels(Info_str, 0, 0, (m_nWndClientWidth / 10)*3 + 30, (m_nWndClientHeight / 4));
+			m_ppUILayer[i]->UpdateLabels(Info_str, 0, 0, (m_nWndClientWidth / 10) * 3 + 30, 90);
 			break;
 		case 3: {
 			Hp_str.append(L" Hp : ");
 			Hp_str.append(to_wstring(m_pPlayer->m_hp));
 			Hp_str.append(L" / ");
 			Hp_str.append(to_wstring(m_pPlayer->m_max_hp));
-			m_ppUILayer[i]->UpdateLabels(Hp_str, 20, 40, 20 + ((float)m_pPlayer->m_hp/ m_pPlayer->m_max_hp)*(m_nWndClientWidth / 10) * 3, 60);
+			m_ppUILayer[i]->UpdateLabels(Hp_str, 20, 40, 20 + ((float)m_pPlayer->m_hp / m_pPlayer->m_max_hp) * (m_nWndClientWidth / 10) * 3, 60);
 			break;
 		}
-		case 4:
+		case 4: {
 			Mp_str.append(L" Mp : ");
 			Mp_str.append(to_wstring(m_pPlayer->m_mp));
 			Mp_str.append(L" / ");
@@ -898,10 +907,29 @@ void CGameFramework::FrameAdvance()
 			m_ppUILayer[i]->UpdateLabels(Mp_str, 20, 60, 20 + ((float)m_pPlayer->m_mp / m_pPlayer->m_max_mp) * (m_nWndClientWidth / 10) * 3, 80);
 			break;
 		}
+		case 5: {
+			if (!Combat_On) break;
+			m_ppUILayer[i]->UpdateLabels(Combat_str, (m_nWndClientWidth / 2) - 80, 0, (m_nWndClientWidth / 2) + 80, (m_nWndClientHeight / 6));
+			break;
+		}
+		case 6: {
+			if (!Combat_On) break;
+			wstring ang = L"HP : ";
+			ang.append(to_wstring((int)get_combat_id_hp()));
+			ang.append(L"/");
+			ang.append(to_wstring((int)get_combat_id_max_hp()));
+			m_ppUILayer[i]->UpdateLabels(ang, (m_nWndClientWidth / 2) - 70, 40, 140*((get_combat_id_hp()/get_combat_id_max_hp()))+((m_nWndClientWidth / 2) - 70), (m_nWndClientHeight / 6) - 20);
+			break;
+		}
+		}
 	}
 
 	for (int i = 0; i < UICOUNT; i++) {
+		if ((i == 5 || i == 6)) {
+			if (!Combat_On) continue;
+		}
 		m_ppUILayer[i]->Render(m_nSwapChainBufferIndex);
+
 	}
 #ifdef _WITH_PRESENT_PARAMETERS
 	DXGI_PRESENT_PARAMETERS dxgiPresentParameters;

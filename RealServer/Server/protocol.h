@@ -66,8 +66,11 @@ const char SC_PACKET_DEAD = 8;
 const char SC_PACKET_REVIVE = 9;
 const char SC_PACKET_LOOK = 10;
 const char SC_PACKET_CHANGE_JOB = 11;
-const char SC_PACKET_PLAY_SHOOT = 12;
-const char SC_PACKET_PLAY_EFFECT = 13;
+const char SC_PACKET_CHANGE_ELEMENT = 12;
+const char SC_PACKET_CHANGE_HP = 13;
+const char SC_PACKET_COMBAT_ID = 14;
+const char SC_PACKET_PLAY_SHOOT = 15;
+const char SC_PACKET_PLAY_EFFECT = 16;
 
 //---------------------------------------------------
 #pragma pack (push, 1)
@@ -123,11 +126,13 @@ struct cs_packet_change_job {
 	char type;
 	JOB job;
 };
+
 struct cs_packet_change_element {
 	unsigned char size;
 	char type;
 	ELEMENT element;
 };
+
 struct sc_packet_login_ok {
 	unsigned char size;
 	char type;
@@ -135,8 +140,8 @@ struct sc_packet_login_ok {
 	char	name[MAX_NAME_SIZE];	// 기존 프로토콜에 없어서 추가해주었습니다
 	float	x, y, z;
 	short	level;
-	short	hp, maxhp;
-	short	mp, maxmp;
+	int		hp, maxhp;
+	int		mp, maxmp;
 	int		exp;
 	short	tribe;					// 기존 프로토콜에 없어서 추가해주었습니다
 	JOB job;
@@ -157,8 +162,12 @@ struct sc_packet_put_object {
 	int id;
 	float x, y, z;
 	float look_x, look_y, look_z;
-	char object_type;
-	char object_class;
+	short	level;
+	int		hp, maxhp;
+	int		mp, maxmp;
+	ELEMENT element;
+	char	object_type;
+	char	object_class;
 	char	name[MAX_NAME_SIZE];
 };
 
@@ -187,7 +196,7 @@ struct sc_packet_status_change {
 	char	type;
 	int		id;
 	short	level;
-	short	hp, maxhp, mp, maxmp;
+	int		hp, maxhp, mp, maxmp;
 	int		exp;
 	JOB job;
 	ELEMENT element;
@@ -230,5 +239,17 @@ struct sc_packet_play_effect {
 	int id;
 };
 
+struct sc_packet_change_hp {
+	unsigned char size;
+	char type;
+	int id;
+	int hp;
+};
+
+struct sc_packet_combat_id {
+	unsigned char size;
+	char type;
+	int id;
+};
 
 #pragma pack(pop)
