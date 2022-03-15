@@ -263,6 +263,7 @@ void magical_skill_success(int p_id, int target, float skill_factor)
 
         //send_status_change_packet(reinterpret_cast<Player*>(players[target]));
 
+        send_change_hp_packet(reinterpret_cast<Player*>(players[target]), players[target]);
         reinterpret_cast<Player*>(players[target])->vl.lock();
         for (auto id : reinterpret_cast<Player*>(players[target])->viewlist) {
             if (true == is_npc(id)) continue;
@@ -301,6 +302,12 @@ void magical_skill_success(int p_id, int target, float skill_factor)
                 send_change_hp_packet(reinterpret_cast<Player*>(obj), players[target]);
             }
         }
+
+        sc_packet_combat_id packet;
+        packet.size = sizeof(packet);
+        packet.type = SC_PACKET_COMBAT_ID;
+        packet.id = target;
+        reinterpret_cast<Player*>(players[p_id])->do_send(sizeof(packet), &packet);
 
         char mess[MAX_CHAT_SIZE];
         sprintf_s(mess, MAX_CHAT_SIZE, "%s -> %s damage : %d",
@@ -418,6 +425,7 @@ void physical_skill_success(int p_id, int target, float skill_factor)
 
         //send_status_change_packet(reinterpret_cast<Player*>(players[target]));
 
+        send_change_hp_packet(reinterpret_cast<Player*>(players[target]), players[target]);
         reinterpret_cast<Player*>(players[target])->vl.lock();
         for (auto id : reinterpret_cast<Player*>(players[target])->viewlist) {
             if (true == is_npc(id)) continue;
@@ -457,7 +465,11 @@ void physical_skill_success(int p_id, int target, float skill_factor)
             }
         }
 
-        
+        sc_packet_combat_id packet;
+        packet.size = sizeof(packet);
+        packet.type = SC_PACKET_COMBAT_ID;
+        packet.id = target;
+        reinterpret_cast<Player*>(players[p_id])->do_send(sizeof(packet), &packet);
 
         char mess[MAX_CHAT_SIZE];
         sprintf_s(mess, MAX_CHAT_SIZE, "%s -> %s damage : %d",
