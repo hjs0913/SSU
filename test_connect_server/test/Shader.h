@@ -9,7 +9,7 @@
 #include "Timer.h"
 
 extern CBillboardObject* pBillboardObject;
-extern CMaterial* pMaterials[7];
+extern CMaterial* pMaterials[15];
 extern CTexturedRectMesh* pRectMesh;
 extern CTexturedRectMesh* pRectMesh1;
 

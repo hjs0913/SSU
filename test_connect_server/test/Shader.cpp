@@ -722,7 +722,7 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	m_nObjects = (xObjects * yObjects * zObjects);  //97
 	// m_nObjects += 1 + 2 * BULLETCNT + 1 + 4;
 	m_nObjects += 1 + 2 * BULLETCNT + 1 + 4 + MAX_NPC + MAX_USER;
-#define TEXTURES 8
+#define TEXTURES 14
 	CTexture* pTexture[TEXTURES];
 	pTexture[0] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
 	pTexture[0] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
@@ -750,9 +750,33 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	pTexture[7] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
 	pTexture[7]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/guard.dds", RESOURCE_TEXTURE2D, 0);
 
+
+	pTexture[8] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
+	pTexture[8]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/water.dds", RESOURCE_TEXTURE2D, 0);
+
+
+	pTexture[9] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
+	pTexture[9]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/metal.dds", RESOURCE_TEXTURE2D, 0);
+
+
+	pTexture[10] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
+	pTexture[10]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/wind.dds", RESOURCE_TEXTURE2D, 0);
+
+
+	pTexture[11] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
+	pTexture[11]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/fire.dds", RESOURCE_TEXTURE2D, 0);
+
+
+	pTexture[12] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
+	pTexture[12]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/tree.dds", RESOURCE_TEXTURE2D, 0);
+
+
+	pTexture[13] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
+	pTexture[13]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/earth.dds", RESOURCE_TEXTURE2D, 0);
+
 	UINT ncbElementBytes = ((sizeof(CB_GAMEOBJECT_INFO) + 255) & ~255);
 
-	CreateCbvSrvDescriptorHeaps(pd3dDevice, m_nObjects, 8);
+	CreateCbvSrvDescriptorHeaps(pd3dDevice, m_nObjects, 14);//8
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	CreateConstantBufferViews(pd3dDevice, m_nObjects, m_pd3dcbGameObjects, ncbElementBytes);
 	for (int i = 0; i < TEXTURES; i++) CreateShaderResourceViews(pd3dDevice, pTexture[i], 0, 3);
@@ -829,7 +853,7 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		pBillboardObject = new CBillboardObject(1);
 		pBillboardObject->SetMesh(0, part);
 #ifndef _WITH_BATCH_MATERIAL
-		pBillboardObject->SetMaterial(pMaterials[5]);
+		pBillboardObject->SetMaterial(pMaterials[8]);
 #endif
 		pBillboardObject->SetPosition(0, -100, 0);
 		pBillboardObject->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
