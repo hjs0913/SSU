@@ -509,67 +509,76 @@ void attack_success(int p_id, int target, float atk_factor)
 
     cout << "공격자  속성" << players[p_id]->get_element() << endl;
 
-    
-    switch (players[p_id]->get_element())
-    {
-   
-     if(players[target]->get_element_cooltime() == false)
-    case E_WATER:
-        if (players[target]->get_element() == E_FULLMETAL || players[target]->get_element() == E_FIRE
-            || players[target]->get_element() == E_EARTH) {
-            players[target]->set_magical_attack(players[target]->get_magical_attack() / 10 * 9);
-            players[target]->set_element_cooltime(true);
-        }
-        cout << "타켓의 마공:" << players[target]->get_magical_attack() << endl;
-        break;
-    case E_FULLMETAL:
-        if (players[target]->get_element() == E_ICE || players[target]->get_element() == E_TREE
-            || players[target]->get_element() == E_WIND) {
-            reinterpret_cast<Player*>(players[p_id])->set_physical_defence(reinterpret_cast<Player*>(players[p_id])->get_physical_defence() + reinterpret_cast<Player*>(players[p_id])->get_physical_defence() / 10);
-            players[target]->set_element_cooltime(true);
-        }
-        break;
-    case E_WIND:
-        if (players[target]->get_element() == E_WATER || players[target]->get_element() == E_EARTH
-            || players[target]->get_element() == E_FIRE) {
+    if (players[target]->get_element_cooltime() == false) {
+        switch (players[p_id]->get_element())
+        {
 
-           //공속 시전속도 상승 , 쿨타임 감소 
-            players[target]->set_element_cooltime(true);
+
+        case E_WATER:
+            if (players[target]->get_element() == E_FULLMETAL || players[target]->get_element() == E_FIRE
+                || players[target]->get_element() == E_EARTH) {
+                players[target]->set_magical_attack(players[target]->get_magical_attack() / 10 * 9);
+                players[target]->set_element_cooltime(true);
+            }
+            cout << "타켓의 마공:" << players[target]->get_magical_attack() << endl;
+            break;
+        case E_FULLMETAL:
+            if (players[target]->get_element() == E_ICE || players[target]->get_element() == E_TREE
+                || players[target]->get_element() == E_WIND) {
+                reinterpret_cast<Player*>(players[p_id])->set_physical_defence(reinterpret_cast<Player*>(players[p_id])->get_physical_defence() + reinterpret_cast<Player*>(players[p_id])->get_physical_defence() / 10);
+                players[target]->set_element_cooltime(true);
+            }
+            break;
+        case E_WIND:
+            if (players[target]->get_element() == E_WATER || players[target]->get_element() == E_EARTH
+                || players[target]->get_element() == E_FIRE) {
+
+                //공속 시전속도 상승 , 쿨타임 감소 
+                players[target]->set_element_cooltime(true);
+            }
+            break;
+        case E_FIRE:
+            if (players[target]->get_element() == E_ICE || players[target]->get_element() == E_TREE
+                || players[target]->get_element() == E_FULLMETAL) {
+                //10초 공격력 10프로의 화상 피해 
+                players[target]->set_element_cooltime(true);
+            }
+            break;
+        case E_TREE:
+            if (players[target]->get_element() == E_EARTH || players[target]->get_element() == E_WATER
+                || players[target]->get_element() == E_WIND) {
+                players[target]->set_physical_attack(players[target]->get_physical_attack() / 10 * 9);
+                players[target]->set_element_cooltime(true);
+            }
+            break;
+        case E_EARTH:
+            if (players[target]->get_element() == E_ICE || players[target]->get_element() == E_FULLMETAL
+                || players[target]->get_element() == E_FIRE) {
+                reinterpret_cast<Player*>(players[p_id])->set_magical_defence(reinterpret_cast<Player*>(players[p_id])->get_magical_defence() + reinterpret_cast<Player*>(players[p_id])->get_magical_defence() / 10);
+                players[target]->set_element_cooltime(true);
+            }
+            break;
+        case E_ICE:
+            if (players[target]->get_element() == E_TREE || players[target]->get_element() == E_WATER
+                || players[target]->get_element() == E_WIND) {
+                //동결 and  10초동안 공속, 시전속도, 이동속도 10프로감소 
+                players[target]->set_element_cooltime(true);
+            }
+            break;
+        default:
+            break;
         }
-        break;
-    case E_FIRE:
-        if (players[target]->get_element() == E_ICE || players[target]->get_element() == E_TREE
-            || players[target]->get_element() == E_FULLMETAL) {
-        //10초 공격력 10프로의 화상 피해 
-            players[target]->set_element_cooltime(true);
+        if (players[target]->get_element_cooltime() == true) {
+            timer_event ev;
+            ev.obj_id = p_id;
+            ev.start_time = chrono::system_clock::now() + 10s;  //쿨타임
+            ev.ev = EVENT_ELEMENT_COOLTIME;;
+            ev.target_id = target;
+            timer_queue.push(ev);
         }
-        break;
-    case E_TREE:
-        if (players[target]->get_element() == E_EARTH || players[target]->get_element() == E_WATER
-            || players[target]->get_element() == E_WIND) {
-            players[target]->set_physical_attack(players[target]->get_physical_attack() / 10 * 9);
-            players[target]->set_element_cooltime(true);
-        }
-        break;
-    case E_EARTH:
-        if (players[target]->get_element() == E_ICE || players[target]->get_element() == E_FULLMETAL
-            || players[target]->get_element() == E_FIRE) {
-            reinterpret_cast<Player*>(players[p_id])->set_magical_defence(reinterpret_cast<Player*>(players[p_id])->get_magical_defence() + reinterpret_cast<Player*>(players[p_id])->get_magical_defence() / 10);
-            players[target]->set_element_cooltime(true);
-        }
-        break;
-    case E_ICE:
-        if (players[target]->get_element() == E_TREE || players[target]->get_element() == E_WATER
-            || players[target]->get_element() == E_WIND) {
-         //동결 and  10초동안 공속, 시전속도, 이동속도 10프로감소 
-            players[target]->set_element_cooltime(true);
-        }
-        break;
-    default:
-        break;
     }
 
-    ;
+   
   //  EXP_OVER* exp_over = new EXP_OVER;
    // exp_over->_comp_op = OP_ELEMENT_COOLTIME;
   //  exp_over->_target = target;
@@ -1498,9 +1507,9 @@ void process_packet(int client_id, unsigned char* p)
 
                             timer_event ev;
                             ev.obj_id = client_id;
-                            ev.start_time = chrono::system_clock::now() + 3s;  //쿨타임
+                            ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
                             ev.ev = EVENT_SKILL_COOLTIME;
-                            ev.target_id = 2;
+                            ev.target_id = 3;
                             timer_queue.push(ev);
 
                             cout << "천사의 치유!!!" << endl;
@@ -1526,13 +1535,20 @@ void process_packet(int client_id, unsigned char* p)
                             }
                             break;
                        // case 1: // 전방으로 보호막을 날려 닿는 사람만 보호막 생성 
-
+                  
+         
+                            
                         }
                         break;
                     }
                     break;
                 case J_MAGICIAN:
-    
+                    timer_event ev;
+                    ev.obj_id = client_id;
+                    ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
+                    ev.ev = EVENT_SKILL_COOLTIME;
+                    ev.target_id = 1;
+                    timer_queue.push(ev);
                     switch (packet->skill_type)
                     {
                     case 0:
@@ -1540,13 +1556,9 @@ void process_packet(int client_id, unsigned char* p)
                     case 1: //마법
                         switch (packet->skill_num)
                         {
-                     /*   case 0: // mp흡수 
-                            timer_event ev;
-                            ev.obj_id = client_id;
-                            ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
-                            ev.ev = EVENT_SKILL_COOLTIME;
-                            ev.target_id = 1;
-                            timer_queue.push(ev);
+                           
+                        case 0: // mp흡수 
+                       
 
                             cout << "마나 드레인!!!" << endl;
                             pl->set_hp(pl->get_hp() - 300);
@@ -1587,17 +1599,9 @@ void process_packet(int client_id, unsigned char* p)
                                     }
                                 }
                             }
-                            break;*/
+                            break;
                         case 1:
-                      
-                            timer_event ev;
-                            ev.obj_id = client_id;
-                            ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
-                            ev.ev = EVENT_SKILL_COOLTIME;
-                            ev.target_id = 1;
-                            timer_queue.push(ev);
-
-
+                     
                             cout << "에너지 볼!!!" << endl;
                             send_play_shoot_packet(pl); // 쏘라고 보내줘야 쏘자 
 

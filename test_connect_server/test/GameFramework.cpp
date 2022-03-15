@@ -411,26 +411,44 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			{
 			case E_NONE:
 				my_element = E_WATER;
+				for (int i = 1 + BULLETCNT; i < 1 + 2 * BULLETCNT; ++i) 
+					m_ppObjects[i]->SetMaterial(pMaterials[8]);
 				break;
 			case E_WATER:
 				my_element = E_FULLMETAL;
+				for (int i = 1 + BULLETCNT; i < 1 + 2 * BULLETCNT; ++i)
+					m_ppObjects[i]->SetMaterial(pMaterials[9]);
+	
 				break;
 			case E_FULLMETAL:
 				my_element = E_WIND;
+				for (int i = 1 + BULLETCNT; i < 1 + 2 * BULLETCNT; ++i)
+					m_ppObjects[i]->SetMaterial(pMaterials[10]);
 				break;
 			case E_WIND:
 				my_element = E_FIRE;
+				for (int i = 1 + BULLETCNT; i < 1 + 2 * BULLETCNT; ++i)
+					m_ppObjects[i]->SetMaterial(pMaterials[11]);
 				break;
 			case E_FIRE:
 				my_element = E_TREE;
+				for (int i = 1 + BULLETCNT; i < 1 + 2 * BULLETCNT; ++i)
+					m_ppObjects[i]->SetMaterial(pMaterials[12]);
 				break;
 			case E_TREE:
 				my_element = E_EARTH;
+				for (int i = 1 + BULLETCNT; i < 1 + 2 * BULLETCNT; ++i)
+					m_ppObjects[i]->SetMaterial(pMaterials[13]);
 				break;
 			case E_EARTH:
 				my_element = E_ICE;
+				for (int i = 1 + BULLETCNT; i < 1 + 2 * BULLETCNT; ++i)
+					m_ppObjects[i]->SetMaterial(pMaterials[5]);
+				break;
 			case E_ICE:
 				my_element = E_NONE;
+				for (int i = 1 + BULLETCNT; i < 1 + 2 * BULLETCNT; ++i)
+					m_ppObjects[i]->SetMaterial(pMaterials[7]);
 				break;
 			default:
 				break;

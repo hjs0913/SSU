@@ -10,7 +10,7 @@
 #include <iostream>
 using namespace std;
 CBillboardObject* pBillboardObject = NULL;
-CMaterial* pMaterials[7];
+CMaterial* pMaterials[15];
 CGameObject** m_ppObjects;
 XMFLOAT3 hp_pos;
 XMFLOAT3 POS_PLAYER;
@@ -543,8 +543,8 @@ bool CBulletObject::Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject* m_
 
 		return true;
 	}
-	//MoveDown(2);
-	MoveForward(2); //볼 움직임
+	MoveDown(2);
+	//MoveForward(2); //볼 움직임
 	return false;
 }
 
