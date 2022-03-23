@@ -154,6 +154,14 @@ void send_chat_packet(const char* send_str)
 	do_send(sizeof(packet), &packet);
 }
 
+void send_gaia_join_packet()
+{
+	cs_packet_gaia_join packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_GAIA_JOIN;
+	do_send(sizeof(packet), &packet);
+}
+
 void do_send(int num_bytes, void* mess)
 {
 	EXP_OVER* ex_over = new EXP_OVER;

@@ -1051,6 +1051,7 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 					// 최초 정보 불러오기 및 종족에 맞게 변환
 					get_basic_information(pPlayer, j - MAX_WORLD_SHADER);
 					if (pPlayer->m_tribe == HUMAN) {
+						cout << j - MAX_USER << endl;
 						pPlayer->SetMesh(0, pOtherPlayerMesh[2]);
 						get_player_information(pPlayer, j - MAX_WORLD_SHADER);
 					}

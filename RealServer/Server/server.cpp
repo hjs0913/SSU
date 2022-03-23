@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Player.h"
+#include "Gaia.h"
 #include "database.h"
 #include "send.h"
 #include <fstream>
@@ -11,6 +12,7 @@ CRITICAL_SECTION cs;
 HANDLE g_h_iocp;
 SOCKET g_s_socket;
 array <Npc*, MAX_USER + MAX_NPC> players;
+array <Gaia*, MAX_USER / 4> dungeons;
 array <Obstacle, MAX_OBSTACLE> obstacles;
 
 typedef pair<int, int> pos;
@@ -765,9 +767,7 @@ void process_packet(int client_id, unsigned char* p)
     switch (packet_type) {
     case CS_PACKET_LOGIN: {
         cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(p);
-
         // pl->set_name(packet->name);
-
         // DB 연결
         /*
         EnterCriticalSection(&cs);
@@ -889,7 +889,7 @@ void process_packet(int client_id, unsigned char* p)
         for (auto& other : players) {
             if (other->get_id() == client_id) continue;   // 나다
 
-            if (true == is_npc(other->get_id())) break;// 만약 내가 있는 곳에 NPC가 있다면
+            if (true == is_npc(other->get_id())) break;
 
             other->state_lock.lock();
             if (ST_INGAME != other->get_state()) {
@@ -990,6 +990,9 @@ void process_packet(int client_id, unsigned char* p)
         break;
     }
     case CS_PACKET_MOVE: {
+        if (pl->get_state() == ST_INDUN) {
+            break;
+        }
         cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(p);
         // pl.last_move_time = packet->move_time;
         pl->last_move_time = packet->move_time;
@@ -1767,6 +1770,52 @@ void process_packet(int client_id, unsigned char* p)
         pl->set_element(packet->element);
         cout << "내 속성은" << packet->element << "번 입니다." << endl;
         send_status_change_packet(pl);
+        break;
+    }
+    case CS_PACKET_GAIA_JOIN: {
+        // check player state
+        pl->state_lock.lock();
+        if (pl->get_state() != ST_INGAME || pl->join_dungeon_room==true) {
+            pl->state_lock.unlock();
+            break;
+        }
+        pl->state_lock.unlock();
+
+        // join dungeon party
+        for (int i = 0; i < MAX_USER / 4; i++) {
+            dungeons[i]->state_lock.lock();
+            if (dungeons[i]->get_dun_st() == DUN_ST_START) {
+                dungeons[i]->state_lock.unlock();
+                continue;
+            }
+            dungeons[i]->state_lock.unlock();
+            dungeons[i]->join_player(pl);
+            dungeons[i]->state_lock.lock();
+            if (dungeons[i]->get_dun_st() == DUN_ST_START) {
+                dungeons[i]->state_lock.unlock();
+                
+                // 게임이 시작 되었으니 시야처리를 해주자
+                Player** vl_pl;
+                vl_pl = dungeons[i]->get_party_palyer();
+                for (int i = 0; i < 4; i++) {
+                    vl_pl[i]->vl.lock();
+                    for (auto j : vl_pl[i]->viewlist) {
+                        send_remove_object_packet(vl_pl[i], players[j]);
+                        if (is_npc(j) == true) continue;
+                        reinterpret_cast<Player*>(players[j])->vl.lock();
+                        reinterpret_cast<Player*>(players[j])->viewlist.erase(client_id);
+                        reinterpret_cast<Player*>(players[j])->vl.unlock();
+
+                        send_remove_object_packet(reinterpret_cast<Player*>(players[j]), vl_pl[i]);
+                    }
+                    vl_pl[i]->viewlist.clear();
+                    vl_pl[i]->vl.unlock();
+                }
+                break;
+            }
+            dungeons[i]->state_lock.unlock();
+            break;
+        }
         break;
     }
     }
@@ -3000,6 +3049,15 @@ void do_timer()
     }
 }
 
+void initialise_DUNGEON()
+{
+    for (int i = 0; i < MAX_USER / 4; i++) {
+        dungeons[i] = new Gaia(i);
+    }
+    cout << "던전 초기화 완료" << endl;
+}
+
+
 int main()
 {
     setlocale(LC_ALL, "korean");
@@ -3040,6 +3098,7 @@ int main()
     // DB 연결1
     // Initialise_DB();
     initialise_NPC();
+    initialise_DUNGEON();
 
     ifstream obstacles_read("tree_position.txt");
     if (!obstacles_read.is_open()) {

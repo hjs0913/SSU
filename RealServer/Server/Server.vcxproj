@@ -142,6 +142,7 @@
   <ItemGroup>
     <ClCompile Include="database.cpp" />
     <ClCompile Include="EXP_OVER.cpp" />
+    <ClCompile Include="Gaia.cpp" />
     <ClCompile Include="Npc.cpp" />
     <ClCompile Include="Obstacle.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -150,6 +151,7 @@
     <ClCompile Include="SkillBuf.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Gaia.h" />
     <ClInclude Include="Obstacle.h" />
     <ClInclude Include="protocol.h" />
     <ClInclude Include="database.h" />

@@ -2,7 +2,7 @@
 
 // --------------------------------------------------------
 // 개인 추가
-enum STATE { ST_FREE, ST_ACCEPT, ST_INGAME, ST_DEAD };
+enum STATE { ST_FREE, ST_ACCEPT, ST_INGAME, ST_DEAD, ST_INDUN };
 enum COMP_OP {
 	OP_RECV, OP_SEND, OP_ACCEPT, OP_NPC_MOVE,
 	OP_NPC_ATTACK, OP_AUTO_PLAYER_HP, OP_PLAYER_REVIVE, OP_NPC_REVIVE,
@@ -24,6 +24,8 @@ enum MONSTER_SPECIES {
 	FALLEN_FLOG, FALLEN_CHICKEN, FALLEN_RABBIT,
 	FALLEN_MONKEY, WOLF_BOSS, FALLEN_TIGER
 };
+enum DUNGEON_STATE{DUN_ST_ROBBY, DUN_ST_START};
+
 
 const int BUFSIZE = 256;
 const int RANGE = 600;
@@ -53,7 +55,7 @@ const char CS_PACKET_SKILL = 6;
 const char CS_PACKET_LOOK = 7;
 const char CS_PACKET_CHANGE_JOB = 8;
 const char CS_PACKET_CHANGE_ELEMENT = 9;
-
+const char CS_PACKET_GAIA_JOIN = 10;
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -71,6 +73,7 @@ const char SC_PACKET_CHANGE_HP = 13;
 const char SC_PACKET_COMBAT_ID = 14;
 const char SC_PACKET_PLAY_SHOOT = 15;
 const char SC_PACKET_PLAY_EFFECT = 16;
+
 
 //---------------------------------------------------
 #pragma pack (push, 1)
@@ -131,6 +134,11 @@ struct cs_packet_change_element {
 	unsigned char size;
 	char type;
 	ELEMENT element;
+};
+
+struct cs_packet_gaia_join {
+	unsigned char size;
+	char type;
 };
 
 struct sc_packet_login_ok {

@@ -463,6 +463,9 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			break;
 		case VK_F10:
 			break;
+		case 0x50:	// p key
+			send_gaia_join_packet();
+			break;
 		default:
 			break;
 		}
