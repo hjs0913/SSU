@@ -161,3 +161,11 @@ void send_play_effect_packet(Player* pl, Npc* npc )
 
     pl->do_send(sizeof(packet), &packet);
 }
+
+void send_start_gaia_packet(Player* pl) 
+{
+    sc_packet_start_gaia packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_START_GAIA;
+    pl->do_send(sizeof(packet), &packet);
+}

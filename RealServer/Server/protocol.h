@@ -73,7 +73,7 @@ const char SC_PACKET_CHANGE_HP = 13;
 const char SC_PACKET_COMBAT_ID = 14;
 const char SC_PACKET_PLAY_SHOOT = 15;
 const char SC_PACKET_PLAY_EFFECT = 16;
-
+const char SC_PACKET_START_GAIA = 17;
 
 //---------------------------------------------------
 #pragma pack (push, 1)
@@ -258,6 +258,11 @@ struct sc_packet_combat_id {
 	unsigned char size;
 	char type;
 	int id;
+};
+
+struct sc_packet_start_gaia {
+	unsigned char size;
+	char type;
 };
 
 #pragma pack(pop)

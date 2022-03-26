@@ -59,6 +59,13 @@ public:
 	LRESULT CALLBACK OnProcessingWindowMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 
 	void UpdateUI(int i);
+
+	void Release_OpenWorld_Object();
+	void Release_InDungeon_Object();
+
+	void Create_OpenWorld_Object();
+	void Create_InDungeon_Object();
+
 private:
 	/////////////////
 	/////////////////
@@ -104,6 +111,8 @@ private:
 	CGameTimer					m_GameTimer;
 
 	CScene						*m_pScene = NULL;
+	CScene						*m_pRaid_Scene = NULL;
+
 	CPlayer						*m_pPlayer = NULL;
 	CCamera						*m_pCamera = NULL;
 

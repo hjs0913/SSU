@@ -60,6 +60,7 @@ CGameFramework::CGameFramework()
 	m_nWndClientHeight = FRAME_BUFFER_HEIGHT;
 
 	m_pScene = NULL;
+	m_pRaid_Scene = NULL;
 	m_pPlayer = NULL;
 
 	_tcscpy_s(m_pszFrameRate, _T("LabProject ("));
@@ -339,8 +340,13 @@ void CGameFramework::ChangeSwapChainState()
 
 void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 {
+	if (InDungeon) {
+		if (m_pRaid_Scene) m_pRaid_Scene->OnProcessingMouseMessage(hWnd, nMessageID, wParam, lParam);
+	}
+	else {
+		if (m_pScene) m_pScene->OnProcessingMouseMessage(hWnd, nMessageID, wParam, lParam);
+	}
 
-	if (m_pScene) m_pScene->OnProcessingMouseMessage(hWnd, nMessageID, wParam, lParam);
 	switch (nMessageID)
 	{
 	case WM_LBUTTONDOWN:
@@ -365,7 +371,13 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 	const wchar_t* temp;
 	int len = 0;
 
-	if (m_pScene) m_pScene->OnProcessingKeyboardMessage(hWnd, nMessageID, wParam, lParam);
+	if (InDungeon) {
+		if (m_pScene) m_pScene->OnProcessingKeyboardMessage(hWnd, nMessageID, wParam, lParam);
+	}
+	else {
+		if (m_pRaid_Scene) m_pRaid_Scene->OnProcessingKeyboardMessage(hWnd, nMessageID, wParam, lParam);
+	}
+
 	switch (nMessageID)
 	{
 	case WM_KEYUP:
@@ -586,10 +598,12 @@ void CGameFramework::BuildObjects()
 	}
 
 
-	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
+	Create_OpenWorld_Object();
+	/*m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
 
 	m_pScene = new CScene();
 	m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList, m_pd3dCommandQueue, m_ppd3dSwapChainBackBuffers);
+
 
 	m_pPlayer = new CTerrainPlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->GetTerrain(), 1);
 	m_pCamera = m_pPlayer->GetCamera();
@@ -602,7 +616,52 @@ void CGameFramework::BuildObjects()
 	WaitForGpuComplete();
 
 	if (m_pScene) m_pScene->ReleaseUploadBuffers();
+	if (m_pRaid_Scene) m_pRaid_Scene->ReleaseUploadBuffers();*/
 
+	// m_GameTimer.Reset();
+}
+
+void CGameFramework::Create_OpenWorld_Object()
+{
+	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
+
+	m_pScene = new CScene();
+	m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList, m_pd3dCommandQueue, m_ppd3dSwapChainBackBuffers);
+
+
+	m_pPlayer = new CTerrainPlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->GetTerrain(), 1);
+	m_pCamera = m_pPlayer->GetCamera();
+	m_pPlayer->SetUse(true);
+
+	m_pd3dCommandList->Close();
+	ID3D12CommandList* ppd3dCommandLists[] = { m_pd3dCommandList };
+	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
+
+	WaitForGpuComplete();
+
+	if (m_pScene) m_pScene->ReleaseUploadBuffers();
+	m_GameTimer.Reset();
+}
+
+void CGameFramework::Create_InDungeon_Object()
+{
+	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
+
+	m_pRaid_Scene = new CScene();
+	m_pRaid_Scene->BuildObjects_Raid(m_pd3dDevice, m_pd3dCommandList, m_pd3dCommandQueue, m_ppd3dSwapChainBackBuffers);
+
+	m_pPlayer = new CTerrainPlayer(m_pd3dDevice, m_pd3dCommandList, m_pRaid_Scene->GetGraphicsRootSignature(), m_pRaid_Scene->GetTerrain(), 1);
+	m_pCamera = m_pPlayer->GetCamera();
+	m_pPlayer->SetUse(true);
+
+	m_pd3dCommandList->Close();
+	ID3D12CommandList* ppd3dCommandLists[] = { m_pd3dCommandList };
+	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
+
+	WaitForGpuComplete();
+
+	if (m_pRaid_Scene) m_pRaid_Scene->ReleaseUploadBuffers();
+	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
 	m_GameTimer.Reset();
 }
 
@@ -617,13 +676,37 @@ void CGameFramework::ReleaseObjects()
 
 	if (m_pScene) m_pScene->ReleaseObjects();
 	if (m_pScene) delete m_pScene;
+
+	if (m_pRaid_Scene) m_pRaid_Scene->ReleaseObjects();
+	if (m_pRaid_Scene) delete m_pRaid_Scene;
+}
+
+void CGameFramework::Release_OpenWorld_Object()
+{
+	if (m_pPlayer) delete m_pPlayer;
+	if (m_pScene) m_pScene->ReleaseObjects();
+	if (m_pScene) delete m_pScene;
+}
+
+void CGameFramework::Release_InDungeon_Object()
+{
+	if (m_pPlayer) delete m_pPlayer;
+	if (m_pRaid_Scene) m_pRaid_Scene->ReleaseObjects();
+	if (m_pRaid_Scene) delete m_pRaid_Scene;
 }
 
 void CGameFramework::ProcessInput()   
 {
 	static UCHAR pKeysBuffer[256];
 	bool bProcessedByScene = false;
-	if (GetKeyboardState(pKeysBuffer) && m_pScene) bProcessedByScene = m_pScene->ProcessInput(pKeysBuffer);
+	
+	if (!InDungeon) {
+		if (GetKeyboardState(pKeysBuffer) && m_pScene) bProcessedByScene = m_pScene->ProcessInput(pKeysBuffer);
+	}
+	else {
+		if (GetKeyboardState(pKeysBuffer) && m_pRaid_Scene) bProcessedByScene = m_pRaid_Scene->ProcessInput(pKeysBuffer);
+	}
+	
 	if (!bProcessedByScene)
 	{
 
@@ -679,7 +762,8 @@ void CGameFramework::ProcessInput()
 						bulletidx = 2;
 						for (int i = 0; i < BULLETCNT; ++i) {
 							if (IsFire[i]) {
-								m_pScene->Rotate(2 + i, 0, tmp[i], 0.0f);
+								if(!InDungeon) m_pScene->Rotate(2 + i, 0, tmp[i], 0.0f);
+								else m_pRaid_Scene->Rotate(2 + i, 0, tmp[i], 0.0f);
 							}
 							IsFire[i] = false;
 						}
@@ -762,7 +846,8 @@ void CGameFramework::ProcessInput()
 					m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
 					for (int i = 0; i < BULLETCNT; ++i) {
 						if (!IsFire[i]) {
-							m_pScene->Rotate(2 + i, 0, cxDelta, 0.0f);
+							if(!InDungeon) m_pScene->Rotate(2 + i, 0, cxDelta, 0.0f);
+							else m_pRaid_Scene->Rotate(2 + i, 0, cxDelta, 0.0f);
 						}
 					}
 				}
@@ -781,7 +866,12 @@ void CGameFramework::ProcessInput()
 
 void CGameFramework::AnimateObjects()
 {
-	if (m_pScene) m_pScene->AnimateObjects(m_GameTimer, m_pCamera, m_pPlayer, bulletidx);
+	if (InDungeon == false) {
+		if (m_pScene) m_pScene->AnimateObjects(m_GameTimer, m_pCamera, m_pPlayer, bulletidx);
+	}
+	else {
+		if (m_pRaid_Scene) m_pRaid_Scene->AnimateObjects(m_GameTimer, m_pCamera, m_pPlayer, bulletidx);
+	}
 }
 
 void CGameFramework::WaitForGpuComplete()
@@ -852,8 +942,8 @@ void CGameFramework::FrameAdvance()
 
 	m_pd3dCommandList->OMSetRenderTargets(1, &d3dRtvCPUDescriptorHandle, TRUE, &d3dDsvCPUDescriptorHandle);
 
-	m_pScene->Render(m_pd3dCommandList, m_pCamera);
-
+	if (!InDungeon) m_pScene->Render(m_pd3dCommandList, m_pCamera);
+	else m_pRaid_Scene->Render(m_pd3dCommandList, m_pCamera);
 
 	XMFLOAT3 tmp = m_pPlayer->GetPosition();
 	XMFLOAT3 tmp2 = m_pCamera->GetPosition();

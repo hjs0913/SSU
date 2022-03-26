@@ -990,9 +990,6 @@ void process_packet(int client_id, unsigned char* p)
         break;
     }
     case CS_PACKET_MOVE: {
-        if (pl->get_state() == ST_INDUN) {
-            break;
-        }
         cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(p);
         // pl.last_move_time = packet->move_time;
         pl->last_move_time = packet->move_time;
@@ -1000,10 +997,35 @@ void process_packet(int client_id, unsigned char* p)
         float y = packet->y;
         float z = packet->z;       
 
+        // InDunProcess
+        if (pl->get_state() == ST_INDUN) {
+            // 유효성 검사
+            //if (check_move_alright(x, z, false) == false) { // Raid Map에 맞는 유효성 검사 필요
+            //    send_move_packet(pl, pl);   
+            //    break;
+            //}
+            pl->set_x(x);
+            pl->set_y(y);
+            pl->set_z(z);
+            pl->vl.lock();
+            unordered_set <int> my_vl{ pl->viewlist };
+            pl->vl.unlock();
+            send_move_packet(pl, pl);
+            for (auto& other : players) {
+                if (other->get_state() != ST_INDUN) continue;
+                if (is_npc(other->get_id())) break;
+                if (reinterpret_cast<Player*>(other)->indun_id == pl->indun_id) {
+                    if (other->get_id() == pl->get_id()) continue;
+                    send_move_packet(reinterpret_cast<Player*>(other), pl);
+                }
+            }
+            break;
+        }
+
+
         // 유효성 검사
         if (check_move_alright(x, z, false) == false) {
             // 올바르지 않을경우 위치를 수정을 해주어야 한다
-            // 클라쪽 수정 필요
             send_move_packet(pl, pl);
             break;
         }
@@ -1145,8 +1167,7 @@ void process_packet(int client_id, unsigned char* p)
             packet.y = ob.get_y();
             packet.z = ob.get_z();
             //pl->do_send(sizeof(packet), &packet);
-            pl->do_send(sizeof(packet), &packet);
-                
+            pl->do_send(sizeof(packet), &packet);      
         }
         break;
     }
@@ -1691,10 +1712,8 @@ void process_packet(int client_id, unsigned char* p)
         for (auto i : my_vl) {
             // Npc
             if (is_npc(i) == true) continue;
-
             // Player
-            send_look_packet(reinterpret_cast<Player*>(players[i]),
-                pl);
+            send_look_packet(reinterpret_cast<Player*>(players[i]),pl);
         }
         break;
     }
@@ -1797,19 +1816,31 @@ void process_packet(int client_id, unsigned char* p)
                 // 게임이 시작 되었으니 시야처리를 해주자
                 Player** vl_pl;
                 vl_pl = dungeons[i]->get_party_palyer();
+
+                unordered_set<int> indun_vl;
+                for (int i = 0; i < 4; i++) indun_vl.insert(vl_pl[i]->get_id());
+
                 for (int i = 0; i < 4; i++) {
                     vl_pl[i]->vl.lock();
-                    for (auto j : vl_pl[i]->viewlist) {
+                    unordered_set<int>temp_vl{ vl_pl[i]->viewlist };
+                    vl_pl[i]->viewlist = indun_vl;
+                    vl_pl[i]->viewlist.erase(vl_pl[i]->get_id());
+                    vl_pl[i]->vl.unlock();
+
+                    for (auto j : temp_vl) {
                         send_remove_object_packet(vl_pl[i], players[j]);
                         if (is_npc(j) == true) continue;
                         reinterpret_cast<Player*>(players[j])->vl.lock();
                         reinterpret_cast<Player*>(players[j])->viewlist.erase(client_id);
                         reinterpret_cast<Player*>(players[j])->vl.unlock();
-
-                        send_remove_object_packet(reinterpret_cast<Player*>(players[j]), vl_pl[i]);
+                        if(indun_vl.find(j) == indun_vl.end())
+                            send_remove_object_packet(reinterpret_cast<Player*>(players[j]), vl_pl[i]);
                     }
-                    vl_pl[i]->viewlist.clear();
-                    vl_pl[i]->vl.unlock();
+
+                    for (auto j : indun_vl) {
+                        if (j == vl_pl[i]->get_id()) continue;
+                        send_put_object_packet(vl_pl[i], players[j]);
+                    }
                 }
                 break;
             }
@@ -2141,8 +2172,7 @@ void worker()
             players[client_id]->lua_lock.unlock();
             delete exp_over;
             break;
-        }
-                        
+        }               
         case OP_AUTO_PLAYER_HP: {
             Player* pl = reinterpret_cast<Player*>(players[client_id]);
             pl->state_lock.lock();
@@ -2214,7 +2244,7 @@ void worker()
             delete exp_over;
             break;
         }
-        case OP_ELEMENT_COOLTIME:
+        case OP_ELEMENT_COOLTIME: {
 
             timer_event ev;
 
@@ -2229,13 +2259,13 @@ void worker()
                 break;
             }
             players[client_id]->state_lock.unlock();
-            
-            switch (players[client_id]->get_element())  
+
+            switch (players[client_id]->get_element())
             {
             case E_WATER:
-                if(players[exp_over->_target]->get_element() == E_FULLMETAL || players[exp_over->_target]->get_element() == E_FIRE
+                if (players[exp_over->_target]->get_element() == E_FULLMETAL || players[exp_over->_target]->get_element() == E_FIRE
                     || players[exp_over->_target]->get_element() == E_EARTH)
-                players[exp_over->_target]->set_magical_attack(players[exp_over->_target]->get_magical_attack() / 10 * 9);
+                    players[exp_over->_target]->set_magical_attack(players[exp_over->_target]->get_magical_attack() / 10 * 9);
                 break;
             case E_FULLMETAL:
                 break;
@@ -2252,9 +2282,9 @@ void worker()
             default:
                 break;
             }
-             delete exp_over;
+            delete exp_over;
             break;
-
+        }
         }
     }
 }

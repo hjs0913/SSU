@@ -33,6 +33,7 @@ extern wstring my_element_str;
 extern wstring Info_str;
 extern wstring Combat_str;
 extern bool Combat_On;
+extern bool InDungeon;
 
 void err_quit(const char* msg);
 

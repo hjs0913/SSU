@@ -1,4 +1,5 @@
 #include "Gaia.h"
+#include "send.h"
 
 Gaia::Gaia(int d_id)
 {
@@ -25,17 +26,21 @@ void Gaia::join_player(Player* pl)
 	// game start
 	if (player_cnt == 4) {
 		// 모든 파티 인던 입장 및 게임 시작
+		state_lock.lock();
+		st = DUN_ST_START;
+		state_lock.unlock();
 		
 		for (auto pt : party) {
 			pt->state_lock.lock();
 			pt->set_state(ST_INDUN);
 			pt->state_lock.unlock();
+			send_start_gaia_packet(pt);
+			pt->indun_id = dungeon_id;
+			// 모든 좌표 및 정보들을 초기화 하자
 		}
 
-		state_lock.lock();
-		st = DUN_ST_START;
-		state_lock.unlock();
 		cout << dungeon_id << "번 던전 시작합니다" << endl;
+
 	}
 }
 

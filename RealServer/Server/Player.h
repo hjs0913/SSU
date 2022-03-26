@@ -25,6 +25,7 @@ public:
     int                 last_move_time;
     bool                superposition;
     bool                join_dungeon_room;
+    int                 indun_id;
 public:
     Player(int id);
 

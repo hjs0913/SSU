@@ -17,6 +17,7 @@ wstring my_element_str = L"";
 wstring Info_str = L"";
 wstring Combat_str = L"";
 bool Combat_On = false;
+bool InDungeon = false;
 
 // locale variable
 XMFLOAT3 my_position(-1.0f, 5.0f, -1.0f);
@@ -440,7 +441,14 @@ void process_packet(unsigned char* p)
 		cout << effect_z << endl;
 		break;
 	}
+	case SC_PACKET_START_GAIA: {
+		cout << "인던으로 입장해야됨" << endl;
+		InDungeon = true;
+		break;
+	}
+
 	default:
+		cout << "잘못된 패킷 type : " << type << endl;
 		cout << "Process packet 오류" << endl;
 		break;
 	}
