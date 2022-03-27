@@ -24,19 +24,20 @@ void Gaia::join_player(Player* pl)
 	pl->join_dungeon_room = true;
 	pl->state_lock.unlock();
 	// game start
-	if (player_cnt == 4) {
+	if (player_cnt == GAIA_ROOM) {
 		// 모든 파티 인던 입장 및 게임 시작
 		state_lock.lock();
 		st = DUN_ST_START;
 		state_lock.unlock();
 		
-		for (auto pt : party) {
+		for (auto& pt : party) {
 			pt->state_lock.lock();
 			pt->set_state(ST_INDUN);
 			pt->state_lock.unlock();
 			send_start_gaia_packet(pt);
 			pt->indun_id = dungeon_id;
 			// 모든 좌표 및 정보들을 초기화 하자
+			pt->set_pos(300, 100);
 		}
 
 		cout << dungeon_id << "번 던전 시작합니다" << endl;

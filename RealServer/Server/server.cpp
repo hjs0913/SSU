@@ -12,7 +12,7 @@ CRITICAL_SECTION cs;
 HANDLE g_h_iocp;
 SOCKET g_s_socket;
 array <Npc*, MAX_USER + MAX_NPC> players;
-array <Gaia*, MAX_USER / 4> dungeons;
+array <Gaia*, MAX_USER / GAIA_ROOM> dungeons;
 array <Obstacle, MAX_OBSTACLE> obstacles;
 
 typedef pair<int, int> pos;
@@ -1801,7 +1801,7 @@ void process_packet(int client_id, unsigned char* p)
         pl->state_lock.unlock();
 
         // join dungeon party
-        for (int i = 0; i < MAX_USER / 4; i++) {
+        for (int i = 0; i < MAX_USER / GAIA_ROOM; i++) {
             dungeons[i]->state_lock.lock();
             if (dungeons[i]->get_dun_st() == DUN_ST_START) {
                 dungeons[i]->state_lock.unlock();
@@ -1818,28 +1818,28 @@ void process_packet(int client_id, unsigned char* p)
                 vl_pl = dungeons[i]->get_party_palyer();
 
                 unordered_set<int> indun_vl;
-                for (int i = 0; i < 4; i++) indun_vl.insert(vl_pl[i]->get_id());
+                for (int j = 0; j < GAIA_ROOM; j++) indun_vl.insert(vl_pl[j]->get_id());
 
-                for (int i = 0; i < 4; i++) {
-                    vl_pl[i]->vl.lock();
-                    unordered_set<int>temp_vl{ vl_pl[i]->viewlist };
-                    vl_pl[i]->viewlist = indun_vl;
-                    vl_pl[i]->viewlist.erase(vl_pl[i]->get_id());
-                    vl_pl[i]->vl.unlock();
+                for (int j = 0; j < GAIA_ROOM; j++) {
+                    vl_pl[j]->vl.lock();
+                    unordered_set<int>temp_vl{ vl_pl[j]->viewlist };
+                    vl_pl[j]->viewlist = indun_vl;
+                    vl_pl[j]->viewlist.erase(vl_pl[j]->get_id());
+                    vl_pl[j]->vl.unlock();
 
-                    for (auto j : temp_vl) {
-                        send_remove_object_packet(vl_pl[i], players[j]);
-                        if (is_npc(j) == true) continue;
-                        reinterpret_cast<Player*>(players[j])->vl.lock();
-                        reinterpret_cast<Player*>(players[j])->viewlist.erase(client_id);
-                        reinterpret_cast<Player*>(players[j])->vl.unlock();
-                        if(indun_vl.find(j) == indun_vl.end())
-                            send_remove_object_packet(reinterpret_cast<Player*>(players[j]), vl_pl[i]);
+                    for (auto k : temp_vl) {
+                        send_remove_object_packet(vl_pl[j], players[k]);
+                        if (is_npc(k) == true) continue;
+                        reinterpret_cast<Player*>(players[k])->vl.lock();
+                        reinterpret_cast<Player*>(players[k])->viewlist.erase(client_id);
+                        reinterpret_cast<Player*>(players[k])->vl.unlock();
+                        if(indun_vl.find(k) == indun_vl.end())
+                            send_remove_object_packet(reinterpret_cast<Player*>(players[k]), vl_pl[j]);
                     }
 
-                    for (auto j : indun_vl) {
-                        if (j == vl_pl[i]->get_id()) continue;
-                        send_put_object_packet(vl_pl[i], players[j]);
+                    for (auto k : indun_vl) {
+                        if (k == vl_pl[j]->get_id()) continue;
+                        send_put_object_packet(vl_pl[j], players[k]);
                     }
                 }
                 break;
@@ -3081,7 +3081,7 @@ void do_timer()
 
 void initialise_DUNGEON()
 {
-    for (int i = 0; i < MAX_USER / 4; i++) {
+    for (int i = 0; i < MAX_USER / GAIA_ROOM; i++) {
         dungeons[i] = new Gaia(i);
     }
     cout << "던전 초기화 완료" << endl;

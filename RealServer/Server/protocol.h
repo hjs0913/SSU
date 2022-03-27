@@ -45,6 +45,8 @@ const int  MAX_USER = 1000;
 const int  MAX_NPC = 180;		// µð¹ö±ë ¿ë
 constexpr int NPC_ID_START = MAX_USER;
 constexpr int NPC_ID_END = MAX_USER + MAX_NPC - 1;
+#define GAIA_ROOM 2
+
 
 const char CS_PACKET_LOGIN = 1;
 const char CS_PACKET_MOVE = 2;

@@ -4,7 +4,7 @@
 class Gaia
 {
 private:
-	Player* party[4];
+	Player* party[GAIA_ROOM];
 	int dungeon_id;
 	int player_cnt;
 	DUNGEON_STATE st;

@@ -1036,8 +1036,20 @@ void CObjectsShader::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 	int yObjects = 1;
 	int zObjects = int(fTerrainLength / fzPitch);
 	m_nObjects = (xObjects * yObjects * zObjects);  //97
-	// m_nObjects += 1 + 2 * BULLETCNT + 1 + 4;
-	m_nObjects += 1 + 2 * BULLETCNT + 1 + 4 + MAX_NPC + MAX_USER;
+	m_nObjects += 1 + 2 * BULLETCNT + 1 + 4 + GAIA_ROOM + 1;
+	/*-------------------------------------------------------------
+	//m_nObjects = xObjects * yObjects * zObjects = 9400
+	m_nObjects += 1
+	m_nObjects += 2*BULLETCNT	// 투사체 처리
+	m_nObjects += 1
+	m_nObjects += 1
+	m_nObjects += GAIA_ROOM		// Party Player
+	m_nObjects += 1				// GAIA(NPC)
+
+	m_nObjects = 1+200+1+1+4+1 = 208
+	-------------------------------------------------------------*/ 
+
+
 #define TEXTURES 14
 	CTexture* pTexture[TEXTURES];
 	pTexture[0] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
