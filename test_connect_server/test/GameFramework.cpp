@@ -33,8 +33,16 @@ int effect_x = 0;
 int effect_y = 0;
 int effect_z = 0;
 
+MOUSEMOVEPOINT m_mouse;
+int m_mouseX = 0;
+int m_mouseY = 0;
+
+CCamera* m_pCamera;
+
 CGameFramework::CGameFramework()
 {
+	
+
 	m_pdxgiFactory = NULL;
 	m_pdxgiSwapChain = NULL;
 	m_pd3dDevice = NULL;
@@ -337,13 +345,133 @@ void CGameFramework::ChangeSwapChainState()
 	CreateRenderTargetViews();
 }
 
-void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
+
+
+
+bool CGameFramework::TestIntersection(int mouseX, int mouseY, CGameObject* obj)
+{
+	
+
+	XMMATRIX projectionMatrix, viewMatrix, inverseViewMatrix, worldMatrix, translateMatrix, inverseWorldMatrix;
+	XMFLOAT4X4 F_projectionMatrix, F_viewMatrix, F_inverseViewMatrix, F_worldMatrix, F_translateMatrix, F_inverseWorldMatrix;
+	XMFLOAT3 direction, origin, rayOrigin, rayDirection;
+	XMFLOAT3 F3_worldMatrix;
+	XMVECTOR V_worldMatrix;
+
+	// 마우스 커서 좌표를 -1에서 +1 범위로 이동합니다
+	float pointX = ((2.0f * (float)mouseX) / (float)FRAME_BUFFER_WIDTH) - 1.0f;
+	float pointY = (((2.0f * (float)mouseY) / (float)FRAME_BUFFER_HEIGHT) - 1.0f) * -1.0f;
+
+	// 뷰포트의 종횡비를 고려하여 투영 행렬을 사용하여 점을 조정합니다
+	F_projectionMatrix = m_pCamera->GetProjectionMatrix();
+	projectionMatrix = XMLoadFloat4x4(&F_projectionMatrix);
+
+	XMFLOAT3X3 projectionMatrix4;
+	XMStoreFloat3x3(&projectionMatrix4, projectionMatrix);
+
+	pointX = pointX / projectionMatrix4._11;
+	pointY = pointY / projectionMatrix4._22;
+
+	// 뷰 행렬의 역함수를 구합니다.
+	F_viewMatrix = m_pCamera->GetViewMatrix();
+	viewMatrix = XMLoadFloat4x4(&F_viewMatrix);
+	inverseViewMatrix = XMMatrixInverse(nullptr, viewMatrix);
+
+	XMFLOAT3X3 inverseViewMatrix4;
+	XMStoreFloat3x3(&inverseViewMatrix4, inverseViewMatrix);
+
+	
+
+	// 뷰 공간에서 피킹 레이의 방향을 계산합니다.
+	direction.x = (pointX * inverseViewMatrix4._11) + (pointY * inverseViewMatrix4._21) + inverseViewMatrix4._31;
+	direction.y = (pointX * inverseViewMatrix4._12) + (pointY * inverseViewMatrix4._22) + inverseViewMatrix4._32;
+	direction.z = (pointX * inverseViewMatrix4._13) + (pointY * inverseViewMatrix4._23) + inverseViewMatrix4._33;
+
+	// 카메라의 위치 인 picking ray의 원점을 가져옵니다.
+	origin = m_pCamera->GetPosition();
+
+	// 세계 행렬을 가져와 구의 위치로 변환합니다.  //.여기 다시 보자 
+	F3_worldMatrix = m_pCamera->GetLookAtPosition();
+	//worldMatrix = XMLoadFloat3(&F3_worldMatrix);
+	worldMatrix = XMMatrixIdentity();
+	translateMatrix = XMMatrixTranslation(obj->GetPosition().x, obj->GetPosition().y, obj->GetPosition().z);
+	worldMatrix = XMMatrixMultiply(worldMatrix, translateMatrix);
+
+	// 이제 번역 된 행렬의 역함수를 구하십시오.
+	inverseWorldMatrix = XMMatrixInverse(nullptr, worldMatrix);
+
+	// 이제 광선 원점과 광선 방향을 뷰 공간에서 월드 공간으로 변환합니다.
+	XMStoreFloat3(&rayOrigin, XMVector3TransformCoord(XMVectorSet(origin.x, origin.y, origin.z, 0.0f), inverseWorldMatrix));
+	XMStoreFloat3(&direction, XMVector3TransformNormal(XMVectorSet(direction.x, direction.y, direction.z, 0.0f), inverseWorldMatrix));
+
+	// 광선 방향을 표준화합니다.
+	XMStoreFloat3(&rayDirection, XMVector3Normalize(XMVectorSet(direction.x, direction.y, direction.z, 0.0f)));
+
+
+
+
+	// 이제 광선 구 교차 테스트를 수행하십시오.
+	//m_pPlayer
+	if (RaySphereIntersect(rayOrigin, rayDirection, 15.0f) == true)
+	{
+		cout << obj->GetPosition().x << "  " <<obj->GetPosition().y  << "  " << obj->GetPosition().z <<  endl;
+		cout << "픽킹";
+		return true;
+		// 교차하는 경우 화면에 표시되는 텍스트 문자열에서 교차로를 "yes"로 설정합니다.
+	//	m_Text->SetIntersection(true, m_D3D->GetDeviceContext());
+	}
+	else
+	{
+		return false;
+		// 그렇지 않으면 "No"로 교차를 설정하십시오.
+	//	m_Text->SetIntersection(false, m_D3D->GetDeviceContext());
+	}
+}
+
+
+
+bool CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 {
 
+
 	if (m_pScene) m_pScene->OnProcessingMouseMessage(hWnd, nMessageID, wParam, lParam);
+
+
+
+
+	cRay* r = new cRay;
 	switch (nMessageID)
 	{
-	case WM_LBUTTONDOWN:
+	case WM_LBUTTONDOWN: //좌클릭
+	
+		::SetCapture(hWnd);
+		::GetCursorPos(&m_ptOldCursorPos);
+
+	
+
+		*r = r->RayAtWorldSpace(m_ptOldCursorPos.x , m_ptOldCursorPos.y);
+	
+		
+		for (int i = 10615; i < 10795; i++) {
+			if (TestIntersection(m_mouseX, m_mouseY, m_ppObjects[i]))
+				cout << i << endl;
+		
+			//cout << sphere[i].fRadius << endl;
+			//sphere[i].isPicked = r->isPicked(&sphere[i]);A
+			
+			/*if (r->isPicked(m_ppObjects[i])) {
+				//sphere[i].isPicked = true;
+				if (m_ppObjects[i]->GetPosition().x != 0 && m_ppObjects[i]->GetPosition().y !=0 && m_ppObjects[i]->GetPosition().z != 0)
+				cout << i << " 피킹" << endl;
+			
+			}*/
+
+		}
+	
+
+	//	TestIntersection(m_mouseX, m_mouseY);
+		//return true;
+		break;
 	case WM_RBUTTONDOWN:
 		::SetCapture(hWnd);
 		::GetCursorPos(&m_ptOldCursorPos);
@@ -357,6 +485,9 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 	default:
 		break;
 	}
+	return false;
+
+
 }
 
 void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
@@ -616,6 +747,37 @@ void CGameFramework::ReleaseObjects()
 	if (m_pScene) delete m_pScene;
 }
 
+/*
+void CGameFramework::OnMouseMove(WPARAM btnState, int x, int y)
+{
+	float dx = XMConvertToRadians(0.25f * static_cast<float>(x - mLastMousePos.x));
+	float dy = XMConvertToRadians(0.25f * static_cast<float>(y - mLastMousePos.y));
+
+	if ((btnState & MK_LBUTTON) != 0)
+	{
+		m_pCamera->GetPitch
+		mPlayer.mCamera.AddPitch(dy);
+
+		// Rotate Camera only
+		mPlayer.mCamera.AddYaw(dx);
+	}
+	else if ((btnState & MK_RBUTTON) != 0)
+	{
+		mPlayer.mCamera.AddPitch(dy);
+
+		// Rotate Camera with Player
+		mPlayer.mCamera.AddYaw(dx);
+		if (!mCameraDetach)
+			mPlayer.UpdatePlayerPosition(ePlayerMoveList::AddYaw, dx);
+	}
+
+	mLastMousePos.x = x;
+	mLastMousePos.y = y;
+
+	mPlayer.UpdateTransformationMatrix();
+}*/
+
+
 void CGameFramework::ProcessInput()   
 {
 	static UCHAR pKeysBuffer[256];
@@ -810,6 +972,7 @@ void CGameFramework::MoveToNextFrame()
 
 //#define _WITH_PLAYER_TOP
 
+
 void CGameFramework::FrameAdvance()
 {
 	m_GameTimer.Tick(0.0f);
@@ -821,7 +984,23 @@ void CGameFramework::FrameAdvance()
 	// receive Player position to server
 	// m_pCamera->Move(return_myCamera());
 	//------------------------------------
-	
+
+
+	POINT ptCursorPos;
+	if (GetCapture() == m_hWnd)
+	{
+		SetCursor(NULL);
+		GetCursorPos(&ptCursorPos);
+		SetCursorPos(m_ptOldCursorPos.x, m_ptOldCursorPos.y);
+	}
+
+	m_mouseX = m_ptOldCursorPos.x;
+	m_mouseY = m_ptOldCursorPos.y;
+	 
+	//cout << "x: " << m_mouseX << endl;
+	//cout << "y: " << m_mouseY << endl;
+
+
 	AnimateObjects();
 
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();

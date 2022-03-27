@@ -272,6 +272,7 @@ void process_packet(unsigned char* p)
 		}
 		else {
 			mPlayer[packet->id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
+			//mPlayer[packet->id]->vCenter = XMFLOAT3(packet->x, packet->y, packet->z);
 		}
 		break;
 	}
@@ -281,7 +282,7 @@ void process_packet(unsigned char* p)
 		if (static_cast<TRIBE>(packet->object_type) != OBSTACLE) {
 			mPlayer[p_id]->SetUse(true);
 			mPlayer[p_id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
-
+			//mPlayer[p_id]->vCenter = XMFLOAT3(packet->x, packet->y, packet->z);
 			mPlayer[p_id]->SetLook(XMFLOAT3(packet->look_x, packet->look_y, packet->look_z));
 			mPlayer[p_id]->m_lv = packet->level;
 			mPlayer[p_id]->m_hp = packet->hp;

@@ -247,3 +247,14 @@ public:
 	virtual D3D12_SHADER_BYTECODE CreateVertexShader(ID3DBlob** ppd3dShaderBlob);
 	virtual void OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, void* pContext);
 };
+
+struct ST_SPHERE
+{
+	XMFLOAT3 vCenter;
+	float fRadius;
+	bool isPicked;
+
+	ST_SPHERE() : fRadius(10.0f), vCenter(0, 0, 0), isPicked(false) {}
+};
+
+extern ST_SPHERE sphere[180];

@@ -23,6 +23,7 @@ CTexturedRectMesh* newhp[100];
 CTexturedRectMesh* newmp[100];
 CCubeMeshDiffused* bullet;
 
+ST_SPHERE sphere[180];
 
 CShader::CShader()
 {
@@ -825,6 +826,7 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	//CAirplaneMeshDiffused* npc = new CAirplaneMeshDiffused(pd3dDevice, pd3dCommandList);
 
 	m_ppObjects = new CGameObject * [m_nObjects];
+	
 	//CBillboardObject* pBillboardObject = NULL;
 
 	CGameObject* phouseObject = new CGameObject(1);
@@ -1019,7 +1021,9 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		pNpc->SetPosition(XMFLOAT3(0, -100, 0));
 		pNpc->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr);
 		m_ppObjects[i] = pNpc;
+
 	}
+
 }
 
 void CObjectsShader::ReleaseObjects()
@@ -1040,13 +1044,17 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 	CAirplanePlayer* pPlayer = NULL;
 	int server_id = MAX_USER + MAX_NPC;
 	int MAX_WORLD_SHADER = m_nObjects - server_id;
+
 	for (int j = 0; j < m_nObjects; j++)
 	{
+ 
+
 		if (j >= m_nObjects - server_id) {
 			pPlayer = reinterpret_cast<CAirplanePlayer*>(m_ppObjects[j]);
 			bool tp = pPlayer->GetUse();
 			pPlayer->SetUse(get_use_to_server(j-MAX_WORLD_SHADER));
 			if (pPlayer->GetUse()) {
+
 				if (tp != pPlayer->GetUse()) {
 					// 최초 정보 불러오기 및 종족에 맞게 변환
 					get_basic_information(pPlayer, j - MAX_WORLD_SHADER);
@@ -1055,6 +1063,7 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 						get_player_information(pPlayer, j - MAX_WORLD_SHADER);
 					}
 					else {
+					
 						switch (pPlayer->m_spices)
 						{
 						case FALLEN_FLOG: {
@@ -1084,14 +1093,27 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 						default:
 							break;
 						}
+					
 					}
 				}
 				// 이때만 렌더링
 				
 				reinterpret_cast<CAirplanePlayer*>(m_ppObjects[j])->m_hp = get_hp_to_server(j - MAX_WORLD_SHADER);
 				m_ppObjects[j]->SetPosition(get_position_to_server(j - MAX_WORLD_SHADER));
+				if (j >= 10615 && j < 10795) {
+					//m_ppObjects[j]->SetPosition(get_position_to_server(j - 9614));
+					m_ppObjects[j]->vCenter = { m_ppObjects[j]->GetPosition().x, m_ppObjects[j]->GetPosition().y + 10, m_ppObjects[j]->GetPosition().z};
+				}
+				
+				
+				//cout << j << endl;
+				//cout << m_ppObjects[j]->vCenter.x << m_ppObjects[j]->vCenter.y << m_ppObjects[j]->vCenter.z << endl;
+
+				
 				pPlayer->SetLook(get_look_to_server(j - MAX_WORLD_SHADER));
 				pPlayer->Animate(pTimer, pCamera, m_ppObjects[j]);
+		
+			
 
 				// hp bar 렌더링
 				//int hp_j = j - MAX_WORLD_SHADER - 1000 + 812;
@@ -1176,6 +1198,7 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 		else {
 			m_ppObjects[j]->Animate(pTimer, pCamera, player);
 		}
+
 
 	}
 }

@@ -370,6 +370,8 @@ void CAirplanePlayer::Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject* 
 
 
 	SetLook(otherplayer->GetLook());
+
+
 	//pOtherPlayer
 }
 
