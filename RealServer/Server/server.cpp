@@ -15,8 +15,6 @@ array <Npc*, MAX_USER + MAX_NPC> players;
 array <Gaia*, MAX_USER / GAIA_ROOM> dungeons;
 array <Obstacle, MAX_OBSTACLE> obstacles;
 
-typedef pair<int, int> pos;
-
 void do_npc_move(int npc_id, int target);
 void return_npc_position(int npc_id);
 
@@ -2647,103 +2645,6 @@ void initialise_NPC()
     cout << "NPC로딩 완료" << endl;
 }
 
-#define REAL_DISTANCE 10
-
-int huristic(int t_x, int t_z, int x, int z) 
-{
-    int s_x = abs(t_x - x);
-    int s_z = abs(t_z - z);
-    int score = sqrt(pow(s_x, 2) + pow(s_z, 2));
-    //cout << "huristic : " << score << endl;
-    return score ;
-}
-
-// A*알고리즘
-pos a_star(int t_x, int t_z, int x, int z)
-{
-    vector<pos> mon_load;
-    // 쫒아가는 범위는 한 방향으로 60까지이다
-    int scoreG[25][25] = { 0 };
-    int scoreH[25][25] = { 0 };
-    int scoreF[25][25] = { 0 };
-    pos prior_point[25][25]{ pos(0,0) };
-
-    typedef pair<int, pos> weight;
-
-
-
-    pos now(12, 12);
-    scoreG[now.first][now.second] = 0;
-    scoreH[now.first][now.second] = huristic(t_x, t_z, x, z);
-    scoreF[now.first][now.second] = scoreG[now.first][now.second] + scoreH[now.first][now.second];
-
-    priority_queue < weight, vector<weight>, greater<weight>> open_q;
-    priority_queue < weight, vector<weight>, greater<weight>> close_q;
-    close_q.push(weight(scoreF[now.first][now.second], now));
-
-
-    int dirX[8] = { -1, 0, 1, 0, -1, 1, 1, -1 };
-    int dirZ[8] = { 0, -1, 0, 1, -1, -1, 1, 1 };
-    int cost[8]{ 10, 10, 10, 10, 14, 14, 14, 14 };
-    while (true) {
-        for (int i = 0; i < 8; i++) {
-            pos p(now.first + dirX[i], now.second + dirZ[i]);
-
-            if ((p.first >= 25 || p.first < 0) || (p.second >= 25 || p.second < 0)) continue;
-            // 검색된게 있다면 검색을 해주지 않는다
-            if (scoreF[now.first + dirX[i]][now.second + dirZ[i]] != 0) continue;
-            // 장애물이랑 부딪히는지 확인
-            if (false == check_move_alright(x + (p.first - 12) * REAL_DISTANCE, z + (p.second - 12) * REAL_DISTANCE, true)) {
-                cout << "장애물 부딪힘" << endl;
-                continue;
-            }
-
-            scoreG[now.first + dirX[i]][now.second + dirZ[i]] = scoreG[now.first][now.second] + cost[i];
-            scoreH[now.first + dirX[i]][now.second + dirZ[i]] = huristic(t_x, t_z, x + (p.first - 12) * REAL_DISTANCE, z + (p.second - 12) * REAL_DISTANCE);
-            scoreF[now.first + dirX[i]][now.second + dirZ[i]] = scoreG[now.first + dirX[i]][now.second + dirZ[i]] +
-                scoreH[now.first + dirX[i]][now.second + dirZ[i]];
-
-            prior_point[now.first + dirX[i]][now.second + dirZ[i]] = pos(now.first, now.second);
-
-            //cout << "scoreG : " << scoreG[now.first + dirX[i]][now.second + dirZ[i]] << endl;
-            //cout << "scoreH : " << scoreH[now.first + dirX[i]][now.second + dirZ[i]] << endl;
-            //cout << "scoreF : " << scoreF[now.first + dirX[i]][now.second + dirZ[i]] << endl << endl;
-
-            weight w(scoreF[now.first + dirX[i]][now.second + dirZ[i]], pos(now.first + dirX[i], now.second + dirZ[i]));
-            //cout << w.first << ", " << w.second.first << ", " << w.second.second << endl;
-            open_q.push(w);
-        }
-        if (open_q.size() == 0) {
-            while (now.first != 12 || now.second != 12) {
-                mon_load.push_back(now);
-                now = prior_point[now.first][now.second];
-            }
-            break;
-        }
-        weight temp = open_q.top();
-        open_q.pop();
-        now = temp.second;
-        close_q.push(temp);
-
-        ///cout << " now : " << now.first << ", " << now.second << endl;
-
-        // 끝내는 조건
-        if (abs((x + (now.first - 12) * REAL_DISTANCE) - t_x) <= 10 && abs((z + (now.second - 12) * REAL_DISTANCE) - t_z) <= 10) {
-            while (now.first != 12 || now.second != 12) {
-                mon_load.push_back(now);
-                now = prior_point[now.first][now.second];
-            }
-            break;
-        }
-    }
-
-    x += (mon_load.back().first - 12) * REAL_DISTANCE;
-    z += (mon_load.back().second - 12) * REAL_DISTANCE;
-    mon_load.pop_back();
-
-    return pos(x, z);
-}
-
 void return_npc_position(int npc_id)
 {
     players[npc_id]->set_target_id(-1); //추가
@@ -2783,7 +2684,7 @@ void return_npc_position(int npc_id)
     int now_z = players[npc_id]->get_z();
     bool my_pos_fail = true;
 
-    pos mv = a_star(my_x, my_z, now_x, now_z);
+    pos mv = players[npc_id]->a_star(my_x, my_z, now_x, now_z, obstacles);
     if (abs(mv.first-my_x) <=10 && abs(mv.second - my_z) <= 10) {
         now_x = my_x;
         now_z = my_z;
@@ -2918,7 +2819,7 @@ void do_npc_move(int npc_id, int target)
     }
 
     // A*알고리즘
-    pos mv = a_star(t_x, t_z, x, z);
+    pos mv = players[npc_id]->a_star(t_x, t_z, x, z, obstacles);
     x = mv.first;
     z = mv.second;
 

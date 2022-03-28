@@ -25,3 +25,6 @@ extern "C" {
 #include "protocol.h"
 
 using namespace std;
+
+typedef pair<int, int> pos;
+#define REAL_DISTANCE 10
