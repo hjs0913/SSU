@@ -10,10 +10,12 @@ private:
 	DUNGEON_STATE st;
 
 	bool fifteen_pattern;
+	int target_id;
 
 public:
 	Npc* boss;
 	mutex state_lock;
+	int player_rander_ok;
 
 public:
 	Gaia(int d_id);

@@ -11,13 +11,16 @@ Gaia::Gaia(int d_id)
 
 	fifteen_pattern = false;
 
+	player_rander_ok = 0;
+	target_id = 0;
+
 	// Boss Npc Intialize	
 	boss = new Npc(dungeon_id);
 	boss->set_tribe(BOSS);
-
 	boss->state_lock.lock();
 	boss->set_state(ST_FREE);
 	boss->state_lock.unlock();
+	boss->set_id(101);
 
 	lua_State* L = boss->L = luaL_newstate();
 	luaL_openlibs(L);
@@ -68,6 +71,10 @@ void Gaia::join_player(Player* pl)
 	// game start
 	if (player_cnt == GAIA_ROOM) {
 		// 모든 파티 인던 입장 및 게임 시작
+		player_rander_ok = 0;
+		// 가장 체력이 높은 플레이어를 일단 타겟으로 잡는다
+		int tmp_hp = 0;
+
 		state_lock.lock();
 		st = DUN_ST_START;
 		state_lock.unlock();
@@ -75,15 +82,33 @@ void Gaia::join_player(Player* pl)
 		boss->set_x(party[0]->get_x() + 10);
 		boss->set_z(party[0]->get_z() + 10);
 
-		for (auto pt : party) {
-			pt->state_lock.lock();
-			pt->set_state(ST_INDUN);
-			pt->state_lock.unlock();
-			send_start_gaia_packet(pt);
-			pt->indun_id = dungeon_id;
+		for (int i = 0; i < GAIA_ROOM; i++) {
+			party[i]->state_lock.lock();
+			party[i]->set_state(ST_INDUN);
+			party[i]->state_lock.unlock();
+			send_start_gaia_packet(party[i]);
+			party[i]->indun_id = dungeon_id;
+
+			// 가장 체력이 높은 플레이어를 일단 타겟으로 잡는다
+			if (party[i]->get_hp() > tmp_hp) target_id = i;
+
 			// 모든 좌표 및 정보들을 초기화 하자
-			pt->set_pos(300, 100);
+			party[i]->set_pos(300, 100);
 		}
+
+		//for (auto pt : party) {
+		//	pt->state_lock.lock();
+		//	pt->set_state(ST_INDUN);
+		//	pt->state_lock.unlock();
+		//	send_start_gaia_packet(pt);
+		//	pt->indun_id = dungeon_id;
+
+		//	// 가장 체력이 높은 플레이어를 일단 타겟으로 잡는다
+		//	if (pt->get_hp() > tmp_hp) boss->set_target_id(pt->get_id());
+
+		//	// 모든 좌표 및 정보들을 초기화 하자
+		//	pt->set_pos(300, 100);
+		//}
 
 		cout << dungeon_id << "번 던전 시작합니다" << endl;
 	}
@@ -101,9 +126,23 @@ Player** Gaia::get_party_palyer()
 
 void Gaia::boss_move()
 {
-	// 프레임 워크 수정하고
-	// target_id에 맞게 a_star로 쫒아간다
-	cout << "원래는 쫒아가는 중" << endl;
+	// Raid Map은 장애물이 없으므로 A_star는 낭비다
+
+	if ((party[target_id]->get_x() >= boss->get_x() - 8 && party[target_id]->get_x() <= boss->get_x() + 8) &&
+		(party[target_id]->get_z() >= boss->get_z() - 8 && party[target_id]->get_z() <= boss->get_z() + 8)) return;
+
+	pos mv = boss->non_a_star(party[target_id]->get_x(), party[target_id]->get_z(), boss->get_x(), boss->get_z());
+	// send boss position
+	//if(mv == 밖으로 떨어지지 않는가) 
+	//		값을 적용시키고 새로운 좌표를 클라이언트에게 보내주기
+	cout << "보스 움직이는 중 : " << mv.first << "," << mv.second << endl;
+	boss->set_x(mv.first);
+	boss->set_z(mv.second);
+	for (auto pt : party) {
+		send_move_packet(pt, boss);
+		send_look_packet(pt, boss);
+	}
+	
 }
 
 void Gaia::boss_attack()

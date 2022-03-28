@@ -60,6 +60,8 @@ const char CS_PACKET_LOOK = 7;
 const char CS_PACKET_CHANGE_JOB = 8;
 const char CS_PACKET_CHANGE_ELEMENT = 9;
 const char CS_PACKET_GAIA_JOIN = 10;
+const char CS_PACKET_RAID_RANDER_OK = 11;
+
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -141,6 +143,11 @@ struct cs_packet_change_element {
 };
 
 struct cs_packet_gaia_join {
+	unsigned char size;
+	char type;
+};
+
+struct cs_packet_raid_rander_ok {
 	unsigned char size;
 	char type;
 };

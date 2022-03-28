@@ -55,6 +55,8 @@ void send_change_element_packet(ELEMENT my_element);
 
 void send_gaia_join_packet();
 
+void send_raid_rander_ok_packet();
+
 int netInit();
 
 void process_packet(unsigned char* p);

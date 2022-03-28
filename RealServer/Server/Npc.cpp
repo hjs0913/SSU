@@ -344,6 +344,27 @@ int Npc::huristic(int t_x, int t_z, int x, int z)
 }
 
 //move
+pos Npc::non_a_star(int t_x, int t_z, int x, int z)
+{
+	float m_x = t_x - x;
+	float m_z = t_z - z;
+
+	float sum = (m_x * m_x) + (m_z * m_z);
+	sum = sqrt(sum);
+
+	m_x = m_x / sum;
+	m_z = m_z / sum;
+
+	x += m_x * REAL_DISTANCE;
+	z += m_z * REAL_DISTANCE;
+
+	_look_x = m_x;
+	_look_z = m_z;
+
+	return pos(x, z);
+}
+
+
 pos Npc::a_star(int t_x, int t_z, int x, int z,array<Obstacle, MAX_OBSTACLE> obs)
 {
 	vector<pos> mon_load;

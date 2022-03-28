@@ -1836,26 +1836,31 @@ void process_packet(int client_id, unsigned char* p)
                     }
                     send_put_object_packet(vl_pl[j], dungeons[i]->boss);
                 }
-                // BOSS NPC Timer Start
-                timer_event ev;
-                ev.obj_id = dungeons[i]->get_dungeon_id();
-                ev.start_time = chrono::system_clock::now() + 1s;
-                ev.ev = EVENT_BOSS_MOVE;
-                ev.target_id = -1;
-                timer_queue.push(ev);
-
-                ZeroMemory(&ev, sizeof(ev));
-                ev.obj_id = dungeons[i]->get_dungeon_id();
-                ev.start_time = chrono::system_clock::now() + 3s;
-                ev.ev = EVENT_BOSS_ATTACK;
-                ev.target_id = -1;
-                timer_queue.push(ev);
-
-
                 break;
             }
             dungeons[i]->state_lock.unlock();
             break;
+        }
+        break;
+    }
+    case CS_PACKET_RAID_RANDER_OK: {
+        dungeons[pl->indun_id]->player_rander_ok++;
+
+        if (dungeons[pl->indun_id]->player_rander_ok == GAIA_ROOM) {
+            // BOSS NPC Timer Start
+            timer_event ev;
+            ev.obj_id = dungeons[pl->indun_id]->get_dungeon_id();
+            ev.start_time = chrono::system_clock::now() + 1s;
+            ev.ev = EVENT_BOSS_MOVE;
+            ev.target_id = -1;
+            timer_queue.push(ev);
+
+            ZeroMemory(&ev, sizeof(ev));
+            ev.obj_id = dungeons[pl->indun_id]->get_dungeon_id();
+            ev.start_time = chrono::system_clock::now() + 3s;
+            ev.ev = EVENT_BOSS_ATTACK;
+            ev.target_id = -1;
+            timer_queue.push(ev);
         }
         break;
     }

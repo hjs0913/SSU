@@ -1379,9 +1379,11 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 					// 최초 정보 불러오기 및 종족에 맞게 변환
 					get_basic_information(pPlayer, j - MAX_WORLD_SHADER);
 					if (pPlayer->m_tribe == HUMAN) {
-						cout << j - MAX_USER << endl;
 						pPlayer->SetMesh(0, pOtherPlayerMesh[2]);
 						get_player_information(pPlayer, j - MAX_WORLD_SHADER);
+					}
+					else if (pPlayer->m_tribe == BOSS) {
+						pPlayer->SetMesh(0, pOtherPlayerMesh[0]);
 					}
 					else {
 						switch (pPlayer->m_spices)
@@ -1475,20 +1477,10 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 					}
 
 
-
-					if (pTimer.GetTotalTime() - start[j] >= 2) {
-
-					
-
-					
+					if (pTimer.GetTotalTime() - start[j] >= 2) {			
 						hit_check = false;
-
-					
 						start[j] = 0;
 					}
-					
-					
-				
 			}
 		}
 		else if (j == m_nObjects-2) {

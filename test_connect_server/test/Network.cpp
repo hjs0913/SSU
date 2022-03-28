@@ -163,6 +163,14 @@ void send_gaia_join_packet()
 	do_send(sizeof(packet), &packet);
 }
 
+void send_raid_rander_ok_packet()
+{
+	cs_packet_raid_rander_ok packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_RAID_RANDER_OK;
+	do_send(sizeof(packet), &packet);
+}
+
 void do_send(int num_bytes, void* mess)
 {
 	EXP_OVER* ex_over = new EXP_OVER;
@@ -288,10 +296,9 @@ void process_packet(unsigned char* p)
 		sc_packet_put_object* packet = reinterpret_cast<sc_packet_put_object*> (p);
 		int p_id = packet->id;
 		if (static_cast<TRIBE>(packet->object_type) != OBSTACLE) {
-			if (static_cast<TRIBE>(packet->object_type) == BOSS) {
+			/*if (static_cast<TRIBE>(packet->object_type) == BOSS) {
 				p_id += 100;
-				cout << "시발 오냐" << endl;
-			}
+			}*/
 
 			mPlayer[p_id]->SetUse(true);
 			mPlayer[p_id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
