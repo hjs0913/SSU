@@ -288,6 +288,11 @@ void process_packet(unsigned char* p)
 		sc_packet_put_object* packet = reinterpret_cast<sc_packet_put_object*> (p);
 		int p_id = packet->id;
 		if (static_cast<TRIBE>(packet->object_type) != OBSTACLE) {
+			if (static_cast<TRIBE>(packet->object_type) == BOSS) {
+				p_id += 100;
+				cout << "시발 오냐" << endl;
+			}
+
 			mPlayer[p_id]->SetUse(true);
 			mPlayer[p_id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
 

@@ -9,9 +9,11 @@ private:
 	int player_cnt;
 	DUNGEON_STATE st;
 
-public:
-	mutex state_lock;
+	bool fifteen_pattern;
 
+public:
+	Npc* boss;
+	mutex state_lock;
 
 public:
 	Gaia(int d_id);
@@ -21,6 +23,7 @@ public:
 	DUNGEON_STATE get_dun_st();
 	Player** get_party_palyer();
 
-
+	void boss_move();
+	void boss_attack();
 };
 

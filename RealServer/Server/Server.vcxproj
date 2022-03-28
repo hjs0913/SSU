@@ -176,6 +176,7 @@
     <None Include="fallen_monkey.lua" />
     <None Include="fallen_rabbit.lua" />
     <None Include="fallen_tiger.lua" />
+    <None Include="Raid_Gaia.lua" />
     <None Include="wolf_boss.lua" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

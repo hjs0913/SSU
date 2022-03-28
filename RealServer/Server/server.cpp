@@ -1841,6 +1841,7 @@ void process_packet(int client_id, unsigned char* p)
                         if (k == vl_pl[j]->get_id()) continue;
                         send_put_object_packet(vl_pl[j], players[k]);
                     }
+                    send_put_object_packet(vl_pl[j], dungeons[i]->boss);
                 }
                 break;
             }

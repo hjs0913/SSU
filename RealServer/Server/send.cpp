@@ -59,7 +59,7 @@ void send_put_object_packet(Player* pl, Npc* target)
     if (target->get_tribe() == HUMAN) {
         packet.object_class = reinterpret_cast<Player*>(target)->get_job();
     }
-    else if (target->get_tribe() == MONSTER) {
+    else if (target->get_tribe() == MONSTER || target->get_tribe() == BOSS) {
         packet.object_class = target->get_mon_spices();
     }
     strcpy_s(packet.name, target->get_name());
