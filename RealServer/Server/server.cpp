@@ -152,7 +152,6 @@ void Activate_Npc_Move_Event(int target, int player_id)
     PostQueuedCompletionStatus(g_h_iocp, 1, target, &exp_over->_wsa_over);
 }
 
-
 void magical_skill_success(int p_id, int target, float skill_factor)
 {
 
@@ -422,9 +421,6 @@ void physical_skill_success(int p_id, int target, float skill_factor)
         }
     }
     else if (p_id >= NPC_ID_START) {
-
-        //send_status_change_packet(reinterpret_cast<Player*>(players[target]));
-
         send_change_hp_packet(reinterpret_cast<Player*>(players[target]), players[target]);
         reinterpret_cast<Player*>(players[target])->vl.lock();
         for (auto id : reinterpret_cast<Player*>(players[target])->viewlist) {
@@ -477,8 +473,6 @@ void physical_skill_success(int p_id, int target, float skill_factor)
        // send_chat_packet(reinterpret_cast<Player*>(players[p_id]), p_id, mess);
     }
 }
-
-//bool superposition = false; //이거를 npc마다 다 주자 
 
 void attack_success(int p_id, int target, float atk_factor)
 {
@@ -757,6 +751,7 @@ bool isInsideTriangle(Coord a, Coord b, Coord c, Coord n)
     return true;
 
 }
+
 void process_packet(int client_id, unsigned char* p)
 {
    
@@ -1841,6 +1836,22 @@ void process_packet(int client_id, unsigned char* p)
                     }
                     send_put_object_packet(vl_pl[j], dungeons[i]->boss);
                 }
+                // BOSS NPC Timer Start
+                timer_event ev;
+                ev.obj_id = dungeons[i]->get_dungeon_id();
+                ev.start_time = chrono::system_clock::now() + 1s;
+                ev.ev = EVENT_BOSS_MOVE;
+                ev.target_id = -1;
+                timer_queue.push(ev);
+
+                ZeroMemory(&ev, sizeof(ev));
+                ev.obj_id = dungeons[i]->get_dungeon_id();
+                ev.start_time = chrono::system_clock::now() + 3s;
+                ev.ev = EVENT_BOSS_ATTACK;
+                ev.target_id = -1;
+                timer_queue.push(ev);
+
+
                 break;
             }
             dungeons[i]->state_lock.unlock();
@@ -1902,16 +1913,6 @@ void player_revive(int client_id)
         other_player->vl.unlock();
 
         send_put_object_packet(other_player, pl);
-        /*sc_packet_put_object packet;
-        packet.id = client_id;
-        strcpy_s(packet.name, pl->get_name());
-        packet.object_type = 0;
-        packet.size = sizeof(packet);
-        packet.type = SC_PACKET_PUT_OBJECT;
-        packet.x = pl->get_x();
-        packet.y = pl->get_y();
-        packet.z = pl->get_z();
-        other_player->do_send(sizeof(packet), &packet);*/
     }
 
     // 새로 접속한 플레이어에게 기존 정보를 보내중
@@ -1950,16 +1951,6 @@ void player_revive(int client_id)
         pl->vl.unlock();
 
         send_put_object_packet(pl, other);
-       /* sc_packet_put_object packet;
-        packet.id = other->get_id();
-        strcpy_s(packet.name, other->get_name());
-        packet.object_type = 0;
-        packet.size = sizeof(packet);
-        packet.type = SC_PACKET_PUT_OBJECT;
-        packet.x = other->get_x();
-        packet.y = other->get_y();
-        packet.z = other->get_z();
-        pl->do_send(sizeof(packet), &packet);*/
     }
     // 장애물 정보
     pl->ob_vl.lock();
@@ -2282,6 +2273,26 @@ void worker()
                 break;
             }
             delete exp_over;
+            break;
+        }
+        case OP_BOSS_MOVE: {
+            dungeons[client_id]->boss_move();
+            timer_event ev;
+            ev.obj_id = client_id;
+            ev.start_time = chrono::system_clock::now() + 1s;
+            ev.ev = EVENT_BOSS_MOVE;
+            ev.target_id = -1;
+            timer_queue.push(ev);
+            break;
+        }
+        case OP_BOSS_ATTACK: {
+            dungeons[client_id]->boss_attack();
+            timer_event ev;
+            ev.obj_id = client_id;
+            ev.start_time = chrono::system_clock::now() + 3s;
+            ev.ev = EVENT_BOSS_ATTACK;
+            ev.target_id = -1;
+            timer_queue.push(ev);
             break;
         }
         }
@@ -2897,10 +2908,17 @@ COMP_OP EVtoOP(EVENT_TYPE ev) {
     case EVENT_NPC_REVIVE:
         return OP_NPC_REVIVE;
         break;
+    case EVENT_BOSS_MOVE:
+        return OP_BOSS_MOVE;
+        break;
+    case EVENT_BOSS_ATTACK:
+        return OP_BOSS_ATTACK;
+        break;
 
     case EVENT_ELEMENT_COOLTIME:
        // return OP_ELEMENT_COOLTIME;
         break;
+
     }
 
 }

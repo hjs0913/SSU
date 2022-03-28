@@ -25,5 +25,7 @@ public:
 
 	void boss_move();
 	void boss_attack();
+
+	int get_dungeon_id();
 };
 

@@ -1,6 +1,7 @@
 #include "Gaia.h"
 #include "send.h"
 #include <random>
+#include <ctime>
 
 Gaia::Gaia(int d_id)
 {
@@ -107,10 +108,11 @@ void Gaia::boss_move()
 
 void Gaia::boss_attack()
 {
-	default_random_engine dre;
-	uniform_int_distribution<int> pattern(0, 4);
+	random_device rd;
+	mt19937 gen(rd());
+	uniform_int_distribution<int> pattern(0, 99);
 
-	int p = pattern(dre);
+	int p = pattern(gen);
 	if (fifteen_pattern == false) {
 		if (boss->get_hp() < boss->get_maxhp()) {
 			fifteen_pattern = true;
@@ -124,8 +126,8 @@ void Gaia::boss_attack()
 			return;
 		}
 	}
-
-	switch (p) {
+	cout << "p : " << p << endl;
+	switch (p%5) {
 	case 0: {
 		cout << "패턴 0(대지 흔들기)" << endl;
 		break;
@@ -150,4 +152,9 @@ void Gaia::boss_attack()
 		cout << "패턴 에러" << endl;
 		break;
 	}
+}
+
+int Gaia::get_dungeon_id()
+{
+	return dungeon_id;
 }
