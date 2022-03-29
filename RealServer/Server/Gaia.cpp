@@ -136,7 +136,6 @@ void Gaia::boss_move()
 	// send boss position
 	//if(mv == 밖으로 떨어지지 않는가) 
 	//		값을 적용시키고 새로운 좌표를 클라이언트에게 보내주기
-	cout << "보스 움직이는 중 : " << mv.first << "," << mv.second << endl;
 	boss->set_x(mv.first);
 	boss->set_z(mv.second);
 	for (auto pt : party) {
