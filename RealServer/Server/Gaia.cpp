@@ -13,6 +13,7 @@ Gaia::Gaia(int d_id)
 
 	player_rander_ok = 0;
 	target_id = 0;
+	start_game = false;
 
 	// Boss Npc Intialize	
 	boss = new Npc(dungeon_id);

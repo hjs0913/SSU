@@ -564,6 +564,9 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[5] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::White, D2D1::ColorF::Black);
 		m_ppUILayer[6] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
 
+		// Boss Hp Info
+		m_ppUILayer[7] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::White, D2D1::ColorF::Black);
+		m_ppUILayer[8] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
 
 		m_ppUILayer[0]->setAlpha(0.5, 1.0);
 		m_ppUILayer[1]->setAlpha(0.5, 1.0);
@@ -572,6 +575,9 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[4]->setAlpha(0.0, 1.0);
 		m_ppUILayer[5]->setAlpha(0.3, 1.0);
 		m_ppUILayer[6]->setAlpha(0.0, 1.0);
+		m_ppUILayer[7]->setAlpha(0.3, 1.0);
+		m_ppUILayer[8]->setAlpha(0.0, 1.0);
+
 
 		m_ppUILayer[0]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_FAR);
@@ -587,6 +593,10 @@ void CGameFramework::BuildObjects()
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 		m_ppUILayer[6]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[7]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+		m_ppUILayer[8]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 		// UIBar Setting
 		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, 40, 20 + (m_nWndClientWidth / 10) * 3, 60);
@@ -595,30 +605,12 @@ void CGameFramework::BuildObjects()
 		reinterpret_cast<UIBar*>(m_ppUILayer[4])->SetColorBrush(D2D1::ColorF::Blue, 1.0, 20, 60, 20 + (m_nWndClientWidth / 10) * 3, 80);
 		reinterpret_cast<UIBar*>(m_ppUILayer[6])->SetBehindBrush(D2D1::ColorF::Black, 1.0, (m_nWndClientWidth / 2) - 70, 40, (m_nWndClientWidth / 2) + 70, (m_nWndClientHeight / 6) - 20);
 		reinterpret_cast<UIBar*>(m_ppUILayer[6])->SetColorBrush(D2D1::ColorF::Red, 1.0, (m_nWndClientWidth / 2) - 70, 40, (m_nWndClientWidth / 2) + 70, (m_nWndClientHeight / 6) - 20);
+		reinterpret_cast<UIBar*>(m_ppUILayer[8])->SetBehindBrush(D2D1::ColorF::Black, 1.0, (m_nWndClientWidth / 2) - 70, 40, (m_nWndClientWidth / 2) + 70*4, (m_nWndClientHeight / 6) - 20);
+		reinterpret_cast<UIBar*>(m_ppUILayer[8])->SetColorBrush(D2D1::ColorF::Red, 1.0, (m_nWndClientWidth / 2) - 70, 40, (m_nWndClientWidth / 2) + 70*4, (m_nWndClientHeight / 6) - 20);
 	}
 
 
 	Create_OpenWorld_Object();
-	/*m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
-
-	m_pScene = new CScene();
-	m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList, m_pd3dCommandQueue, m_ppd3dSwapChainBackBuffers);
-
-
-	m_pPlayer = new CTerrainPlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->GetTerrain(), 1);
-	m_pCamera = m_pPlayer->GetCamera();
-	m_pPlayer->SetUse(true);
-
-	m_pd3dCommandList->Close();
-	ID3D12CommandList* ppd3dCommandLists[] = { m_pd3dCommandList };
-	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
-
-	WaitForGpuComplete();
-
-	if (m_pScene) m_pScene->ReleaseUploadBuffers();
-	if (m_pRaid_Scene) m_pRaid_Scene->ReleaseUploadBuffers();*/
-
-	// m_GameTimer.Reset();
 }
 
 void CGameFramework::Create_OpenWorld_Object()
@@ -943,8 +935,10 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandList->OMSetRenderTargets(1, &d3dRtvCPUDescriptorHandle, TRUE, &d3dDsvCPUDescriptorHandle);
 
 	if (!InDungeon) m_pScene->Render(m_pd3dCommandList, m_pCamera);
-	else m_pRaid_Scene->Render(m_pd3dCommandList, m_pCamera);
-
+	else {
+		if (m_pRaid_Scene) m_pRaid_Scene->Render(m_pd3dCommandList, m_pCamera);
+		else return;
+	}
 	XMFLOAT3 tmp = m_pPlayer->GetPosition();
 	XMFLOAT3 tmp2 = m_pCamera->GetPosition();
 
@@ -1032,12 +1026,66 @@ void CGameFramework::FrameAdvance()
 			m_ppUILayer[i]->UpdateLabels(ang, (m_nWndClientWidth / 2) - 70, 40, 140*((get_combat_id_hp()/get_combat_id_max_hp()))+((m_nWndClientWidth / 2) - 70), (m_nWndClientHeight / 6) - 20);
 			break;
 		}
+		case 7: {
+			if (!InDungeon) break;
+
+			m_ppUILayer[i]->UpdateLabels(L"가이아", (m_nWndClientWidth / 2) - 80, 0, (m_nWndClientWidth / 2) + 80*4, (m_nWndClientHeight / 6));
+			break; 
+		}
+		case 8: {
+			if (!InDungeon) break;
+			int hp_x = (int)get_combat_id_hp() / 100000;
+			float bar_percent = (((int)get_combat_id_hp() % 100000)+1)/100000.0f;
+			wstring ang = L"HP : ";
+			ang.append(to_wstring((int)get_combat_id_hp()));
+			ang.append(L"/");
+			ang.append(to_wstring((int)get_combat_id_max_hp()));
+			ang.append(L"\t\t\t\tX");
+			ang.append(to_wstring(hp_x));
+
+			// 피(hp_x)에 따른 숫자 바꾸기
+			D2D1::ColorF::Enum bc = D2D1::ColorF::Black;
+			D2D1::ColorF::Enum fc = D2D1::ColorF::Red;
+			switch (hp_x%5) {
+			case 0:
+				bc = D2D1::ColorF::Purple;
+				fc = D2D1::ColorF::Red;
+				break;
+			case 1:
+				bc = D2D1::ColorF::Red;
+				fc = D2D1::ColorF::Orange;
+				break;
+			case 2:
+				bc = D2D1::ColorF::Orange;
+				fc = D2D1::ColorF::Green;
+				break;
+			case 3:
+				bc = D2D1::ColorF::Green;
+				fc = D2D1::ColorF::DeepSkyBlue;
+				break;
+			case 4:
+				bc = D2D1::ColorF::DeepSkyBlue;
+				fc = D2D1::ColorF::Purple;
+				break;
+			}
+
+			if (hp_x == 0)  bc = D2D1::ColorF::Black;
+
+			reinterpret_cast<UIBar*>(m_ppUILayer[i])->SetBehindBrush(bc, 1.0, (m_nWndClientWidth / 2) - 70, 40, (m_nWndClientWidth / 2) + 70 * 4, (m_nWndClientHeight / 6) - 20);
+			reinterpret_cast<UIBar*>(m_ppUILayer[i])->SetColorBrush(fc, 1.0, (m_nWndClientWidth / 2) - 70, 40, (m_nWndClientWidth / 2) + 70 * 4, (m_nWndClientHeight / 6) - 20);
+			
+			m_ppUILayer[i]->UpdateLabels(ang, (m_nWndClientWidth / 2) - 70, 40, (m_nWndClientWidth / 2) - 70 + (70*5)*bar_percent, (m_nWndClientHeight / 6) - 20);
+			break;
+		}
 		}
 	}
 
 	for (int i = 0; i < UICOUNT; i++) {
 		if ((i == 5 || i == 6)) {
 			if (!Combat_On) continue;
+		}
+		if (i == 7 || i == 8) {
+			if (!InDungeon) continue;
 		}
 		m_ppUILayer[i]->Render(m_nSwapChainBufferIndex);
 

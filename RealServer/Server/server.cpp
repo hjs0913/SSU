@@ -1183,6 +1183,24 @@ void process_packet(int client_id, unsigned char* p)
         ev.target_id = client_id;
         timer_queue.push(ev);
         
+        if (pl->join_dungeon_room && dungeons[pl->indun_id]->start_game) {
+            int indun = pl->indun_id;
+            Npc* bos = dungeons[indun]->boss;
+            if (bos->get_x() >= pl->get_x() - 10 && bos->get_x() <= pl->get_x() + 10) {
+                if (bos->get_z() >= pl->get_z() - 10 && bos->get_z() <= pl->get_z() + 10) {
+                   // 일단 고정값으로 제거해 주자
+                    bos->set_hp(bos->get_hp() - 130000);
+
+                    Player** ps = dungeons[indun]->get_party_palyer();
+
+                    for (int i = 0; i < GAIA_ROOM; i++) {
+                        send_change_hp_packet(ps[i], bos);
+                    }
+                }
+            }
+            return;
+        }
+
         for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
             players[i]->state_lock.lock();
             if (players[i]->get_state() != ST_INGAME) {
@@ -1863,6 +1881,7 @@ void process_packet(int client_id, unsigned char* p)
         dungeons[pl->indun_id]->player_rander_ok++;
 
         if (dungeons[pl->indun_id]->player_rander_ok == GAIA_ROOM) {
+            dungeons[pl->indun_id]->start_game = true;
             // BOSS NPC Timer Start
             timer_event ev;
             ev.obj_id = dungeons[pl->indun_id]->get_dungeon_id();

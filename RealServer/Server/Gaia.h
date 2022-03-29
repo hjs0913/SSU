@@ -16,7 +16,7 @@ public:
 	Npc* boss;
 	mutex state_lock;
 	int player_rander_ok;
-
+	bool start_game;
 public:
 	Gaia(int d_id);
 	~Gaia();

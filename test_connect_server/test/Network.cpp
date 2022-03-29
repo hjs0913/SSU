@@ -455,6 +455,7 @@ void process_packet(unsigned char* p)
 	}
 	case SC_PACKET_START_GAIA: {
 		cout << "인던으로 입장해야됨" << endl;
+		combat_id = 101;
 		InDungeon = true;
 		break;
 	}
