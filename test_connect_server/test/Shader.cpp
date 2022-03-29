@@ -1040,7 +1040,7 @@ void CObjectsShader::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 	int yObjects = 1;
 	int zObjects = int(fTerrainLength / fzPitch);
 	m_nObjects = (xObjects * yObjects * zObjects);  //97
-	m_nObjects += 1 + 2 * BULLETCNT + 1 + 4 + GAIA_ROOM + 1;
+	m_nObjects += 1 + 2 * BULLETCNT + 1 + 4 + MAX_NPC + MAX_USER;
 	/*-------------------------------------------------------------
 	//m_nObjects = xObjects * yObjects * zObjects = 9400
 	m_nObjects += 1

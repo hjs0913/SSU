@@ -1736,7 +1736,6 @@ void process_packet(int client_id, unsigned char* p)
             // Npc
             if (is_npc(i) == true) continue;
             // Player
-            cout << client_id << "가 방향을 " << i << "에게 보냄" << endl;
             send_look_packet(reinterpret_cast<Player*>(players[i]),pl);
         }
         break;
