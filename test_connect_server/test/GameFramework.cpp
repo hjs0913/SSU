@@ -39,7 +39,9 @@ int m_mouseY = 0;
 
 CCamera* m_pCamera;
 
-bool num0_picking_possible = false;
+bool f4_picking_possible = false;
+bool f5_picking_possible = false;
+bool f6_picking_possible = false;
 
 CGameFramework::CGameFramework()
 {
@@ -416,7 +418,7 @@ bool CGameFramework::TestIntersection(int mouseX, int mouseY, CGameObject* obj)
 
 	// 이제 광선 구 교차 테스트를 수행하십시오.
 	//m_pPlayer
-	if (RaySphereIntersect(rayOrigin, rayDirection, 20.0f) == true)
+	if (RaySphereIntersect(rayOrigin, rayDirection, 40.0f) == true)
 	{
 		cout << obj->GetPosition().x << "  " <<obj->GetPosition().y  << "  " << obj->GetPosition().z <<  endl;
 		cout << "픽킹";
@@ -453,11 +455,34 @@ bool CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 	
 
 	
-		if (num0_picking_possible) {
+		if (f4_picking_possible) {
 			for (int i = 9615; i < 10615; i++) {  //9615  for (int i = 10615; i < 10795; i++) 
 				if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, m_ppObjects[i])) {
 					send_picking_skill_packet(2, 0, i);
-					num0_picking_possible = false;
+					m_ppObjects[i]->SetMesh(0, pOtherPlayerMesh[1]);  //피킹 확인위해 색상변경 
+					f4_picking_possible = false;
+					cout << i << endl;
+				}
+			}
+		}
+
+		if (f5_picking_possible) {
+			for (int i = 9615; i < 10615; i++) {  //9615  for (int i = 10615; i < 10795; i++) 
+				if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, m_ppObjects[i])) {
+					send_picking_skill_packet(0, 0, i);
+					m_ppObjects[i]->SetMesh(0, pOtherPlayerMesh[1]);
+					f5_picking_possible = false;
+					cout << i << endl;
+				}
+			}
+		}
+
+		if (f6_picking_possible) {
+			for (int i = 9615; i < 10615; i++) {  //9615  for (int i = 10615; i < 10795; i++) 
+				if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, m_ppObjects[i])) {
+					send_picking_skill_packet(1, 0, i);
+					m_ppObjects[i]->SetMesh(0, pOtherPlayerMesh[1]);
+					f6_picking_possible = false;
 					cout << i << endl;
 				}
 			}
@@ -580,6 +605,15 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			break;
 		case VK_F3:
 				m_pCamera = m_pPlayer->ChangeCamera((DWORD)(wParam - VK_F1 + 1), m_GameTimer.GetTimeElapsed());
+			break;
+		case VK_F4:
+			f4_picking_possible = true;
+			break;
+		case VK_F5:
+			f5_picking_possible = true;
+			break;
+		case VK_F6:
+			f6_picking_possible = true;
 			break;
 		case VK_F9:
 			ChangeSwapChainState();
@@ -770,9 +804,9 @@ void CGameFramework::ProcessInput()
 				//send_move_packet(3);
 				dwDirection |= DIR_RIGHT;
 			}
-			if ((pKeysBuffer[VK_NUMPAD0] & 0xF0) || (pKeysBuffer['0'] & 0xF0)) {   
-				num0_picking_possible = true;
-			}
+		//	if ((pKeysBuffer[VK_NUMPAD0] & 0xF0) || (pKeysBuffer['0'] & 0xF0)) {   
+		//		f4_picking_possible = true;
+		//	}
 
 			//��ų---------------------------------
 			if ((pKeysBuffer[VK_NUMPAD1] & 0xF0) || (pKeysBuffer['1'] & 0xF0)) {     //   1 
