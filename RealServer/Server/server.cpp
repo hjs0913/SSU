@@ -794,6 +794,10 @@ void process_packet(int client_id, unsigned char* p)
         pl->set_lv(25);
         pl->set_element(E_WATER);
         pl->set_name("정의범");
+
+        pl->indun_id - 1;
+        pl->join_dungeon_room = false;
+
         switch (pl->get_job()) {
         case J_DILLER: {
             int lv = pl->get_lv();
@@ -1714,6 +1718,7 @@ void process_packet(int client_id, unsigned char* p)
             // Npc
             if (is_npc(i) == true) continue;
             // Player
+            cout << client_id << "가 방향을 " << i << "에게 보냄" << endl;
             send_look_packet(reinterpret_cast<Player*>(players[i]),pl);
         }
         break;
@@ -1832,10 +1837,13 @@ void process_packet(int client_id, unsigned char* p)
                         send_remove_object_packet(vl_pl[j], players[k]);
                         if (is_npc(k) == true) continue;
                         reinterpret_cast<Player*>(players[k])->vl.lock();
-                        reinterpret_cast<Player*>(players[k])->viewlist.erase(client_id);
-                        reinterpret_cast<Player*>(players[k])->vl.unlock();
-                        if(indun_vl.find(k) == indun_vl.end())
+                        if (indun_vl.find(k) == indun_vl.end()) {
+                            reinterpret_cast<Player*>(players[k])->viewlist.erase(client_id);
+                            reinterpret_cast<Player*>(players[k])->vl.unlock();
                             send_remove_object_packet(reinterpret_cast<Player*>(players[k]), vl_pl[j]);
+                            continue;
+                        }
+                        reinterpret_cast<Player*>(players[k])->vl.unlock();
                     }
 
                     for (auto k : indun_vl) {

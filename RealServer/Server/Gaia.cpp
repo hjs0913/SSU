@@ -93,7 +93,7 @@ void Gaia::join_player(Player* pl)
 			if (party[i]->get_hp() > tmp_hp) target_id = i;
 
 			// 모든 좌표 및 정보들을 초기화 하자
-			party[i]->set_pos(300, 100);
+			//party[i]->set_pos(300, 100);
 		}
 
 		//for (auto pt : party) {
