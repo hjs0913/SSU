@@ -128,6 +128,18 @@ void send_skill_packet(int sk_t, int sk_n)
 	do_send(sizeof(packet), &packet);
 
 }
+
+void send_picking_skill_packet(int sk_t, int sk_n, int target)
+{
+	cs_packet_picking_skill packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_PICKING_SKILL;
+	packet.target = target;
+	packet.skill_type = sk_t;
+	packet.skill_num = sk_n;
+	do_send(sizeof(packet), &packet);
+
+}
 void send_change_job_packet(JOB my_job)
 {
 	cs_packet_change_job packet;
@@ -289,6 +301,7 @@ void process_packet(unsigned char* p)
 		}
 		else {
 			mPlayer[packet->id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
+			//mPlayer[packet->id]->vCenter = XMFLOAT3(packet->x, packet->y, packet->z);
 		}
 		break;
 	}
@@ -302,7 +315,7 @@ void process_packet(unsigned char* p)
 
 			mPlayer[p_id]->SetUse(true);
 			mPlayer[p_id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
-
+			//mPlayer[p_id]->vCenter = XMFLOAT3(packet->x, packet->y, packet->z);
 			mPlayer[p_id]->SetLook(XMFLOAT3(packet->look_x, packet->look_y, packet->look_z));
 			mPlayer[p_id]->m_lv = packet->level;
 			mPlayer[p_id]->m_hp = packet->hp;

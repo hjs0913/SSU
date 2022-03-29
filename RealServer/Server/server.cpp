@@ -1815,6 +1815,102 @@ void process_packet(int client_id, unsigned char* p)
         send_status_change_packet(pl);
         break;
     }
+    case CS_PACKET_PICKING_SKILL: {
+        cs_packet_picking_skill* packet = reinterpret_cast<cs_packet_picking_skill*>(p);
+        if (pl->get_skill_active(packet->skill_type) == true) return;
+        pl->set_skill_active(packet->skill_type, true);   
+
+        switch (packet->skill_type)
+        {
+        case 0:
+            switch (packet->skill_num)
+            {
+            case 0:
+                timer_event ev;
+                ev.obj_id = client_id;
+                ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
+                ev.ev = EVENT_SKILL_COOLTIME;
+                ev.target_id = 3;
+                timer_queue.push(ev);
+
+                cout << "마나 회복!!!" << endl;
+                pl->set_mp(pl->get_mp() - 1000);
+                send_status_change_packet(pl);
+
+                int taget = packet->target - 9615;
+
+                cout << "아이디 " << taget << "의 이전 mp" << players[taget]->get_mp() << endl;
+                players[taget]->set_mp(players[taget]->get_mp() + players[taget]->get_maxmp() / 10);
+                send_status_change_packet(reinterpret_cast<Player*>(players[taget]));
+
+            
+                cout << "아이디 " << taget << "의 이후 mp" << players[taget]->get_mp() << endl;
+
+
+
+                break;
+
+            }
+            break;
+        case 1:
+            switch (packet->skill_num)
+            {
+            case 0:
+                timer_event ev;
+                ev.obj_id = client_id;
+                ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
+                ev.ev = EVENT_SKILL_COOLTIME;
+                ev.target_id = 3;
+                timer_queue.push(ev);
+
+                cout << "아테네의 가호!!!" << endl;
+                pl->set_mp(pl->get_mp() - 1000);
+                send_status_change_packet(pl);
+
+                int taget = packet->target - 9615;
+
+                players[taget]->set_physical_defence(players[taget]->get_physical_defence()  * 11 / 10);
+                players[taget]->set_magical_defence(players[taget]->get_magical_defence() * 11 / 10);
+                send_status_change_packet(reinterpret_cast<Player*>(players[taget]));
+
+                break;
+
+            }
+            break;
+        case 2:
+            switch (packet->skill_num)
+            {
+            case 0:
+                timer_event ev;
+                ev.obj_id = client_id;
+                ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
+                ev.ev = EVENT_SKILL_COOLTIME;
+                ev.target_id = 3;
+                timer_queue.push(ev);
+
+                cout << "천사의 치유!!!" << endl;
+                pl->set_mp(pl->get_mp() - 1000);
+                send_status_change_packet(pl);
+
+                int taget = packet->target - 9615;
+
+                cout << "아이디 " << taget << "의 이전 hp" << players[taget]->get_hp() << endl;
+                players[taget]->set_hp(players[taget]->get_hp() + players[taget]->get_maxhp() / 10);
+                send_status_change_packet(reinterpret_cast<Player*>(players[taget]));
+
+                cout << "체력 회복" << endl;
+                cout << "아이디 " << taget << "의 이후 hp" << players[taget]->get_hp() << endl;
+
+
+
+                break;
+
+            }
+            break;
+        }
+        break;
+    }
+
     case CS_PACKET_GAIA_JOIN: {
         // check player state
         pl->state_lock.lock();

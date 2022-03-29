@@ -146,6 +146,10 @@ public:
 
 	D3D12_GPU_DESCRIPTOR_HANDLE		m_d3dCbvGPUDescriptorHandle;
 
+	XMFLOAT3 vCenter{ -1,-1, - 1 };
+	float fRadius = 20;
+	bool isPicked = 10;
+
 protected:
 	ID3D12Resource					*m_pd3dcbGameObject = NULL;
 	CB_GAMEOBJECT_INFO				*m_pcbMappedGameObject = NULL;

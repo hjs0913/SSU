@@ -59,9 +59,9 @@ const char CS_PACKET_SKILL = 6;
 const char CS_PACKET_LOOK = 7;
 const char CS_PACKET_CHANGE_JOB = 8;
 const char CS_PACKET_CHANGE_ELEMENT = 9;
-const char CS_PACKET_GAIA_JOIN = 10;
-const char CS_PACKET_RAID_RANDER_OK = 11;
-
+const char CS_PACKET_PICKING_SKILL = 10;
+const char CS_PACKET_GAIA_JOIN = 11;
+const char CS_PACKET_RAID_RANDER_OK = 12;
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -269,6 +269,15 @@ struct sc_packet_combat_id {
 	unsigned char size;
 	char type;
 	int id;
+};
+
+
+struct cs_packet_picking_skill {
+	unsigned char size;
+	char type;
+	int target;
+	char skill_type;    //0 : 물리 공격 1: 마법 공격  2 : 버프 
+	char skill_num;    // 0-0, 0-1   ,,,,,   1-0,  1-1  
 };
 
 struct sc_packet_start_gaia {

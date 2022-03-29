@@ -15,7 +15,7 @@ struct VS_CB_CAMERA_INFO
 
 class CPlayer;
 
-class CCamera
+ class CCamera
 {
 protected:
 	XMFLOAT3						m_xmf3Position;
@@ -36,15 +36,17 @@ protected:
 	XMFLOAT4X4						m_xmf4x4View;
 	XMFLOAT4X4						m_xmf4x4Projection;
 
-	D3D12_VIEWPORT					m_d3dViewport;
 	D3D12_RECT						m_d3dScissorRect;
-
+	D3D12_VIEWPORT					m_d3dViewport;
 	CPlayer							*m_pPlayer;
 
 public:
+
+
 	CCamera();
 	CCamera(CCamera *pCamera);
 	virtual ~CCamera();
+
 
 	virtual void CreateShaderVariables(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
 	virtual void ReleaseShaderVariables();
@@ -90,6 +92,10 @@ public:
 
 	XMFLOAT4X4 GetViewMatrix() { return(m_xmf4x4View); }
 	XMFLOAT4X4 GetProjectionMatrix() { return(m_xmf4x4Projection); }
+
+
+
+
 	D3D12_VIEWPORT GetViewport() { return(m_d3dViewport); }
 	D3D12_RECT GetScissorRect() { return(m_d3dScissorRect); }
 
