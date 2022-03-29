@@ -46,6 +46,8 @@ void send_look_packet(XMFLOAT3 look, XMFLOAT3 right);
 
 void send_skill_packet(int sk_t, int sk_n);
 
+void send_picking_skill_packet(int sk_t, int sk_n, int target);
+
 void send_chat_packet(const char* send_str);
 
 void send_change_job_packet(JOB my_job);

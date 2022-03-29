@@ -39,6 +39,8 @@ int m_mouseY = 0;
 
 CCamera* m_pCamera;
 
+bool num0_picking_possible = false;
+
 CGameFramework::CGameFramework()
 {
 	
@@ -359,8 +361,8 @@ bool CGameFramework::TestIntersection(int mouseX, int mouseY, CGameObject* obj)
 	XMVECTOR V_worldMatrix;
 
 	// 마우스 커서 좌표를 -1에서 +1 범위로 이동합니다
-	float pointX = ((2.0f * (float)mouseX) / (float)FRAME_BUFFER_WIDTH) - 1.0f;
-	float pointY = (((2.0f * (float)mouseY) / (float)FRAME_BUFFER_HEIGHT) - 1.0f) * -1.0f;
+	float pointX = ((2.0f * (float)mouseX) / (float)m_nWndClientWidth) - 1.0f;      //FRAME_BUFFER_WIDTH
+	float pointY = (((2.0f * (float)mouseY) / (float)m_nWndClientHeight) - 1.0f) * -1.0f;  //FRAME_BUFFER_HEIGHT
 
 	// 뷰포트의 종횡비를 고려하여 투영 행렬을 사용하여 점을 조정합니다
 	F_projectionMatrix = m_pCamera->GetProjectionMatrix();
@@ -394,6 +396,8 @@ bool CGameFramework::TestIntersection(int mouseX, int mouseY, CGameObject* obj)
 	F3_worldMatrix = m_pCamera->GetLookAtPosition();
 	//worldMatrix = XMLoadFloat3(&F3_worldMatrix);
 	worldMatrix = XMMatrixIdentity();
+
+	//translateMatrix = XMMatrixTranslation(obj->vCenter.x, obj->vCenter.y, obj->vCenter.z);
 	translateMatrix = XMMatrixTranslation(obj->GetPosition().x, obj->GetPosition().y, obj->GetPosition().z);
 	worldMatrix = XMMatrixMultiply(worldMatrix, translateMatrix);
 
@@ -412,7 +416,7 @@ bool CGameFramework::TestIntersection(int mouseX, int mouseY, CGameObject* obj)
 
 	// 이제 광선 구 교차 테스트를 수행하십시오.
 	//m_pPlayer
-	if (RaySphereIntersect(rayOrigin, rayDirection, 15.0f) == true)
+	if (RaySphereIntersect(rayOrigin, rayDirection, 20.0f) == true)
 	{
 		cout << obj->GetPosition().x << "  " <<obj->GetPosition().y  << "  " << obj->GetPosition().z <<  endl;
 		cout << "픽킹";
@@ -438,40 +442,28 @@ bool CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 
 
 
-
-	cRay* r = new cRay;
 	switch (nMessageID)
 	{
 	case WM_LBUTTONDOWN: //좌클릭
+
 	
 		::SetCapture(hWnd);
 		::GetCursorPos(&m_ptOldCursorPos);
 
 	
 
-		*r = r->RayAtWorldSpace(m_ptOldCursorPos.x , m_ptOldCursorPos.y);
 	
-		
-		for (int i = 10615; i < 10795; i++) {
-			if (TestIntersection(m_mouseX, m_mouseY, m_ppObjects[i]))
-				cout << i << endl;
-		
-			//cout << sphere[i].fRadius << endl;
-			//sphere[i].isPicked = r->isPicked(&sphere[i]);A
-			
-			/*if (r->isPicked(m_ppObjects[i])) {
-				//sphere[i].isPicked = true;
-				if (m_ppObjects[i]->GetPosition().x != 0 && m_ppObjects[i]->GetPosition().y !=0 && m_ppObjects[i]->GetPosition().z != 0)
-				cout << i << " 피킹" << endl;
-			
-			}*/
-
+		if (num0_picking_possible) {
+			for (int i = 9615; i < 10615; i++) {  //9615  for (int i = 10615; i < 10795; i++) 
+				if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, m_ppObjects[i])) {
+					send_picking_skill_packet(2, 0, i);
+					num0_picking_possible = false;
+					cout << i << endl;
+				}
+			}
 		}
-	
-
-	//	TestIntersection(m_mouseX, m_mouseY);
-		//return true;
 		break;
+
 	case WM_RBUTTONDOWN:
 		::SetCapture(hWnd);
 		::GetCursorPos(&m_ptOldCursorPos);
@@ -747,36 +739,6 @@ void CGameFramework::ReleaseObjects()
 	if (m_pScene) delete m_pScene;
 }
 
-/*
-void CGameFramework::OnMouseMove(WPARAM btnState, int x, int y)
-{
-	float dx = XMConvertToRadians(0.25f * static_cast<float>(x - mLastMousePos.x));
-	float dy = XMConvertToRadians(0.25f * static_cast<float>(y - mLastMousePos.y));
-
-	if ((btnState & MK_LBUTTON) != 0)
-	{
-		m_pCamera->GetPitch
-		mPlayer.mCamera.AddPitch(dy);
-
-		// Rotate Camera only
-		mPlayer.mCamera.AddYaw(dx);
-	}
-	else if ((btnState & MK_RBUTTON) != 0)
-	{
-		mPlayer.mCamera.AddPitch(dy);
-
-		// Rotate Camera with Player
-		mPlayer.mCamera.AddYaw(dx);
-		if (!mCameraDetach)
-			mPlayer.UpdatePlayerPosition(ePlayerMoveList::AddYaw, dx);
-	}
-
-	mLastMousePos.x = x;
-	mLastMousePos.y = y;
-
-	mPlayer.UpdateTransformationMatrix();
-}*/
-
 
 void CGameFramework::ProcessInput()   
 {
@@ -807,6 +769,9 @@ void CGameFramework::ProcessInput()
 			if (pKeysBuffer['D'] & 0xF0) {
 				//send_move_packet(3);
 				dwDirection |= DIR_RIGHT;
+			}
+			if ((pKeysBuffer[VK_NUMPAD0] & 0xF0) || (pKeysBuffer['0'] & 0xF0)) {   
+				num0_picking_possible = true;
 			}
 
 			//��ų---------------------------------
@@ -985,7 +950,7 @@ void CGameFramework::FrameAdvance()
 	// m_pCamera->Move(return_myCamera());
 	//------------------------------------
 
-
+	
 	POINT ptCursorPos;
 	if (GetCapture() == m_hWnd)
 	{
@@ -996,9 +961,7 @@ void CGameFramework::FrameAdvance()
 
 	m_mouseX = m_ptOldCursorPos.x;
 	m_mouseY = m_ptOldCursorPos.y;
-	 
-	//cout << "x: " << m_mouseX << endl;
-	//cout << "y: " << m_mouseY << endl;
+
 
 
 	AnimateObjects();

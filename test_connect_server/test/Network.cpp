@@ -127,6 +127,18 @@ void send_skill_packet(int sk_t, int sk_n)
 	do_send(sizeof(packet), &packet);
 
 }
+
+void send_picking_skill_packet(int sk_t, int sk_n, int target)
+{
+	cs_packet_picking_skill packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_PICKING_SKILL;
+	packet.target = target;
+	packet.skill_type = sk_t;
+	packet.skill_num = sk_n;
+	do_send(sizeof(packet), &packet);
+
+}
 void send_change_job_packet(JOB my_job)
 {
 	cs_packet_change_job packet;
