@@ -59,7 +59,7 @@ void send_put_object_packet(Player* pl, Npc* target)
     if (target->get_tribe() == HUMAN) {
         packet.object_class = reinterpret_cast<Player*>(target)->get_job();
     }
-    else if (target->get_tribe() == MONSTER) {
+    else if (target->get_tribe() == MONSTER || target->get_tribe() == BOSS) {
         packet.object_class = target->get_mon_spices();
     }
     strcpy_s(packet.name, target->get_name());
@@ -159,5 +159,13 @@ void send_play_effect_packet(Player* pl, Npc* npc )
     packet.z = npc->get_z();
     packet.id = npc->get_id();
 
+    pl->do_send(sizeof(packet), &packet);
+}
+
+void send_start_gaia_packet(Player* pl) 
+{
+    sc_packet_start_gaia packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_START_GAIA;
     pl->do_send(sizeof(packet), &packet);
 }

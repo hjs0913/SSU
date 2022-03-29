@@ -2,16 +2,18 @@
 
 // --------------------------------------------------------
 // 개인 추가
-enum STATE { ST_FREE, ST_ACCEPT, ST_INGAME, ST_DEAD };
+enum STATE { ST_FREE, ST_ACCEPT, ST_INGAME, ST_DEAD, ST_INDUN };
 enum COMP_OP {
 	OP_RECV, OP_SEND, OP_ACCEPT, OP_NPC_MOVE,
 	OP_NPC_ATTACK, OP_AUTO_PLAYER_HP, OP_PLAYER_REVIVE, OP_NPC_REVIVE,
-	OP_PLAYER_ATTACK, OP_NPC_AGRO, OP_ELEMENT_COOLTIME
+	OP_PLAYER_ATTACK, OP_NPC_AGRO, OP_ELEMENT_COOLTIME,
+	OP_BOSS_MOVE, OP_BOSS_ATTACK
 };
 enum EVENT_TYPE {
 	EVENT_NPC_MOVE, EVENT_NPC_ATTACK, EVENT_AUTO_PLAYER_HP,
 	EVENT_PLAYER_REVIVE, EVENT_NPC_REVIVE, EVENT_PLAYER_ATTACK,
-	EVENT_SKILL_COOLTIME, EVENT_NPC_AGRO, EVENT_ELEMENT_COOLTIME
+	EVENT_SKILL_COOLTIME, EVENT_NPC_AGRO, EVENT_ELEMENT_COOLTIME,
+	EVENT_BOSS_MOVE, EVENT_BOSS_ATTACK
 };
 enum TRIBE { HUMAN, MONSTER, AGRO, BOSS, OBSTACLE };
 enum BUF_TYPE {
@@ -22,8 +24,10 @@ enum ELEMENT { E_NONE = 0, E_WATER, E_FULLMETAL, E_WIND, E_FIRE, E_TREE, E_EARTH
 enum JOB { J_DILLER = 0, J_TANKER, J_MAGICIAN, J_SUPPORTER = 3 };
 enum MONSTER_SPECIES {
 	FALLEN_FLOG, FALLEN_CHICKEN, FALLEN_RABBIT,
-	FALLEN_MONKEY, WOLF_BOSS, FALLEN_TIGER
+	FALLEN_MONKEY, WOLF_BOSS, FALLEN_TIGER, RAID_GAIA
 };
+enum DUNGEON_STATE{DUN_ST_ROBBY, DUN_ST_START};
+
 
 const int BUFSIZE = 256;
 const int RANGE = 600;
@@ -43,6 +47,8 @@ const int  MAX_USER = 1000;
 const int  MAX_NPC = 180;		// 디버깅 용
 constexpr int NPC_ID_START = MAX_USER;
 constexpr int NPC_ID_END = MAX_USER + MAX_NPC - 1;
+#define GAIA_ROOM 2
+
 
 const char CS_PACKET_LOGIN = 1;
 const char CS_PACKET_MOVE = 2;
@@ -54,6 +60,8 @@ const char CS_PACKET_LOOK = 7;
 const char CS_PACKET_CHANGE_JOB = 8;
 const char CS_PACKET_CHANGE_ELEMENT = 9;
 const char CS_PACKET_PICKING_SKILL = 10;
+const char CS_PACKET_GAIA_JOIN = 11;
+const char CS_PACKET_RAID_RANDER_OK = 12;
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -71,6 +79,7 @@ const char SC_PACKET_CHANGE_HP = 13;
 const char SC_PACKET_COMBAT_ID = 14;
 const char SC_PACKET_PLAY_SHOOT = 15;
 const char SC_PACKET_PLAY_EFFECT = 16;
+const char SC_PACKET_START_GAIA = 17;
 
 //---------------------------------------------------
 #pragma pack (push, 1)
@@ -131,6 +140,16 @@ struct cs_packet_change_element {
 	unsigned char size;
 	char type;
 	ELEMENT element;
+};
+
+struct cs_packet_gaia_join {
+	unsigned char size;
+	char type;
+};
+
+struct cs_packet_raid_rander_ok {
+	unsigned char size;
+	char type;
 };
 
 struct sc_packet_login_ok {
@@ -259,6 +278,11 @@ struct cs_packet_picking_skill {
 	int target;
 	char skill_type;    //0 : 물리 공격 1: 마법 공격  2 : 버프 
 	char skill_num;    // 0-0, 0-1   ,,,,,   1-0,  1-1  
+};
+
+struct sc_packet_start_gaia {
+	unsigned char size;
+	char type;
 };
 
 #pragma pack(pop)

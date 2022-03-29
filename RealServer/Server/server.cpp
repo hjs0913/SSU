@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Player.h"
+#include "Gaia.h"
 #include "database.h"
 #include "send.h"
 #include <fstream>
@@ -11,9 +12,8 @@ CRITICAL_SECTION cs;
 HANDLE g_h_iocp;
 SOCKET g_s_socket;
 array <Npc*, MAX_USER + MAX_NPC> players;
+array <Gaia*, MAX_USER / GAIA_ROOM> dungeons;
 array <Obstacle, MAX_OBSTACLE> obstacles;
-
-typedef pair<int, int> pos;
 
 void do_npc_move(int npc_id, int target);
 void return_npc_position(int npc_id);
@@ -151,7 +151,6 @@ void Activate_Npc_Move_Event(int target, int player_id)
     exp_over->_target = player_id;
     PostQueuedCompletionStatus(g_h_iocp, 1, target, &exp_over->_wsa_over);
 }
-
 
 void magical_skill_success(int p_id, int target, float skill_factor)
 {
@@ -422,9 +421,6 @@ void physical_skill_success(int p_id, int target, float skill_factor)
         }
     }
     else if (p_id >= NPC_ID_START) {
-
-        //send_status_change_packet(reinterpret_cast<Player*>(players[target]));
-
         send_change_hp_packet(reinterpret_cast<Player*>(players[target]), players[target]);
         reinterpret_cast<Player*>(players[target])->vl.lock();
         for (auto id : reinterpret_cast<Player*>(players[target])->viewlist) {
@@ -477,8 +473,6 @@ void physical_skill_success(int p_id, int target, float skill_factor)
        // send_chat_packet(reinterpret_cast<Player*>(players[p_id]), p_id, mess);
     }
 }
-
-//bool superposition = false; //이거를 npc마다 다 주자 
 
 void attack_success(int p_id, int target, float atk_factor)
 {
@@ -757,6 +751,7 @@ bool isInsideTriangle(Coord a, Coord b, Coord c, Coord n)
     return true;
 
 }
+
 void process_packet(int client_id, unsigned char* p)
 {
    
@@ -765,9 +760,7 @@ void process_packet(int client_id, unsigned char* p)
     switch (packet_type) {
     case CS_PACKET_LOGIN: {
         cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(p);
-
         // pl->set_name(packet->name);
-
         // DB 연결
         /*
         EnterCriticalSection(&cs);
@@ -801,6 +794,10 @@ void process_packet(int client_id, unsigned char* p)
         pl->set_lv(25);
         pl->set_element(E_WATER);
         pl->set_name("정의범");
+
+        pl->indun_id - 1;
+        pl->join_dungeon_room = false;
+
         switch (pl->get_job()) {
         case J_DILLER: {
             int lv = pl->get_lv();
@@ -889,7 +886,7 @@ void process_packet(int client_id, unsigned char* p)
         for (auto& other : players) {
             if (other->get_id() == client_id) continue;   // 나다
 
-            if (true == is_npc(other->get_id())) break;// 만약 내가 있는 곳에 NPC가 있다면
+            if (true == is_npc(other->get_id())) break;
 
             other->state_lock.lock();
             if (ST_INGAME != other->get_state()) {
@@ -997,10 +994,35 @@ void process_packet(int client_id, unsigned char* p)
         float y = packet->y;
         float z = packet->z;       
 
+        // InDunProcess
+        if (pl->get_state() == ST_INDUN) {
+            // 유효성 검사
+            //if (check_move_alright(x, z, false) == false) { // Raid Map에 맞는 유효성 검사 필요
+            //    send_move_packet(pl, pl);   
+            //    break;
+            //}
+            pl->set_x(x);
+            pl->set_y(y);
+            pl->set_z(z);
+            pl->vl.lock();
+            unordered_set <int> my_vl{ pl->viewlist };
+            pl->vl.unlock();
+            send_move_packet(pl, pl);
+            for (auto& other : players) {
+                if (other->get_state() != ST_INDUN) continue;
+                if (is_npc(other->get_id())) break;
+                if (reinterpret_cast<Player*>(other)->indun_id == pl->indun_id) {
+                    if (other->get_id() == pl->get_id()) continue;
+                    send_move_packet(reinterpret_cast<Player*>(other), pl);
+                }
+            }
+            break;
+        }
+
+
         // 유효성 검사
         if (check_move_alright(x, z, false) == false) {
             // 올바르지 않을경우 위치를 수정을 해주어야 한다
-            // 클라쪽 수정 필요
             send_move_packet(pl, pl);
             break;
         }
@@ -1142,8 +1164,7 @@ void process_packet(int client_id, unsigned char* p)
             packet.y = ob.get_y();
             packet.z = ob.get_z();
             //pl->do_send(sizeof(packet), &packet);
-            pl->do_send(sizeof(packet), &packet);
-                
+            pl->do_send(sizeof(packet), &packet);      
         }
         break;
     }
@@ -1162,6 +1183,24 @@ void process_packet(int client_id, unsigned char* p)
         ev.target_id = client_id;
         timer_queue.push(ev);
         
+        if (pl->join_dungeon_room && dungeons[pl->indun_id]->start_game) {
+            int indun = pl->indun_id;
+            Npc* bos = dungeons[indun]->boss;
+            if (bos->get_x() >= pl->get_x() - 10 && bos->get_x() <= pl->get_x() + 10) {
+                if (bos->get_z() >= pl->get_z() - 10 && bos->get_z() <= pl->get_z() + 10) {
+                   // 일단 고정값으로 제거해 주자
+                    bos->set_hp(bos->get_hp() - 130000);
+
+                    Player** ps = dungeons[indun]->get_party_palyer();
+
+                    for (int i = 0; i < GAIA_ROOM; i++) {
+                        send_change_hp_packet(ps[i], bos);
+                    }
+                }
+            }
+            return;
+        }
+
         for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
             players[i]->state_lock.lock();
             if (players[i]->get_state() != ST_INGAME) {
@@ -1193,17 +1232,25 @@ void process_packet(int client_id, unsigned char* p)
         cs_packet_chat* packet = reinterpret_cast<cs_packet_chat*>(p);
         char c_temp[MAX_CHAT_SIZE];
         sprintf_s(c_temp, MAX_CHAT_SIZE, "%s : %s", pl->get_name(), packet->message);
-        for (auto& s_pl : players) {
-            s_pl->state_lock.lock();
-            if (s_pl->get_state() != ST_INGAME) {
-                s_pl->state_lock.unlock();
-                continue;
+        if (pl->join_dungeon_room) {
+            Player** vl_pl;
+            vl_pl = dungeons[pl->indun_id]->get_party_palyer();
+            for (int i = 0; i < GAIA_ROOM; i++) {
+                send_chat_packet(vl_pl[i], client_id, c_temp);
             }
-            s_pl->state_lock.unlock();
-            if (s_pl->get_tribe() == MONSTER) break;
+        }
+        else {
+            for (auto& s_pl : players) {
+                s_pl->state_lock.lock();
+                if (s_pl->get_state() != ST_INGAME) {
+                    s_pl->state_lock.unlock();
+                    continue;
+                }
+                s_pl->state_lock.unlock();
+                if (s_pl->get_tribe() == MONSTER) break;
+                send_chat_packet(reinterpret_cast<Player*>(s_pl), client_id, c_temp);
             
-            send_chat_packet(reinterpret_cast<Player*>(s_pl), client_id, c_temp);
-            
+            }
         }
         break;
     }
@@ -1688,10 +1735,9 @@ void process_packet(int client_id, unsigned char* p)
         for (auto i : my_vl) {
             // Npc
             if (is_npc(i) == true) continue;
-
             // Player
-            send_look_packet(reinterpret_cast<Player*>(players[i]),
-                pl);
+            cout << client_id << "가 방향을 " << i << "에게 보냄" << endl;
+            send_look_packet(reinterpret_cast<Player*>(players[i]),pl);
         }
         break;
     }
@@ -1861,12 +1907,92 @@ void process_packet(int client_id, unsigned char* p)
 
             }
             break;
+        }
+        break;
+    }
 
+    case CS_PACKET_GAIA_JOIN: {
+        // check player state
+        pl->state_lock.lock();
+        if (pl->get_state() != ST_INGAME || pl->join_dungeon_room==true) {
+            pl->state_lock.unlock();
             break;
         }
+        pl->state_lock.unlock();
 
+        // join dungeon party
+        for (int i = 0; i < MAX_USER / GAIA_ROOM; i++) {
+            dungeons[i]->state_lock.lock();
+            if (dungeons[i]->get_dun_st() == DUN_ST_START) {
+                dungeons[i]->state_lock.unlock();
+                continue;
+            }
+            dungeons[i]->state_lock.unlock();
+            dungeons[i]->join_player(pl);
+            dungeons[i]->state_lock.lock();
+            if (dungeons[i]->get_dun_st() == DUN_ST_START) {
+                dungeons[i]->state_lock.unlock();
+                
+                // 게임이 시작 되었으니 시야처리를 해주자
+                Player** vl_pl;
+                vl_pl = dungeons[i]->get_party_palyer();
 
+                unordered_set<int> indun_vl;
+                for (int j = 0; j < GAIA_ROOM; j++) indun_vl.insert(vl_pl[j]->get_id());
 
+                for (int j = 0; j < GAIA_ROOM; j++) {
+                    vl_pl[j]->vl.lock();
+                    unordered_set<int>temp_vl{ vl_pl[j]->viewlist };
+                    vl_pl[j]->viewlist = indun_vl;
+                    vl_pl[j]->viewlist.erase(vl_pl[j]->get_id());
+                    vl_pl[j]->vl.unlock();
+
+                    for (auto k : temp_vl) {
+                        send_remove_object_packet(vl_pl[j], players[k]);
+                        if (is_npc(k) == true) continue;
+                        reinterpret_cast<Player*>(players[k])->vl.lock();
+                        if (indun_vl.find(k) == indun_vl.end()) {
+                            reinterpret_cast<Player*>(players[k])->viewlist.erase(client_id);
+                            reinterpret_cast<Player*>(players[k])->vl.unlock();
+                            send_remove_object_packet(reinterpret_cast<Player*>(players[k]), vl_pl[j]);
+                            continue;
+                        }
+                        reinterpret_cast<Player*>(players[k])->vl.unlock();
+                    }
+
+                    for (auto k : indun_vl) {
+                        if (k == vl_pl[j]->get_id()) continue;
+                        send_put_object_packet(vl_pl[j], players[k]);
+                    }
+                    send_put_object_packet(vl_pl[j], dungeons[i]->boss);
+                }
+                break;
+            }
+            dungeons[i]->state_lock.unlock();
+            break;
+        }
+        break;
+    }
+    case CS_PACKET_RAID_RANDER_OK: {
+        dungeons[pl->indun_id]->player_rander_ok++;
+
+        if (dungeons[pl->indun_id]->player_rander_ok == GAIA_ROOM) {
+            dungeons[pl->indun_id]->start_game = true;
+            // BOSS NPC Timer Start
+            timer_event ev;
+            ev.obj_id = dungeons[pl->indun_id]->get_dungeon_id();
+            ev.start_time = chrono::system_clock::now() + 1s;
+            ev.ev = EVENT_BOSS_MOVE;
+            ev.target_id = -1;
+            timer_queue.push(ev);
+
+            ZeroMemory(&ev, sizeof(ev));
+            ev.obj_id = dungeons[pl->indun_id]->get_dungeon_id();
+            ev.start_time = chrono::system_clock::now() + 3s;
+            ev.ev = EVENT_BOSS_ATTACK;
+            ev.target_id = -1;
+            timer_queue.push(ev);
+        }
         break;
     }
     }
@@ -1923,16 +2049,6 @@ void player_revive(int client_id)
         other_player->vl.unlock();
 
         send_put_object_packet(other_player, pl);
-        /*sc_packet_put_object packet;
-        packet.id = client_id;
-        strcpy_s(packet.name, pl->get_name());
-        packet.object_type = 0;
-        packet.size = sizeof(packet);
-        packet.type = SC_PACKET_PUT_OBJECT;
-        packet.x = pl->get_x();
-        packet.y = pl->get_y();
-        packet.z = pl->get_z();
-        other_player->do_send(sizeof(packet), &packet);*/
     }
 
     // 새로 접속한 플레이어에게 기존 정보를 보내중
@@ -1971,16 +2087,6 @@ void player_revive(int client_id)
         pl->vl.unlock();
 
         send_put_object_packet(pl, other);
-       /* sc_packet_put_object packet;
-        packet.id = other->get_id();
-        strcpy_s(packet.name, other->get_name());
-        packet.object_type = 0;
-        packet.size = sizeof(packet);
-        packet.type = SC_PACKET_PUT_OBJECT;
-        packet.x = other->get_x();
-        packet.y = other->get_y();
-        packet.z = other->get_z();
-        pl->do_send(sizeof(packet), &packet);*/
     }
     // 장애물 정보
     pl->ob_vl.lock();
@@ -2192,8 +2298,7 @@ void worker()
             players[client_id]->lua_lock.unlock();
             delete exp_over;
             break;
-        }
-                        
+        }               
         case OP_AUTO_PLAYER_HP: {
             Player* pl = reinterpret_cast<Player*>(players[client_id]);
             pl->state_lock.lock();
@@ -2265,7 +2370,7 @@ void worker()
             delete exp_over;
             break;
         }
-        case OP_ELEMENT_COOLTIME:
+        case OP_ELEMENT_COOLTIME: {
 
             timer_event ev;
 
@@ -2280,13 +2385,13 @@ void worker()
                 break;
             }
             players[client_id]->state_lock.unlock();
-            
-            switch (players[client_id]->get_element())  
+
+            switch (players[client_id]->get_element())
             {
             case E_WATER:
-                if(players[exp_over->_target]->get_element() == E_FULLMETAL || players[exp_over->_target]->get_element() == E_FIRE
+                if (players[exp_over->_target]->get_element() == E_FULLMETAL || players[exp_over->_target]->get_element() == E_FIRE
                     || players[exp_over->_target]->get_element() == E_EARTH)
-                players[exp_over->_target]->set_magical_attack(players[exp_over->_target]->get_magical_attack() / 10 * 9);
+                    players[exp_over->_target]->set_magical_attack(players[exp_over->_target]->get_magical_attack() / 10 * 9);
                 break;
             case E_FULLMETAL:
                 break;
@@ -2303,9 +2408,29 @@ void worker()
             default:
                 break;
             }
-             delete exp_over;
+            delete exp_over;
             break;
-
+        }
+        case OP_BOSS_MOVE: {
+            dungeons[client_id]->boss_move();
+            timer_event ev;
+            ev.obj_id = client_id;
+            ev.start_time = chrono::system_clock::now() + 1s;
+            ev.ev = EVENT_BOSS_MOVE;
+            ev.target_id = -1;
+            timer_queue.push(ev);
+            break;
+        }
+        case OP_BOSS_ATTACK: {
+            dungeons[client_id]->boss_attack();
+            timer_event ev;
+            ev.obj_id = client_id;
+            ev.start_time = chrono::system_clock::now() + 3s;
+            ev.ev = EVENT_BOSS_ATTACK;
+            ev.target_id = -1;
+            timer_queue.push(ev);
+            break;
+        }
         }
     }
 }
@@ -2667,103 +2792,6 @@ void initialise_NPC()
     cout << "NPC로딩 완료" << endl;
 }
 
-#define REAL_DISTANCE 10
-
-int huristic(int t_x, int t_z, int x, int z) 
-{
-    int s_x = abs(t_x - x);
-    int s_z = abs(t_z - z);
-    int score = sqrt(pow(s_x, 2) + pow(s_z, 2));
-    //cout << "huristic : " << score << endl;
-    return score ;
-}
-
-// A*알고리즘
-pos a_star(int t_x, int t_z, int x, int z)
-{
-    vector<pos> mon_load;
-    // 쫒아가는 범위는 한 방향으로 60까지이다
-    int scoreG[25][25] = { 0 };
-    int scoreH[25][25] = { 0 };
-    int scoreF[25][25] = { 0 };
-    pos prior_point[25][25]{ pos(0,0) };
-
-    typedef pair<int, pos> weight;
-
-
-
-    pos now(12, 12);
-    scoreG[now.first][now.second] = 0;
-    scoreH[now.first][now.second] = huristic(t_x, t_z, x, z);
-    scoreF[now.first][now.second] = scoreG[now.first][now.second] + scoreH[now.first][now.second];
-
-    priority_queue < weight, vector<weight>, greater<weight>> open_q;
-    priority_queue < weight, vector<weight>, greater<weight>> close_q;
-    close_q.push(weight(scoreF[now.first][now.second], now));
-
-
-    int dirX[8] = { -1, 0, 1, 0, -1, 1, 1, -1 };
-    int dirZ[8] = { 0, -1, 0, 1, -1, -1, 1, 1 };
-    int cost[8]{ 10, 10, 10, 10, 14, 14, 14, 14 };
-    while (true) {
-        for (int i = 0; i < 8; i++) {
-            pos p(now.first + dirX[i], now.second + dirZ[i]);
-
-            if ((p.first >= 25 || p.first < 0) || (p.second >= 25 || p.second < 0)) continue;
-            // 검색된게 있다면 검색을 해주지 않는다
-            if (scoreF[now.first + dirX[i]][now.second + dirZ[i]] != 0) continue;
-            // 장애물이랑 부딪히는지 확인
-            if (false == check_move_alright(x + (p.first - 12) * REAL_DISTANCE, z + (p.second - 12) * REAL_DISTANCE, true)) {
-                cout << "장애물 부딪힘" << endl;
-                continue;
-            }
-
-            scoreG[now.first + dirX[i]][now.second + dirZ[i]] = scoreG[now.first][now.second] + cost[i];
-            scoreH[now.first + dirX[i]][now.second + dirZ[i]] = huristic(t_x, t_z, x + (p.first - 12) * REAL_DISTANCE, z + (p.second - 12) * REAL_DISTANCE);
-            scoreF[now.first + dirX[i]][now.second + dirZ[i]] = scoreG[now.first + dirX[i]][now.second + dirZ[i]] +
-                scoreH[now.first + dirX[i]][now.second + dirZ[i]];
-
-            prior_point[now.first + dirX[i]][now.second + dirZ[i]] = pos(now.first, now.second);
-
-            //cout << "scoreG : " << scoreG[now.first + dirX[i]][now.second + dirZ[i]] << endl;
-            //cout << "scoreH : " << scoreH[now.first + dirX[i]][now.second + dirZ[i]] << endl;
-            //cout << "scoreF : " << scoreF[now.first + dirX[i]][now.second + dirZ[i]] << endl << endl;
-
-            weight w(scoreF[now.first + dirX[i]][now.second + dirZ[i]], pos(now.first + dirX[i], now.second + dirZ[i]));
-            //cout << w.first << ", " << w.second.first << ", " << w.second.second << endl;
-            open_q.push(w);
-        }
-        if (open_q.size() == 0) {
-            while (now.first != 12 || now.second != 12) {
-                mon_load.push_back(now);
-                now = prior_point[now.first][now.second];
-            }
-            break;
-        }
-        weight temp = open_q.top();
-        open_q.pop();
-        now = temp.second;
-        close_q.push(temp);
-
-        ///cout << " now : " << now.first << ", " << now.second << endl;
-
-        // 끝내는 조건
-        if (abs((x + (now.first - 12) * REAL_DISTANCE) - t_x) <= 10 && abs((z + (now.second - 12) * REAL_DISTANCE) - t_z) <= 10) {
-            while (now.first != 12 || now.second != 12) {
-                mon_load.push_back(now);
-                now = prior_point[now.first][now.second];
-            }
-            break;
-        }
-    }
-
-    x += (mon_load.back().first - 12) * REAL_DISTANCE;
-    z += (mon_load.back().second - 12) * REAL_DISTANCE;
-    mon_load.pop_back();
-
-    return pos(x, z);
-}
-
 void return_npc_position(int npc_id)
 {
     players[npc_id]->set_target_id(-1); //추가
@@ -2803,7 +2831,7 @@ void return_npc_position(int npc_id)
     int now_z = players[npc_id]->get_z();
     bool my_pos_fail = true;
 
-    pos mv = a_star(my_x, my_z, now_x, now_z);
+    pos mv = players[npc_id]->a_star(my_x, my_z, now_x, now_z, obstacles);
     if (abs(mv.first-my_x) <=10 && abs(mv.second - my_z) <= 10) {
         now_x = my_x;
         now_z = my_z;
@@ -2938,7 +2966,7 @@ void do_npc_move(int npc_id, int target)
     }
 
     // A*알고리즘
-    pos mv = a_star(t_x, t_z, x, z);
+    pos mv = players[npc_id]->a_star(t_x, t_z, x, z, obstacles);
     x = mv.first;
     z = mv.second;
 
@@ -3016,10 +3044,17 @@ COMP_OP EVtoOP(EVENT_TYPE ev) {
     case EVENT_NPC_REVIVE:
         return OP_NPC_REVIVE;
         break;
+    case EVENT_BOSS_MOVE:
+        return OP_BOSS_MOVE;
+        break;
+    case EVENT_BOSS_ATTACK:
+        return OP_BOSS_ATTACK;
+        break;
 
     case EVENT_ELEMENT_COOLTIME:
        // return OP_ELEMENT_COOLTIME;
         break;
+
     }
 
 }
@@ -3100,6 +3135,15 @@ void do_timer()
     }
 }
 
+void initialise_DUNGEON()
+{
+    for (int i = 0; i < MAX_USER / GAIA_ROOM; i++) {
+        dungeons[i] = new Gaia(i);
+    }
+    cout << "던전 초기화 완료" << endl;
+}
+
+
 int main()
 {
     setlocale(LC_ALL, "korean");
@@ -3140,6 +3184,7 @@ int main()
     // DB 연결1
     // Initialise_DB();
     initialise_NPC();
+    initialise_DUNGEON();
 
     ifstream obstacles_read("tree_position.txt");
     if (!obstacles_read.is_open()) {

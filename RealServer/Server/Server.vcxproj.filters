@@ -19,6 +19,9 @@
     <Filter Include="헤더 파일\lua_lib">
       <UniqueIdentifier>{04edfcf1-b2d3-4edc-8b28-437c9932b0b7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\raid_script">
+      <UniqueIdentifier>{a32c756c-b8f7-4e2a-8ead-3d1ab4f6a798}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="server.cpp">
@@ -43,6 +46,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Obstacle.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Gaia.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -89,6 +95,9 @@
     <ClInclude Include="include\luaconf.h">
       <Filter>헤더 파일\lua_lib</Filter>
     </ClInclude>
+    <ClInclude Include="Gaia.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="lua54.lib">
@@ -113,6 +122,9 @@
     </None>
     <None Include="fallen_tiger.lua">
       <Filter>소스 파일\monster_script</Filter>
+    </None>
+    <None Include="Raid_Gaia.lua">
+      <Filter>소스 파일\raid_script</Filter>
     </None>
   </ItemGroup>
 </Project>

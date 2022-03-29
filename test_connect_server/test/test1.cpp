@@ -40,6 +40,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 
 	hAccelTable = ::LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_LABPROJECT085));
 
+	bool change_dungeon = false;
+
 	while (1)
 	{
 		if (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
@@ -53,6 +55,19 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 		}
 		else
 		{
+			if (change_dungeon != InDungeon) {
+				change_dungeon = InDungeon;
+				if (change_dungeon) {
+					gGameFramework.Release_OpenWorld_Object();
+					gGameFramework.Create_InDungeon_Object();
+					send_raid_rander_ok_packet();
+				}
+				else {
+					gGameFramework.Release_InDungeon_Object();
+					gGameFramework.Create_OpenWorld_Object();
+				}
+			}
+
 			gGameFramework.FrameAdvance();
 		}
 	}

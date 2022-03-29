@@ -2,7 +2,7 @@
 
 #define FRAME_BUFFER_WIDTH		640
 #define FRAME_BUFFER_HEIGHT		480
-#define UICOUNT 7
+#define UICOUNT 9
 
 //#include "Timer.h"
 #include "Player.h"
@@ -86,6 +86,13 @@ public:
 	void OnMouseMove(WPARAM btnState, int x, int y);
 	
 	
+
+	void Release_OpenWorld_Object();
+	void Release_InDungeon_Object();
+
+	void Create_OpenWorld_Object();
+	void Create_InDungeon_Object();
+
 private:
 	/////////////////
 	/////////////////
@@ -133,6 +140,8 @@ private:
 	CGameTimer					m_GameTimer;
 
 	CScene						*m_pScene = NULL;
+	CScene						*m_pRaid_Scene = NULL;
+
 	CPlayer						*m_pPlayer = NULL;
 	
 
