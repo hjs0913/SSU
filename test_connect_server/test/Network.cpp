@@ -17,6 +17,7 @@ wstring my_element_str = L"";
 wstring Info_str = L"";
 wstring Combat_str = L"";
 bool Combat_On = false;
+bool InDungeon = false;
 
 // locale variable
 XMFLOAT3 my_position(-1.0f, 5.0f, -1.0f);
@@ -154,6 +155,22 @@ void send_chat_packet(const char* send_str)
 	do_send(sizeof(packet), &packet);
 }
 
+void send_gaia_join_packet()
+{
+	cs_packet_gaia_join packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_GAIA_JOIN;
+	do_send(sizeof(packet), &packet);
+}
+
+void send_raid_rander_ok_packet()
+{
+	cs_packet_raid_rander_ok packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_RAID_RANDER_OK;
+	do_send(sizeof(packet), &packet);
+}
+
 void do_send(int num_bytes, void* mess)
 {
 	EXP_OVER* ex_over = new EXP_OVER;
@@ -279,6 +296,10 @@ void process_packet(unsigned char* p)
 		sc_packet_put_object* packet = reinterpret_cast<sc_packet_put_object*> (p);
 		int p_id = packet->id;
 		if (static_cast<TRIBE>(packet->object_type) != OBSTACLE) {
+			/*if (static_cast<TRIBE>(packet->object_type) == BOSS) {
+				p_id += 100;
+			}*/
+
 			mPlayer[p_id]->SetUse(true);
 			mPlayer[p_id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
 
@@ -432,7 +453,15 @@ void process_packet(unsigned char* p)
 		cout << effect_z << endl;
 		break;
 	}
+	case SC_PACKET_START_GAIA: {
+		cout << "인던으로 입장해야됨" << endl;
+		combat_id = 101;
+		InDungeon = true;
+		break;
+	}
+
 	default:
+		cout << "잘못된 패킷 type : " << type << endl;
 		cout << "Process packet 오류" << endl;
 		break;
 	}

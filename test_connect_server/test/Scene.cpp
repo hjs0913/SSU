@@ -39,7 +39,27 @@ void CScene::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* p
 	//pObjectShader->BuildObjects(pd3dDevice, pd3dCommandList, m_pTerrain);
 	pObjectShader->BuildObjects2(pd3dDevice, pd3dCommandList, m_pTerrain, m_pd3dGraphicsRootSignature);
 	m_ppShaders[0] = pObjectShader;
+}
 
+void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12CommandQueue* pd3dCommandQueue, ID3D12Resource** ppd3dRenderTargets)
+{
+	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
+
+	XMFLOAT3 xmf3Scale(8.0f, 2.0f, 8.0f);
+	XMFLOAT4 xmf4Color(0.0f, 0.5f, 0.0f, 0.0f);
+
+	m_pTerrain = new CHeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Image/Gaia2.raw"), 512, 512, 13, 13, xmf3Scale, xmf4Color);
+
+	m_pSkyBox = new CSkyBox(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
+	mirror = new Mirror(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
+	reflect = new Reflect(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
+	m_nShaders = 1;
+	m_ppShaders = new CShader * [m_nShaders];
+
+	CObjectsShader* pObjectShader = new CObjectsShader();
+	pObjectShader->CreateShader(pd3dDevice, m_pd3dGraphicsRootSignature);
+	pObjectShader->BuildObjects_Raid(pd3dDevice, pd3dCommandList, m_pTerrain, m_pd3dGraphicsRootSignature);
+	m_ppShaders[0] = pObjectShader;
 }
 
 void CScene::ReleaseObjects()

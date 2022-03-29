@@ -33,6 +33,7 @@ extern wstring my_element_str;
 extern wstring Info_str;
 extern wstring Combat_str;
 extern bool Combat_On;
+extern bool InDungeon;
 
 void err_quit(const char* msg);
 
@@ -51,6 +52,10 @@ void send_chat_packet(const char* send_str);
 void send_change_job_packet(JOB my_job);
 
 void send_change_element_packet(ELEMENT my_element);
+
+void send_gaia_join_packet();
+
+void send_raid_rander_ok_packet();
 
 int netInit();
 

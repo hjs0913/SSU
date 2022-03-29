@@ -1,4 +1,5 @@
 #include "Npc.h"
+#include <queue>
 
 Npc::Npc(int id)
 {
@@ -315,4 +316,126 @@ void Npc::set_element_cooltime(bool yn)
 bool Npc::get_element_cooltime()
 {
 	return superposition;
+}
+
+bool Npc::check_move_alright(int x, int z, bool monster, array<Obstacle, MAX_OBSTACLE> obs)
+{
+	int size = 0;
+	if (monster) size = 15;
+	else size = 5;
+
+	for (auto& ob : obs) {
+		if ((ob.get_x() - size <= x && x <= ob.get_x() + size) && (ob.get_z() - size <= z && z <= ob.get_z() + size)) {
+			cout << "충돌했다" << endl;
+			return false;
+		}
+	}
+
+	return true;
+}
+
+int Npc::huristic(int t_x, int t_z, int x, int z)
+{
+	int s_x = abs(t_x - x);
+	int s_z = abs(t_z - z);
+	int score = sqrt(pow(s_x, 2) + pow(s_z, 2));
+	//cout << "huristic : " << score << endl;
+	return score;
+}
+
+//move
+pos Npc::non_a_star(int t_x, int t_z, int x, int z)
+{
+	float m_x = t_x - x;
+	float m_z = t_z - z;
+
+	float sum = (m_x * m_x) + (m_z * m_z);
+	sum = sqrt(sum);
+
+	m_x = m_x / sum;
+	m_z = m_z / sum;
+
+	x += m_x * REAL_DISTANCE;
+	z += m_z * REAL_DISTANCE;
+
+	_look_x = m_x;
+	_look_z = m_z;
+
+	return pos(x, z);
+}
+
+
+pos Npc::a_star(int t_x, int t_z, int x, int z,array<Obstacle, MAX_OBSTACLE> obs)
+{
+	vector<pos> mon_load;
+	// 쫒아가는 범위는 한 방향으로 60까지이다
+	int scoreG[25][25] = { 0 };
+	int scoreH[25][25] = { 0 };
+	int scoreF[25][25] = { 0 };
+	pos prior_point[25][25]{ pos(0,0) };
+
+	typedef pair<int, pos> weight;
+
+
+
+	pos now(12, 12);
+	scoreG[now.first][now.second] = 0;
+	scoreH[now.first][now.second] = huristic(t_x, t_z, x, z);
+	scoreF[now.first][now.second] = scoreG[now.first][now.second] + scoreH[now.first][now.second];
+
+	priority_queue < weight, vector<weight>, greater<weight>> open_q;
+	priority_queue < weight, vector<weight>, greater<weight>> close_q;
+	close_q.push(weight(scoreF[now.first][now.second], now));
+
+
+	int dirX[8] = { -1, 0, 1, 0, -1, 1, 1, -1 };
+	int dirZ[8] = { 0, -1, 0, 1, -1, -1, 1, 1 };
+	int cost[8]{ 10, 10, 10, 10, 14, 14, 14, 14 };
+	while (true) {
+		for (int i = 0; i < 8; i++) {
+			pos p(now.first + dirX[i], now.second + dirZ[i]);
+
+			if ((p.first >= 25 || p.first < 0) || (p.second >= 25 || p.second < 0)) continue;
+			// 검색된게 있다면 검색을 해주지 않는다
+			if (scoreF[now.first + dirX[i]][now.second + dirZ[i]] != 0) continue;
+			// 장애물이랑 부딪히는지 확인
+			if (false == check_move_alright(x + (p.first - 12) * REAL_DISTANCE, z + (p.second - 12) * REAL_DISTANCE, true, obs)) continue;
+
+			scoreG[now.first + dirX[i]][now.second + dirZ[i]] = scoreG[now.first][now.second] + cost[i];
+			scoreH[now.first + dirX[i]][now.second + dirZ[i]] = huristic(t_x, t_z, x + (p.first - 12) * REAL_DISTANCE, z + (p.second - 12) * REAL_DISTANCE);
+			scoreF[now.first + dirX[i]][now.second + dirZ[i]] = scoreG[now.first + dirX[i]][now.second + dirZ[i]] +
+				scoreH[now.first + dirX[i]][now.second + dirZ[i]];
+
+			prior_point[now.first + dirX[i]][now.second + dirZ[i]] = pos(now.first, now.second);
+
+			weight w(scoreF[now.first + dirX[i]][now.second + dirZ[i]], pos(now.first + dirX[i], now.second + dirZ[i]));
+			open_q.push(w);
+		}
+		if (open_q.size() == 0) {
+			while (now.first != 12 || now.second != 12) {
+				mon_load.push_back(now);
+				now = prior_point[now.first][now.second];
+			}
+			break;
+		}
+		weight temp = open_q.top();
+		open_q.pop();
+		now = temp.second;
+		close_q.push(temp);
+
+		// 끝내는 조건
+		if (abs((x + (now.first - 12) * REAL_DISTANCE) - t_x) <= 10 && abs((z + (now.second - 12) * REAL_DISTANCE) - t_z) <= 10) {
+			while (now.first != 12 || now.second != 12) {
+				mon_load.push_back(now);
+				now = prior_point[now.first][now.second];
+			}
+			break;
+		}
+	}
+
+	x += (mon_load.back().first - 12) * REAL_DISTANCE;
+	z += (mon_load.back().second - 12) * REAL_DISTANCE;
+	mon_load.pop_back();
+
+	return pos(x, z);
 }

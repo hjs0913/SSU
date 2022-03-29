@@ -143,6 +143,8 @@ public:
 
 	virtual void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList,  void *pContext = NULL);
 	virtual void BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext, ID3D12RootSignature* pd3dGraphicsRootSignature);
+	virtual void BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext, ID3D12RootSignature* pd3dGraphicsRootSignature);
+
 	virtual void AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameObject* player, int bulletidx);
 	virtual void RotateObject(int i, float x, float y, float z);
 	virtual void ReleaseObjects();

@@ -96,5 +96,10 @@ public:
 	void set_element_cooltime(bool yn);
 	bool get_element_cooltime();
 	
+	// move
+	bool check_move_alright(int x, int z, bool monster, array<Obstacle, MAX_OBSTACLE> obs);
+	pos non_a_star(int t_x, int t_z, int x, int z);
+	pos a_star(int t_x, int t_z, int x, int z, array<Obstacle, MAX_OBSTACLE> obs);
+	int huristic(int t_x, int t_z, int x, int z);
 };
 

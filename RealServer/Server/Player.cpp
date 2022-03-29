@@ -14,6 +14,8 @@ Player::Player(int id) : Npc(id)
     _attack_active = false;
     last_move_time = 0;
     superposition = false;
+    join_dungeon_room = false;
+    indun_id = -1;
 }
 
 void Player::set_exp(int exp)

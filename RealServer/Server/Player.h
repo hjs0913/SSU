@@ -23,7 +23,9 @@ public:
     unordered_set<int>  ob_viewlist;
 
     int                 last_move_time;
-    bool    superposition;
+    bool                superposition;
+    bool                join_dungeon_room;
+    int                 indun_id;
 public:
     Player(int id);
 
