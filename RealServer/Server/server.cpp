@@ -18,22 +18,6 @@ array <Obstacle, MAX_OBSTACLE> obstacles;
 void do_npc_move(int npc_id, int target);
 void return_npc_position(int npc_id);
 
-struct timer_event {
-    int obj_id;
-    chrono::system_clock::time_point start_time;
-    EVENT_TYPE ev;
-    /*     target_id
-    스킬 관련 쿨타임의 경우 : 어떤 스킬인지 넣어줌
-    */
-    int target_id;      
-
-    constexpr bool operator < (const timer_event& _left) const
-    {
-        return (start_time > _left.start_time);
-    }
-
-};
-
 concurrency::concurrent_priority_queue<timer_event> timer_queue;
 
 void error_display(int err_no)
@@ -3077,8 +3061,6 @@ void do_timer()
                  
                     //send_status_change_packet(reinterpret_cast<Player*>(players[temp.obj_id]));
                 }
-       
-             
                 reinterpret_cast<Player*>(players[temp.obj_id])->set_skill_active(temp.target_id, false);
             }
 

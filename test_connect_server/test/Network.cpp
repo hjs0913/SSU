@@ -33,6 +33,9 @@ WSABUF mybuf_recv;
 WSABUF mybuf;
 
 int combat_id = -1;
+int party_id[GAIA_ROOM];
+wstring party_name[GAIA_ROOM];
+CPattern m_gaiaPattern;
 
 
 struct EXP_OVER {
@@ -448,7 +451,6 @@ void process_packet(unsigned char* p)
 		}
 		break;
 	}
-
 	case SC_PACKET_PLAY_SHOOT: {
 		sc_packet_play_shoot* packet = reinterpret_cast<sc_packet_play_shoot*>(p);
 		shoot = true;	
@@ -467,12 +469,28 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_START_GAIA: {
+		sc_packet_start_gaia* packet = reinterpret_cast<sc_packet_start_gaia*>(p);
 		cout << "인던으로 입장해야됨" << endl;
 		combat_id = 101;
 		InDungeon = true;
+		for (int i = 0; i < GAIA_ROOM; i++) {
+			party_id[i] = packet->party_id[i];
+
+			wchar_t* temp;
+			int len = 1 + strlen(mPlayer[party_id[i]]->m_name);
+			temp = new TCHAR[len];
+			mbstowcs(temp, mPlayer[party_id[i]]->m_name, len);
+			party_name[i] = L"";
+			party_name[i].append(temp);
+		}
 		break;
 	}
-
+	case SC_PACKET_GAIA_PATTERN_ONE: {
+		sc_packet_gaia_pattern_one* packet = reinterpret_cast<sc_packet_gaia_pattern_one*>(p);
+		m_gaiaPattern.pattern_on[0] = true;
+		m_gaiaPattern.set_pattern_one(packet->point_x, packet->point_z);
+		break;
+	}
 	default:
 		cout << "잘못된 패킷 type : " << type << endl;
 		cout << "Process packet 오류" << endl;
@@ -650,6 +668,11 @@ XMFLOAT3 get_look_to_server(int id)
 int get_hp_to_server(int id)
 {
 	return mPlayer[id]->m_hp;
+}
+
+int get_max_hp_to_server(int id)
+{
+	return mPlayer[id]->m_max_hp;
 }
 
 float get_combat_id_hp()

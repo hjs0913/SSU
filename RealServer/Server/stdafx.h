@@ -26,5 +26,24 @@ extern "C" {
 
 using namespace std;
 
+struct timer_event {
+    int obj_id;
+    chrono::system_clock::time_point start_time;
+    EVENT_TYPE ev;
+    /*     target_id
+    스킬 관련 쿨타임의 경우 : 어떤 스킬인지 넣어줌
+    */
+    int target_id;
+
+    constexpr bool operator < (const timer_event& _left) const
+    {
+        return (start_time > _left.start_time);
+    }
+
+};
+
+extern concurrency::concurrent_priority_queue<timer_event> timer_queue;
+
+
 typedef pair<int, int> pos;
 #define REAL_DISTANCE 10

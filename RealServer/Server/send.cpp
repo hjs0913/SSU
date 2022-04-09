@@ -162,10 +162,24 @@ void send_play_effect_packet(Player* pl, Npc* npc )
     pl->do_send(sizeof(packet), &packet);
 }
 
-void send_start_gaia_packet(Player* pl) 
+void send_start_gaia_packet(Player* pl, int* id) 
 {
     sc_packet_start_gaia packet;
     packet.size = sizeof(packet);
     packet.type = SC_PACKET_START_GAIA;
+    for (int i = 0; i < GAIA_ROOM; i++) packet.party_id[i] = id[i];
+    pl->do_send(sizeof(packet), &packet);
+}
+
+void send_gaia_pattern_one_packet(Player* pl, pos* pt_pos)
+{
+    sc_packet_gaia_pattern_one packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_GAIA_PATTERN_ONE;
+
+    for (int i = 0; i < 4; i++) {
+        packet.point_x[i] = pt_pos[i].first;
+        packet.point_z[i] = pt_pos[i].second;
+    }
     pl->do_send(sizeof(packet), &packet);
 }

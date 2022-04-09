@@ -80,6 +80,13 @@ const char SC_PACKET_COMBAT_ID = 14;
 const char SC_PACKET_PLAY_SHOOT = 15;
 const char SC_PACKET_PLAY_EFFECT = 16;
 const char SC_PACKET_START_GAIA = 17;
+const char SC_PACKET_GAIA_PATTERN_ONE = 18;
+const char SC_PACKET_GAIA_PATTERN_TWO = 19;
+const char SC_PACKET_GAIA_PATTERN_THREE = 20;
+const char SC_PACKET_GAIA_PATTERN_FOUR = 21;
+const char SC_PACKET_GAIA_PATTERN_FIVE = 22;
+const char SC_PACKET_GAIA_PATTERN_SIX = 23;
+const char SC_PACKET_GAIA_PATTERN_SEVEN = 24;
 
 //---------------------------------------------------
 #pragma pack (push, 1)
@@ -283,6 +290,14 @@ struct cs_packet_picking_skill {
 struct sc_packet_start_gaia {
 	unsigned char size;
 	char type;
+	int party_id[GAIA_ROOM];
+};
+
+struct sc_packet_gaia_pattern_one {
+	unsigned char size;
+	char type;
+	int point_x[4];
+	int point_z[4];
 };
 
 #pragma pack(pop)

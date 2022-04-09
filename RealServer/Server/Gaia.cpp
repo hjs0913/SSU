@@ -15,6 +15,8 @@ Gaia::Gaia(int d_id)
 	target_id = 0;
 	start_game = false;
 
+	party_id = new int[GAIA_ROOM];
+
 	// Boss Npc Intialize	
 	boss = new Npc(dungeon_id);
 	boss->set_tribe(BOSS);
@@ -64,6 +66,7 @@ Gaia::~Gaia()
 void Gaia::join_player(Player* pl)
 {
 	party[player_cnt] = pl;
+	party_id[player_cnt] = pl->get_id();
 	player_cnt++;
 	cout << dungeon_id << "번 던전에 입장 중입니다" << endl;
 	pl->state_lock.lock();
@@ -87,29 +90,12 @@ void Gaia::join_player(Player* pl)
 			party[i]->state_lock.lock();
 			party[i]->set_state(ST_INDUN);
 			party[i]->state_lock.unlock();
-			send_start_gaia_packet(party[i]);
+			send_start_gaia_packet(party[i], party_id);
 			party[i]->indun_id = dungeon_id;
 
 			// 가장 체력이 높은 플레이어를 일단 타겟으로 잡는다
 			if (party[i]->get_hp() > tmp_hp) target_id = i;
-
-			// 모든 좌표 및 정보들을 초기화 하자
-			//party[i]->set_pos(300, 100);
 		}
-
-		//for (auto pt : party) {
-		//	pt->state_lock.lock();
-		//	pt->set_state(ST_INDUN);
-		//	pt->state_lock.unlock();
-		//	send_start_gaia_packet(pt);
-		//	pt->indun_id = dungeon_id;
-
-		//	// 가장 체력이 높은 플레이어를 일단 타겟으로 잡는다
-		//	if (pt->get_hp() > tmp_hp) boss->set_target_id(pt->get_id());
-
-		//	// 모든 좌표 및 정보들을 초기화 하자
-		//	pt->set_pos(300, 100);
-		//}
 
 		cout << dungeon_id << "번 던전 시작합니다" << endl;
 	}
@@ -138,6 +124,7 @@ void Gaia::boss_move()
 	//		값을 적용시키고 새로운 좌표를 클라이언트에게 보내주기
 	boss->set_x(mv.first);
 	boss->set_z(mv.second);
+	cout << mv.first << "," << mv.second << endl;
 	for (auto pt : party) {
 		send_move_packet(pt, boss);
 		send_look_packet(pt, boss);
@@ -153,7 +140,7 @@ void Gaia::boss_attack()
 
 	int p = pattern(gen);
 	if (fifteen_pattern == false) {
-		if (boss->get_hp() < boss->get_maxhp()) {
+		if (boss->get_hp() < boss->get_maxhp()/2) {
 			fifteen_pattern = true;
 			cout << "특수 패턴을 실행합니다" << endl;
 			return;
@@ -165,10 +152,30 @@ void Gaia::boss_attack()
 			return;
 		}
 	}
+
 	cout << "p : " << p << endl;
 	switch (p%5) {
 	case 0: {
-		cout << "패턴 0(대지 흔들기)" << endl;
+		pos pt_pos[4];
+		// 목표지점
+		// 1차 타점
+		pt_pos[0].first = boss->get_x() + boss->get_look_x() * 50;
+		pt_pos[0].second = boss->get_z() + boss->get_look_z() * 50;
+		// 2차 타점
+		pt_pos[1].first = boss->get_x() - boss->get_look_x() * 50;
+		pt_pos[1].second = boss->get_z() - boss->get_look_z() * 50;
+		// 3차 타점
+		pt_pos[2].first = boss->get_x() + boss->get_right_x() * 50;
+		pt_pos[2].second = boss->get_z() + boss->get_right_z() * 50;
+		// 4차 타점
+		pt_pos[3].first = boss->get_x() - boss->get_right_x() * 50;
+		pt_pos[3].second = boss->get_z() - boss->get_right_z() * 50;
+
+		for (int i = 0; i < GAIA_ROOM; i++) {
+			send_gaia_pattern_one_packet(party[i], pt_pos);
+		}
+
+		// 
 		break;
 	}
 	case 1: {

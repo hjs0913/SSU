@@ -23,4 +23,6 @@ void send_change_hp_packet(Player* pl, Npc* victim);
 void send_play_shoot_packet(Player* pl);
 void send_play_effect_packet(Player* pl, Npc* npc);
 
-void send_start_gaia_packet(Player* pl);
+void send_start_gaia_packet(Player* pl, int* id);
+
+void send_gaia_pattern_one_packet(Player *pl, pos* pt_pos);

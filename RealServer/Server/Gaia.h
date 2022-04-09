@@ -12,6 +12,8 @@ private:
 	bool fifteen_pattern;
 	int target_id;
 
+	int* party_id;
+
 public:
 	Npc* boss;
 	mutex state_lock;
