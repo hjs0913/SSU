@@ -1040,7 +1040,7 @@ void CObjectsShader::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 	int yObjects = 1;
 	int zObjects = int(fTerrainLength / fzPitch);
 	m_nObjects = (xObjects * yObjects * zObjects);  //97
-	m_nObjects += 1 + 2 * BULLETCNT + 1 + 4 + MAX_NPC + MAX_USER;
+	m_nObjects += 1 + 2 * BULLETCNT + 1 + 4 + MAX_NPC + MAX_USER+4;
 	/*-------------------------------------------------------------
 	//m_nObjects = xObjects * yObjects * zObjects = 9400
 	m_nObjects += 1
@@ -1335,6 +1335,18 @@ void CObjectsShader::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 	phouseObject->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + ::gnCbvSrvDescriptorIncrementSize * (++tmp));
 	m_ppObjects[tmp] = phouseObject;
 
+	CAirplaneMeshDiffused *pTempMesh = new CAirplaneMeshDiffused(pd3dDevice, pd3dCommandList,
+		20.0f, 1.0f, 20.0f, XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+
+	// 장판
+	for (int i = m_nObjects - MAX_NPC - MAX_USER-4; i < m_nObjects - MAX_NPC - MAX_USER; i++) {
+		CAirplanePlayer* pOtherPlayer = new CAirplanePlayer(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, pTerrain);
+		pOtherPlayer->SetMesh(0, pTempMesh);
+		pOtherPlayer->SetPosition(XMFLOAT3(0, -100, 0));
+		pOtherPlayer->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr);
+		m_ppObjects[i] = pOtherPlayer;
+	}
+
 	// 플레이어
 	for (int i = m_nObjects - MAX_NPC - MAX_USER; i < m_nObjects - MAX_NPC; i++) {
 		CAirplanePlayer* pOtherPlayer = new CAirplanePlayer(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, pTerrain);
@@ -1453,6 +1465,12 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 			else {
 				m_ppObjects[j]->SetPosition(XMFLOAT3(0, -100, 0));
 				pPlayer->Animate(pTimer, pCamera, m_ppObjects[j]);
+			}
+		}
+		else if ((j >= m_nObjects - server_id - 4) && (j < m_nObjects - server_id)) {
+			if (m_gaiaPattern.pattern_on[0]) {
+				m_ppObjects[j]->SetPosition(m_gaiaPattern.pattern_one[j - m_nObjects + server_id + 4]);
+				m_ppObjects[j]->Animate(pTimer, pCamera, m_ppObjects[j]);
 			}
 		}
 		else if ( j <= bulletidx) { //총알 원위치 

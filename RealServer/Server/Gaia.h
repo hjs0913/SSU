@@ -14,11 +14,16 @@ private:
 
 	int* party_id;
 
+	pos pattern_one_position[4];
+
+	bool running_pattern;
+
 public:
 	Npc* boss;
 	mutex state_lock;
 	int player_rander_ok;
 	bool start_game;
+
 public:
 	Gaia(int d_id);
 	~Gaia();
@@ -31,5 +36,7 @@ public:
 	void boss_attack();
 
 	int get_dungeon_id();
+
+	void pattern_active(int pattern);
 };
 

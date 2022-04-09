@@ -7,13 +7,13 @@ enum COMP_OP {
 	OP_RECV, OP_SEND, OP_ACCEPT, OP_NPC_MOVE,
 	OP_NPC_ATTACK, OP_AUTO_PLAYER_HP, OP_PLAYER_REVIVE, OP_NPC_REVIVE,
 	OP_PLAYER_ATTACK, OP_NPC_AGRO, OP_ELEMENT_COOLTIME,
-	OP_BOSS_MOVE, OP_BOSS_ATTACK
+	OP_BOSS_MOVE, OP_BOSS_ATTACK, OP_GAIA_PATTERN
 };
 enum EVENT_TYPE {
 	EVENT_NPC_MOVE, EVENT_NPC_ATTACK, EVENT_AUTO_PLAYER_HP,
 	EVENT_PLAYER_REVIVE, EVENT_NPC_REVIVE, EVENT_PLAYER_ATTACK,
 	EVENT_SKILL_COOLTIME, EVENT_NPC_AGRO, EVENT_ELEMENT_COOLTIME,
-	EVENT_BOSS_MOVE, EVENT_BOSS_ATTACK
+	EVENT_BOSS_MOVE, EVENT_BOSS_ATTACK, EVENT_GAIA_PATTERN
 };
 enum TRIBE { HUMAN, MONSTER, AGRO, BOSS, OBSTACLE };
 enum BUF_TYPE {
@@ -87,6 +87,7 @@ const char SC_PACKET_GAIA_PATTERN_FOUR = 21;
 const char SC_PACKET_GAIA_PATTERN_FIVE = 22;
 const char SC_PACKET_GAIA_PATTERN_SIX = 23;
 const char SC_PACKET_GAIA_PATTERN_SEVEN = 24;
+const char SC_PACKET_GAIA_PATTERN_ONE_ACTIVE = 25;
 
 //---------------------------------------------------
 #pragma pack (push, 1)
@@ -278,7 +279,6 @@ struct sc_packet_combat_id {
 	int id;
 };
 
-
 struct cs_packet_picking_skill {
 	unsigned char size;
 	char type;
@@ -298,6 +298,11 @@ struct sc_packet_gaia_pattern_one {
 	char type;
 	int point_x[4];
 	int point_z[4];
+};
+
+struct sc_packet_gaia_pattern_one_active {
+	unsigned char size;
+	char type;
 };
 
 #pragma pack(pop)

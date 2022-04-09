@@ -491,6 +491,10 @@ void process_packet(unsigned char* p)
 		m_gaiaPattern.set_pattern_one(packet->point_x, packet->point_z);
 		break;
 	}
+	case SC_PACKET_GAIA_PATTERN_ONE_ACTIVE: {
+		m_gaiaPattern.pattern_on[0] = false;
+		break;
+	}
 	default:
 		cout << "잘못된 패킷 type : " << type << endl;
 		cout << "Process packet 오류" << endl;

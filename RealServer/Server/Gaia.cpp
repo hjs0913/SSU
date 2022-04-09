@@ -17,6 +17,8 @@ Gaia::Gaia(int d_id)
 
 	party_id = new int[GAIA_ROOM];
 
+	running_pattern = false;
+
 	// Boss Npc Intialize	
 	boss = new Npc(dungeon_id);
 	boss->set_tribe(BOSS);
@@ -114,6 +116,7 @@ Player** Gaia::get_party_palyer()
 void Gaia::boss_move()
 {
 	// Raid Map은 장애물이 없으므로 A_star는 낭비다
+	if (running_pattern) return;
 
 	if ((party[target_id]->get_x() >= boss->get_x() - 8 && party[target_id]->get_x() <= boss->get_x() + 8) &&
 		(party[target_id]->get_z() >= boss->get_z() - 8 && party[target_id]->get_z() <= boss->get_z() + 8)) return;
@@ -137,6 +140,7 @@ void Gaia::boss_attack()
 	random_device rd;
 	mt19937 gen(rd());
 	uniform_int_distribution<int> pattern(0, 99);
+	timer_event ev;
 
 	int p = pattern(gen);
 	if (fifteen_pattern == false) {
@@ -156,42 +160,76 @@ void Gaia::boss_attack()
 	cout << "p : " << p << endl;
 	switch (p%5) {
 	case 0: {
-		pos pt_pos[4];
 		// 목표지점
 		// 1차 타점
-		pt_pos[0].first = boss->get_x() + boss->get_look_x() * 50;
-		pt_pos[0].second = boss->get_z() + boss->get_look_z() * 50;
+		pattern_one_position[0].first = boss->get_x() + boss->get_look_x() * 50;
+		pattern_one_position[0].second = boss->get_z() + boss->get_look_z() * 50;
 		// 2차 타점
-		pt_pos[1].first = boss->get_x() - boss->get_look_x() * 50;
-		pt_pos[1].second = boss->get_z() - boss->get_look_z() * 50;
+		pattern_one_position[1].first = boss->get_x() - boss->get_look_x() * 50;
+		pattern_one_position[1].second = boss->get_z() - boss->get_look_z() * 50;
 		// 3차 타점
-		pt_pos[2].first = boss->get_x() + boss->get_right_x() * 50;
-		pt_pos[2].second = boss->get_z() + boss->get_right_z() * 50;
+		pattern_one_position[2].first = boss->get_x() + boss->get_right_x() * 50;
+		pattern_one_position[2].second = boss->get_z() + boss->get_right_z() * 50;
 		// 4차 타점
-		pt_pos[3].first = boss->get_x() - boss->get_right_x() * 50;
-		pt_pos[3].second = boss->get_z() - boss->get_right_z() * 50;
+		pattern_one_position[3].first = boss->get_x() - boss->get_right_x() * 50;
+		pattern_one_position[3].second = boss->get_z() - boss->get_right_z() * 50;
 
 		for (int i = 0; i < GAIA_ROOM; i++) {
-			send_gaia_pattern_one_packet(party[i], pt_pos);
+			send_gaia_pattern_one_packet(party[i], pattern_one_position);
 		}
-
-		// 
+		//
+		ev.obj_id = dungeon_id;
+		ev.start_time = chrono::system_clock::now() + 2s;
+		ev.ev = EVENT_GAIA_PATTERN;
+		ev.target_id = 0;
+		timer_queue.push(ev);
+		
+		//
+		ev.obj_id = dungeon_id;
+		ev.start_time = chrono::system_clock::now() + 5s;
+		ev.ev = EVENT_BOSS_ATTACK;
+		ev.target_id = -1;
+		timer_queue.push(ev);
 		break;
 	}
 	case 1: {
 		cout << "패턴 1(대지 해일)" << endl;
+		//
+		ev.obj_id = dungeon_id;
+		ev.start_time = chrono::system_clock::now() + 3s;
+		ev.ev = EVENT_BOSS_ATTACK;
+		ev.target_id = -1;
+		timer_queue.push(ev);
 		break;
 	}
 	case 2: {
 		cout << "패턴 2(검 꽂기)" << endl;
+		//
+		ev.obj_id = dungeon_id;
+		ev.start_time = chrono::system_clock::now() + 3s;
+		ev.ev = EVENT_BOSS_ATTACK;
+		ev.target_id = -1;
+		timer_queue.push(ev);
 		break;
 	}
 	case 3: {
 		cout << "패턴 3(나뭇잎 공격)" << endl;
+		//
+		ev.obj_id = dungeon_id;
+		ev.start_time = chrono::system_clock::now() + 3s;
+		ev.ev = EVENT_BOSS_ATTACK;
+		ev.target_id = -1;
+		timer_queue.push(ev);
 		break;
 	}
 	case 4: {
 		cout << "패턴 4(참격)" << endl;
+		//
+		ev.obj_id = dungeon_id;
+		ev.start_time = chrono::system_clock::now() + 3s;
+		ev.ev = EVENT_BOSS_ATTACK;
+		ev.target_id = -1;
+		timer_queue.push(ev);
 		break;
 	}
 	default:
@@ -203,4 +241,35 @@ void Gaia::boss_attack()
 int Gaia::get_dungeon_id()
 {
 	return dungeon_id;
+}
+
+void Gaia::pattern_active(int pattern)
+{
+	switch (pattern) {
+	case 0: {
+		// 패턴이 발동되었다고 클라에 보내주자
+		
+		// 패턴 판정 확인
+		for (auto& p : party) {
+			for (int i = 0; i < 4; i++) {
+				int x = pattern_one_position[i].first;
+				int z = pattern_one_position[i].second;
+
+				if (sqrt((p->get_x() - x) * (p->get_x() - x) + (p->get_z() - z) * (p->get_z() - z)) < 20) {
+					p->set_hp(p->get_hp() - 2000);
+					// 패턴 맞은사람이 있으면 맞았다고 보내주자
+					for (auto send_pl : party) {
+						send_change_hp_packet(send_pl, p);
+					}
+				}
+			}
+			send_gaia_pattern_one_active_packet(p);
+		}
+
+		break;
+	}
+	default:
+		cout << "잘봇된 패턴 활성화" << endl;
+		break;
+	}
 }

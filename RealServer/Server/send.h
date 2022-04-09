@@ -26,3 +26,5 @@ void send_play_effect_packet(Player* pl, Npc* npc);
 void send_start_gaia_packet(Player* pl, int* id);
 
 void send_gaia_pattern_one_packet(Player *pl, pos* pt_pos);
+
+void send_gaia_pattern_one_active_packet(Player* pl);

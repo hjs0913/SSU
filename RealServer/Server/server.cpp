@@ -460,9 +460,6 @@ void physical_skill_success(int p_id, int target, float skill_factor)
 
 void attack_success(int p_id, int target, float atk_factor)
 {
-
-
-
     // 현재 물리 공격에 대해서만 생각한다
     float give_damage = players[p_id]->get_physical_attack() * atk_factor;
     float defence_damage = (players[target]->get_defence_factor() *
@@ -2402,16 +2399,17 @@ void worker()
             ev.ev = EVENT_BOSS_MOVE;
             ev.target_id = -1;
             timer_queue.push(ev);
+            delete exp_over;
             break;
         }
         case OP_BOSS_ATTACK: {
             dungeons[client_id]->boss_attack();
-            timer_event ev;
-            ev.obj_id = client_id;
-            ev.start_time = chrono::system_clock::now() + 3s;
-            ev.ev = EVENT_BOSS_ATTACK;
-            ev.target_id = -1;
-            timer_queue.push(ev);
+            delete exp_over;
+            break;
+        }
+        case OP_GAIA_PATTERN: {
+            dungeons[client_id]->pattern_active(exp_over->_target);
+            delete exp_over;
             break;
         }
         }
@@ -3037,7 +3035,9 @@ COMP_OP EVtoOP(EVENT_TYPE ev) {
     case EVENT_ELEMENT_COOLTIME:
        // return OP_ELEMENT_COOLTIME;
         break;
-
+    case EVENT_GAIA_PATTERN:
+        return OP_GAIA_PATTERN;
+        break;
     }
 
 }

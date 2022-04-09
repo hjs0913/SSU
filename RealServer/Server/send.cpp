@@ -183,3 +183,12 @@ void send_gaia_pattern_one_packet(Player* pl, pos* pt_pos)
     }
     pl->do_send(sizeof(packet), &packet);
 }
+
+void send_gaia_pattern_one_active_packet(Player* pl)
+{
+    sc_packet_gaia_pattern_one_active packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_GAIA_PATTERN_ONE_ACTIVE;
+
+    pl->do_send(sizeof(packet), &packet);
+}
