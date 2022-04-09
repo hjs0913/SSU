@@ -16,6 +16,8 @@
 #define IDC_MYICON				2
 #ifndef IDC_STATIC
 #define IDC_STATIC				-1
+#define IDB_MY_IMAGE                    130
+#define IDB_DIRECTORY                    131
 #endif
 // 다음은 새 개체에 사용할 기본값입니다.
 //

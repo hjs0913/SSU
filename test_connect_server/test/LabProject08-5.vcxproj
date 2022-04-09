@@ -146,6 +146,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\RealServer\Server\protocol.h" />
+    <ClInclude Include="Bitmap.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="DDSTextureLoader12.h" />
     <ClInclude Include="GameFramework.h" />
@@ -160,6 +161,9 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Timer.h" />
+    <ClInclude Include="twapi_w01.h" />
+    <ClInclude Include="twapi_w01_gdi.h" />
+    <ClInclude Include="twapi_w01_util.h" />
     <ClInclude Include="UILayer.h" />
     <ClInclude Include="cRay.h" />
   </ItemGroup>

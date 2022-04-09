@@ -7,8 +7,8 @@
 #include <iostream>
 #include <fstream>
 #include <format>
-
 #include <array>
+
 using namespace std;
 #define BULLETCNT 100
 #define ROOMX 4000
@@ -270,6 +270,7 @@ void CGameFramework::CreateRenderTargetViews()
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle = m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	for (UINT i = 0; i < m_nSwapChainBuffers; i++)
 	{
+
 		m_pdxgiSwapChain->GetBuffer(i, __uuidof(ID3D12Resource), (void**)&m_ppd3dSwapChainBackBuffers[i]);
 		m_pd3dDevice->CreateRenderTargetView(m_ppd3dSwapChainBackBuffers[i], NULL, d3dRtvCPUDescriptorHandle);
 		d3dRtvCPUDescriptorHandle.ptr += m_nRtvDescriptorIncrementSize;
@@ -701,6 +702,8 @@ void CGameFramework::OnDestroy()
 
 void CGameFramework::BuildObjects()
 {
+	
+
 	if (!m_ppUILayer) {
 		m_ppUILayer = new UILayer * [UICOUNT];
 
@@ -1146,6 +1149,7 @@ void CGameFramework::FrameAdvance()
 	for (int i = 0; i < UICOUNT; i++) {
 		switch (i) {
 		case 0: {
+			
 			for (auto& m : g_msg) {
 				wchar_t* temp;
 				//wstring temp = wstring(m.begin(), m.end());
@@ -1261,6 +1265,13 @@ void CGameFramework::FrameAdvance()
 		m_ppUILayer[i]->Render(m_nSwapChainBufferIndex);
 
 	}
+
+
+
+
+
+
+
 #ifdef _WITH_PRESENT_PARAMETERS
 	DXGI_PRESENT_PARAMETERS dxgiPresentParameters;
 	dxgiPresentParameters.DirtyRectsCount = 0;

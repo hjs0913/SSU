@@ -4,6 +4,8 @@
 #include "stdafx.h"
 #include "test1.h"
 #include "GameFramework.h"
+#include "Bitmap.h"
+#include "UILayer.h" 
 #pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console") //ÄÜ¼Ö ¶ç¿ìÀÚ 
 #define MAX_LOADSTRING 100
 
@@ -17,6 +19,12 @@ ATOM MyRegisterClass(HINSTANCE hInstance);
 BOOL InitInstance(HINSTANCE, int);
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
+
+
+#pragma comment(lib, "WindowsCodecs.lib")
+#pragma comment(lib, "D2D1.lib")
+
+
 
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
 {
@@ -120,6 +128,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	return(TRUE);
 }
 
+
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	int wmId, wmEvent;
@@ -130,6 +140,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	static HIMC imeID = nullptr;
 	switch (message)
 	{
+	case WM_CREATE:
+		break;
 	case WM_MOUSELEAVE:
 		tme.cbSize = sizeof(TRACKMOUSEEVENT);
 		tme.hwndTrack = hWnd;
@@ -141,6 +153,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_MOUSEHOVER:
 	case WM_SIZE:
 	case WM_LBUTTONDOWN:
+
 	case WM_LBUTTONUP:
 	case WM_RBUTTONDOWN:
 	case WM_RBUTTONUP:
@@ -164,6 +177,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			::DialogBox(ghAppInstance, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
 			break;
 		case IDM_EXIT:
+			SAFE_RELEASE(m_pD2DFactory);
+			SAFE_RELEASE(m_pWICFactory);
+			SAFE_RELEASE(m_pRenderTarget);
+			SAFE_RELEASE(m_pGridPatternBitmapBrush);
+			SAFE_RELEASE(m_pBitmap);
+
 			::DestroyWindow(hWnd);
 			break;
 		default:
@@ -171,7 +190,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case WM_PAINT:
+
 		hdc = ::BeginPaint(hWnd, &ps);
+	
 		EndPaint(hWnd, &ps);
 		break;
 	case WM_DESTROY:
