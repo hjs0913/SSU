@@ -1269,7 +1269,10 @@ void CGameFramework::FrameAdvance()
 		}
 		case 9: {
 			if (!InDungeon) break;
-			m_ppUILayer[i]->UpdateLabels(L"파티원정보", 0, (m_nWndClientHeight / 2)-80, 150, (m_nWndClientHeight / 2)+20);
+			wstring party_info_str = L"파티원정보(DC : ";
+			party_info_str.append(to_wstring(indun_death_count));
+			party_info_str.append(L")");
+			m_ppUILayer[i]->UpdateLabels(party_info_str, 0, (m_nWndClientHeight / 2)-80, 150, (m_nWndClientHeight / 2)+20);
 			break; 
 		}
 		case 10: {

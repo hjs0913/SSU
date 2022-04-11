@@ -87,7 +87,8 @@ const char SC_PACKET_GAIA_PATTERN_FOUR = 21;
 const char SC_PACKET_GAIA_PATTERN_FIVE = 22;
 const char SC_PACKET_GAIA_PATTERN_SIX = 23;
 const char SC_PACKET_GAIA_PATTERN_SEVEN = 24;
-const char SC_PACKET_GAIA_PATTERN_ONE_ACTIVE = 25;
+const char SC_PACKET_GAIA_PATTERN_FINISH = 25;
+const char SC_PACKET_CHANGE_DEATH_COUNT = 26;
 
 //---------------------------------------------------
 #pragma pack (push, 1)
@@ -300,9 +301,31 @@ struct sc_packet_gaia_pattern_one {
 	int point_z[4];
 };
 
-struct sc_packet_gaia_pattern_one_active {
+struct sc_packet_gaia_pattern_finish {
 	unsigned char size;
 	char type;
+	char pattern;
+};
+
+struct sc_packet_gaia_pattern_two {
+	unsigned char size;
+	char type;
+	int point_x[3];
+	int point_z[3];
+	char pattern_number;
+};
+
+struct sc_packet_gaia_pattern_five {
+	unsigned char size;
+	char type;
+	int point_x;
+	int point_z;
+};
+
+struct sc_packet_change_death_count {
+	unsigned char size;
+	char type;
+	char death_count;
 };
 
 #pragma pack(pop)

@@ -1040,7 +1040,7 @@ void CObjectsShader::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 	int yObjects = 1;
 	int zObjects = int(fTerrainLength / fzPitch);
 	m_nObjects = (xObjects * yObjects * zObjects);  //97
-	m_nObjects += 1 + 2 * BULLETCNT + 1 + 4 + MAX_NPC + MAX_USER+4;
+	m_nObjects += 1 + 2 * BULLETCNT + 1 + 4 + MAX_NPC + MAX_USER+4+3+1;
 	/*-------------------------------------------------------------
 	//m_nObjects = xObjects * yObjects * zObjects = 9400
 	m_nObjects += 1
@@ -1335,17 +1335,38 @@ void CObjectsShader::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 	phouseObject->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + ::gnCbvSrvDescriptorIncrementSize * (++tmp));
 	m_ppObjects[tmp] = phouseObject;
 
-	CAirplaneMeshDiffused *pTempMesh = new CAirplaneMeshDiffused(pd3dDevice, pd3dCommandList,
-		20.0f, 1.0f, 20.0f, XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+	CAirplaneMeshDiffused *pTempMesh_1 = new CAirplaneMeshDiffused(pd3dDevice, pd3dCommandList,
+		20.0f, 1.0f, 20.0f, XMFLOAT4(1.0f, 0.0f, 0.0f, 0.3f));
+	CAirplaneMeshDiffused* pTempMesh_2 = new CAirplaneMeshDiffused(pd3dDevice, pd3dCommandList,
+		100.0f, 10.0f, 50.0f, XMFLOAT4(0.647f, 0.164f, 0.164f, 0.5f));
+	CAirplaneMeshDiffused* pTempMesh_5 = new CAirplaneMeshDiffused(pd3dDevice, pd3dCommandList,
+		50.0f, 0.3f, 10.0f, XMFLOAT4(1.0f, 0.0f, 0.0f, 0.5f));
 
-	// 장판
-	for (int i = m_nObjects - MAX_NPC - MAX_USER-4; i < m_nObjects - MAX_NPC - MAX_USER; i++) {
+	// 1번패턴 장판
+	for (int i = m_nObjects - MAX_NPC - MAX_USER-8; i < m_nObjects - MAX_NPC - MAX_USER-4; i++) {
 		CAirplanePlayer* pOtherPlayer = new CAirplanePlayer(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, pTerrain);
-		pOtherPlayer->SetMesh(0, pTempMesh);
+		pOtherPlayer->SetMesh(0, pTempMesh_1);
 		pOtherPlayer->SetPosition(XMFLOAT3(0, -100, 0));
 		pOtherPlayer->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr);
 		m_ppObjects[i] = pOtherPlayer;
 	}
+
+	// 2번패턴 장판
+	for (int i = m_nObjects - MAX_NPC - MAX_USER - 4; i < m_nObjects - MAX_NPC - MAX_USER-1; i++) {
+		CAirplanePlayer* pOtherPlayer = new CAirplanePlayer(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, pTerrain);
+		pOtherPlayer->SetMesh(0, pTempMesh_2);
+		pOtherPlayer->SetPosition(XMFLOAT3(0, -100, 0));
+		pOtherPlayer->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr);
+		m_ppObjects[i] = pOtherPlayer;
+	}
+
+	// 5번패턴 장판
+	CAirplanePlayer* pOtherPlayer = new CAirplanePlayer(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, pTerrain);
+	pOtherPlayer->SetMesh(0, pTempMesh_5);
+	pOtherPlayer->SetPosition(XMFLOAT3(0, -100, 0));
+	pOtherPlayer->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr);
+	m_ppObjects[m_nObjects - MAX_NPC - MAX_USER-1] = pOtherPlayer;
+
 
 	// 플레이어
 	for (int i = m_nObjects - MAX_NPC - MAX_USER; i < m_nObjects - MAX_NPC; i++) {
@@ -1385,111 +1406,278 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 	int server_id = MAX_USER + MAX_NPC;
 	int MAX_WORLD_SHADER = m_nObjects - server_id;
 
-	for (int j = 0; j < m_nObjects; j++)
-	{
+	if (InDungeon) {
+		for (int j = 0; j < m_nObjects; j++)
+		{
  
 
-		if (j >= m_nObjects - server_id) {
-			pPlayer = reinterpret_cast<CAirplanePlayer*>(m_ppObjects[j]);
-			bool tp = pPlayer->GetUse();
-			pPlayer->SetUse(get_use_to_server(j-MAX_WORLD_SHADER));
-			if (pPlayer->GetUse()) {
+			if (j >= m_nObjects - server_id) {
+				pPlayer = reinterpret_cast<CAirplanePlayer*>(m_ppObjects[j]);
+				bool tp = pPlayer->GetUse();
+				pPlayer->SetUse(get_use_to_server(j-MAX_WORLD_SHADER));
+				if (pPlayer->GetUse()) {
 
-				if (tp != pPlayer->GetUse()) {
-					// 최초 정보 불러오기 및 종족에 맞게 변환
-					get_basic_information(pPlayer, j - MAX_WORLD_SHADER);
-					if (pPlayer->m_tribe == HUMAN) {
-						pPlayer->SetMesh(0, pOtherPlayerMesh[2]);
-						get_player_information(pPlayer, j - MAX_WORLD_SHADER);
-					}
-					else if (pPlayer->m_tribe == BOSS) {
-						pPlayer->SetMesh(0, pOtherPlayerMesh[0]);
-					}
-					else {
-					
-						switch (pPlayer->m_spices)
-						{
-						case FALLEN_FLOG: {
-							pPlayer->SetMesh(0, pOtherPlayerMesh[1]);
-							break;
+					if (tp != pPlayer->GetUse()) {
+						// 최초 정보 불러오기 및 종족에 맞게 변환
+						get_basic_information(pPlayer, j - MAX_WORLD_SHADER);
+						if (pPlayer->m_tribe == HUMAN) {
+							pPlayer->SetMesh(0, pOtherPlayerMesh[2]);
+							get_player_information(pPlayer, j - MAX_WORLD_SHADER);
 						}
-						case FALLEN_CHICKEN: {
-							pPlayer->SetMesh(0, pOtherPlayerMesh[3]);
-							break;
-						}
-						case FALLEN_RABBIT: {
-							pPlayer->SetMesh(0, pOtherPlayerMesh[6]);
-							break;
-						}
-						case FALLEN_MONKEY: {
-							pPlayer->SetMesh(0, pOtherPlayerMesh[5]);
-							break;
-						}
-						case WOLF_BOSS: {
-							pPlayer->SetMesh(0, pOtherPlayerMesh[4]);
-							break;
-						}
-						case FALLEN_TIGER: {
+						else if (pPlayer->m_tribe == BOSS) {
 							pPlayer->SetMesh(0, pOtherPlayerMesh[0]);
-							break;
 						}
-						default:
-							break;
-						}
+						else {
 					
+							switch (pPlayer->m_spices)
+							{
+							case FALLEN_FLOG: {
+								pPlayer->SetMesh(0, pOtherPlayerMesh[1]);
+								break;
+							}
+							case FALLEN_CHICKEN: {
+								pPlayer->SetMesh(0, pOtherPlayerMesh[3]);
+								break;
+							}
+							case FALLEN_RABBIT: {
+								pPlayer->SetMesh(0, pOtherPlayerMesh[6]);
+								break;
+							}
+							case FALLEN_MONKEY: {
+								pPlayer->SetMesh(0, pOtherPlayerMesh[5]);
+								break;
+							}
+							case WOLF_BOSS: {
+								pPlayer->SetMesh(0, pOtherPlayerMesh[4]);
+								break;
+							}
+							case FALLEN_TIGER: {
+								pPlayer->SetMesh(0, pOtherPlayerMesh[0]);
+								break;
+							}
+							default:
+								break;
+							}
+					
+						}
 					}
+					// 이때만 렌더링
+				
+					reinterpret_cast<CAirplanePlayer*>(m_ppObjects[j])->m_hp = get_hp_to_server(j - MAX_WORLD_SHADER);
+					m_ppObjects[j]->SetPosition(get_position_to_server(j - MAX_WORLD_SHADER));
+					if (j >= 10615+7 && j < 10795 + 7) {
+						//m_ppObjects[j]->SetPosition(get_position_to_server(j - 9614));
+						m_ppObjects[j]->vCenter = { m_ppObjects[j]->GetPosition().x, m_ppObjects[j]->GetPosition().y + 10, m_ppObjects[j]->GetPosition().z};
+					}
+
+					pPlayer->SetLook(get_look_to_server(j - MAX_WORLD_SHADER));
+					pPlayer->Animate(pTimer, pCamera, m_ppObjects[j]);
 				}
-				// 이때만 렌더링
-				
-				reinterpret_cast<CAirplanePlayer*>(m_ppObjects[j])->m_hp = get_hp_to_server(j - MAX_WORLD_SHADER);
-				m_ppObjects[j]->SetPosition(get_position_to_server(j - MAX_WORLD_SHADER));
-				if (j >= 10615 && j < 10795) {
-					//m_ppObjects[j]->SetPosition(get_position_to_server(j - 9614));
-					m_ppObjects[j]->vCenter = { m_ppObjects[j]->GetPosition().x, m_ppObjects[j]->GetPosition().y + 10, m_ppObjects[j]->GetPosition().z};
+				else {
+					m_ppObjects[j]->SetPosition(XMFLOAT3(0, -100, 0));
+					pPlayer->Animate(pTimer, pCamera, m_ppObjects[j]);
 				}
-				
-				
-				//cout << j << endl;
-				//cout << m_ppObjects[j]->vCenter.x << m_ppObjects[j]->vCenter.y << m_ppObjects[j]->vCenter.z << endl;
+			}
+			else if ((j >= m_nObjects - server_id - 8) && (j < m_nObjects - server_id-4)) {
+				if (m_gaiaPattern.pattern_on[0]) {
+					m_ppObjects[j]->SetPosition(m_gaiaPattern.pattern_one[j - m_nObjects + server_id + 8]);
+					m_ppObjects[j]->Animate(pTimer, pCamera, m_ppObjects[j]);
+				}
+				else {
+					m_ppObjects[j]->SetPosition(XMFLOAT3(0, -100, 0));
+					m_ppObjects[j]->Animate(pTimer, pCamera, m_ppObjects[j]);
+				}
+			}
+			else if ((j >= m_nObjects - server_id - 4) && (j < m_nObjects - server_id-1)) {
+				if (m_gaiaPattern.pattern_on[1]) {
+					pPlayer = reinterpret_cast<CAirplanePlayer*>(m_ppObjects[j]);
+					m_ppObjects[j]->SetPosition(m_gaiaPattern.pattern_two[j - m_nObjects + server_id + 4]);
+					pPlayer->SetLook(m_gaiaPattern.pattern_two_look);
+					pPlayer->Animate(pTimer, pCamera, m_ppObjects[j]);
+				}
+				else {
+					m_ppObjects[j]->SetPosition(XMFLOAT3(0, -100, 0));
+					m_ppObjects[j]->Animate(pTimer, pCamera, m_ppObjects[j]);
+				}
+			}
+			else if (j == m_nObjects - server_id - 1) {
+				if (m_gaiaPattern.pattern_on[4]) {
+					pPlayer = reinterpret_cast<CAirplanePlayer*>(m_ppObjects[j]);
+					m_ppObjects[j]->SetPosition(m_gaiaPattern.pattern_five);
+					pPlayer->SetLook(m_gaiaPattern.pattern_five_look);	// 보스가 보는 방향과 같은 값을 가져오자
+					pPlayer->Animate_Own_Height(pTimer, pCamera, m_ppObjects[j]);
+				}
+				else {
+					m_ppObjects[j]->SetPosition(XMFLOAT3(0, -100, 0));
+					m_ppObjects[j]->Animate(pTimer, pCamera, m_ppObjects[j]);
+				}
+			}
+			else if ( j <= bulletidx) { //총알 원위치 
+				if (m_ppObjects[j]->GetPosition().x <  0 || m_ppObjects[j]->GetPosition().x>5000 ||
+					m_ppObjects[j]->GetPosition().z < 0 || m_ppObjects[j]->GetPosition().z>5000) {
+					m_ppObjects[j]->SetPosition(0, 100, 0);
 
-				
-				pPlayer->SetLook(get_look_to_server(j - MAX_WORLD_SHADER));
-				pPlayer->Animate(pTimer, pCamera, m_ppObjects[j]);
-		
+				}
 			
-
-				// hp bar 렌더링
-				//int hp_j = j - MAX_WORLD_SHADER - 1000 + 812;
-				//m_ppObjects[hp_j]->Animate2(hp_j,pTimer, pCamera, pPlayer);
-			}
-			else {
-				m_ppObjects[j]->SetPosition(XMFLOAT3(0, -100, 0));
-				pPlayer->Animate(pTimer, pCamera, m_ppObjects[j]);
-			}
-		}
-		else if ((j >= m_nObjects - server_id - 4) && (j < m_nObjects - server_id)) {
-			if (m_gaiaPattern.pattern_on[0]) {
-				m_ppObjects[j]->SetPosition(m_gaiaPattern.pattern_one[j - m_nObjects + server_id + 4]);
-				m_ppObjects[j]->Animate(pTimer, pCamera, m_ppObjects[j]);
-			}
-		}
-		else if ( j <= bulletidx) { //총알 원위치 
-			if (m_ppObjects[j]->GetPosition().x <  0 || m_ppObjects[j]->GetPosition().x>5000 ||
-				m_ppObjects[j]->GetPosition().z < 0 || m_ppObjects[j]->GetPosition().z>5000) {
-				m_ppObjects[j]->SetPosition(0, 100, 0);
-
-			}
-			
-			else if (reinterpret_cast<CBulletObject*>(m_ppObjects[j])->Animate(pTimer, pCamera, player, map)) { // 구체 이펙트 
+				else if (reinterpret_cast<CBulletObject*>(m_ppObjects[j])->Animate(pTimer, pCamera, player, map)) { // 구체 이펙트 
 	
 			
+						if (start[j] == 0)
+							start[j] = pTimer.GetTotalTime();
+
+
+						//m_ppObjects[j + BULLETCNT]->SetPosition(effect_x, effect_y + 10, effect_z);
+
+						m_ppObjects[j + BULLETCNT]->AnimatePart(pTimer, start[j], XMFLOAT3(effect_x, effect_y + 10,effect_z), 0);
+
+
+						if (j < 70) {
+
+							//m_ppObjects[j + BULLETCNT + 30]->SetPosition(effect_x - 10, effect_y, effect_z);
+							//m_ppObjects[j + BULLETCNT + 31]->SetPosition(effect_x, effect_y , effect_z);
+							//m_ppObjects[j + BULLETCNT + 32]->SetPosition(effect_x - 10, effect_y , effect_z);
+
+							m_ppObjects[j + BULLETCNT + 32]->AnimatePart(pTimer, start[j], XMFLOAT3(effect_x, effect_y + 10, effect_z), 1);
+							m_ppObjects[j + BULLETCNT + 31]->AnimatePart(pTimer, start[j], XMFLOAT3(effect_x, effect_y + 10, effect_z), 2);
+							m_ppObjects[j + BULLETCNT + 30]->AnimatePart(pTimer, start[j], XMFLOAT3(effect_x, effect_y + 10, effect_z), 3);
+
+			
+
+						}
+						else {
+							cout << "우아2" << endl;
+							//m_ppObjects[j + BULLETCNT - 30]->SetPosition(effect_x - 10, effect_y + 10, effect_z);
+							//m_ppObjects[j + BULLETCNT - 31]->SetPosition(effect_x, effect_y , effect_z);
+							//m_ppObjects[j + BULLETCNT - 32]->SetPosition(effect_x - 10, effect_y + 10, effect_z);
+
+							//m_ppObjects[j + BULLETCNT - 32]->AnimatePart(pTimer, start[j], XMFLOAT3(effect_x, effect_y + 10, effect_z), 1);
+							//m_ppObjects[j + BULLETCNT - 31]->AnimatePart(pTimer, start[j], XMFLOAT3(effect_x, effect_y + 10, effect_z), 2);
+							//m_ppObjects[j + BULLETCNT - 30]->AnimatePart(pTimer, start[j], XMFLOAT3(effect_x, effect_y + 10, effect_z), 3);
+						}
+
+
+						if (pTimer.GetTotalTime() - start[j] >= 2) {			
+							hit_check = false;
+							start[j] = 0;
+						}
+				}
+			}
+			else if (j == m_nObjects-2) {
+				m_ppObjects[j]->SyncPlayer(pTimer, pCamera, player);
+			}
+			else if (j >= 812 && j < 992) {
+				pPlayer = reinterpret_cast<CAirplanePlayer*>(m_ppObjects[MAX_WORLD_SHADER + MAX_USER + j - 812]);
+				if (pPlayer->GetUse()) {
+					int width = ((float)pPlayer->m_hp / pPlayer->m_max_hp) * 50.0f;
+					m_ppObjects[j]->SetMesh(0, newhp[width]);
+				}
+				m_ppObjects[j]->Animate2(j, pTimer, pCamera, pPlayer);
+			}
+			else {
+				m_ppObjects[j]->Animate(pTimer, pCamera, player);
+			}
+
+
+		}
+	}
+	else {
+		for (int j = 0; j < m_nObjects; j++)
+		{
+			if (j >= m_nObjects - server_id) {
+				pPlayer = reinterpret_cast<CAirplanePlayer*>(m_ppObjects[j]);
+				bool tp = pPlayer->GetUse();
+				pPlayer->SetUse(get_use_to_server(j - MAX_WORLD_SHADER));
+				if (pPlayer->GetUse()) {
+
+					if (tp != pPlayer->GetUse()) {
+						// 최초 정보 불러오기 및 종족에 맞게 변환
+						get_basic_information(pPlayer, j - MAX_WORLD_SHADER);
+						if (pPlayer->m_tribe == HUMAN) {
+							pPlayer->SetMesh(0, pOtherPlayerMesh[2]);
+							get_player_information(pPlayer, j - MAX_WORLD_SHADER);
+						}
+						else if (pPlayer->m_tribe == BOSS) {
+							pPlayer->SetMesh(0, pOtherPlayerMesh[0]);
+						}
+						else {
+
+							switch (pPlayer->m_spices)
+							{
+							case FALLEN_FLOG: {
+								pPlayer->SetMesh(0, pOtherPlayerMesh[1]);
+								break;
+							}
+							case FALLEN_CHICKEN: {
+								pPlayer->SetMesh(0, pOtherPlayerMesh[3]);
+								break;
+							}
+							case FALLEN_RABBIT: {
+								pPlayer->SetMesh(0, pOtherPlayerMesh[6]);
+								break;
+							}
+							case FALLEN_MONKEY: {
+								pPlayer->SetMesh(0, pOtherPlayerMesh[5]);
+								break;
+							}
+							case WOLF_BOSS: {
+								pPlayer->SetMesh(0, pOtherPlayerMesh[4]);
+								break;
+							}
+							case FALLEN_TIGER: {
+								pPlayer->SetMesh(0, pOtherPlayerMesh[0]);
+								break;
+							}
+							default:
+								break;
+							}
+
+						}
+					}
+					// 이때만 렌더링
+
+					reinterpret_cast<CAirplanePlayer*>(m_ppObjects[j])->m_hp = get_hp_to_server(j - MAX_WORLD_SHADER);
+					m_ppObjects[j]->SetPosition(get_position_to_server(j - MAX_WORLD_SHADER));
+					if (j >= 10615 && j < 10795) {
+						//m_ppObjects[j]->SetPosition(get_position_to_server(j - 9614));
+						m_ppObjects[j]->vCenter = { m_ppObjects[j]->GetPosition().x, m_ppObjects[j]->GetPosition().y + 10, m_ppObjects[j]->GetPosition().z };
+					}
+
+
+					//cout << j << endl;
+					//cout << m_ppObjects[j]->vCenter.x << m_ppObjects[j]->vCenter.y << m_ppObjects[j]->vCenter.z << endl;
+
+
+					pPlayer->SetLook(get_look_to_server(j - MAX_WORLD_SHADER));
+					pPlayer->Animate(pTimer, pCamera, m_ppObjects[j]);
+
+
+
+					// hp bar 렌더링
+					//int hp_j = j - MAX_WORLD_SHADER - 1000 + 812;
+					//m_ppObjects[hp_j]->Animate2(hp_j,pTimer, pCamera, pPlayer);
+				}
+				else {
+					m_ppObjects[j]->SetPosition(XMFLOAT3(0, -100, 0));
+					pPlayer->Animate(pTimer, pCamera, m_ppObjects[j]);
+				}
+			}
+			else if (j <= bulletidx) { //총알 원위치 
+				if (m_ppObjects[j]->GetPosition().x < 0 || m_ppObjects[j]->GetPosition().x>5000 ||
+					m_ppObjects[j]->GetPosition().z < 0 || m_ppObjects[j]->GetPosition().z>5000) {
+					m_ppObjects[j]->SetPosition(0, 100, 0);
+
+				}
+
+				else if (reinterpret_cast<CBulletObject*>(m_ppObjects[j])->Animate(pTimer, pCamera, player, map)) { // 구체 이펙트 
+
+
 					if (start[j] == 0)
 						start[j] = pTimer.GetTotalTime();
 
 
 					//m_ppObjects[j + BULLETCNT]->SetPosition(effect_x, effect_y + 10, effect_z);
 
-					m_ppObjects[j + BULLETCNT]->AnimatePart(pTimer, start[j], XMFLOAT3(effect_x, effect_y + 10,effect_z), 0);
+					m_ppObjects[j + BULLETCNT]->AnimatePart(pTimer, start[j], XMFLOAT3(effect_x, effect_y + 10, effect_z), 0);
 
 
 					if (j < 70) {
@@ -1502,7 +1690,7 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 						m_ppObjects[j + BULLETCNT + 31]->AnimatePart(pTimer, start[j], XMFLOAT3(effect_x, effect_y + 10, effect_z), 2);
 						m_ppObjects[j + BULLETCNT + 30]->AnimatePart(pTimer, start[j], XMFLOAT3(effect_x, effect_y + 10, effect_z), 3);
 
-			
+
 
 					}
 					else {
@@ -1517,29 +1705,31 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 					}
 
 
-					if (pTimer.GetTotalTime() - start[j] >= 2) {			
+					if (pTimer.GetTotalTime() - start[j] >= 2) {
 						hit_check = false;
 						start[j] = 0;
 					}
+				}
 			}
-		}
-		else if (j == m_nObjects-2) {
-			m_ppObjects[j]->SyncPlayer(pTimer, pCamera, player);
-		}
-		else if (j >= 812 && j < 992) {
-			pPlayer = reinterpret_cast<CAirplanePlayer*>(m_ppObjects[MAX_WORLD_SHADER + MAX_USER + j - 812]);
-			if (pPlayer->GetUse()) {
-				int width = ((float)pPlayer->m_hp / pPlayer->m_max_hp) * 50.0f;
-				m_ppObjects[j]->SetMesh(0, newhp[width]);
+			else if (j == m_nObjects - 2) {
+				m_ppObjects[j]->SyncPlayer(pTimer, pCamera, player);
 			}
-			m_ppObjects[j]->Animate2(j, pTimer, pCamera, pPlayer);
-		}
-		else {
-			m_ppObjects[j]->Animate(pTimer, pCamera, player);
-		}
+			else if (j >= 812 && j < 992) {
+				pPlayer = reinterpret_cast<CAirplanePlayer*>(m_ppObjects[MAX_WORLD_SHADER + MAX_USER + j - 812]);
+				if (pPlayer->GetUse()) {
+					int width = ((float)pPlayer->m_hp / pPlayer->m_max_hp) * 50.0f;
+					m_ppObjects[j]->SetMesh(0, newhp[width]);
+				}
+				m_ppObjects[j]->Animate2(j, pTimer, pCamera, pPlayer);
+			}
+			else {
+				m_ppObjects[j]->Animate(pTimer, pCamera, player);
+			}
 
 
+		}
 	}
+	
 }
 
 void CObjectsShader::RotateObject(int i, float x, float y, float z) {

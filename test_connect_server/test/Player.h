@@ -154,6 +154,8 @@ public:
 
 	void Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject* otherplayer);
 
+	void Animate_Own_Height(CGameTimer pTimer, CCamera* pCamera, CGameObject* otherplayer);
+
 	float GetHeightToTerrain(CGameObject* otherplayer);
 };
 

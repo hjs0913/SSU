@@ -15,9 +15,16 @@ CPattern::~CPattern()
 
 void CPattern::set_pattern_one(int* x, int* z)
 {
-	cout << "패턴1 입력중 " << endl;
 	for (int i = 0; i < 4; i++) {
 		pattern_one[i].x = x[i];
 		pattern_one[i].z = z[i];
+	}
+}
+
+void CPattern::set_pattern_two(int* x, int* z)
+{
+	for (int i = 0; i < 3; i++) {
+		pattern_two[i].x = x[i];
+		pattern_two[i].z = z[i];
 	}
 }

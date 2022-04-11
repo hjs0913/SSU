@@ -27,4 +27,10 @@ void send_start_gaia_packet(Player* pl, int* id);
 
 void send_gaia_pattern_one_packet(Player *pl, pos* pt_pos);
 
-void send_gaia_pattern_one_active_packet(Player* pl);
+void send_gaia_pattern_two_packet(Player* pl, pos* pt_pos, int pattern_two_number);
+
+void send_gaia_pattern_five_packet(Player* pl, pos* pt_pos);
+
+void send_gaia_pattern_finish_packet(Player* pl, int pattern);
+
+void send_change_death_count_packet(Player* pl, int dc);
