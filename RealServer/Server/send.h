@@ -19,8 +19,8 @@ void send_look_packet(Player* pl, Npc* changer);
 
 void send_change_hp_packet(Player* pl, Npc* victim);
 
-
 void send_play_shoot_packet(Player* pl);
+
 void send_play_effect_packet(Player* pl, Npc* npc);
 
 void send_start_gaia_packet(Player* pl, int* id);
@@ -34,3 +34,5 @@ void send_gaia_pattern_five_packet(Player* pl, pos* pt_pos);
 void send_gaia_pattern_finish_packet(Player* pl, int pattern);
 
 void send_change_death_count_packet(Player* pl, int dc);
+
+void send_gaia_join_ok(Player* pl, int room_number);

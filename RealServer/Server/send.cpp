@@ -224,3 +224,12 @@ void send_change_death_count_packet(Player* pl, int dc)
     packet.death_count = dc;
     pl->do_send(sizeof(packet), &packet);
 }
+
+void send_gaia_join_ok(Player* pl, int room_number)
+{
+    sc_packet_gaia_join_ok packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_GAIA_JOIN_OK;
+    packet.room_number = room_number;
+    pl->do_send(sizeof(packet), &packet);
+}

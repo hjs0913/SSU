@@ -74,6 +74,8 @@ void Gaia::join_player(Player* pl)
 	pl->state_lock.lock();
 	pl->join_dungeon_room = true;
 	pl->state_lock.unlock();
+	send_gaia_join_ok(pl, dungeon_id);
+
 	// game start
 	if (player_cnt == GAIA_ROOM) {
 		// 모든 파티 인던 입장 및 게임 시작
@@ -523,6 +525,7 @@ void Gaia::pattern_active(int pattern)
 		}
 		else {
 			pattern_five_count = 0;
+			running_pattern = false;
 			for (int i = 0; i < GAIA_ROOM; i++) send_gaia_pattern_finish_packet(party[i], 4);
 		}
 

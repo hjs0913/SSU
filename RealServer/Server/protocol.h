@@ -79,6 +79,7 @@ const char SC_PACKET_CHANGE_HP = 13;
 const char SC_PACKET_COMBAT_ID = 14;
 const char SC_PACKET_PLAY_SHOOT = 15;
 const char SC_PACKET_PLAY_EFFECT = 16;
+
 const char SC_PACKET_START_GAIA = 17;
 const char SC_PACKET_GAIA_PATTERN_ONE = 18;
 const char SC_PACKET_GAIA_PATTERN_TWO = 19;
@@ -89,6 +90,7 @@ const char SC_PACKET_GAIA_PATTERN_SIX = 23;
 const char SC_PACKET_GAIA_PATTERN_SEVEN = 24;
 const char SC_PACKET_GAIA_PATTERN_FINISH = 25;
 const char SC_PACKET_CHANGE_DEATH_COUNT = 26;
+const char SC_PACKET_GAIA_JOIN_OK = 27;
 
 //---------------------------------------------------
 #pragma pack (push, 1)
@@ -326,6 +328,12 @@ struct sc_packet_change_death_count {
 	unsigned char size;
 	char type;
 	char death_count;
+};
+
+struct sc_packet_gaia_join_ok {
+	unsigned char size;
+	char type;
+	char room_number;
 };
 
 #pragma pack(pop)
