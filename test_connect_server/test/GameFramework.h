@@ -33,10 +33,11 @@ public:
 	CGameFramework();
 	~CGameFramework();
 
-	bool OnCreate(HINSTANCE hInstance, HWND hMainWnd);
+	bool OnCreate(HINSTANCE hInstance, HWND hMainWnd, HWND hPartyWnd);
 	void OnDestroy();
 
 	void CreateSwapChain();
+	void CreatePartySwapChain();
 	void CreateDirect3DDevice();
 	void CreateCommandQueueAndList();
 
@@ -103,6 +104,8 @@ private:
 
 	HINSTANCE					m_hInstance;
 	HWND						m_hWnd; 
+	HWND						m_Partyjoin_hWnd;
+
 
 	int							m_nWndClientWidth;
 	int							m_nWndClientHeight;

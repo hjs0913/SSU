@@ -105,10 +105,11 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	DWORD dwStyle = WS_OVERLAPPED | WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU | WS_BORDER;
 	AdjustWindowRect(&rc, dwStyle, FALSE);
 	HWND hMainWnd = CreateWindow(szWindowClass, szTitle, dwStyle, CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, NULL, NULL, hInstance, NULL);
+	HWND hPartyWnd = CreateWindow(szWindowClass, szTitle, dwStyle, CW_USEDEFAULT, CW_USEDEFAULT, (rc.right - rc.left)/2, (rc.bottom - rc.top)/2, NULL, NULL, hInstance, NULL);
 
 	if (!hMainWnd) return(FALSE);
 
-	gGameFramework.OnCreate(hInstance, hMainWnd);
+	gGameFramework.OnCreate(hInstance, hMainWnd, hPartyWnd);
 
 	::ShowWindow(hMainWnd, nCmdShow);
 	::UpdateWindow(hMainWnd);

@@ -76,7 +76,7 @@ void Gaia::join_player(Player* pl)
 	pl->state_lock.unlock();
 	send_gaia_join_ok(pl, dungeon_id);
 
-	// game start
+	// game start -> (파티원이 준비가 모두 되면 게임을 시작하도록 바꾸자)
 	if (player_cnt == GAIA_ROOM) {
 		// 모든 파티 인던 입장 및 게임 시작
 		player_rander_ok = 0;
@@ -129,7 +129,6 @@ void Gaia::boss_move()
 	//		값을 적용시키고 새로운 좌표를 클라이언트에게 보내주기
 	boss->set_x(mv.first);
 	boss->set_z(mv.second);
-	cout << mv.first << "," << mv.second << endl;
 	for (auto pt : party) {
 		send_move_packet(pt, boss);
 		send_look_packet(pt, boss);
@@ -159,7 +158,6 @@ void Gaia::boss_attack()
 		}
 	}
 
-	cout << "p : " << p << endl;
 	switch (p%5) {
 	case 0: {
 		running_pattern = true;

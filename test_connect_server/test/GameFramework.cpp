@@ -82,10 +82,11 @@ CGameFramework::~CGameFramework()
 {
 }
 
-bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
+bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd, HWND hPartyWnd)
 {
 	m_hInstance = hInstance;
 	m_hWnd = hMainWnd;
+	m_Partyjoin_hWnd = hPartyWnd;
 
 	CreateDirect3DDevice();
 	CreateCommandQueueAndList();
@@ -171,6 +172,76 @@ void CGameFramework::CreateSwapChain()
 	}
 
 	hResult = m_pdxgiFactory->MakeWindowAssociation(m_hWnd, DXGI_MWA_NO_ALT_ENTER);
+	m_nSwapChainBufferIndex = m_pdxgiSwapChain->GetCurrentBackBufferIndex();
+}
+
+void CGameFramework::CreatePartySwapChain()
+{
+	RECT rcClient;
+	::GetClientRect(m_Partyjoin_hWnd, &rcClient);
+	m_nWndClientWidth = rcClient.right - rcClient.left;
+	m_nWndClientHeight = rcClient.bottom - rcClient.top;
+
+#ifdef _WITH_CREATE_SWAPCHAIN_FOR_HWND
+	DXGI_SWAP_CHAIN_DESC1 dxgiSwapChainDesc;
+	::ZeroMemory(&dxgiSwapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC1));
+	dxgiSwapChainDesc.Width = m_nWndClientWidth;
+	dxgiSwapChainDesc.Height = m_nWndClientHeight;
+	dxgiSwapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	dxgiSwapChainDesc.SampleDesc.Count = (m_bMsaa4xEnable) ? 4 : 1;
+	dxgiSwapChainDesc.SampleDesc.Quality = (m_bMsaa4xEnable) ? (m_nMsaa4xQualityLevels - 1) : 0;
+	dxgiSwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	dxgiSwapChainDesc.BufferCount = m_nSwapChainBuffers;
+	dxgiSwapChainDesc.Scaling = DXGI_SCALING_NONE;
+	dxgiSwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+	dxgiSwapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
+#ifdef _WITH_ONLY_RESIZE_BACKBUFFERS
+	dxgiSwapChainDesc.Flags = 0;
+#else
+	dxgiSwapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+#endif
+
+	DXGI_SWAP_CHAIN_FULLSCREEN_DESC dxgiSwapChainFullScreenDesc;
+	::ZeroMemory(&dxgiSwapChainFullScreenDesc, sizeof(DXGI_SWAP_CHAIN_FULLSCREEN_DESC));
+	dxgiSwapChainFullScreenDesc.RefreshRate.Numerator = 60;
+	dxgiSwapChainFullScreenDesc.RefreshRate.Denominator = 1;
+	dxgiSwapChainFullScreenDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+	dxgiSwapChainFullScreenDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+	dxgiSwapChainFullScreenDesc.Windowed = TRUE;
+
+	HRESULT hResult = m_pdxgiFactory->CreateSwapChainForHwnd(m_pd3dCommandQueue, m_Partyjoin_hWnd, &dxgiSwapChainDesc, &dxgiSwapChainFullScreenDesc, NULL, (IDXGISwapChain1**)&m_pdxgiSwapChain);
+#else
+	DXGI_SWAP_CHAIN_DESC dxgiSwapChainDesc;
+	::ZeroMemory(&dxgiSwapChainDesc, sizeof(dxgiSwapChainDesc));
+	dxgiSwapChainDesc.BufferCount = m_nSwapChainBuffers;
+	dxgiSwapChainDesc.BufferDesc.Width = m_nWndClientWidth/2;
+	dxgiSwapChainDesc.BufferDesc.Height = m_nWndClientHeight/2;
+	dxgiSwapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	dxgiSwapChainDesc.BufferDesc.RefreshRate.Numerator = 60;
+	dxgiSwapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
+	dxgiSwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	dxgiSwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+	dxgiSwapChainDesc.OutputWindow = m_Partyjoin_hWnd;
+	dxgiSwapChainDesc.SampleDesc.Count = (m_bMsaa4xEnable) ? 4 : 1;
+	dxgiSwapChainDesc.SampleDesc.Quality = (m_bMsaa4xEnable) ? (m_nMsaa4xQualityLevels - 1) : 0;
+	dxgiSwapChainDesc.Windowed = TRUE;
+#ifdef _WITH_ONLY_RESIZE_BACKBUFFERS
+	dxgiSwapChainDesc.Flags = 0;
+#else
+	dxgiSwapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+#endif
+
+	HRESULT hResult = m_pdxgiFactory->CreateSwapChain(m_pd3dCommandQueue, &dxgiSwapChainDesc, (IDXGISwapChain**)&m_pdxgiSwapChain);
+#endif
+
+	if (!m_pdxgiSwapChain)
+	{
+		MessageBox(NULL, L"Swap Chain Cannot be Created.", L"Error", MB_OK);
+		::PostQuitMessage(0);
+		return;
+	}
+
+	hResult = m_pdxgiFactory->MakeWindowAssociation(m_Partyjoin_hWnd, DXGI_MWA_NO_ALT_ENTER);
 	m_nSwapChainBufferIndex = m_pdxgiSwapChain->GetCurrentBackBufferIndex();
 }
 
@@ -628,9 +699,12 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			break;
 		case VK_F10:
 			break;
-		case 0x50:	// p key
-			send_gaia_join_packet();
+		case 0x50: {// p key
+			ShowWindow(m_Partyjoin_hWnd, SW_SHOW);
+			UpdateWindow(m_Partyjoin_hWnd);
+			//send_gaia_join_packet();
 			break;
+		}
 		default:
 			break;
 		}
@@ -717,14 +791,16 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[5] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::White, D2D1::ColorF::Black);
 		m_ppUILayer[6] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
 
-		// Boss Hp Info
+		// Boss Hp Info in Dungeon
 		m_ppUILayer[7] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::White, D2D1::ColorF::Black);
 		m_ppUILayer[8] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
 
-		// Party Hp Info
+		// Party Hp Info in Dungeon
 		m_ppUILayer[9] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::White, D2D1::ColorF::Black);
 		m_ppUILayer[10] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
 		m_ppUILayer[11] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
+
+		// Party Info
 
 		m_ppUILayer[0]->setAlpha(0.5, 1.0);
 		m_ppUILayer[1]->setAlpha(0.5, 1.0);
@@ -976,17 +1052,6 @@ void CGameFramework::ProcessInput()
 			}
 			else
 				cameradis = 1.0f;
-
-		/*	static bool pushCTRL = true;
-			if (GetAsyncKeyState(VK_CONTROL) & 0x8000) {
-				if (pushCTRL) {
-					++bulletidx;
-					pushCTRL = false;
-				}
-			}
-			else {
-				pushCTRL = true;
-			}*/
 		}
 	
 		float cxDelta = 0.0f, cyDelta = 0.0f;
@@ -1067,9 +1132,6 @@ void CGameFramework::MoveToNextFrame()
 		::WaitForSingleObject(m_hFenceEvent, INFINITE);
 	}
 }
-
-//#define _WITH_PLAYER_TOP
-
 
 void CGameFramework::FrameAdvance()
 {
