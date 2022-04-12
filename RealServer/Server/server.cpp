@@ -1823,7 +1823,8 @@ void process_packet(int client_id, unsigned char* p)
                 players[taget]->set_mp(players[taget]->get_mp() + players[taget]->get_maxmp() / 10);
                 send_status_change_packet(reinterpret_cast<Player*>(players[taget]));
 
-            
+                send_buff_ui_packet(reinterpret_cast<Player*>(players[taget]), 0);
+
                 cout << "아이디 " << taget << "의 이후 mp" << players[taget]->get_mp() << endl;
 
 
@@ -1852,7 +1853,7 @@ void process_packet(int client_id, unsigned char* p)
                 players[taget]->set_physical_defence(players[taget]->get_physical_defence()  * 11 / 10);
                 players[taget]->set_magical_defence(players[taget]->get_magical_defence() * 11 / 10);
                 send_status_change_packet(reinterpret_cast<Player*>(players[taget]));
-
+                send_buff_ui_packet(reinterpret_cast<Player*>(players[taget]), 1);
                 break;
 
             }
@@ -1877,7 +1878,7 @@ void process_packet(int client_id, unsigned char* p)
                 cout << "아이디 " << taget << "의 이전 hp" << players[taget]->get_hp() << endl;
                 players[taget]->set_hp(players[taget]->get_hp() + players[taget]->get_maxhp() / 10);
                 send_status_change_packet(reinterpret_cast<Player*>(players[taget]));
-
+                send_buff_ui_packet(reinterpret_cast<Player*>(players[taget]), 2);
                 cout << "체력 회복" << endl;
                 cout << "아이디 " << taget << "의 이후 hp" << players[taget]->get_hp() << endl;
 
@@ -1886,6 +1887,7 @@ void process_packet(int client_id, unsigned char* p)
                 break;
 
             }
+
             break;
         }
         break;

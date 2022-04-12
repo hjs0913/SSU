@@ -258,7 +258,7 @@ void CScene::Rotate(int j, float x, float y, float z) {
 void CScene::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
 {
 	SetGraphicsRootSignature(pd3dCommandList);
-
+	
 	pCamera->SetViewportsAndScissorRects(pd3dCommandList);
 	pCamera->UpdateShaderVariables(pd3dCommandList);
 

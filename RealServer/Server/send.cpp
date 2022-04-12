@@ -233,3 +233,12 @@ void send_gaia_join_ok(Player* pl, int room_number)
     packet.room_number = room_number;
     pl->do_send(sizeof(packet), &packet);
 }
+void send_buff_ui_packet(Player* pl, int num)
+{
+  
+    sc_packet_buff_ui packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_BUFF_UI;
+    packet.buff_num = num;
+    pl->do_send(sizeof(packet), &packet);
+}

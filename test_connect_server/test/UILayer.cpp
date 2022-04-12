@@ -4,6 +4,8 @@
 
 using namespace std;
 
+int buff_ui_num[3] = {-1};
+
 UILayer::UILayer(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor)
 {
     m_fWidth = 0.0f;
@@ -13,6 +15,9 @@ UILayer::UILayer(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
     m_vTextBlocks.resize(1);
     Initialize(pd3dDevice, pd3dCommandQueue, LayoutColor, TextColor);
 }
+
+
+
 
 void UILayer::Initialize(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor)
 {
@@ -61,6 +66,8 @@ void UILayer::Initialize(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dComma
 
     D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(ID2D1Factory3), &d2dFactoryOptions, (void **)&m_pd2dFactory);
     HRESULT hResult = m_pd2dFactory->CreateDevice(pdxgiDevice, (ID2D1Device2 **)&m_pd2dDevice);
+
+ 
     m_pd2dDevice->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, (ID2D1DeviceContext2 **)&m_pd2dDeviceContext);
 
     m_pd2dDeviceContext->SetTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE);
@@ -82,6 +89,7 @@ void UILayer::UpdateLabels(const std::wstring& strUIText, UINT LeftTop_x, UINT L
 
 void UILayer::Render(UINT nFrame)
 {
+
     ID3D11Resource* ppResources[] = { m_vWrappedRenderTargets[nFrame] };
 
     m_pd2dDeviceContext->SetTarget(m_vd2dRenderTargets[nFrame]);
@@ -135,10 +143,13 @@ void UILayer::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT nHei
 
     for (UINT i = 0; i < GetRenderTargetsCount(); i++)
     {
+       
         D3D11_RESOURCE_FLAGS d3d11Flags = { D3D11_BIND_RENDER_TARGET };
         m_pd3d11On12Device->CreateWrappedResource(ppd3dRenderTargets[i], &d3d11Flags, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT, IID_PPV_ARGS(&m_vWrappedRenderTargets[i]));
         IDXGISurface* pdxgiSurface = NULL;
         m_vWrappedRenderTargets[i]->QueryInterface(__uuidof(IDXGISurface), (void **)&pdxgiSurface);
+
+    
         m_pd2dDeviceContext->CreateBitmapFromDxgiSurface(pdxgiSurface, &d2dBitmapProperties, &m_vd2dRenderTargets[i]);
         pdxgiSurface->Release();
     }
@@ -177,10 +188,19 @@ void UIBar::UpdateLabels(const std::wstring& strUIText, UINT LeftTop_x, UINT Lef
 {
     m_vTextBlocks[0] = { strUIText, D2D1::RectF(Basic_LeftTop_x, Basic_LeftTop_y, Basic_RightBottom_x, Basic_RightBottom_y), m_pdwTextFormat };
     Color_Bar = D2D1::RectF(LeftTop_x, LeftTop_y, RightBottom_x, RightBottom_y);
+   
+
 }
 
 void UIBar::Render(UINT nFrame)
 {
+
+    if (Setup()) {
+        m_pd2dDeviceContext->SetTarget(m_vd2dRenderTargets[nFrame]);
+    }
+   
+
+
     ID3D11Resource* ppResources[] = { m_vWrappedRenderTargets[nFrame] };
 
     m_pd2dDeviceContext->SetTarget(m_vd2dRenderTargets[nFrame]);
@@ -188,7 +208,19 @@ void UIBar::Render(UINT nFrame)
     m_pd3d11On12Device->AcquireWrappedResources(ppResources, _countof(ppResources));
 
 
+    //--추가---
     m_pd2dDeviceContext->BeginDraw();
+    if (buff_ui_num[0] == 0) {
+        m_pd2dDeviceContext->DrawBitmap(bitmap[0], buff_space2);
+    }
+    if (buff_ui_num[1] == 1) {
+        m_pd2dDeviceContext->DrawBitmap(bitmap[1], buff_space1);
+    } 
+    if (buff_ui_num[2] == 2) {
+        m_pd2dDeviceContext->DrawBitmap(bitmap[2], buff_space2);
+    }
+    //--------
+
     m_pd2dDeviceContext->FillRectangle(Behind_Bar, m_pBehindBrush);
     m_pd2dDeviceContext->DrawRectangle(Behind_Bar, m_pBehindBrush);
     m_pd2dDeviceContext->FillRectangle(Color_Bar, m_pColorBrush);
@@ -203,6 +235,11 @@ void UIBar::Render(UINT nFrame)
 
     m_pd3d11On12Device->ReleaseWrappedResources(ppResources, _countof(ppResources));
     m_pd3d11DeviceContext->Flush();
+
+
+
+
+
 }
 
 void UIBar::SetBehindBrush(D2D1::ColorF::Enum c, float a,UINT LeftTop_x, UINT LeftTop_y, UINT RightBottom_x, UINT RightBottom_y)
@@ -220,8 +257,11 @@ void UIBar::SetBehindBrush(D2D1::ColorF::Enum c, float a,UINT LeftTop_x, UINT Le
 
 void UIBar::SetColorBrush(D2D1::ColorF::Enum c, float a, UINT LeftTop_x, UINT LeftTop_y, UINT RightBottom_x, UINT RightBottom_y)
 {
+
     m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(c), (ID2D1SolidColorBrush**)&m_pColorBrush);
     m_pColorBrush->SetColor(D2D1::ColorF(c));
     m_pColorBrush->SetOpacity(a);
     Color_Bar = D2D1::RectF(LeftTop_x, LeftTop_y, RightBottom_x, RightBottom_y);
 }
+
+

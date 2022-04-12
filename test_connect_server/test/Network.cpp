@@ -527,6 +527,29 @@ void process_packet(unsigned char* p)
 		indun_death_count = reinterpret_cast<sc_packet_change_death_count*>(p)->death_count;
 		break;
 	}
+	case SC_PACKET_GAIA_JOIN_OK: {
+		break;
+	}
+	case SC_PACKET_BUFF_UI: {
+		sc_packet_buff_ui* packet = reinterpret_cast<sc_packet_buff_ui*>(p);
+		switch (packet->buff_num)
+		{
+		case 0:
+			buff_ui_num[0] = packet->buff_num;
+			break;
+		case 1:
+			buff_ui_num[1] = packet->buff_num;
+			break;
+		case 2:
+			buff_ui_num[2] = packet->buff_num;
+			break;
+		default:
+			break;
+		}
+	
+
+		break;
+	}
 	default:
 		cout << "잘못된 패킷 type : " << type << endl;
 		cout << "Process packet 오류" << endl;

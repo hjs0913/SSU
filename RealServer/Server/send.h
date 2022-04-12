@@ -36,3 +36,5 @@ void send_gaia_pattern_finish_packet(Player* pl, int pattern);
 void send_change_death_count_packet(Player* pl, int dc);
 
 void send_gaia_join_ok(Player* pl, int room_number);
+
+void send_buff_ui_packet(Player* pl, int num);

@@ -91,6 +91,8 @@ const char SC_PACKET_GAIA_PATTERN_SEVEN = 24;
 const char SC_PACKET_GAIA_PATTERN_FINISH = 25;
 const char SC_PACKET_CHANGE_DEATH_COUNT = 26;
 const char SC_PACKET_GAIA_JOIN_OK = 27;
+const char SC_PACKET_BUFF_UI = 28;
+
 
 //---------------------------------------------------
 #pragma pack (push, 1)
@@ -334,6 +336,12 @@ struct sc_packet_gaia_join_ok {
 	unsigned char size;
 	char type;
 	char room_number;
+};
+
+struct sc_packet_buff_ui {
+	unsigned char size;
+	char type;
+	int buff_num;
 };
 
 #pragma pack(pop)
