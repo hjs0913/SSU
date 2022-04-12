@@ -5,6 +5,12 @@
 using namespace std;
 
 int buff_ui_num[3] = {-1};
+clock_t start_buff_0;
+clock_t start_buff_1;
+clock_t start_buff_2;
+clock_t end_buff_0;
+clock_t end_buff_1;
+clock_t end_buff_2;
 
 UILayer::UILayer(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor)
 {
@@ -211,7 +217,8 @@ void UIBar::Render(UINT nFrame)
     //--추가---
     m_pd2dDeviceContext->BeginDraw();
     if (buff_ui_num[0] == 0) {
-        m_pd2dDeviceContext->DrawBitmap(bitmap[0], buff_space2);
+        m_pd2dDeviceContext->DrawBitmap(bitmap[0], buff_space0);
+
     }
     if (buff_ui_num[1] == 1) {
         m_pd2dDeviceContext->DrawBitmap(bitmap[1], buff_space1);
@@ -236,11 +243,16 @@ void UIBar::Render(UINT nFrame)
     m_pd3d11On12Device->ReleaseWrappedResources(ppResources, _countof(ppResources));
     m_pd3d11DeviceContext->Flush();
 
-
-
-
-
-}
+    end_buff_0 = clock();
+    end_buff_1 = clock();
+    end_buff_2 = clock();
+    if ((end_buff_0 - start_buff_0) / CLOCKS_PER_SEC >= 3)
+        buff_ui_num[0] = -1;
+    if ((end_buff_1 - start_buff_1) / CLOCKS_PER_SEC >= 10)
+        buff_ui_num[1] = -1;
+    if ((end_buff_2 - start_buff_2) / CLOCKS_PER_SEC >= 3)
+        buff_ui_num[2] = -1;
+}   
 
 void UIBar::SetBehindBrush(D2D1::ColorF::Enum c, float a,UINT LeftTop_x, UINT LeftTop_y, UINT RightBottom_x, UINT RightBottom_y)
 {

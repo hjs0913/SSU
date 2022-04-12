@@ -464,7 +464,7 @@ bool CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 					send_picking_skill_packet(2, 0, i);
 					m_ppObjects[i]->SetMesh(0, pOtherPlayerMesh[1]);  //피킹 확인위해 색상변경 
 					f4_picking_possible = false;
-					cout << i << endl;
+		
 				}
 			}
 		}
@@ -475,7 +475,7 @@ bool CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 					send_picking_skill_packet(0, 0, i);
 					m_ppObjects[i]->SetMesh(0, pOtherPlayerMesh[1]);
 					f5_picking_possible = false;
-					cout << i << endl;
+			
 				}
 			}
 		}
@@ -486,7 +486,7 @@ bool CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 					send_picking_skill_packet(1, 0, i);
 					m_ppObjects[i]->SetMesh(0, pOtherPlayerMesh[1]);
 					f6_picking_possible = false;
-					cout << i << endl;
+			
 				}
 			}
 		}

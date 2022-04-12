@@ -536,12 +536,15 @@ void process_packet(unsigned char* p)
 		{
 		case 0:
 			buff_ui_num[0] = packet->buff_num;
+			start_buff_0 = clock();
 			break;
 		case 1:
 			buff_ui_num[1] = packet->buff_num;
+			start_buff_1 = clock();
 			break;
 		case 2:
 			buff_ui_num[2] = packet->buff_num;
+			start_buff_2 = clock();
 			break;
 		default:
 			break;
