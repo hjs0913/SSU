@@ -527,6 +527,9 @@ void process_packet(unsigned char* p)
 		indun_death_count = reinterpret_cast<sc_packet_change_death_count*>(p)->death_count;
 		break;
 	}
+	case SC_PACKET_GAIA_JOIN_OK: {
+		break;
+	}
 	case SC_PACKET_BUFF_UI: {
 		sc_packet_buff_ui* packet = reinterpret_cast<sc_packet_buff_ui*>(p);
 		switch (packet->buff_num)
