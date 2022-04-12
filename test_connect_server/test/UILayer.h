@@ -9,7 +9,7 @@ using namespace D2D1;
 
 
 #define SafeRelease(p) { if(p) { (p)->Release(); (p)=NULL; } }
-
+extern int buff_ui_num[3];
 struct TextBlock
 {
     std::wstring        strText;
@@ -73,9 +73,16 @@ private:
     ID2D1SolidColorBrush* m_pColorBrush;
     ID2D1SolidColorBrush* m_pBehindBrush;
 
-    IWICImagingFactory* imagingFactory = 0;
+    IWICImagingFactory* imagingFactory[3] = {};
 
-    ID2D1Bitmap* bitmap = 0;
+    ID2D1Bitmap* bitmap[3] = {};
+
+    D2D1_RECT_F buff_space0 = { 0.0f, 90.0f, 35.0f, 125.0f };
+    D2D1_RECT_F buff_space1 = { 40.0f, 90.0f, 75.0f, 125.0f };
+    D2D1_RECT_F buff_space2 = { 80.0f, 90.0f, 115.0f, 125.0f }; 
+    int buff_space_used0 = -1;
+    int buff_space_used1 = -1;
+    int buff_space_used2 = -1;
 
 public:
     UIBar(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor);
@@ -234,25 +241,45 @@ public:
 
     {
 
-        if (FAILED(WICInit(&imagingFactory)))
+     
 
-        {
-
-            MessageBox(0, L"Imaging  Factory", 0, 0);
-
-            return false;
-
+        if (buff_ui_num[0] == 0) {
+            if (FAILED(WICInit(&imagingFactory[0])))
+            {
+                MessageBox(0, L"Imaging  Factory", 0, 0);
+                return false;
+            }
+            if (FAILED(D2DLoadBitmap(L"\Image/마나2.png", m_pd2dDeviceContext, imagingFactory[0], &bitmap[0])))
+                return false;
         }
-
-        if (FAILED(D2DLoadBitmap(L"\Image/마나2.png", m_pd2dDeviceContext, imagingFactory, &bitmap)))
-
-            return false;
+        if (buff_ui_num[1] == 1) {
+            if (FAILED(WICInit(&imagingFactory[1])))
+            {
+                MessageBox(0, L"Imaging  Factory", 0, 0);
+                return false;
+            }
+            if (FAILED(D2DLoadBitmap(L"\Image/가호.png", m_pd2dDeviceContext, imagingFactory[1], &bitmap[1])))
+                return false;
+        }
+        if (buff_ui_num[2] == 2) {
+            if (FAILED(WICInit(&imagingFactory[2])))
+            {
+                MessageBox(0, L"Imaging  Factory", 0, 0);
+                return false;
+            }
+            if (FAILED(D2DLoadBitmap(L"\Image/천사.png", m_pd2dDeviceContext, imagingFactory[2], &bitmap[2])))
+                return false;
+        }
+   
+            
+        
+         
 
         return true;
 
     }
 
-    void Display(DWORD timeDelta)
+    void Display()
 
     {
 
@@ -263,7 +290,7 @@ public:
 
         m_pd2dDeviceContext->DrawBitmap(
 
-            bitmap,
+            bitmap[0],
 
             D2D1::RectF(0.0f, 0.0f, 300.0f, 300.0f)
 
@@ -272,7 +299,7 @@ public:
 
     };
 
-    void Clean()
+   /* void Clean()
 
     {
 
@@ -283,7 +310,7 @@ public:
         SafeRelease(m_pd2dDeviceContext);
 
 
-    }
+    }*/
 
 
 };

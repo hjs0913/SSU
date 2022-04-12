@@ -150,6 +150,7 @@ private:
 	_TCHAR						m_pszFrameRate[50];
 
 	UILayer						** m_ppUILayer = NULL;	
+	
 };
 
 class cRay :public CGameFramework 

@@ -472,7 +472,26 @@ void process_packet(unsigned char* p)
 		InDungeon = true;
 		break;
 	}
+	case SC_PACKET_BUFF_UI: {
+		sc_packet_buff_ui* packet = reinterpret_cast<sc_packet_buff_ui*>(p);
+		switch (packet->buff_num)
+		{
+		case 0:
+			buff_ui_num[0] = packet->buff_num;
+			break;
+		case 1:
+			buff_ui_num[1] = packet->buff_num;
+			break;
+		case 2:
+			buff_ui_num[2] = packet->buff_num;
+			break;
+		default:
+			break;
+		}
+	
 
+		break;
+	}
 	default:
 		cout << "잘못된 패킷 type : " << type << endl;
 		cout << "Process packet 오류" << endl;

@@ -24,3 +24,5 @@ void send_play_shoot_packet(Player* pl);
 void send_play_effect_packet(Player* pl, Npc* npc);
 
 void send_start_gaia_packet(Player* pl);
+
+void send_buff_ui_packet(Player* pl, int num);

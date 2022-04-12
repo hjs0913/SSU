@@ -4,7 +4,7 @@
 
 using namespace std;
 
-
+int buff_ui_num[3] = {-1};
 
 UILayer::UILayer(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor)
 {
@@ -188,14 +188,17 @@ void UIBar::UpdateLabels(const std::wstring& strUIText, UINT LeftTop_x, UINT Lef
 {
     m_vTextBlocks[0] = { strUIText, D2D1::RectF(Basic_LeftTop_x, Basic_LeftTop_y, Basic_RightBottom_x, Basic_RightBottom_y), m_pdwTextFormat };
     Color_Bar = D2D1::RectF(LeftTop_x, LeftTop_y, RightBottom_x, RightBottom_y);
+   
+
 }
 
 void UIBar::Render(UINT nFrame)
 {
-    if (Setup()) {
-        m_pd2dDeviceContext->SetTarget(m_vd2dRenderTargets[nFrame]);  
-    }
 
+    if (Setup()) {
+        m_pd2dDeviceContext->SetTarget(m_vd2dRenderTargets[nFrame]);
+    }
+   
 
 
     ID3D11Resource* ppResources[] = { m_vWrappedRenderTargets[nFrame] };
@@ -204,10 +207,18 @@ void UIBar::Render(UINT nFrame)
 
     m_pd3d11On12Device->AcquireWrappedResources(ppResources, _countof(ppResources));
 
-    //--추가----
+
+    //--추가---
     m_pd2dDeviceContext->BeginDraw();
-    m_pd2dDeviceContext->DrawBitmap( bitmap, D2D1::RectF(0.0f, 90.0f, 35.0f, 125.0f)
-    );
+    if (buff_ui_num[0] == 0) {
+        m_pd2dDeviceContext->DrawBitmap(bitmap[0], buff_space2);
+    }
+    if (buff_ui_num[1] == 1) {
+        m_pd2dDeviceContext->DrawBitmap(bitmap[1], buff_space1);
+    } 
+    if (buff_ui_num[2] == 2) {
+        m_pd2dDeviceContext->DrawBitmap(bitmap[2], buff_space2);
+    }
     //--------
 
     m_pd2dDeviceContext->FillRectangle(Behind_Bar, m_pBehindBrush);

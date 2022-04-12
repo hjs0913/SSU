@@ -80,6 +80,8 @@ const char SC_PACKET_COMBAT_ID = 14;
 const char SC_PACKET_PLAY_SHOOT = 15;
 const char SC_PACKET_PLAY_EFFECT = 16;
 const char SC_PACKET_START_GAIA = 17;
+const char SC_PACKET_BUFF_UI = 18;
+
 
 //---------------------------------------------------
 #pragma pack (push, 1)
@@ -283,6 +285,12 @@ struct cs_packet_picking_skill {
 struct sc_packet_start_gaia {
 	unsigned char size;
 	char type;
+};
+
+struct sc_packet_buff_ui {
+	unsigned char size;
+	char type;
+	int buff_num;
 };
 
 #pragma pack(pop)
