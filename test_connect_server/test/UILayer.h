@@ -10,6 +10,13 @@ using namespace D2D1;
 
 #define SafeRelease(p) { if(p) { (p)->Release(); (p)=NULL; } }
 extern int buff_ui_num[3];
+extern clock_t start_buff_0;
+extern clock_t start_buff_1;
+extern clock_t start_buff_2;
+
+extern clock_t end_buff_0;
+extern clock_t end_buff_1;
+extern clock_t end_buff_2;
 struct TextBlock
 {
     std::wstring        strText;
@@ -262,6 +269,7 @@ public:
                 return false;
         }
         if (buff_ui_num[2] == 2) {
+    
             if (FAILED(WICInit(&imagingFactory[2])))
             {
                 MessageBox(0, L"Imaging  Factory", 0, 0);
@@ -299,18 +307,18 @@ public:
 
     };
 
-   /* void Clean()
+   void Clean()
 
     {
 
-        SafeRelease(bitmap);
+        SafeRelease(bitmap[0]);
 
-        SafeRelease(imagingFactory);
+        SafeRelease(imagingFactory[0]);
 
-        SafeRelease(m_pd2dDeviceContext);
+      //  SafeRelease(m_pd2dDeviceContext);
 
 
-    }*/
+    }
 
 
 };

@@ -519,7 +519,7 @@ bool CBulletObject::check2() {
 	
 	if (hit_check == true) {
 	
-		cout << "히또다 히또" << endl;
+		cout << "히트" << endl;
 		//hit_check = false;
 		return true;
 	}
@@ -539,7 +539,6 @@ bool CBulletObject::check(void* map) {
 bool CBulletObject::Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject* m_ppObjects, void* map) {
 	XMFLOAT3 tmp;
 	if (check2()) {  //맵에 닿으면 터짐 
-		cout << "맞자나!" << endl;
 
 		return true;
 	}
