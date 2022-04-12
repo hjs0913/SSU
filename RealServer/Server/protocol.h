@@ -7,13 +7,13 @@ enum COMP_OP {
 	OP_RECV, OP_SEND, OP_ACCEPT, OP_NPC_MOVE,
 	OP_NPC_ATTACK, OP_AUTO_PLAYER_HP, OP_PLAYER_REVIVE, OP_NPC_REVIVE,
 	OP_PLAYER_ATTACK, OP_NPC_AGRO, OP_ELEMENT_COOLTIME,
-	OP_BOSS_MOVE, OP_BOSS_ATTACK
+	OP_BOSS_MOVE, OP_BOSS_ATTACK, OP_GAIA_PATTERN
 };
 enum EVENT_TYPE {
 	EVENT_NPC_MOVE, EVENT_NPC_ATTACK, EVENT_AUTO_PLAYER_HP,
 	EVENT_PLAYER_REVIVE, EVENT_NPC_REVIVE, EVENT_PLAYER_ATTACK,
 	EVENT_SKILL_COOLTIME, EVENT_NPC_AGRO, EVENT_ELEMENT_COOLTIME,
-	EVENT_BOSS_MOVE, EVENT_BOSS_ATTACK
+	EVENT_BOSS_MOVE, EVENT_BOSS_ATTACK, EVENT_GAIA_PATTERN
 };
 enum TRIBE { HUMAN, MONSTER, AGRO, BOSS, OBSTACLE };
 enum BUF_TYPE {
@@ -79,7 +79,18 @@ const char SC_PACKET_CHANGE_HP = 13;
 const char SC_PACKET_COMBAT_ID = 14;
 const char SC_PACKET_PLAY_SHOOT = 15;
 const char SC_PACKET_PLAY_EFFECT = 16;
+
 const char SC_PACKET_START_GAIA = 17;
+const char SC_PACKET_GAIA_PATTERN_ONE = 18;
+const char SC_PACKET_GAIA_PATTERN_TWO = 19;
+const char SC_PACKET_GAIA_PATTERN_THREE = 20;
+const char SC_PACKET_GAIA_PATTERN_FOUR = 21;
+const char SC_PACKET_GAIA_PATTERN_FIVE = 22;
+const char SC_PACKET_GAIA_PATTERN_SIX = 23;
+const char SC_PACKET_GAIA_PATTERN_SEVEN = 24;
+const char SC_PACKET_GAIA_PATTERN_FINISH = 25;
+const char SC_PACKET_CHANGE_DEATH_COUNT = 26;
+const char SC_PACKET_GAIA_JOIN_OK = 27;
 
 //---------------------------------------------------
 #pragma pack (push, 1)
@@ -271,7 +282,6 @@ struct sc_packet_combat_id {
 	int id;
 };
 
-
 struct cs_packet_picking_skill {
 	unsigned char size;
 	char type;
@@ -283,6 +293,47 @@ struct cs_packet_picking_skill {
 struct sc_packet_start_gaia {
 	unsigned char size;
 	char type;
+	int party_id[GAIA_ROOM];
+};
+
+struct sc_packet_gaia_pattern_one {
+	unsigned char size;
+	char type;
+	int point_x[4];
+	int point_z[4];
+};
+
+struct sc_packet_gaia_pattern_finish {
+	unsigned char size;
+	char type;
+	char pattern;
+};
+
+struct sc_packet_gaia_pattern_two {
+	unsigned char size;
+	char type;
+	int point_x[3];
+	int point_z[3];
+	char pattern_number;
+};
+
+struct sc_packet_gaia_pattern_five {
+	unsigned char size;
+	char type;
+	int point_x;
+	int point_z;
+};
+
+struct sc_packet_change_death_count {
+	unsigned char size;
+	char type;
+	char death_count;
+};
+
+struct sc_packet_gaia_join_ok {
+	unsigned char size;
+	char type;
+	char room_number;
 };
 
 #pragma pack(pop)

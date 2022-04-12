@@ -150,6 +150,7 @@
     <ClInclude Include="DDSTextureLoader12.h" />
     <ClInclude Include="GameFramework.h" />
     <ClInclude Include="Network.h" />
+    <ClInclude Include="Pattern.h" />
     <ClInclude Include="test1.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Object.h" />
@@ -168,6 +169,7 @@
     <ClCompile Include="DDSTextureLoader12.cpp" />
     <ClCompile Include="GameFramework.cpp" />
     <ClCompile Include="Network.cpp" />
+    <ClCompile Include="Pattern.cpp" />
     <ClCompile Include="test1.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Object.cpp" />

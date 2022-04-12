@@ -141,9 +141,6 @@ void send_play_shoot_packet(Player* pl)
     sc_packet_play_shoot packet;
     packet.size = sizeof(packet);
     packet.type = SC_PACKET_PLAY_SHOOT;
-
-  
-
     pl->do_send(sizeof(packet), &packet);
 }
 
@@ -162,10 +159,77 @@ void send_play_effect_packet(Player* pl, Npc* npc )
     pl->do_send(sizeof(packet), &packet);
 }
 
-void send_start_gaia_packet(Player* pl) 
+void send_start_gaia_packet(Player* pl, int* id) 
 {
     sc_packet_start_gaia packet;
     packet.size = sizeof(packet);
     packet.type = SC_PACKET_START_GAIA;
+    for (int i = 0; i < GAIA_ROOM; i++) packet.party_id[i] = id[i];
+    pl->do_send(sizeof(packet), &packet);
+}
+
+void send_gaia_pattern_one_packet(Player* pl, pos* pt_pos)
+{
+    sc_packet_gaia_pattern_one packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_GAIA_PATTERN_ONE;
+
+    for (int i = 0; i < 4; i++) {
+        packet.point_x[i] = pt_pos[i].first;
+        packet.point_z[i] = pt_pos[i].second;
+    }
+    pl->do_send(sizeof(packet), &packet);
+}
+
+void send_gaia_pattern_two_packet(Player* pl, pos* pt_pos, int pattern_two_number)
+{
+    sc_packet_gaia_pattern_two packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_GAIA_PATTERN_TWO;
+
+    for (int i = 0; i < 3; i++) {
+        packet.point_x[i] = pt_pos[i].first;
+        packet.point_z[i] = pt_pos[i].second;
+    }
+    packet.pattern_number = pattern_two_number;
+    pl->do_send(sizeof(packet), &packet);
+}
+
+void send_gaia_pattern_five_packet(Player* pl, pos* pt_pos)
+{
+    sc_packet_gaia_pattern_five packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_GAIA_PATTERN_FIVE;
+
+    packet.point_x = pt_pos->first;
+    packet.point_z = pt_pos->second;
+    
+    pl->do_send(sizeof(packet), &packet);
+}
+
+void send_gaia_pattern_finish_packet(Player* pl, int pattern)
+{
+    sc_packet_gaia_pattern_finish packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_GAIA_PATTERN_FINISH;
+    packet.pattern = pattern;
+    pl->do_send(sizeof(packet), &packet);
+}
+
+void send_change_death_count_packet(Player* pl, int dc)
+{
+    sc_packet_change_death_count packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_CHANGE_DEATH_COUNT;
+    packet.death_count = dc;
+    pl->do_send(sizeof(packet), &packet);
+}
+
+void send_gaia_join_ok(Player* pl, int room_number)
+{
+    sc_packet_gaia_join_ok packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_GAIA_JOIN_OK;
+    packet.room_number = room_number;
     pl->do_send(sizeof(packet), &packet);
 }

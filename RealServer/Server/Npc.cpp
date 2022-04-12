@@ -355,11 +355,14 @@ pos Npc::non_a_star(int t_x, int t_z, int x, int z)
 	m_x = m_x / sum;
 	m_z = m_z / sum;
 
-	x += m_x * REAL_DISTANCE;
-	z += m_z * REAL_DISTANCE;
+	x += m_x * REAL_DISTANCE*2;
+	z += m_z * REAL_DISTANCE*2;
 
 	_look_x = m_x;
 	_look_z = m_z;
+
+	_right_x = _look_z;
+	_right_z = -_look_x;
 
 	return pos(x, z);
 }

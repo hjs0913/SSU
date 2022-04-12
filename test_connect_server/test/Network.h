@@ -11,6 +11,7 @@
 
 #include "../../RealServer/Server/protocol.h"
 #include "stdafx.h"
+#include "Pattern.h"
 
 #ifdef UNICODE
 #pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
@@ -33,7 +34,12 @@ extern wstring my_element_str;
 extern wstring Info_str;
 extern wstring Combat_str;
 extern bool Combat_On;
+
 extern bool InDungeon;
+extern int party_id[GAIA_ROOM];
+extern wstring party_name[GAIA_ROOM];
+extern CPattern m_gaiaPattern;
+extern int indun_death_count;
 
 void err_quit(const char* msg);
 
@@ -81,6 +87,8 @@ XMFLOAT3 return_myCamera();
 void get_basic_information(CPlayer* m_otherPlayer, int id);
 
 int get_hp_to_server(int id);
+
+int get_max_hp_to_server(int id);
 
 void get_player_information(CPlayer* m_otherPlayer, int id);
 
