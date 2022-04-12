@@ -954,8 +954,8 @@ CHeightMapImage::CHeightMapImage(LPCTSTR pFileName, int nWidth, int nLength, XMF
 	{
 		for (int x = 0; x < m_nWidth; x++)
 		{
-			if(!InDungeon) m_pHeightMapPixels[x + ((m_nLength - 1 - y) * m_nWidth)] = pHeightMapPixels[x + (y * m_nWidth)];
-			else m_pHeightMapPixels[x + ((m_nLength - 1 - y) * m_nWidth)] = pHeightMapPixels[x + (y * m_nWidth)]*8;
+			if (!InDungeon) m_pHeightMapPixels[x + ((m_nLength - 1 - y) * m_nWidth)] = pHeightMapPixels[x + (y * m_nWidth)];
+			else m_pHeightMapPixels[x + ((m_nLength - 1 - y) * m_nWidth)] = pHeightMapPixels[x + (y * m_nWidth)] * 8;
 		}
 	}
 

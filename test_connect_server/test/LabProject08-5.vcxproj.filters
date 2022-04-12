@@ -69,7 +69,7 @@
     <ClInclude Include="cRay.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Bitmap.h">
+    <ClInclude Include="Pattern.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -104,13 +104,16 @@
     <ClCompile Include="Shader.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
     <ClCompile Include="Network.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="UILayer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Timer.cpp">
+    <ClCompile Include="Pattern.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

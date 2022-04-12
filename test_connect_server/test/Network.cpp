@@ -33,7 +33,10 @@ WSABUF mybuf_recv;
 WSABUF mybuf;
 
 int combat_id = -1;
-
+int party_id[GAIA_ROOM];
+wstring party_name[GAIA_ROOM];
+CPattern m_gaiaPattern;
+int indun_death_count = 4;
 
 struct EXP_OVER {
 	WSAOVERLAPPED m_wsa_over;
@@ -448,7 +451,6 @@ void process_packet(unsigned char* p)
 		}
 		break;
 	}
-
 	case SC_PACKET_PLAY_SHOOT: {
 		sc_packet_play_shoot* packet = reinterpret_cast<sc_packet_play_shoot*>(p);
 		shoot = true;	
@@ -467,9 +469,62 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_START_GAIA: {
+		sc_packet_start_gaia* packet = reinterpret_cast<sc_packet_start_gaia*>(p);
 		cout << "인던으로 입장해야됨" << endl;
 		combat_id = 101;
 		InDungeon = true;
+		for (int i = 0; i < GAIA_ROOM; i++) {
+			party_id[i] = packet->party_id[i];
+
+			wchar_t* temp;
+			int len = 1 + strlen(mPlayer[party_id[i]]->m_name);
+			temp = new TCHAR[len];
+			mbstowcs(temp, mPlayer[party_id[i]]->m_name, len);
+			party_name[i] = L"";
+			party_name[i].append(temp);
+		}
+		break;
+	}
+	case SC_PACKET_GAIA_PATTERN_ONE: {
+		sc_packet_gaia_pattern_one* packet = reinterpret_cast<sc_packet_gaia_pattern_one*>(p);
+		m_gaiaPattern.pattern_on[0] = true;
+		m_gaiaPattern.set_pattern_one(packet->point_x, packet->point_z);
+		break;
+	}
+	case SC_PACKET_GAIA_PATTERN_FINISH: {
+		sc_packet_gaia_pattern_finish* packet = reinterpret_cast<sc_packet_gaia_pattern_finish*>(p);
+		m_gaiaPattern.pattern_on[packet->pattern] = false;
+		break;
+	}
+	case SC_PACKET_GAIA_PATTERN_TWO: {
+		sc_packet_gaia_pattern_two* packet = reinterpret_cast<sc_packet_gaia_pattern_two*>(p);
+		m_gaiaPattern.pattern_on[1] = true;
+		m_gaiaPattern.set_pattern_two(packet->point_x, packet->point_z);
+		switch ((int)packet->pattern_number) {
+		case 0:
+			m_gaiaPattern.pattern_two_look = XMFLOAT3(-1, 0, -1);
+			break;
+		case 1:
+			m_gaiaPattern.pattern_two_look = XMFLOAT3(1, 0, -1);
+			break;
+		case 2:
+			m_gaiaPattern.pattern_two_look = XMFLOAT3(1, 0, 1);
+			break;
+		case 3:
+			m_gaiaPattern.pattern_two_look = XMFLOAT3(-1, 0, 1);
+			break;
+		}
+		break;
+	}
+	case SC_PACKET_GAIA_PATTERN_FIVE: {
+		sc_packet_gaia_pattern_five* packet = reinterpret_cast<sc_packet_gaia_pattern_five*>(p);
+		m_gaiaPattern.pattern_on[4] = true;
+		m_gaiaPattern.pattern_five = XMFLOAT3(packet->point_x, 5, packet->point_z);
+		m_gaiaPattern.pattern_five_look = XMFLOAT3(mPlayer[101]->GetLook());
+		break;
+	}
+	case SC_PACKET_CHANGE_DEATH_COUNT: {
+		indun_death_count = reinterpret_cast<sc_packet_change_death_count*>(p)->death_count;
 		break;
 	}
 	case SC_PACKET_BUFF_UI: {
@@ -669,6 +724,11 @@ XMFLOAT3 get_look_to_server(int id)
 int get_hp_to_server(int id)
 {
 	return mPlayer[id]->m_hp;
+}
+
+int get_max_hp_to_server(int id)
+{
+	return mPlayer[id]->m_max_hp;
 }
 
 float get_combat_id_hp()

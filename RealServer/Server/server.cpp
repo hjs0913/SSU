@@ -18,22 +18,6 @@ array <Obstacle, MAX_OBSTACLE> obstacles;
 void do_npc_move(int npc_id, int target);
 void return_npc_position(int npc_id);
 
-struct timer_event {
-    int obj_id;
-    chrono::system_clock::time_point start_time;
-    EVENT_TYPE ev;
-    /*     target_id
-    스킬 관련 쿨타임의 경우 : 어떤 스킬인지 넣어줌
-    */
-    int target_id;      
-
-    constexpr bool operator < (const timer_event& _left) const
-    {
-        return (start_time > _left.start_time);
-    }
-
-};
-
 concurrency::concurrent_priority_queue<timer_event> timer_queue;
 
 void error_display(int err_no)
@@ -476,9 +460,6 @@ void physical_skill_success(int p_id, int target, float skill_factor)
 
 void attack_success(int p_id, int target, float atk_factor)
 {
-
-
-
     // 현재 물리 공격에 대해서만 생각한다
     float give_damage = players[p_id]->get_physical_attack() * atk_factor;
     float defence_damage = (players[target]->get_defence_factor() *
@@ -2420,16 +2401,17 @@ void worker()
             ev.ev = EVENT_BOSS_MOVE;
             ev.target_id = -1;
             timer_queue.push(ev);
+            delete exp_over;
             break;
         }
         case OP_BOSS_ATTACK: {
             dungeons[client_id]->boss_attack();
-            timer_event ev;
-            ev.obj_id = client_id;
-            ev.start_time = chrono::system_clock::now() + 3s;
-            ev.ev = EVENT_BOSS_ATTACK;
-            ev.target_id = -1;
-            timer_queue.push(ev);
+            delete exp_over;
+            break;
+        }
+        case OP_GAIA_PATTERN: {
+            dungeons[client_id]->pattern_active(exp_over->_target);
+            delete exp_over;
             break;
         }
         }
@@ -3055,7 +3037,9 @@ COMP_OP EVtoOP(EVENT_TYPE ev) {
     case EVENT_ELEMENT_COOLTIME:
        // return OP_ELEMENT_COOLTIME;
         break;
-
+    case EVENT_GAIA_PATTERN:
+        return OP_GAIA_PATTERN;
+        break;
     }
 
 }
@@ -3079,8 +3063,6 @@ void do_timer()
                  
                     //send_status_change_packet(reinterpret_cast<Player*>(players[temp.obj_id]));
                 }
-       
-             
                 reinterpret_cast<Player*>(players[temp.obj_id])->set_skill_active(temp.target_id, false);
             }
 
