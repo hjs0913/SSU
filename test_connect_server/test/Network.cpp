@@ -38,6 +38,8 @@ wstring party_name[GAIA_ROOM];
 CPattern m_gaiaPattern;
 int indun_death_count = 4;
 
+
+
 struct EXP_OVER {
 	WSAOVERLAPPED m_wsa_over;
 	WSABUF m_wsa_buf;
@@ -83,6 +85,16 @@ void err_quit(const char* msg)
 	MessageBox(NULL, (LPTSTR)lpMsgBuf, (LPTSTR)msg, MB_ICONERROR);
 	LocalFree(lpMsgBuf);
 	exit(1);
+}
+
+void send_login_packet(char* id, char* name)
+{
+	cs_packet_login packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_LOGIN;
+	strcpy_s(packet.id, id);
+	strcpy_s(packet.name, name);
+	do_send(sizeof(packet), &packet);
 }
 
 void send_attack_packet(int skill)
@@ -250,6 +262,7 @@ void process_packet(unsigned char* p)
 	switch (type) {
 	case SC_PACKET_LOGIN_OK: {
 		// 플레이어의 모든 정보를 보내주자
+		cout << "로그인 성공" << endl;
 		sc_packet_login_ok* packet = reinterpret_cast<sc_packet_login_ok*>(p);
 		my_id = packet->id;
 		my_position.x = packet->x;
@@ -361,6 +374,12 @@ void process_packet(unsigned char* p)
 	
 		g_msg.push_back(msg);
 
+		break;
+	}
+	case SC_PACKET_LOGIN_FAIL: {
+		cout << "로그인 실패(3초후 꺼집니다)" << endl;
+		Sleep(3000);
+		exit(0);
 		break;
 	}
 	case SC_PACKET_STATUS_CHANGE: {
@@ -674,12 +693,14 @@ int netInit()
 	for (auto& pl : mPlayer) {
 		pl = new CPlayer();
 	}
-
-	cs_packet_login packet;
-	packet.size = sizeof(packet);
-	packet.type = CS_PACKET_LOGIN;
-	strcpy_s(packet.name, "황천길");
-	do_send(sizeof(packet), &packet);
+	
+	char pl_id[MAX_NAME_SIZE];
+	char pl_name[MAX_NAME_SIZE];
+	cout << "ID를 입력하세요 : ";
+	cin >> pl_id;
+	cout << "이름을 입력하세요 : ";
+	cin >> pl_name;
+	send_login_packet(pl_id, pl_name);
 
 	do_recv();
 }

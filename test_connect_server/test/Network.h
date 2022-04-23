@@ -45,6 +45,8 @@ void err_quit(const char* msg);
 
 void err_display(const char* msg);
 
+void send_login_packet(char* id, char* name);
+
 void send_attack_packet(int skill);
 
 void send_move_packet(XMFLOAT3 position);

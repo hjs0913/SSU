@@ -5,7 +5,7 @@
 class Player : public Npc
 {
 protected:
-    int                 _login_id;
+    char                _login_id[MAX_NAME_SIZE];
     int		            _exp;
     JOB                 _job;
     atomic_bool	        _attack_active;		// NPC가 가만히 안있고 움직일때
@@ -79,9 +79,9 @@ public:
     }
 
     // --------------------------
-    void set_login_id(int login_id)
+    void set_login_id(char* login_id)
     {
-        _login_id = login_id;
+        strcpy_s(_login_id, login_id);
     }
     
     void set_attack_active(bool atk) {
@@ -97,7 +97,7 @@ public:
 
     void set_job(JOB job);
 
-    int get_login_id() {
+    char* get_login_id() {
         return _login_id;
     }
 

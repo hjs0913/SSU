@@ -105,6 +105,7 @@ const char SC_PACKET_PARTY_ROOM_INFO = 30;
 struct cs_packet_login {
 	unsigned char size;
 	char	type;
+	char	id[MAX_NAME_SIZE];
 	char	name[MAX_NAME_SIZE];
 };
 
