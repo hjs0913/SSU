@@ -2,7 +2,7 @@
 
 #define FRAME_BUFFER_WIDTH		640
 #define FRAME_BUFFER_HEIGHT		480
-#define UICOUNT 13
+#define UICOUNT 14
 
 //#include "Timer.h"
 #include "Player.h"
@@ -17,6 +17,8 @@ extern XMFLOAT3 POS_PLAYER;
 extern wstring Chatting_Str;
 extern bool Chatting_On;
 extern bool Mouse_On;
+extern bool PartyUI_On;
+
 
 extern int effect_x;
 extern int effect_y;

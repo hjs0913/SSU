@@ -195,8 +195,6 @@ void UIBar::UpdateLabels(const std::wstring& strUIText, UINT LeftTop_x, UINT Lef
 {
     m_vTextBlocks[0] = { strUIText, D2D1::RectF(Basic_LeftTop_x, Basic_LeftTop_y, Basic_RightBottom_x, Basic_RightBottom_y), m_pdwTextFormat };
     Color_Bar = D2D1::RectF(LeftTop_x, LeftTop_y, RightBottom_x, RightBottom_y);
-   
-
 }
 
 void UIBar::Render(UINT nFrame)
@@ -222,16 +220,6 @@ void UIBar::Render(UINT nFrame)
 
     m_pd3d11On12Device->ReleaseWrappedResources(ppResources, _countof(ppResources));
     m_pd3d11DeviceContext->Flush();
-
-    end_buff_0 = clock();
-    end_buff_1 = clock();
-    end_buff_2 = clock();
-    if ((end_buff_0 - start_buff_0) / CLOCKS_PER_SEC >= 3)
-        buff_ui_num[0] = -1;
-    if ((end_buff_1 - start_buff_1) / CLOCKS_PER_SEC >= 10)
-        buff_ui_num[1] = -1;
-    if ((end_buff_2 - start_buff_2) / CLOCKS_PER_SEC >= 3)
-        buff_ui_num[2] = -1;
 }   
 
 void UIBar::SetBehindBrush(D2D1::ColorF::Enum c, float a,UINT LeftTop_x, UINT LeftTop_y, UINT RightBottom_x, UINT RightBottom_y)
