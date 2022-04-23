@@ -242,3 +242,29 @@ void send_buff_ui_packet(Player* pl, int num)
     packet.buff_num = num;
     pl->do_send(sizeof(packet), &packet);
 }
+
+void send_party_room_packet(Player* pl, char* room_name, int room_id)
+{
+    sc_packet_party_room packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_PARTY_ROOM;
+    strcpy_s(packet.room_name, room_name);
+    packet.room_id = room_id;
+    pl->do_send(sizeof(packet), &packet);
+}
+
+void send_party_room_info_packet(Player* pl, Player** room_pl, int players_num, int room_id) 
+{
+    sc_packet_party_room_info packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_PARTY_ROOM_INFO;
+    packet.room_id = room_id;
+    packet.players_num = players_num;
+    strcpy_s(packet.player_name1, room_pl[0]->get_name());
+    if(players_num == 2) strcpy_s(packet.player_name2, room_pl[1]->get_name());
+    for (int i = 0; i < players_num; i++) {
+        packet.players_lv[i] = room_pl[i]->get_lv();
+        packet.players_job[i] = room_pl[i]->get_job();
+    }
+    pl->do_send(sizeof(packet), &packet);
+}

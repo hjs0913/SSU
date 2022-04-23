@@ -1892,7 +1892,49 @@ void process_packet(int client_id, unsigned char* p)
         }
         break;
     }
+    case CS_PACKET_PARTY_ROOM: {
+        // 현재 활성화 되었는 던전의 정보들을 보낸다
+        for (auto& dun : dungeons) {
+            dun->state_lock.lock();
+            if (dun->get_dun_st() == DUN_ST_ROBBY) {
+                // 던전의 정보들을 보내준다
+                dun->state_lock.unlock();
+                cout << "파티 정보를 보내줍니다" << dun->get_party_name() << endl;
+                send_party_room_packet(pl, dun->get_party_name(), dun->get_dungeon_id());
+                break;
+            }
+            dun->state_lock.unlock();
+        }
+        break;
+    }
+    case CS_PACKET_PARTY_ROOM_MAKE: {
+        cout << "방을 만들고 있습니다" << endl;
+        pl->state_lock.lock();
+        if (pl->get_state() != ST_INGAME || pl->join_dungeon_room == true) {
+            pl->state_lock.unlock();
+            break;
+        }
+        pl->state_lock.unlock();
 
+        for (auto& dun : dungeons) {
+            // join dungeon party
+            dun->state_lock.lock();
+            if (dun->get_dun_st() == DUN_ST_FREE) {
+                dun->set_dun_st(DUN_ST_ROBBY);
+                dun->state_lock.unlock();
+                // 이 방에 이 플레이어를 집어 넣는다
+                dun->set_party_name(pl->get_name());
+                dun->join_player(pl);
+                // 이 방에 대한 정보를 보내준다
+                send_party_room_packet(pl, dun->get_party_name(), dun->get_dungeon_id());
+                send_party_room_info_packet(pl, dun->get_party_palyer(), dun->player_cnt, dun->get_dungeon_id());
+                break;
+            }
+            dun->state_lock.unlock();
+        }
+        break;
+    }
+    /*
     case CS_PACKET_GAIA_JOIN: {
         // check player state
         pl->state_lock.lock();
@@ -1955,6 +1997,8 @@ void process_packet(int client_id, unsigned char* p)
         }
         break;
     }
+    */
+
     case CS_PACKET_RAID_RANDER_OK: {
         dungeons[pl->indun_id]->player_rander_ok++;
 

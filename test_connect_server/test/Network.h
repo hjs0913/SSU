@@ -61,9 +61,11 @@ void send_change_job_packet(JOB my_job);
 
 void send_change_element_packet(ELEMENT my_element);
 
-void send_gaia_join_packet();
+void send_party_room_packet();
 
 void send_raid_rander_ok_packet();
+
+void send_party_room_make();
 
 int netInit();
 

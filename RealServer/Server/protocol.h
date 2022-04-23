@@ -26,7 +26,7 @@ enum MONSTER_SPECIES {
 	FALLEN_FLOG, FALLEN_CHICKEN, FALLEN_RABBIT,
 	FALLEN_MONKEY, WOLF_BOSS, FALLEN_TIGER, RAID_GAIA
 };
-enum DUNGEON_STATE{DUN_ST_ROBBY, DUN_ST_START};
+enum DUNGEON_STATE{DUN_ST_FREE, DUN_ST_ROBBY, DUN_ST_START};
 
 
 const int BUFSIZE = 256;
@@ -60,8 +60,11 @@ const char CS_PACKET_LOOK = 7;
 const char CS_PACKET_CHANGE_JOB = 8;
 const char CS_PACKET_CHANGE_ELEMENT = 9;
 const char CS_PACKET_PICKING_SKILL = 10;
-const char CS_PACKET_GAIA_JOIN = 11;
-const char CS_PACKET_RAID_RANDER_OK = 12;
+const char CS_PACKET_PARTY_ROOM = 11;
+const char CS_PACKET_PARTY_ROOM_JOIN = 12;
+const char CS_PACKET_GAIA_START = 13;
+const char CS_PACKET_RAID_RANDER_OK = 14;
+const char CS_PACKET_PARTY_ROOM_MAKE = 15;
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -91,8 +94,11 @@ const char SC_PACKET_GAIA_PATTERN_SEVEN = 24;
 const char SC_PACKET_GAIA_PATTERN_FINISH = 25;
 const char SC_PACKET_CHANGE_DEATH_COUNT = 26;
 const char SC_PACKET_GAIA_JOIN_OK = 27;
+
 const char SC_PACKET_BUFF_UI = 28;
 
+const char SC_PACKET_PARTY_ROOM = 29;
+const char SC_PACKET_PARTY_ROOM_INFO = 30;
 
 //---------------------------------------------------
 #pragma pack (push, 1)
@@ -155,7 +161,18 @@ struct cs_packet_change_element {
 	ELEMENT element;
 };
 
-struct cs_packet_gaia_join {
+struct cs_packet_party_room {
+	unsigned char size;
+	char type;
+};
+
+struct cs_packet_party_room_join {
+	unsigned char size;
+	char type;
+	unsigned char room_number;
+};
+
+struct cs_packet_gaia_start {
 	unsigned char size;
 	char type;
 };
@@ -164,6 +181,13 @@ struct cs_packet_raid_rander_ok {
 	unsigned char size;
 	char type;
 };
+
+struct cs_packet_party_room_make {
+	unsigned char size;
+	char type;
+};
+
+//---------------------------------------------
 
 struct sc_packet_login_ok {
 	unsigned char size;
@@ -342,6 +366,26 @@ struct sc_packet_buff_ui {
 	unsigned char size;
 	char type;
 	int buff_num;
+};
+
+struct sc_packet_party_room {
+	unsigned char size;
+	char type;
+	char room_name[MAX_NAME_SIZE];
+	unsigned char room_id;
+};
+
+struct sc_packet_party_room_info {
+	unsigned char size;
+	char type;
+	unsigned char room_id;
+	unsigned char players_num;	// 몇명이 들어와있는지 보내줌
+	char player_name1[MAX_NAME_SIZE];
+	char player_name2[MAX_NAME_SIZE];
+	/*char player_name3[MAX_CHAT_SIZE];
+	char player_name4[MAX_CHAT_SIZE];*/
+	unsigned char players_lv[GAIA_ROOM];
+	unsigned char players_job[GAIA_ROOM];
 };
 
 #pragma pack(pop)

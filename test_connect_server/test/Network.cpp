@@ -170,11 +170,11 @@ void send_chat_packet(const char* send_str)
 	do_send(sizeof(packet), &packet);
 }
 
-void send_gaia_join_packet()
+void send_party_room_packet()
 {
-	cs_packet_gaia_join packet;
+	cs_packet_party_room packet;
 	packet.size = sizeof(packet);
-	packet.type = CS_PACKET_GAIA_JOIN;
+	packet.type = CS_PACKET_PARTY_ROOM;
 	do_send(sizeof(packet), &packet);
 }
 
@@ -183,6 +183,14 @@ void send_raid_rander_ok_packet()
 	cs_packet_raid_rander_ok packet;
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET_RAID_RANDER_OK;
+	do_send(sizeof(packet), &packet);
+}
+
+void send_party_room_make()
+{
+	cs_packet_party_room_make packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_PARTY_ROOM_MAKE;
 	do_send(sizeof(packet), &packet);
 }
 
@@ -551,6 +559,17 @@ void process_packet(unsigned char* p)
 		}
 	
 
+		break;
+	}
+	case SC_PACKET_PARTY_ROOM: {
+		sc_packet_party_room* packet = reinterpret_cast<sc_packet_party_room*>(p);
+		cout <<"파티 방의 번호, 이름 : " << (int)packet->room_id << "," <<  packet->room_name << endl;
+		break;
+	}
+	case SC_PACKET_PARTY_ROOM_INFO: {
+		sc_packet_party_room_info* packet = reinterpret_cast<sc_packet_party_room_info*>(p);
+		cout << "파티원의 수 : " << (int)packet->players_num << endl;
+		cout << "파티 방의 번호, 이름 : " << (int)packet->room_id << endl;
 		break;
 	}
 	default:

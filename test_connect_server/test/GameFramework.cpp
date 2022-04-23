@@ -456,7 +456,9 @@ bool CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 			POINT CursorPosInClient = m_ptOldCursorPos;
 			ScreenToClient(hWnd, &CursorPosInClient);
 			if (CursorPosInClient.y >= 360 && CursorPosInClient.y <= 400) {
-				if (CursorPosInClient.x >= 140 && CursorPosInClient.x <= 205) cout << "방만들기" << endl;
+				if (CursorPosInClient.x >= 140 && CursorPosInClient.x <= 205) {
+					send_party_room_make();
+				}
 				if (CursorPosInClient.x >= 215 && CursorPosInClient.x <= 280) cout << "방나가기" << endl;
 				if (CursorPosInClient.x >= 360 && CursorPosInClient.x <= 425) cout << "초대하기" << endl;
 				if (CursorPosInClient.x >= 435 && CursorPosInClient.x <= 500) cout << "AI넣기" << endl;
@@ -639,7 +641,7 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 		case 0x50:	// p key
 			if (InDungeon) break;
 			PartyUI_On = !PartyUI_On;
-			//send_gaia_join_packet();
+			send_party_room_packet();
 			break;
 		default:
 			break;
