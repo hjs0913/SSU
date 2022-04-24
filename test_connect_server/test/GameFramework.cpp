@@ -1208,7 +1208,8 @@ void CGameFramework::FrameAdvance()
 	Mp_str = L"";
 	string temp_str;
 	wstring* party_name_index;
-	if(robby_cnt > 0) party_name_index = new wstring[robby_cnt];
+	if (robby_cnt > 0) party_name_index = new wstring[robby_cnt];
+	else party_name_index = nullptr;
 
 	for (int i = 0; i < UICOUNT; i++) {
 		switch (i) {
@@ -1338,22 +1339,22 @@ void CGameFramework::FrameAdvance()
 		case 13: {
 			if (!PartyUI_On) break;
 			reinterpret_cast<PartyUI*>(m_ppUILayer[i])->ResizeTextBlock(robby_cnt + 4);
-			if (party_id_index_vector.size() == 0) break;
+			if (party_id_index_vector.size() != 0) {
+				int tmp = 0;
+				for (auto t : party_id_index_vector) {
+					party_name_index[tmp] = L"NO. ";
+					party_name_index[tmp].append(to_wstring(m_party[t]->get_party_id()));
+					party_name_index[tmp].append(L"\n 방제 : ");
 
-			int tmp = 0;
-			for (auto t : party_id_index_vector) {
-				party_name_index[tmp] = L"NO. ";
-				party_name_index[tmp].append(to_wstring(m_party[t]->get_party_id()));
-				party_name_index[tmp].append(L"\n 방제 : ");
-
-				// 방 제목 넣기
-				wchar_t* temp;
-				int len = 1 + strlen(m_party[t]->get_room_name());
-				temp = new TCHAR[len];
-				mbstowcs(temp, m_party[t]->get_room_name(), len);
-				party_name_index[tmp].append(temp);
-				delete temp;
-				tmp++;
+					// 방 제목 넣기
+					wchar_t* temp;
+					int len = 1 + strlen(m_party[t]->get_room_name());
+					temp = new TCHAR[len];
+					mbstowcs(temp, m_party[t]->get_room_name(), len);
+					party_name_index[tmp].append(temp);
+					delete temp;
+					tmp++;
+				}
 			}
 			reinterpret_cast<PartyUI*>(m_ppUILayer[i])->UpdateLabels(party_name_index);
 
