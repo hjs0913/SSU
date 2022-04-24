@@ -1,5 +1,6 @@
 #pragma once
 #include "UILayer.h"
+#include "stdafx.h"
 #include "../../RealServer/Server/protocol.h"
 
 class Party
@@ -26,8 +27,8 @@ public:
 	void set_room_name(char* name);
 	void set_player_name(char* name);
 
-	void get_party_id(int id);
-	void get_room_name(char* name);
+	int get_party_id();
+	char* get_room_name();
 	void get_player_name(char* name);
 };
 
@@ -48,6 +49,6 @@ public:
 	~PartyUI();
 
 	virtual void ResizeTextBlock(int size);
-	virtual void UpdateLabels(const std::wstring& strUIText, UINT LeftTop_x, UINT LeftTop_y, UINT RightBottom_x, UINT RightBottom_y);
+	virtual void UpdateLabels(const std::wstring* strUIText);
 	virtual void Render(UINT nFrame);
 };

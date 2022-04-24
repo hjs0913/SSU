@@ -461,7 +461,28 @@ bool CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 				}
 				if (CursorPosInClient.x >= 215 && CursorPosInClient.x <= 280) cout << "방나가기" << endl;
 				if (CursorPosInClient.x >= 360 && CursorPosInClient.x <= 425) cout << "초대하기" << endl;
-				if (CursorPosInClient.x >= 435 && CursorPosInClient.x <= 500) cout << "AI넣기" << endl;
+				if (CursorPosInClient.x >= 435 && CursorPosInClient.x <= 500) {
+					cout << "AI넣기" << endl;
+				}
+			}
+			else {
+				if (CursorPosInClient.x >= 120 && CursorPosInClient.x <= 300) {
+					if (CursorPosInClient.y >= 60 && CursorPosInClient.y <= 100) {
+						cout << "첫번째 인덱스" << endl;
+					}
+					if (CursorPosInClient.y >= 110 && CursorPosInClient.y <= 150) {
+						cout << "2번째 인덱스" << endl;
+					}
+					if (CursorPosInClient.y >= 160 && CursorPosInClient.y <= 200) {
+						cout << "3번째 인덱스" << endl;
+					}
+					if (CursorPosInClient.y >= 210 && CursorPosInClient.y <= 250) {
+						cout << "4번째 인덱스" << endl;
+					}
+					if (CursorPosInClient.y >= 260 && CursorPosInClient.y <= 300) {
+						cout << "5번째 인덱스" << endl;
+					}
+				}
 			}
 			break;
 		}
@@ -1186,6 +1207,9 @@ void CGameFramework::FrameAdvance()
 	Hp_str = L"";
 	Mp_str = L"";
 	string temp_str;
+	wstring* party_name_index;
+	if(robby_cnt > 0) party_name_index = new wstring[robby_cnt];
+
 	for (int i = 0; i < UICOUNT; i++) {
 		switch (i) {
 		case 0: {
@@ -1312,8 +1336,27 @@ void CGameFramework::FrameAdvance()
 			break;
 		}
 		case 13: {
+			if (!PartyUI_On) break;
 			reinterpret_cast<PartyUI*>(m_ppUILayer[i])->ResizeTextBlock(robby_cnt + 4);
-			m_ppUILayer[i]->UpdateLabels(party_name[1], 10, (m_nWndClientHeight / 2) - 30, 10 + 130 * ((float)get_hp_to_server(party_id[1]) / get_max_hp_to_server(party_id[1])), (m_nWndClientHeight / 2) - 10);
+			if (party_id_index_vector.size() == 0) break;
+
+			int tmp = 0;
+			for (auto t : party_id_index_vector) {
+				party_name_index[tmp] = L"NO. ";
+				party_name_index[tmp].append(to_wstring(m_party[t]->get_party_id()));
+				party_name_index[tmp].append(L"\n 방제 : ");
+
+				// 방 제목 넣기
+				wchar_t* temp;
+				int len = 1 + strlen(m_party[t]->get_room_name());
+				temp = new TCHAR[len];
+				mbstowcs(temp, m_party[t]->get_room_name(), len);
+				party_name_index[tmp].append(temp);
+				delete temp;
+				tmp++;
+			}
+			reinterpret_cast<PartyUI*>(m_ppUILayer[i])->UpdateLabels(party_name_index);
+
 			break;
 		}
 	}
@@ -1351,5 +1394,7 @@ void CGameFramework::FrameAdvance()
 
 	m_GameTimer.GetFrameRate(m_pszFrameRate + 12, 37);
 	::SetWindowText(m_hWnd, m_pszFrameRate);
+
+	if (robby_cnt > 0) delete []party_name_index;
 }
 

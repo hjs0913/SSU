@@ -40,6 +40,7 @@ int indun_death_count = 4;
 
 array<CPlayer*, MAX_USER+MAX_NPC> mPlayer;
 array<Party*, (MAX_USER / GAIA_ROOM)> m_party;
+vector<int> party_id_index_vector;
 Party* m_party_info;
 bool party_info_on = false;
 int  robby_cnt = 0;
@@ -589,6 +590,7 @@ void process_packet(unsigned char* p)
 		if (m_party[(int)packet->room_id]->dst != DUN_ST_ROBBY) {
 			m_party[(int)packet->room_id]->dst = DUN_ST_ROBBY;
 			robby_cnt++;
+			party_id_index_vector.push_back((int)packet->room_id);
 		}
 		break;
 	}

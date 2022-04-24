@@ -3,6 +3,7 @@
 #include <d2d1helper.h>
 #include <dwrite.h>
 #include <wincodec.h>
+#include "stdafx.h"
 #pragma comment(lib, "D2D1.lib")
 using namespace D2D1;
 

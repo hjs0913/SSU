@@ -45,6 +45,16 @@ void Party::set_player_name(char* name)
     strcpy_s(player_name[player_cnt], MAX_NAME_SIZE, name);
 }
 
+int Party::get_party_id()
+{
+    return party_id;
+}
+
+char* Party::get_room_name()
+{
+    return room_name;
+}
+
 //--------------------------------------------
 PartyUI::PartyUI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor) : UILayer(nFrame, pd3dDevice, pd3dCommandQueue, LayoutColor, TextColor)
 {
@@ -73,15 +83,15 @@ void PartyUI::ResizeTextBlock(int size)
     m_room_cnt = size;
 }
 
-void PartyUI::UpdateLabels(const std::wstring& strUIText, UINT LeftTop_x, UINT LeftTop_y, UINT RightBottom_x, UINT RightBottom_y)
+void PartyUI::UpdateLabels(const std::wstring* strUIText)
 {
     m_vTextBlocks[0] = { L"방만들기", D2D1::RectF(140, 360, 205, 400), m_pdwTextFormat };
     m_vTextBlocks[1] = { L"방나가기", D2D1::RectF(215, 360, 280, 400), m_pdwTextFormat };
     m_vTextBlocks[2] = { L"초대하기", D2D1::RectF(360, 360, 425, 400), m_pdwTextFormat};
     m_vTextBlocks[3] = { L"AI넣기", D2D1::RectF(435, 360, 500, 400), m_pdwTextFormat };
-
+   
     for (int i = 4; i < m_room_cnt; i++) {
-        m_vTextBlocks[i] = { L"AI넣기", D2D1::RectF(120, 60+30*(i-4), 300, 80 + 30 * (i - 4)), m_pdwTextFormat };
+        m_vTextBlocks[i] = { strUIText[i-4], D2D1::RectF(120, 60+50*(i-4), 300, 100 + 50 * (i - 4)), m_pdwTextFormat };
     }
 }
 

@@ -65,6 +65,7 @@ const char CS_PACKET_PARTY_ROOM_JOIN = 12;
 const char CS_PACKET_GAIA_START = 13;
 const char CS_PACKET_RAID_RANDER_OK = 14;
 const char CS_PACKET_PARTY_ROOM_MAKE = 15;
+const char CS_PACKET_PARTY_ROOM_INFO_REQUEST = 16;
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -186,6 +187,12 @@ struct cs_packet_raid_rander_ok {
 struct cs_packet_party_room_make {
 	unsigned char size;
 	char type;
+};
+
+struct cs_packet_party_room_info_request {
+	unsigned char size;
+	char type;
+	unsigned char room_id;
 };
 
 //---------------------------------------------

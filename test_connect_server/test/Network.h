@@ -46,6 +46,7 @@ extern array<Party*, (MAX_USER / GAIA_ROOM)> m_party;
 extern Party* m_party_info;
 extern bool party_info_on;
 extern int  robby_cnt;
+extern vector<int> party_id_index_vector;
 
 void err_quit(const char* msg);
 
