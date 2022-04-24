@@ -22,6 +22,9 @@
     <Filter Include="소스 파일\raid_script">
       <UniqueIdentifier>{a32c756c-b8f7-4e2a-8ead-3d1ab4f6a798}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\raid_partner">
+      <UniqueIdentifier>{7b1f7384-6a45-4dc3-b304-2fbb2c2dded1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="server.cpp">
@@ -49,6 +52,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Gaia.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Partner.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -98,6 +104,9 @@
     <ClInclude Include="Gaia.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Partner.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="lua54.lib">
@@ -125,6 +134,9 @@
     </None>
     <None Include="Raid_Gaia.lua">
       <Filter>소스 파일\raid_script</Filter>
+    </None>
+    <None Include="Raid_Partner.lua">
+      <Filter>소스 파일\raid_partner</Filter>
     </None>
   </ItemGroup>
 </Project>

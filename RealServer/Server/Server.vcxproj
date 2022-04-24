@@ -145,6 +145,7 @@
     <ClCompile Include="Gaia.cpp" />
     <ClCompile Include="Npc.cpp" />
     <ClCompile Include="Obstacle.cpp" />
+    <ClCompile Include="Partner.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="send.cpp" />
     <ClCompile Include="server.cpp" />
@@ -153,6 +154,7 @@
   <ItemGroup>
     <ClInclude Include="Gaia.h" />
     <ClInclude Include="Obstacle.h" />
+    <ClInclude Include="Partner.h" />
     <ClInclude Include="protocol.h" />
     <ClInclude Include="database.h" />
     <ClInclude Include="EXP_OVER.h" />
@@ -177,6 +179,7 @@
     <None Include="fallen_rabbit.lua" />
     <None Include="fallen_tiger.lua" />
     <None Include="Raid_Gaia.lua" />
+    <None Include="Raid_Partner.lua" />
     <None Include="wolf_boss.lua" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

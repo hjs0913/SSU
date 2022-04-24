@@ -2,6 +2,7 @@
 #include "EXP_OVER.h"
 #include "Npc.h"
 #include "SkillBuf.h"
+
 class Player : public Npc
 {
 protected:

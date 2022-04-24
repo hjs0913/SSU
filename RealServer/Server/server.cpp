@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Player.h"
 #include "Gaia.h"
+#include "Partner.h"
 #include "database.h"
 #include "send.h"
 #include <fstream>
@@ -13,6 +14,7 @@ HANDLE g_h_iocp;
 SOCKET g_s_socket;
 array <Npc*, MAX_USER + MAX_NPC> players;
 array <Gaia*, MAX_USER / GAIA_ROOM> dungeons;
+array <Partner*, MAX_USER / GAIA_ROOM> partners;
 array <Obstacle, MAX_OBSTACLE> obstacles;
 
 void do_npc_move(int npc_id, int target);
@@ -1977,6 +1979,12 @@ void process_packet(int client_id, unsigned char* p)
         }
         break;
     }
+    case CS_PACKET_PARTNER_JOIN: {
+
+
+        break;
+    }
+
     }
 }
 
@@ -2414,6 +2422,18 @@ void worker()
             delete exp_over;
             break;
         }
+        case OP_PARTNER_MOVE: {
+            partners[client_id]->partner_move();
+            timer_event ev;
+            ev.obj_id = client_id;
+            ev.start_time = chrono::system_clock::now() + 1s;
+            ev.ev = EVENT_PARTNER_MOVE;
+            ev.target_id = -1;
+            timer_queue.push(ev);
+            delete exp_over;
+            break;
+        }
+
         }
     }
 }
