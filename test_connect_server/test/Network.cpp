@@ -38,6 +38,12 @@ wstring party_name[GAIA_ROOM];
 CPattern m_gaiaPattern;
 int indun_death_count = 4;
 
+array<CPlayer*, MAX_USER+MAX_NPC> mPlayer;
+array<Party*, (MAX_USER / GAIA_ROOM)> m_party;
+Party* m_party_info;
+bool party_info_on = false;
+int  robby_cnt = 0;
+
 struct EXP_OVER {
 	WSAOVERLAPPED m_wsa_over;
 	WSABUF m_wsa_buf;
@@ -51,7 +57,7 @@ HANDLE g_h_iocp;	// 나중에 iocp바꿀 시 사용
 
 
 bool g_client_shutdown = false;
-array<CPlayer*, MAX_USER+MAX_NPC> mPlayer;
+
 
 void err_display(int err_no)
 {
@@ -83,6 +89,16 @@ void err_quit(const char* msg)
 	MessageBox(NULL, (LPTSTR)lpMsgBuf, (LPTSTR)msg, MB_ICONERROR);
 	LocalFree(lpMsgBuf);
 	exit(1);
+}
+
+void send_login_packet(char* id, char* name)
+{
+	cs_packet_login packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_LOGIN;
+	strcpy_s(packet.id, id);
+	strcpy_s(packet.name, name);
+	do_send(sizeof(packet), &packet);
 }
 
 void send_attack_packet(int skill)
@@ -129,7 +145,6 @@ void send_skill_packet(int sk_t, int sk_n)
 	packet.skill_type = sk_t;
 	packet.skill_num = sk_n;
 	do_send(sizeof(packet), &packet);
-
 }
 
 void send_picking_skill_packet(int sk_t, int sk_n, int target)
@@ -170,11 +185,11 @@ void send_chat_packet(const char* send_str)
 	do_send(sizeof(packet), &packet);
 }
 
-void send_gaia_join_packet()
+void send_party_room_packet()
 {
-	cs_packet_gaia_join packet;
+	cs_packet_party_room packet;
 	packet.size = sizeof(packet);
-	packet.type = CS_PACKET_GAIA_JOIN;
+	packet.type = CS_PACKET_PARTY_ROOM;
 	do_send(sizeof(packet), &packet);
 }
 
@@ -183,6 +198,14 @@ void send_raid_rander_ok_packet()
 	cs_packet_raid_rander_ok packet;
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET_RAID_RANDER_OK;
+	do_send(sizeof(packet), &packet);
+}
+
+void send_party_room_make()
+{
+	cs_packet_party_room_make packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_PARTY_ROOM_MAKE;
 	do_send(sizeof(packet), &packet);
 }
 
@@ -242,6 +265,7 @@ void process_packet(unsigned char* p)
 	switch (type) {
 	case SC_PACKET_LOGIN_OK: {
 		// 플레이어의 모든 정보를 보내주자
+		cout << "로그인 성공" << endl;
 		sc_packet_login_ok* packet = reinterpret_cast<sc_packet_login_ok*>(p);
 		my_id = packet->id;
 		my_position.x = packet->x;
@@ -353,6 +377,12 @@ void process_packet(unsigned char* p)
 	
 		g_msg.push_back(msg);
 
+		break;
+	}
+	case SC_PACKET_LOGIN_FAIL: {
+		cout << "로그인 실패(3초후 꺼집니다)" << endl;
+		Sleep(3000);
+		exit(0);
 		break;
 	}
 	case SC_PACKET_STATUS_CHANGE: {
@@ -553,6 +583,34 @@ void process_packet(unsigned char* p)
 
 		break;
 	}
+	case SC_PACKET_PARTY_ROOM: {
+		sc_packet_party_room* packet = reinterpret_cast<sc_packet_party_room*>(p);
+		m_party[(int)packet->room_id]->set_room_name(packet->room_name);
+		if (m_party[(int)packet->room_id]->dst != DUN_ST_ROBBY) {
+			m_party[(int)packet->room_id]->dst = DUN_ST_ROBBY;
+			robby_cnt++;
+		}
+		break;
+	}
+	case SC_PACKET_PARTY_ROOM_INFO: {
+		sc_packet_party_room_info* packet = reinterpret_cast<sc_packet_party_room_info*>(p);
+		int r_id = (int)packet->room_id;
+
+		for (int i = 0; i < packet->players_num; i++) {
+			m_party[r_id]->player_id[0] = (int)packet->players_id_in_server[0];
+			m_party[r_id]->player_lv[0] = (int)packet->players_lv[0];
+			m_party[r_id]->player_job[0] = static_cast<JOB>(packet->players_job[0]);
+		}
+
+		m_party[r_id]->player_cnt = 0;
+		m_party[r_id]->set_player_name(packet->player_name1);
+		m_party[r_id]->player_cnt++;
+		if (packet->players_num == 2) {
+			m_party[packet->room_id]->set_player_name(packet->player_name1);
+		}
+
+		break;
+	}
 	default:
 		cout << "잘못된 패킷 type : " << type << endl;
 		cout << "Process packet 오류" << endl;
@@ -655,12 +713,18 @@ int netInit()
 	for (auto& pl : mPlayer) {
 		pl = new CPlayer();
 	}
+	
+	for (int i = 0; i < (MAX_USER / GAIA_ROOM); i++) {
+		m_party[i] = new Party(i);
+	}
 
-	cs_packet_login packet;
-	packet.size = sizeof(packet);
-	packet.type = CS_PACKET_LOGIN;
-	strcpy_s(packet.name, "황천길");
-	do_send(sizeof(packet), &packet);
+	char pl_id[MAX_NAME_SIZE];
+	char pl_name[MAX_NAME_SIZE];
+	cout << "ID를 입력하세요 : ";
+	cin >> pl_id;
+	cout << "이름을 입력하세요 : ";
+	cin >> pl_name;
+	send_login_packet(pl_id, pl_name);
 
 	do_recv();
 }

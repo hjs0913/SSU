@@ -120,6 +120,9 @@ void Disconnect(int c_id)
         LeaveCriticalSection(&cs);
     }
     */
+    
+    // 이 파티원이 파티에 참가하고 있거나 레이드에 있으면 해제해주자
+
 
     players[c_id]->state_lock.lock();
     closesocket(reinterpret_cast<Player*>(players[c_id])->_socket);
@@ -755,18 +758,18 @@ void process_packet(int client_id, unsigned char* p)
         */
 
         // 중복 아이디 검사
-        /*
+        
         for (auto* p : players) {
             if (p->get_tribe() != HUMAN) break;
             if (p->get_state() == ST_FREE) continue;
             if (p->get_id() == client_id) continue;
-            if (reinterpret_cast<Player*>(p)->get_login_id() == pl->get_login_id()) {
+            if (strcmp(reinterpret_cast<Player*>(p)->get_login_id(), packet->id)==0) {
+                cout << "중복된 아이디 접속 확인" << endl;
                 send_login_fail_packet(pl, 1);   // 중복 로그인
                 Disconnect(client_id);
                 return;
             }
         }
-        */
         // 원래는 DB에서 받아와야 하는 정보를 기본 정보로 대체
         pl->set_x(2100);
         pl->set_y(0);
@@ -774,7 +777,9 @@ void process_packet(int client_id, unsigned char* p)
         pl->set_job(J_TANKER);
         pl->set_lv(25);
         pl->set_element(E_WATER);
-        pl->set_name("정의범");
+
+        pl->set_name(packet->name);
+        pl->set_login_id(packet->id);
 
         pl->indun_id - 1;
         pl->join_dungeon_room = false;
@@ -1892,7 +1897,47 @@ void process_packet(int client_id, unsigned char* p)
         }
         break;
     }
+    case CS_PACKET_PARTY_ROOM: {
+        // 현재 활성화 되었는 던전의 정보들을 보낸다
+        for (auto& dun : dungeons) {
+            dun->state_lock.lock();
+            if (dun->get_dun_st() == DUN_ST_ROBBY) {
+                // 던전의 정보들을 보내준다
+                dun->state_lock.unlock();
+                send_party_room_packet(pl, dun->get_party_name(), dun->get_dungeon_id());
+                continue;
+            }
+            dun->state_lock.unlock();
+        }
+        break;
+    }
+    case CS_PACKET_PARTY_ROOM_MAKE: {
+        pl->state_lock.lock();
+        if (pl->get_state() != ST_INGAME || pl->join_dungeon_room == true) {
+            pl->state_lock.unlock();
+            break;
+        }
+        pl->state_lock.unlock();
 
+        for (auto& dun : dungeons) {
+            // join dungeon party
+            dun->state_lock.lock();
+            if (dun->get_dun_st() == DUN_ST_FREE) {
+                dun->set_dun_st(DUN_ST_ROBBY);
+                dun->state_lock.unlock();
+                // 이 방에 이 플레이어를 집어 넣는다
+                dun->set_party_name(pl->get_name());
+                dun->join_player(pl);
+                // 이 방에 대한 정보를 보내준다
+                send_party_room_packet(pl, dun->get_party_name(), dun->get_dungeon_id());
+                send_party_room_info_packet(pl, dun->get_party_palyer(), dun->player_cnt, dun->get_dungeon_id());
+                break;
+            }
+            dun->state_lock.unlock();
+        }
+        break;
+    }
+    /*
     case CS_PACKET_GAIA_JOIN: {
         // check player state
         pl->state_lock.lock();
@@ -1955,6 +2000,8 @@ void process_packet(int client_id, unsigned char* p)
         }
         break;
     }
+    */
+
     case CS_PACKET_RAID_RANDER_OK: {
         dungeons[pl->indun_id]->player_rander_ok++;
 

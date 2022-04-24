@@ -7,8 +7,8 @@ private:
 // 기본정보
 	Player* party[GAIA_ROOM];	// 파티원 정보
 	int dungeon_id;
-	int player_cnt;
 	DUNGEON_STATE st;
+	char room_name[MAX_NAME_SIZE];
 
 	int target_id;	// agro_id (이때 id는 파티원에게 부여된 파티내 아이디(0~GAIA_ROOM)
 
@@ -32,6 +32,7 @@ private:
 
 
 public:
+	int player_cnt;
 	Npc* boss;
 	mutex state_lock;
 	int player_rander_ok;
@@ -43,7 +44,10 @@ public:
 
 	void join_player(Player* pl);
 	DUNGEON_STATE get_dun_st();
+	void set_dun_st(DUNGEON_STATE dst);
 	Player** get_party_palyer();
+	char* get_party_name();
+	void set_party_name(char* name);
 
 	void boss_move();
 	void boss_attack();

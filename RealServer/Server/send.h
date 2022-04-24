@@ -38,3 +38,7 @@ void send_change_death_count_packet(Player* pl, int dc);
 void send_gaia_join_ok(Player* pl, int room_number);
 
 void send_buff_ui_packet(Player* pl, int num);
+
+void send_party_room_packet(Player* pl, char* room_name, int room_id);
+
+void send_party_room_info_packet(Player* pl, Player** room_pl, int players_num, int room_id);

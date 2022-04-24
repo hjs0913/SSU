@@ -94,7 +94,8 @@ bool Search_Id(Player* pl, char* login_id)
 		if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
 		{
 			//strcmp(clients[array_id].name, (const char*)c_name);
-			pl->set_login_id(c_id);
+			
+			//pl->set_login_id(c_id); -> 현재 오류때문에 주석 넣음, DB처리할때는 풀어야함
 			strSize = WideCharToMultiByte(CP_ACP, 0, c_name, -1, NULL, 0, NULL, NULL);
 			WideCharToMultiByte(CP_ACP, 0, c_name, -1, pl->get_name(), strSize, 0, 0);
 			cout << pl->get_name() << endl;
@@ -147,7 +148,7 @@ bool Search_Id(Player* pl, char* login_id)
 						if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
 						{
 							//strcmp(clients[array_id].name, (const char*)c_name);
-							pl->set_login_id(c_id);
+							// pl->set_login_id(c_id); -> 현재 오류때문에 주석 넣음, DB처리할때는 풀어야함
 							strSize = WideCharToMultiByte(CP_ACP, 0, c_name, -1, NULL, 0, NULL, NULL);
 							WideCharToMultiByte(CP_ACP, 0, c_name, -1, pl->get_name(), strSize, 0, 0);
 							cout << pl->get_name() << endl;
