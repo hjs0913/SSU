@@ -233,6 +233,7 @@ void send_gaia_join_ok(Player* pl, int room_number)
     packet.room_number = room_number;
     pl->do_send(sizeof(packet), &packet);
 }
+
 void send_buff_ui_packet(Player* pl, int num)
 {
   
@@ -265,6 +266,7 @@ void send_party_room_info_packet(Player* pl, Player** room_pl, int players_num, 
     for (int i = 0; i < players_num; i++) {
         packet.players_lv[i] = room_pl[i]->get_lv();
         packet.players_job[i] = room_pl[i]->get_job();
+        packet.players_id_in_server[i] = room_pl[i]->get_id();
     }
     pl->do_send(sizeof(packet), &packet);
 }

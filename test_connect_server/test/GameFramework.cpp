@@ -1312,6 +1312,7 @@ void CGameFramework::FrameAdvance()
 			break;
 		}
 		case 13: {
+			reinterpret_cast<PartyUI*>(m_ppUILayer[i])->ResizeTextBlock(robby_cnt + 4);
 			m_ppUILayer[i]->UpdateLabels(party_name[1], 10, (m_nWndClientHeight / 2) - 30, 10 + 130 * ((float)get_hp_to_server(party_id[1]) / get_max_hp_to_server(party_id[1])), (m_nWndClientHeight / 2) - 10);
 			break;
 		}
@@ -1328,12 +1329,6 @@ void CGameFramework::FrameAdvance()
 		if (i == 13 && !PartyUI_On) continue;
 		m_ppUILayer[i]->Render(m_nSwapChainBufferIndex);
 	}
-
-
-
-
-
-
 
 #ifdef _WITH_PRESENT_PARAMETERS
 	DXGI_PRESENT_PARAMETERS dxgiPresentParameters;

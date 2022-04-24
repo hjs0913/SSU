@@ -12,6 +12,7 @@
 #include "../../RealServer/Server/protocol.h"
 #include "stdafx.h"
 #include "Pattern.h"
+#include "PartyUI.h"
 
 #ifdef UNICODE
 #pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
@@ -40,6 +41,11 @@ extern int party_id[GAIA_ROOM];
 extern wstring party_name[GAIA_ROOM];
 extern CPattern m_gaiaPattern;
 extern int indun_death_count;
+
+extern array<Party*, (MAX_USER / GAIA_ROOM)> m_party;
+extern Party* m_party_info;
+extern bool party_info_on;
+extern int  robby_cnt;
 
 void err_quit(const char* msg);
 

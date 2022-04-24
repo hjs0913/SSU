@@ -387,6 +387,7 @@ struct sc_packet_party_room_info {
 	char player_name4[MAX_CHAT_SIZE];*/
 	unsigned char players_lv[GAIA_ROOM];
 	unsigned char players_job[GAIA_ROOM];
+	int players_id_in_server[GAIA_ROOM];
 };
 
 #pragma pack(pop)

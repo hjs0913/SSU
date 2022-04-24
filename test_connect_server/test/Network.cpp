@@ -38,7 +38,11 @@ wstring party_name[GAIA_ROOM];
 CPattern m_gaiaPattern;
 int indun_death_count = 4;
 
-
+array<CPlayer*, MAX_USER+MAX_NPC> mPlayer;
+array<Party*, (MAX_USER / GAIA_ROOM)> m_party;
+Party* m_party_info;
+bool party_info_on = false;
+int  robby_cnt = 0;
 
 struct EXP_OVER {
 	WSAOVERLAPPED m_wsa_over;
@@ -53,7 +57,7 @@ HANDLE g_h_iocp;	// 나중에 iocp바꿀 시 사용
 
 
 bool g_client_shutdown = false;
-array<CPlayer*, MAX_USER+MAX_NPC> mPlayer;
+
 
 void err_display(int err_no)
 {
@@ -141,7 +145,6 @@ void send_skill_packet(int sk_t, int sk_n)
 	packet.skill_type = sk_t;
 	packet.skill_num = sk_n;
 	do_send(sizeof(packet), &packet);
-
 }
 
 void send_picking_skill_packet(int sk_t, int sk_n, int target)
@@ -582,13 +585,30 @@ void process_packet(unsigned char* p)
 	}
 	case SC_PACKET_PARTY_ROOM: {
 		sc_packet_party_room* packet = reinterpret_cast<sc_packet_party_room*>(p);
-		cout <<"파티 방의 번호, 이름 : " << (int)packet->room_id << "," <<  packet->room_name << endl;
+		m_party[(int)packet->room_id]->set_room_name(packet->room_name);
+		if (m_party[(int)packet->room_id]->dst != DUN_ST_ROBBY) {
+			m_party[(int)packet->room_id]->dst = DUN_ST_ROBBY;
+			robby_cnt++;
+		}
 		break;
 	}
 	case SC_PACKET_PARTY_ROOM_INFO: {
 		sc_packet_party_room_info* packet = reinterpret_cast<sc_packet_party_room_info*>(p);
-		cout << "파티원의 수 : " << (int)packet->players_num << endl;
-		cout << "파티 방의 번호, 이름 : " << (int)packet->room_id << endl;
+		int r_id = (int)packet->room_id;
+
+		for (int i = 0; i < packet->players_num; i++) {
+			m_party[r_id]->player_id[0] = (int)packet->players_id_in_server[0];
+			m_party[r_id]->player_lv[0] = (int)packet->players_lv[0];
+			m_party[r_id]->player_job[0] = static_cast<JOB>(packet->players_job[0]);
+		}
+
+		m_party[r_id]->player_cnt = 0;
+		m_party[r_id]->set_player_name(packet->player_name1);
+		m_party[r_id]->player_cnt++;
+		if (packet->players_num == 2) {
+			m_party[packet->room_id]->set_player_name(packet->player_name1);
+		}
+
 		break;
 	}
 	default:
@@ -694,6 +714,10 @@ int netInit()
 		pl = new CPlayer();
 	}
 	
+	for (int i = 0; i < (MAX_USER / GAIA_ROOM); i++) {
+		m_party[i] = new Party(i);
+	}
+
 	char pl_id[MAX_NAME_SIZE];
 	char pl_name[MAX_NAME_SIZE];
 	cout << "ID를 입력하세요 : ";

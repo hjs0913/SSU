@@ -8,7 +8,6 @@
 #include "Player.h"
 #include "Scene.h"
 #include "Network.h"
-#include "../../RealServer/Server/protocol.h"
 
 extern bool shoot;
 extern  XMFLOAT3 hp_pos;
