@@ -467,20 +467,20 @@ bool CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 			}
 			else {
 				if (CursorPosInClient.x >= 120 && CursorPosInClient.x <= 300) {
-					if (CursorPosInClient.y >= 60 && CursorPosInClient.y <= 100) {
-						cout << "첫번째 인덱스" << endl;
+					if (CursorPosInClient.y >= 60 && CursorPosInClient.y <= 100 && robby_cnt>=1) {
+						send_party_room_info_request(party_id_index_vector[0]);
 					}
-					if (CursorPosInClient.y >= 110 && CursorPosInClient.y <= 150) {
-						cout << "2번째 인덱스" << endl;
+					if (CursorPosInClient.y >= 110 && CursorPosInClient.y <= 150 && robby_cnt >= 2) {
+						send_party_room_info_request(party_id_index_vector[1]);
 					}
-					if (CursorPosInClient.y >= 160 && CursorPosInClient.y <= 200) {
-						cout << "3번째 인덱스" << endl;
+					if (CursorPosInClient.y >= 160 && CursorPosInClient.y <= 200 && robby_cnt >= 3) {
+						send_party_room_info_request(party_id_index_vector[2]);
 					}
-					if (CursorPosInClient.y >= 210 && CursorPosInClient.y <= 250) {
-						cout << "4번째 인덱스" << endl;
+					if (CursorPosInClient.y >= 210 && CursorPosInClient.y <= 250 && robby_cnt >= 4) {
+						send_party_room_info_request(party_id_index_vector[3]);
 					}
-					if (CursorPosInClient.y >= 260 && CursorPosInClient.y <= 300) {
-						cout << "5번째 인덱스" << endl;
+					if (CursorPosInClient.y >= 260 && CursorPosInClient.y <= 300 && robby_cnt >= 5) {
+						send_party_room_info_request(party_id_index_vector[4]);
 					}
 				}
 			}
@@ -1338,25 +1338,50 @@ void CGameFramework::FrameAdvance()
 		}
 		case 13: {
 			if (!PartyUI_On) break;
-			reinterpret_cast<PartyUI*>(m_ppUILayer[i])->ResizeTextBlock(robby_cnt + 4);
-			if (party_id_index_vector.size() != 0) {
-				int tmp = 0;
-				for (auto t : party_id_index_vector) {
-					party_name_index[tmp] = L"NO. ";
-					party_name_index[tmp].append(to_wstring(m_party[t]->get_party_id()));
-					party_name_index[tmp].append(L"\n 방제 : ");
+			if (!party_info_on) {
+				reinterpret_cast<PartyUI*>(m_ppUILayer[i])->ResizeTextBlock(robby_cnt + 4);
+				if (party_id_index_vector.size() != 0) {
+					int tmp = 0;
+					for (auto t : party_id_index_vector) {
+						party_name_index[tmp] = L"NO. ";
+						party_name_index[tmp].append(to_wstring(m_party[t]->get_party_id()));
+						party_name_index[tmp].append(L"\n 방제 : ");
 
-					// 방 제목 넣기
-					wchar_t* temp;
-					int len = 1 + strlen(m_party[t]->get_room_name());
-					temp = new TCHAR[len];
-					mbstowcs(temp, m_party[t]->get_room_name(), len);
-					party_name_index[tmp].append(temp);
-					delete temp;
-					tmp++;
+						// 방 제목 넣기
+						wchar_t* temp;
+						int len = 1 + strlen(m_party[t]->get_room_name());
+						temp = new TCHAR[len];
+						mbstowcs(temp, m_party[t]->get_room_name(), len);
+						party_name_index[tmp].append(temp);
+						delete temp;
+						tmp++;
+					}
 				}
+				reinterpret_cast<PartyUI*>(m_ppUILayer[i])->UpdateLabels(party_name_index);
 			}
-			reinterpret_cast<PartyUI*>(m_ppUILayer[i])->UpdateLabels(party_name_index);
+			else {
+				reinterpret_cast<PartyUI*>(m_ppUILayer[i])->ResizeTextBlock(robby_cnt + 4 + GAIA_ROOM);
+				if (party_id_index_vector.size() != 0) {
+					int tmp = 0;
+					for (auto t : party_id_index_vector) {
+						party_name_index[tmp] = L"NO. ";
+						party_name_index[tmp].append(to_wstring(m_party[t]->get_party_id()));
+						party_name_index[tmp].append(L"\n 방제 : ");
+
+						// 방 제목 넣기
+						wchar_t* temp;
+						int len = 1 + strlen(m_party[t]->get_room_name());
+						temp = new TCHAR[len];
+						mbstowcs(temp, m_party[t]->get_room_name(), len);
+						party_name_index[tmp].append(temp);
+						delete temp;
+						tmp++;
+					}
+				}
+				
+				// 파티에 대한 정보 출력
+				reinterpret_cast<PartyUI*>(m_ppUILayer[i])->UpdateLabels_PartyInfo(party_name_index, m_party_info);
+			}
 
 			break;
 		}

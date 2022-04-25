@@ -95,6 +95,32 @@ void PartyUI::UpdateLabels(const std::wstring* strUIText)
     }
 }
 
+void PartyUI::UpdateLabels_PartyInfo(const std::wstring* strUIText, Party* p)
+{
+    m_vTextBlocks[0] = { L"방만들기", D2D1::RectF(140, 360, 205, 400), m_pdwTextFormat };
+    m_vTextBlocks[1] = { L"방나가기", D2D1::RectF(215, 360, 280, 400), m_pdwTextFormat };
+    m_vTextBlocks[2] = { L"초대하기", D2D1::RectF(360, 360, 425, 400), m_pdwTextFormat };
+    m_vTextBlocks[3] = { L"AI넣기", D2D1::RectF(435, 360, 500, 400), m_pdwTextFormat };
+
+    for (int i = 4; i < m_room_cnt-GAIA_ROOM; i++) {
+        m_vTextBlocks[i] = { strUIText[i - 4], D2D1::RectF(120, 60 + 50 * (i - 4), 300, 100 + 50 * (i - 4)), m_pdwTextFormat };
+    }
+
+    int tmp = 0;
+    for (int i = m_room_cnt - GAIA_ROOM; i < m_room_cnt; i++) {
+        wchar_t* temp;
+        if (tmp > p->player_cnt) temp = L"";
+        else {
+            int len = 1 + strlen(p->player_name[tmp]);
+            temp = new TCHAR[len];
+            mbstowcs(temp, p->player_name[tmp], len);
+        }
+        m_vTextBlocks[i] = { temp, D2D1::RectF(320, 60 + 50 * (tmp), 520, 100 + 50 * (tmp)), m_pdwTextFormat };
+        tmp++;
+        delete temp;
+    }
+}
+
 void PartyUI::Render(UINT nFrame)
 {
     ID3D11Resource* ppResources[] = { m_vWrappedRenderTargets[nFrame] };

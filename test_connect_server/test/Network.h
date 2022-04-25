@@ -76,6 +76,8 @@ void send_raid_rander_ok_packet();
 
 void send_party_room_make();
 
+void send_party_room_info_request(int r_id);
+
 int netInit();
 
 void process_packet(unsigned char* p);

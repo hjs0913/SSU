@@ -9,10 +9,10 @@ private:
 	int		party_id;
 	char	room_name[MAX_NAME_SIZE];
 
-	char*	player_name[GAIA_ROOM];
 
 	bool	player_use[4];
 public:
+	char*	player_name[GAIA_ROOM];
 	int		player_id[GAIA_ROOM];
 	int		player_lv[GAIA_ROOM];
 	JOB		player_job[GAIA_ROOM];
@@ -50,5 +50,6 @@ public:
 
 	virtual void ResizeTextBlock(int size);
 	virtual void UpdateLabels(const std::wstring* strUIText);
+	void UpdateLabels_PartyInfo(const std::wstring* strUIText, Party* p);
 	virtual void Render(UINT nFrame);
 };

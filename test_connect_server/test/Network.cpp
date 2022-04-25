@@ -210,6 +210,15 @@ void send_party_room_make()
 	do_send(sizeof(packet), &packet);
 }
 
+void send_party_room_info_request(int r_id)
+{
+	cs_packet_party_room_info_request packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_PARTY_ROOM_INFO_REQUEST;
+	packet.room_id = m_party[r_id]->get_party_id();
+	do_send(sizeof(packet), &packet);
+}
+
 void do_send(int num_bytes, void* mess)
 {
 	EXP_OVER* ex_over = new EXP_OVER;
@@ -610,7 +619,8 @@ void process_packet(unsigned char* p)
 		if (packet->players_num == 2) {
 			m_party[packet->room_id]->set_player_name(packet->player_name1);
 		}
-
+		party_info_on = true;
+		m_party_info = m_party[r_id];
 		break;
 	}
 	default:

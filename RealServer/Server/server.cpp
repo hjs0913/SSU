@@ -2001,7 +2001,12 @@ void process_packet(int client_id, unsigned char* p)
         break;
     }
     */
-
+    case CS_PACKET_PARTY_ROOM_INFO_REQUEST: {
+        int r_id = reinterpret_cast<cs_packet_party_room_info_request*>(p)->room_id;
+        send_party_room_info_packet(pl, dungeons[r_id]->get_party_palyer(), 
+            dungeons[r_id]->player_cnt, dungeons[r_id]->get_dungeon_id());
+        break;
+    }
     case CS_PACKET_RAID_RANDER_OK: {
         dungeons[pl->indun_id]->player_rander_ok++;
 
