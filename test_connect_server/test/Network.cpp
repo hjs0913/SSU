@@ -637,8 +637,9 @@ void process_packet(unsigned char* p)
 		m_party[r_id]->set_player_name(packet->player_name1);
 		m_party[r_id]->player_cnt++;
 		if (packet->players_num == 2) {
-			m_party[packet->room_id]->set_player_name(packet->player_name2);
+			m_party[r_id]->set_player_name(packet->player_name2);
 		}
+		else m_party[r_id]->set_player_name("");
 		party_info_on = true;
 		m_party_info = m_party[r_id];
 		break;

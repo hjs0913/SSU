@@ -1938,7 +1938,7 @@ void process_packet(int client_id, unsigned char* p)
         }
         break;
     }
-    /*
+    /*  
     case CS_PACKET_GAIA_JOIN: {
         // check player state
         pl->state_lock.lock();
@@ -2061,6 +2061,8 @@ void process_packet(int client_id, unsigned char* p)
         
         // 여기에 인원이 꽉찼으면 5초후 게임을 시작하는 타이머를 돌려주자
 
+
+
         // 이 방에 대한 정보를 보내준다
         Player** party_players = dun->get_party_palyer();
         for (int i = 0; i < dun->player_cnt; i++) {
@@ -2070,7 +2072,16 @@ void process_packet(int client_id, unsigned char* p)
         break;
     }
     case CS_PACKET_PARTY_ROOM_QUIT_REQUEST: {
-        cout << "방좀 나갈꼐요 : " << (int)reinterpret_cast<cs_packet_party_room_enter_request*>(p)->room_id << endl;
+        int r_id = (int)reinterpret_cast<cs_packet_party_room_quit_request*>(p)->room_id;
+        Gaia* dun = dungeons[r_id];
+        dun->quit_palyer(pl);
+        // 나갔다는 정보를 player에게 보내준다
+        Player** party_players = dun->get_party_palyer();
+        for (int i = 0; i < dun->player_cnt; i++) {
+            send_party_room_info_packet(party_players[i], dun->get_party_palyer(), dun->player_cnt, dun->get_dungeon_id());
+        }
+        send_party_room_quit_ok_packet(pl);
+
         break;
     }
     }

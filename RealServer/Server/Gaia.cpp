@@ -15,8 +15,6 @@ Gaia::Gaia(int d_id)
 	target_id = 0;
 	start_game = false;
 
-	party_id = new int[GAIA_ROOM];
-
 	running_pattern = false;
 
 	// Boss Npc Intialize	
@@ -104,6 +102,29 @@ void Gaia::join_player(Player* pl)
 
 	//	cout << dungeon_id << "번 던전 시작합니다" << endl;
 	//}
+}
+
+void Gaia::quit_palyer(Player* pl)
+{
+	int tmp = 0;
+	for (int i = 0; i < GAIA_ROOM; i++) {
+		if (party_id[i] == pl->get_id()) tmp = i;
+	}
+
+	// 앞으로 다 땡겨오기
+	for (int i = tmp; i < GAIA_ROOM; i++) {
+		if (i == GAIA_ROOM - 1) continue;
+		party[i] = party[i + 1];
+		party_id[i] = party_id[i + 1];
+	}
+
+
+
+
+	pl->state_lock.lock();
+	pl->join_dungeon_room = false;
+	pl->state_lock.unlock();
+	player_cnt--;
 }
 
 DUNGEON_STATE Gaia::get_dun_st()
