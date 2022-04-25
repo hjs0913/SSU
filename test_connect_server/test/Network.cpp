@@ -44,6 +44,8 @@ vector<int> party_id_index_vector;
 Party* m_party_info;
 bool party_info_on = false;
 int  robby_cnt = 0;
+bool party_enter = false;
+int party_enter_room_id = -1;
 
 struct EXP_OVER {
 	WSAOVERLAPPED m_wsa_over;
@@ -216,6 +218,24 @@ void send_party_room_info_request(int r_id)
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET_PARTY_ROOM_INFO_REQUEST;
 	packet.room_id = m_party[r_id]->get_party_id();
+	do_send(sizeof(packet), &packet);
+}
+
+void send_party_room_enter_request()
+{
+	cs_packet_party_room_enter_request packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_PARTY_ROOM_ENTER_REQUEST;
+	packet.room_id = m_party_info->get_party_id();
+	do_send(sizeof(packet), &packet);
+}
+
+void send_party_room_quit_request()
+{
+	cs_packet_party_room_quit_request packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_PARTY_ROOM_QUIT_REQUEST;
+	packet.room_id = party_enter_room_id;
 	do_send(sizeof(packet), &packet);
 }
 
@@ -617,10 +637,24 @@ void process_packet(unsigned char* p)
 		m_party[r_id]->set_player_name(packet->player_name1);
 		m_party[r_id]->player_cnt++;
 		if (packet->players_num == 2) {
-			m_party[packet->room_id]->set_player_name(packet->player_name1);
+			m_party[packet->room_id]->set_player_name(packet->player_name2);
 		}
 		party_info_on = true;
 		m_party_info = m_party[r_id];
+		break;
+	}
+	case SC_PACKET_PARTY_ROOM_ENTER_OK: {
+		party_enter = true;
+		party_enter_room_id = reinterpret_cast<sc_packet_party_room_enter_ok*>(p)->room_id;
+		break;
+	}
+	case SC_PACKET_PARTY_ROOM_ENTER_FAILED: {
+		party_enter = false;
+		break;
+	}
+	case SC_PACKET_PARTY_ROOM_QUIT_OK: {
+		party_enter = false;
+		party_info_on = false;
 		break;
 	}
 	default:

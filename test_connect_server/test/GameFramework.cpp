@@ -459,7 +459,11 @@ bool CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 				if (CursorPosInClient.x >= 140 && CursorPosInClient.x <= 205) {
 					send_party_room_make();
 				}
-				if (CursorPosInClient.x >= 215 && CursorPosInClient.x <= 280) cout << "방나가기" << endl;
+				if (CursorPosInClient.x >= 215 && CursorPosInClient.x <= 280) {
+					if (!party_info_on) break;
+					if (party_enter == false) send_party_room_enter_request();
+					else send_party_room_quit_request();
+				}
 				if (CursorPosInClient.x >= 360 && CursorPosInClient.x <= 425) cout << "초대하기" << endl;
 				if (CursorPosInClient.x >= 435 && CursorPosInClient.x <= 500) {
 					cout << "AI넣기" << endl;
@@ -662,7 +666,7 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 		case 0x50:	// p key
 			if (InDungeon) break;
 			PartyUI_On = !PartyUI_On;
-			send_party_room_packet();
+			if(PartyUI_On) send_party_room_packet();
 			break;
 		default:
 			break;
@@ -1380,7 +1384,7 @@ void CGameFramework::FrameAdvance()
 				}
 				
 				// 파티에 대한 정보 출력
-				reinterpret_cast<PartyUI*>(m_ppUILayer[i])->UpdateLabels_PartyInfo(party_name_index, m_party_info);
+				reinterpret_cast<PartyUI*>(m_ppUILayer[i])->UpdateLabels_PartyInfo(party_name_index, m_party_info, party_enter);
 			}
 
 			break;

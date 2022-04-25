@@ -66,6 +66,8 @@ const char CS_PACKET_GAIA_START = 13;
 const char CS_PACKET_RAID_RANDER_OK = 14;
 const char CS_PACKET_PARTY_ROOM_MAKE = 15;
 const char CS_PACKET_PARTY_ROOM_INFO_REQUEST = 16;
+const char CS_PACKET_PARTY_ROOM_ENTER_REQUEST = 17;
+const char CS_PACKET_PARTY_ROOM_QUIT_REQUEST = 18;
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -100,6 +102,10 @@ const char SC_PACKET_BUFF_UI = 28;
 
 const char SC_PACKET_PARTY_ROOM = 29;
 const char SC_PACKET_PARTY_ROOM_INFO = 30;
+const char SC_PACKET_PARTY_ROOM_ENTER_OK = 31;
+const char SC_PACKET_PARTY_ROOM_ENTER_FAILED = 32;
+const char SC_PACKET_PARTY_ROOM_QUIT_OK = 33;
+
 
 //---------------------------------------------------
 #pragma pack (push, 1)
@@ -190,6 +196,18 @@ struct cs_packet_party_room_make {
 };
 
 struct cs_packet_party_room_info_request {
+	unsigned char size;
+	char type;
+	unsigned char room_id;
+};
+
+struct cs_packet_party_room_enter_request {
+	unsigned char size;
+	char type;
+	unsigned char room_id;
+};
+
+struct cs_packet_party_room_quit_request {
 	unsigned char size;
 	char type;
 	unsigned char room_id;
@@ -395,6 +413,24 @@ struct sc_packet_party_room_info {
 	unsigned char players_lv[GAIA_ROOM];
 	unsigned char players_job[GAIA_ROOM];
 	int players_id_in_server[GAIA_ROOM];
+};
+
+struct sc_packet_party_room_enter_ok {
+	unsigned char size;
+	char type;
+	unsigned char room_id;
+};
+
+struct sc_packet_party_room_enter_failed {
+	unsigned char size;
+	char type;
+	unsigned char room_id;
+	unsigned char failed_reason;	// 0 : 인원이 꽉참, 1 : 없는 방, 2: 플레이어가 어느 방에 들어가있음
+};
+
+struct sc_packet_party_room_quit_ok {
+	unsigned char size;
+	char type;
 };
 
 #pragma pack(pop)

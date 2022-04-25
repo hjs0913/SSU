@@ -74,6 +74,7 @@ void Gaia::join_player(Player* pl)
 	pl->state_lock.lock();
 	pl->join_dungeon_room = true;
 	pl->state_lock.unlock();
+
 	//send_gaia_join_ok(pl, dungeon_id);
 
 	// game start

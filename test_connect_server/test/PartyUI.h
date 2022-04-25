@@ -50,6 +50,6 @@ public:
 
 	virtual void ResizeTextBlock(int size);
 	virtual void UpdateLabels(const std::wstring* strUIText);
-	void UpdateLabels_PartyInfo(const std::wstring* strUIText, Party* p);
+	void UpdateLabels_PartyInfo(const std::wstring* strUIText, Party* p, bool party_enter);
 	virtual void Render(UINT nFrame);
 };

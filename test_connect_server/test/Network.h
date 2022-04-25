@@ -48,6 +48,10 @@ extern bool party_info_on;
 extern int  robby_cnt;
 extern vector<int> party_id_index_vector;
 
+extern bool party_enter;
+extern int party_enter_room_id;
+
+
 void err_quit(const char* msg);
 
 void err_display(const char* msg);
@@ -77,6 +81,10 @@ void send_raid_rander_ok_packet();
 void send_party_room_make();
 
 void send_party_room_info_request(int r_id);
+
+void send_party_room_enter_request();
+
+void send_party_room_quit_request();
 
 int netInit();
 

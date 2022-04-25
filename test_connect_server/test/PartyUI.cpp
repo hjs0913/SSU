@@ -7,6 +7,7 @@ Party::Party()
     dst = DUN_ST_FREE;
     for (int i = 0; i < GAIA_ROOM; i++) {
         player_name[i] = new char[MAX_NAME_SIZE];
+        strcpy_s(player_name[i], MAX_NAME_SIZE, "");
         player_id[i] = -1;
         player_use[i] = false;
     }
@@ -86,7 +87,7 @@ void PartyUI::ResizeTextBlock(int size)
 void PartyUI::UpdateLabels(const std::wstring* strUIText)
 {
     m_vTextBlocks[0] = { L"방만들기", D2D1::RectF(140, 360, 205, 400), m_pdwTextFormat };
-    m_vTextBlocks[1] = { L"방나가기", D2D1::RectF(215, 360, 280, 400), m_pdwTextFormat };
+    m_vTextBlocks[1] = { L"방들어가기", D2D1::RectF(215, 360, 280, 400), m_pdwTextFormat };
     m_vTextBlocks[2] = { L"초대하기", D2D1::RectF(360, 360, 425, 400), m_pdwTextFormat};
     m_vTextBlocks[3] = { L"AI넣기", D2D1::RectF(435, 360, 500, 400), m_pdwTextFormat };
    
@@ -95,10 +96,11 @@ void PartyUI::UpdateLabels(const std::wstring* strUIText)
     }
 }
 
-void PartyUI::UpdateLabels_PartyInfo(const std::wstring* strUIText, Party* p)
+void PartyUI::UpdateLabels_PartyInfo(const std::wstring* strUIText, Party* p, bool party_enter)
 {
     m_vTextBlocks[0] = { L"방만들기", D2D1::RectF(140, 360, 205, 400), m_pdwTextFormat };
-    m_vTextBlocks[1] = { L"방나가기", D2D1::RectF(215, 360, 280, 400), m_pdwTextFormat };
+    if(party_enter) m_vTextBlocks[1] = { L"방나가기", D2D1::RectF(215, 360, 280, 400), m_pdwTextFormat };
+    else m_vTextBlocks[1] = { L"방들어가기", D2D1::RectF(215, 360, 280, 400), m_pdwTextFormat };
     m_vTextBlocks[2] = { L"초대하기", D2D1::RectF(360, 360, 425, 400), m_pdwTextFormat };
     m_vTextBlocks[3] = { L"AI넣기", D2D1::RectF(435, 360, 500, 400), m_pdwTextFormat };
 
@@ -109,7 +111,7 @@ void PartyUI::UpdateLabels_PartyInfo(const std::wstring* strUIText, Party* p)
     int tmp = 0;
     for (int i = m_room_cnt - GAIA_ROOM; i < m_room_cnt; i++) {
         wchar_t* temp;
-        if (tmp > p->player_cnt) temp = L"";
+        if (tmp > p->player_cnt) temp = L" ";
         else {
             int len = 1 + strlen(p->player_name[tmp]);
             temp = new TCHAR[len];

@@ -42,3 +42,9 @@ void send_buff_ui_packet(Player* pl, int num);
 void send_party_room_packet(Player* pl, char* room_name, int room_id);
 
 void send_party_room_info_packet(Player* pl, Player** room_pl, int players_num, int room_id);
+
+void send_party_room_enter_ok_packet(Player* pl, int room_id);
+
+void send_party_room_enter_failed_packet(Player* pl, int room_id, int failed_reason);
+
+void send_party_room_quit_ok_packet(Player* pl);
