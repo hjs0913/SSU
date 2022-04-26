@@ -159,6 +159,133 @@ void Gaia::set_party_name(char* name)
 }
 
 
+void Gaia::partner_move(int p_id)
+{
+	if (party[p_id]->get_tribe() != PARTNER) return;
+
+	if ((boss->get_x() >= party[p_id]->get_x() - 8 && boss->get_x() <= boss->get_x() + 8) &&
+		(boss->get_z() >= party[p_id]->get_z() - 8 && boss->get_z() <= boss->get_z() + 8)) return;
+
+	pos mv = party[p_id]->non_a_star(boss->get_x(), boss->get_z(), party[p_id]->get_x(), party[p_id]->get_z());
+	// send boss position
+	//if(mv == 밖으로 떨어지지 않는가) 
+	//		값을 적용시키고 새로운 좌표를 클라이언트에게 보내주기
+	party[p_id]->set_x(mv.first);
+	party[p_id]->set_z(mv.second);
+	cout << mv.first << "," << mv.second << endl;
+	for (auto pt : party) {
+		send_move_packet(pt, party[p_id]);
+		send_look_packet(pt, party[p_id]);
+	}
+
+}
+
+void Gaia::partner_attack(int p_id)  //일반공격 기본, 스킬을 쿨타임 돌때마다 계속 쓰도록 하자 
+{
+	random_device rd;
+	mt19937 gen(rd());
+	uniform_int_distribution<int> pattern(0, 99);
+	timer_event ev;
+
+	int p = pattern(gen);
+	int _id = party[p_id]->get_id();
+	
+	cout << "p : " << p << endl;
+
+	switch (p % 3) { // 늘릴수록 늘리자
+	case 0: {
+		
+		cout << "최후의 일격 !!!" << endl;
+		party[p_id]->set_mp(party[p_id]->get_mp() - 1000);
+
+		if ((boss->get_x() >= party[p_id]->get_x() - 10 && boss->get_x() <= party[p_id]->get_x() + 10) && (boss->get_z() >= party[p_id]->get_z() - 10 && boss->get_z() <= party[p_id]->get_z() + 10)) {
+			party[p_id]->set_skill_factor(0, 0);  
+			
+			float give_damage = party[p_id]->get_physical_attack() * party[p_id]->get_skill_factor(0, 0);
+			boss->set_hp(boss->get_hp() - give_damage);
+
+			for (auto send_pl : party) {
+				send_change_hp_packet(send_pl, boss);
+			}
+
+			ev.obj_id = _id;
+			ev.start_time = chrono::system_clock::now() + 10s;
+			ev.ev = EVENT_PARTNER_PATTERN;
+			ev.target_id = 0;
+			timer_queue.push(ev);
+
+			//
+			ev.obj_id = _id;
+			ev.start_time = chrono::system_clock::now() + 5s;
+			ev.ev = EVENT_PARTNER_ATTACK;
+			ev.target_id = -1;
+			timer_queue.push(ev);
+			break;
+		}
+
+		break;
+	}
+	case 1: {
+	
+		pos a = { party[p_id]->get_x(), party[p_id]->get_z() };    //플레이어 기준 전방 삼각형 범위 
+		pos b = { party[p_id]->get_x() - party[p_id]->get_right_x() * 40 + party[p_id]->get_look_x() * 100,
+			party[p_id]->get_z() - party[p_id]->get_right_z() * 40 + party[p_id]->get_look_z() * 100 };  // 왼쪽 위
+		pos c = { party[p_id]->get_x() + party[p_id]->get_right_x() * 40 + party[p_id]->get_look_x() * 100,
+			party[p_id]->get_z() + party[p_id]->get_right_z() * 40 + party[p_id]->get_look_z() * 100 };  // 오른쪽 위
+
+		cout << "광야 일격 !!!" << endl;
+		party[p_id]->set_mp(pl->get_mp() - 1000);
+
+		pos n = { boss->get_x(),boss->get_z() };
+
+
+		if (isInsideTriangle(a, b, c, n)) {
+			cout << "맞았다 : " << n.x << ", " << n.z << endl;
+			party[p_id]->set_skill_factor(1, 0);
+			float give_damage = party[p_id]->get_magical_attack() * party[p_id]->get_skill_factor(1, 0);
+			boss->set_hp(boss->get_hp() - give_damage);
+
+			for (auto send_pl : party) {
+				send_change_hp_packet(send_pl, boss);
+			}
+			timer_event ev;
+			ev.obj_id = p_id;
+			ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
+			ev.ev = EVENT__PARTNER_ATTACK;
+			ev.target_id = 1;
+			timer_queue.push(ev);
+
+		}
+
+
+		break;
+	}
+	case 2: {
+
+		cout << "아레스의 가호 !!!" << endl;
+		party[p_id]->set_mp(party[p_id]->get_mp() - 1000);
+
+		party[p_id]->set_physical_attack(0.6 * party[p_id]->get_lv() * party[p_id]->get_lv() + 10 * party[p_id]->get_lv()); //일단 두배 
+		party[p_id]->set_magical_attack(0.2 * party[p_id]->get_lv() * party[p_id]->get_lv() + 5 * party[p_id]->get_lv());
+		//send_status_change_packet(pl);
+
+		timer_event ev;
+		ev.obj_id = p_id;
+		ev.start_time = chrono::system_clock::now() + 10s;  //쿨타임
+		ev.ev = EVENT_PARTNER_ATTACK;
+		ev.target_id = 2;
+		timer_queue.push(ev);
+
+
+		break;
+	}
+	
+	default:
+		cout << "패턴 에러" << endl;
+		break;
+	}
+	
+}
 void Gaia::boss_move()
 {
 	// Raid Map은 장애물이 없으므로 A_star는 낭비다

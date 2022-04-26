@@ -86,7 +86,9 @@ void send_party_room_enter_request();
 
 void send_party_room_quit_request();
 
-void send_party_invite(char* user);
+void send_party_invite(char* user); 
+
+void send_party_add_partner();
 
 int netInit();
 

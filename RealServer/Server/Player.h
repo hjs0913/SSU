@@ -26,6 +26,7 @@ public:
     bool                superposition;
     bool                join_dungeon_room;
     int                 indun_id;
+
 public:
     Player(int id);
 
@@ -122,4 +123,7 @@ public:
     void set_Pmp(int mp);
     int get_Pmaxmp();
     void set_Pmaxmp(int mp);
+
+
+ 
 };

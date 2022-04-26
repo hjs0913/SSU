@@ -49,6 +49,7 @@ public:
 
 	DUNGEON_STATE get_dun_st();
 	void set_dun_st(DUNGEON_STATE dst);
+	
 	Player** get_party_palyer();
 	char* get_party_name();
 	void set_party_name(char* name);
@@ -67,5 +68,8 @@ public:
 	void judge_pattern_two_leftup(Player* p);
 
 	void player_death(Player* p);
+
+	void partner_move(int p_id);
+	void partner_attack(int p_id);
 };
 
