@@ -71,5 +71,7 @@ public:
 
 	void partner_move(int p_id);
 	void partner_attack(int p_id);
+
+	
 };
 

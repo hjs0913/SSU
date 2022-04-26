@@ -259,6 +259,14 @@ void send_party_add_partner()
 	packet.room_id = party_enter_room_id;
 	do_send(sizeof(packet), &packet);
 }
+void send_partner_rander_ok_packet()
+{
+	cs_packet_partner_rander_ok packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_PARTNER_RANDER_OK;
+	do_send(sizeof(packet), &packet);
+}
+
 
 void do_send(int num_bytes, void* mess)
 {

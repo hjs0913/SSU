@@ -192,15 +192,14 @@ void Gaia::partner_attack(int p_id)  //ÀÏ¹Ý°ø°Ý ±âº», ½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °è¼
 	
 	cout << "p : " << p << endl;
 
-	switch (p % 3) { // ´Ã¸±¼ö·Ï ´Ã¸®ÀÚ
+	switch (p % 4) { // ´Ã¸±¼ö·Ï ´Ã¸®ÀÚ
 	case 0: {
-		
 		cout << "ÃÖÈÄÀÇ ÀÏ°Ý !!!" << endl;
 		party[p_id]->set_mp(party[p_id]->get_mp() - 1000);
 
 		if ((boss->get_x() >= party[p_id]->get_x() - 10 && boss->get_x() <= party[p_id]->get_x() + 10) && (boss->get_z() >= party[p_id]->get_z() - 10 && boss->get_z() <= party[p_id]->get_z() + 10)) {
-			party[p_id]->set_skill_factor(0, 0);  
-			
+			party[p_id]->set_skill_factor(0, 0);
+
 			float give_damage = party[p_id]->get_physical_attack() * party[p_id]->get_skill_factor(0, 0);
 			boss->set_hp(boss->get_hp() - give_damage);
 
@@ -226,7 +225,6 @@ void Gaia::partner_attack(int p_id)  //ÀÏ¹Ý°ø°Ý ±âº», ½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °è¼
 		break;
 	}
 	case 1: {
-	
 		pos a = { party[p_id]->get_x(), party[p_id]->get_z() };    //ÇÃ·¹ÀÌ¾î ±âÁØ Àü¹æ »ï°¢Çü ¹üÀ§ 
 		pos b = { party[p_id]->get_x() - party[p_id]->get_right_x() * 40 + party[p_id]->get_look_x() * 100,
 			party[p_id]->get_z() - party[p_id]->get_right_z() * 40 + party[p_id]->get_look_z() * 100 };  // ¿ÞÂÊ À§
@@ -234,13 +232,13 @@ void Gaia::partner_attack(int p_id)  //ÀÏ¹Ý°ø°Ý ±âº», ½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °è¼
 			party[p_id]->get_z() + party[p_id]->get_right_z() * 40 + party[p_id]->get_look_z() * 100 };  // ¿À¸¥ÂÊ À§
 
 		cout << "±¤¾ß ÀÏ°Ý !!!" << endl;
-		party[p_id]->set_mp(pl->get_mp() - 1000);
+		party[p_id]->set_mp(party[p_id]->get_mp() - 1000);
 
 		pos n = { boss->get_x(),boss->get_z() };
 
 
 		if (isInsideTriangle(a, b, c, n)) {
-			cout << "¸Â¾Ò´Ù : " << n.x << ", " << n.z << endl;
+			cout << "¸Â¾Ò´Ù : " << n.first << ", " << n.second << endl;
 			party[p_id]->set_skill_factor(1, 0);
 			float give_damage = party[p_id]->get_magical_attack() * party[p_id]->get_skill_factor(1, 0);
 			boss->set_hp(boss->get_hp() - give_damage);
@@ -251,7 +249,7 @@ void Gaia::partner_attack(int p_id)  //ÀÏ¹Ý°ø°Ý ±âº», ½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °è¼
 			timer_event ev;
 			ev.obj_id = p_id;
 			ev.start_time = chrono::system_clock::now() + 5s;  //ÄðÅ¸ÀÓ
-			ev.ev = EVENT__PARTNER_ATTACK;
+			ev.ev = EVENT_PARTNER_ATTACK;
 			ev.target_id = 1;
 			timer_queue.push(ev);
 
@@ -261,7 +259,6 @@ void Gaia::partner_attack(int p_id)  //ÀÏ¹Ý°ø°Ý ±âº», ½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °è¼
 		break;
 	}
 	case 2: {
-
 		cout << "¾Æ·¹½ºÀÇ °¡È£ !!!" << endl;
 		party[p_id]->set_mp(party[p_id]->get_mp() - 1000);
 
@@ -279,7 +276,28 @@ void Gaia::partner_attack(int p_id)  //ÀÏ¹Ý°ø°Ý ±âº», ½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °è¼
 
 		break;
 	}
-	
+	case 3: {
+		cout << "¹Ð¾î³»±â !!!" << endl;
+		party[p_id]->set_mp(party[p_id]->get_mp() - 1000);
+
+		if ((boss->get_x() >= party[p_id]->get_x() - 15 && boss->get_x() <= party[p_id]->get_x() + 15) && (boss->get_z() >= party[p_id]->get_z() - 15 && boss->get_z() <= party[p_id]->get_z() + 15)) {
+			party[p_id]->set_skill_factor(0, 0);
+			float give_damage = party[p_id]->get_physical_attack() * party[p_id]->get_skill_factor(0, 0);
+			boss->set_pos(boss->get_x() + party[p_id]->get_look_x() * 40, boss->get_z() + party[p_id]->get_look_z() * 40);
+			for (auto pa : party) {
+				send_move_packet(pa, boss);
+				send_change_hp_packet(pa, boss);
+			}
+			timer_event ev;
+			ev.obj_id = p_id;
+			ev.start_time = chrono::system_clock::now() + 10s;  //ÄðÅ¸ÀÓ
+			ev.ev = EVENT_PARTNER_ATTACK;
+			ev.target_id = 0;
+			timer_queue.push(ev);
+			break;
+
+		}
+	}
 	default:
 		cout << "ÆÐÅÏ ¿¡·¯" << endl;
 		break;

@@ -90,6 +90,8 @@ void send_party_invite(char* user);
 
 void send_party_add_partner();
 
+void send_partner_rander_ok_packet();
+
 int netInit();
 
 void process_packet(unsigned char* p);

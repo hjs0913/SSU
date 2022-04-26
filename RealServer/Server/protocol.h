@@ -230,6 +230,11 @@ struct cs_packet_party_add_partner {
 	char type;
 	unsigned char room_id;
 };
+
+struct cs_packet_partner_rander_ok {
+	unsigned char size;
+	char type;
+};
 //---------------------------------------------
 
 struct sc_packet_login_ok {
