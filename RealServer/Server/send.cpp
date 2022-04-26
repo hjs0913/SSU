@@ -270,3 +270,19 @@ void send_party_room_info_packet(Player* pl, Player** room_pl, int players_num, 
     }
     pl->do_send(sizeof(packet), &packet);
 }
+void send_partner_party_room_info_packet(Player* pl, Partner** room_pl, int players_num, int room_id)
+{
+    sc_packet_partner_party_room_info packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_PARTNER_PARTY_ROOM_INFO;
+    packet.room_id = room_id;
+    packet.players_num = players_num;
+    strcpy_s(packet.player_name1, room_pl[0]->partner_get_name());
+    if (players_num == 2) strcpy_s(packet.player_name2, room_pl[1]->partner_get_name());
+    for (int i = 0; i < players_num; i++) {
+        packet.players_lv[i] = room_pl[i]->partner_get_lv();
+        packet.players_job[i] = room_pl[i]->partner_get_job();
+        packet.players_id_in_server[i] = room_pl[i]->partner_get_id();
+    }
+    pl->do_send(sizeof(packet), &packet);
+}

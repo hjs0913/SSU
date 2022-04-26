@@ -1,6 +1,8 @@
 #pragma once
 #include "Player.h"
+#include "Partner.h"
 #include "stdafx.h"
+
 void send_login_ok_packet(Player* pl);
 
 void send_move_packet(Player* pl, Npc* mover);
@@ -42,3 +44,5 @@ void send_buff_ui_packet(Player* pl, int num);
 void send_party_room_packet(Player* pl, char* room_name, int room_id);
 
 void send_party_room_info_packet(Player* pl, Player** room_pl, int players_num, int room_id);
+
+void send_partner_party_room_info_packet(Player* pl, Partner** room_pl, int players_num, int room_id);

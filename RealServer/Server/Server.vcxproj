@@ -145,6 +145,7 @@
     <ClCompile Include="Gaia.cpp" />
     <ClCompile Include="Npc.cpp" />
     <ClCompile Include="Obstacle.cpp" />
+    <ClCompile Include="Partner.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="send.cpp" />
     <ClCompile Include="server.cpp" />
@@ -153,6 +154,7 @@
   <ItemGroup>
     <ClInclude Include="Gaia.h" />
     <ClInclude Include="Obstacle.h" />
+    <ClInclude Include="Partner.h" />
     <ClInclude Include="protocol.h" />
     <ClInclude Include="database.h" />
     <ClInclude Include="EXP_OVER.h" />

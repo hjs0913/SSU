@@ -73,7 +73,11 @@ void send_party_room_packet();
 
 void send_raid_rander_ok_packet();
 
+void send_partner_rander_ok_packet();
+
 void send_party_room_make();
+
+void send_add_partner_packet();
 
 int netInit();
 

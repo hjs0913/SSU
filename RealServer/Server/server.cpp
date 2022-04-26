@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Player.h"
 #include "Gaia.h"
+#include "Partner.h"
 #include "database.h"
 #include "send.h"
 #include <fstream>
@@ -13,6 +14,7 @@ HANDLE g_h_iocp;
 SOCKET g_s_socket;
 array <Npc*, MAX_USER + MAX_NPC> players;
 array <Gaia*, MAX_USER / GAIA_ROOM> dungeons;
+array <Partner*, MAX_USER * 3> partners;
 array <Obstacle, MAX_OBSTACLE> obstacles;
 
 void do_npc_move(int npc_id, int target);
@@ -1922,6 +1924,7 @@ void process_packet(int client_id, unsigned char* p)
         for (auto& dun : dungeons) {
             // join dungeon party
             dun->state_lock.lock();
+          
             if (dun->get_dun_st() == DUN_ST_FREE) {
                 dun->set_dun_st(DUN_ST_ROBBY);
                 dun->state_lock.unlock();
@@ -2024,6 +2027,64 @@ void process_packet(int client_id, unsigned char* p)
         }
         break;
     }
+    case CS_PACKET_ADD_PARTNER: {
+        cout << "추가!" << endl;
+
+        int level_sum = 0;
+        int i = 0;
+        for (auto& dun : dungeons) {
+            dun->state_lock.lock();
+            if (dun->get_dun_st() == DUN_ST_ROBBY) {
+                level_sum += dun->get_party_palyer()[i]->get_lv();
+                dun->state_lock.unlock();
+            }
+            dun->state_lock.unlock();
+            ++i;
+            partners[pl->indun_id]->set_level(level_sum / i);
+        }
+\
+        for (auto dun : partners) {
+            dun->set_dun_st(DUN_ST_ROBBY);
+            if (dun->get_dun_st() == DUN_ST_ROBBY) {
+                dun->state_lock.lock();
+                // 이 방에 이 플레이어를 집어 넣는다
+                dun->join_partner(partners[pl->indun_id]);  //이상
+                // 이 방에 대한 정보를 보내준다
+                send_partner_party_room_info_packet(pl, dun->get_party_partner(), dun->player_cnt, dun->get_dungeon_id());
+            
+                break;
+            }
+            dun->state_lock.unlock();
+        }
+
+
+        cout << "추가 끝!" << endl;
+        break; 
+    }
+    case CS_PACKET_PARTNER_RENDER_OK: {
+
+        dungeons[pl->indun_id]->player_rander_ok++;
+
+        if (dungeons[pl->indun_id]->player_rander_ok == GAIA_ROOM) {
+            partners[pl->indun_id]->start_game = true;
+            timer_event ev;
+
+            ev.obj_id = partners[pl->indun_id]->get_dungeon_id();
+            ev.start_time = chrono::system_clock::now() + 1s;
+            ev.ev = EVENT_PARTNER_MOVE;
+            ev.target_id = -1;
+            timer_queue.push(ev);
+
+            ZeroMemory(&ev, sizeof(ev));
+            ev.obj_id = partners[pl->indun_id]->get_dungeon_id();
+            ev.start_time = chrono::system_clock::now() + 3s;
+            ev.ev = EVENT_PARTNER_ATTACK;
+            ev.target_id = -1;
+            timer_queue.push(ev);
+        }
+        break;
+    }
+
     }
 }
 
@@ -2458,6 +2519,22 @@ void worker()
         }
         case OP_GAIA_PATTERN: {
             dungeons[client_id]->pattern_active(exp_over->_target);
+            delete exp_over;
+            break;
+        }
+        case OP_PARTNER_MOVE: {
+            partners[client_id]->partner_move();
+            timer_event ev;
+            ev.obj_id = client_id;
+            ev.start_time = chrono::system_clock::now() + 1s;
+            ev.ev = EVENT_PARTNER_MOVE;
+            ev.target_id = -1;
+            timer_queue.push(ev);
+            delete exp_over;
+            break;
+        }
+        case OP_PARTNER_ATTACK: {
+          //  partners[client_id]->boss_attack();
             delete exp_over;
             break;
         }
@@ -3087,6 +3164,12 @@ COMP_OP EVtoOP(EVENT_TYPE ev) {
     case EVENT_GAIA_PATTERN:
         return OP_GAIA_PATTERN;
         break;
+    case EVENT_PARTNER_MOVE:
+        return OP_PARTNER_MOVE;
+        break;
+    case EVENT_PARTNER_ATTACK:
+        return OP_PARTNER_ATTACK;
+        break;
     }
 
 }
@@ -3173,6 +3256,13 @@ void initialise_DUNGEON()
     cout << "던전 초기화 완료" << endl;
 }
 
+void initialize_PARTNER()
+{
+    for (int i = 0; i < MAX_USER * 3; i++) {
+        partners[i] = new Partner(i);
+    }
+    cout << "파트너 초기화 완료" << endl;
+}
 
 int main()
 {
@@ -3215,6 +3305,7 @@ int main()
     // Initialise_DB();
     initialise_NPC();
     initialise_DUNGEON();
+    initialize_PARTNER();
 
     ifstream obstacles_read("tree_position.txt");
     if (!obstacles_read.is_open()) {

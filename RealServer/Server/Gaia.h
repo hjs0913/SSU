@@ -1,11 +1,14 @@
 #pragma once
 #include "Player.h"
+#include "Partner.h"
+
 
 class Gaia
 {
 private:
 // 기본정보
 	Player* party[GAIA_ROOM];	// 파티원 정보
+	
 	int dungeon_id;
 	DUNGEON_STATE st;
 	char room_name[MAX_NAME_SIZE];
@@ -13,6 +16,7 @@ private:
 	int target_id;	// agro_id (이때 id는 파티원에게 부여된 파티내 아이디(0~GAIA_ROOM)
 
 	int* party_id;	//서버에서의 파티원 id
+	int* partner_party_id;	//서버에서의 파티원 id
 	int  player_death_count = 4;
 
 // 패턴 정보
@@ -43,6 +47,7 @@ public:
 	~Gaia();
 
 	void join_player(Player* pl);
+
 	DUNGEON_STATE get_dun_st();
 	void set_dun_st(DUNGEON_STATE dst);
 	Player** get_party_palyer();
@@ -64,4 +69,4 @@ public:
 
 	void player_death(Player* p);
 };
-
+extern array <Gaia*, MAX_USER / GAIA_ROOM> dungeons;

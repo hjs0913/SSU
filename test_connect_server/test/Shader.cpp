@@ -1040,7 +1040,7 @@ void CObjectsShader::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 	int yObjects = 1;
 	int zObjects = int(fTerrainLength / fzPitch);
 	m_nObjects = (xObjects * yObjects * zObjects);  //97
-	m_nObjects += 1 + 2 * BULLETCNT + 1 + 4 + MAX_NPC + MAX_USER+4+3+1;
+	m_nObjects += 1 + 2 * BULLETCNT + 1 + 4 + MAX_NPC + MAX_USER+4+3+1 +1; //마지막 의범이 추가 
 	/*-------------------------------------------------------------
 	//m_nObjects = xObjects * yObjects * zObjects = 9400
 	m_nObjects += 1
@@ -1385,6 +1385,15 @@ void CObjectsShader::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 		pNpc->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr);
 		m_ppObjects[i] = pNpc;
 	}
+	// PARTNER
+		CAirplanePlayer* pNpc = new CAirplanePlayer(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, pTerrain);
+		pNpc->SetMesh(0, pOtherPlayerMesh[3]);
+		pNpc->SetPosition(XMFLOAT3(0, -100, 0));
+		pNpc->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr);
+		m_ppObjects[m_nObjects-1] = pNpc;
+	
+
+
 }
 
 void CObjectsShader::ReleaseObjects()

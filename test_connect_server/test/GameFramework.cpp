@@ -461,7 +461,10 @@ bool CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 				}
 				if (CursorPosInClient.x >= 215 && CursorPosInClient.x <= 280) cout << "방나가기" << endl;
 				if (CursorPosInClient.x >= 360 && CursorPosInClient.x <= 425) cout << "초대하기" << endl;
-				if (CursorPosInClient.x >= 435 && CursorPosInClient.x <= 500) cout << "AI넣기" << endl;
+				if (CursorPosInClient.x >= 435 && CursorPosInClient.x <= 500) {
+					cout << "AI넣기" << endl;
+					send_add_partner_packet();  // CS_PACKET_ADD_PARTNER 
+				}
 			}
 			break;
 		}

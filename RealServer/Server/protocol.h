@@ -7,15 +7,17 @@ enum COMP_OP {
 	OP_RECV, OP_SEND, OP_ACCEPT, OP_NPC_MOVE,
 	OP_NPC_ATTACK, OP_AUTO_PLAYER_HP, OP_PLAYER_REVIVE, OP_NPC_REVIVE,
 	OP_PLAYER_ATTACK, OP_NPC_AGRO, OP_ELEMENT_COOLTIME,
-	OP_BOSS_MOVE, OP_BOSS_ATTACK, OP_GAIA_PATTERN
+	OP_BOSS_MOVE, OP_BOSS_ATTACK, OP_GAIA_PATTERN,
+	OP_PARTNER_MOVE, OP_PARTNER_ATTACK
 };
 enum EVENT_TYPE {
 	EVENT_NPC_MOVE, EVENT_NPC_ATTACK, EVENT_AUTO_PLAYER_HP,
 	EVENT_PLAYER_REVIVE, EVENT_NPC_REVIVE, EVENT_PLAYER_ATTACK,
 	EVENT_SKILL_COOLTIME, EVENT_NPC_AGRO, EVENT_ELEMENT_COOLTIME,
-	EVENT_BOSS_MOVE, EVENT_BOSS_ATTACK, EVENT_GAIA_PATTERN
+	EVENT_BOSS_MOVE, EVENT_BOSS_ATTACK, EVENT_GAIA_PATTERN,
+	EVENT_PARTNER_MOVE, EVENT_PARTNER_ATTACK, EVENT_PARTNER_PATTERN
 };
-enum TRIBE { HUMAN, MONSTER, AGRO, BOSS, OBSTACLE };
+enum TRIBE { HUMAN, MONSTER, AGRO, BOSS, OBSTACLE, PARTNER };
 enum BUF_TYPE {
 	B_NONE, B_PHYATTACK, B_MAGATTACK, B_PHYDEFENCE,
 	B_MAGDEFENCE, B_SPEED, B_BURN
@@ -65,6 +67,9 @@ const char CS_PACKET_PARTY_ROOM_JOIN = 12;
 const char CS_PACKET_GAIA_START = 13;
 const char CS_PACKET_RAID_RANDER_OK = 14;
 const char CS_PACKET_PARTY_ROOM_MAKE = 15;
+const char CS_PACKET_ADD_PARTNER = 16;
+const char CS_PACKET_PARTNER_RANDER_OK = 17;
+const char CS_PACKET_PARTNER_RENDER_OK = 18;
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -99,7 +104,8 @@ const char SC_PACKET_BUFF_UI = 28;
 
 const char SC_PACKET_PARTY_ROOM = 29;
 const char SC_PACKET_PARTY_ROOM_INFO = 30;
-
+const char SC_PACKET_PARTNER_PARTY_ROOM_INFO = 31;
+const char SC_PACKET_PARTNER_JOIN_OK = 32;
 //---------------------------------------------------
 #pragma pack (push, 1)
 struct cs_packet_login {
@@ -182,12 +188,18 @@ struct cs_packet_raid_rander_ok {
 	unsigned char size;
 	char type;
 };
-
+struct cs_packet_partner_rander_ok {
+	unsigned char size;
+	char type;
+};
 struct cs_packet_party_room_make {
 	unsigned char size;
 	char type;
 };
-
+struct cs_packet_add_partner {
+	unsigned char size;
+	char type;
+};
 //---------------------------------------------
 
 struct sc_packet_login_ok {
@@ -388,6 +400,25 @@ struct sc_packet_party_room_info {
 	unsigned char players_lv[GAIA_ROOM];
 	unsigned char players_job[GAIA_ROOM];
 	int players_id_in_server[GAIA_ROOM];
+};
+struct sc_packet_partner_party_room_info {
+	unsigned char size;
+	char type;
+	unsigned char room_id;
+	unsigned char players_num;	// 몇명이 들어와있는지 보내줌
+	char player_name1[MAX_NAME_SIZE];
+	char player_name2[MAX_NAME_SIZE];
+	/*char player_name3[MAX_CHAT_SIZE];
+	char player_name4[MAX_CHAT_SIZE];*/
+	unsigned char players_lv[GAIA_ROOM];
+	unsigned char players_job[GAIA_ROOM];
+	int players_id_in_server[GAIA_ROOM];
+};
+
+struct sc_packet_partner_join_ok {
+	unsigned char size;
+	char type;
+	char room_number;
 };
 
 #pragma pack(pop)
