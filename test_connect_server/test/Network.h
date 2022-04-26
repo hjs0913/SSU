@@ -46,6 +46,11 @@ extern array<Party*, (MAX_USER / GAIA_ROOM)> m_party;
 extern Party* m_party_info;
 extern bool party_info_on;
 extern int  robby_cnt;
+extern vector<int> party_id_index_vector;
+
+extern bool party_enter;
+extern int party_enter_room_id;
+extern bool PartyInviteUI_ON;
 
 void err_quit(const char* msg);
 
@@ -74,6 +79,14 @@ void send_party_room_packet();
 void send_raid_rander_ok_packet();
 
 void send_party_room_make();
+
+void send_party_room_info_request(int r_id);
+
+void send_party_room_enter_request();
+
+void send_party_room_quit_request();
+
+void send_party_invite(char* user);
 
 int netInit();
 

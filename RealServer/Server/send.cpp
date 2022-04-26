@@ -270,3 +270,30 @@ void send_party_room_info_packet(Player* pl, Player** room_pl, int players_num, 
     }
     pl->do_send(sizeof(packet), &packet);
 }
+
+void send_party_room_enter_ok_packet(Player* pl, int room_id)
+{
+    sc_packet_party_room_enter_ok packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_PARTY_ROOM_ENTER_OK;
+    packet.room_id = room_id;
+    pl->do_send(sizeof(packet), &packet);
+}
+
+void send_party_room_enter_failed_packet(Player* pl, int room_id, int failed_reason)
+{
+    sc_packet_party_room_enter_failed packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_PARTY_ROOM_ENTER_FAILED;
+    packet.room_id = room_id;
+    packet.failed_reason = failed_reason;
+    pl->do_send(sizeof(packet), &packet);
+}
+
+void send_party_room_quit_ok_packet(Player* pl)
+{
+    sc_packet_party_room_quit_ok packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_PARTY_ROOM_QUIT_OK;
+    pl->do_send(sizeof(packet), &packet);
+}

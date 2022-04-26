@@ -95,9 +95,22 @@ bool is_player(int id)
 void Disconnect(int c_id)
 {
     Player* pl = reinterpret_cast<Player*>(players[c_id]);
+    // indun처리
+    // viewlist 처리
     pl->vl.lock();
     unordered_set <int> my_vl = pl->viewlist;
-    pl->vl.unlock();
+    if (pl->join_dungeon_room == true) {
+        pl->join_dungeon_room == false;
+        pl->vl.unlock();
+        Gaia* dun = dungeons[pl->get_indun_id()];
+        dun->quit_palyer(pl);
+        Player** party_players = dun->get_party_palyer();
+        for (int i = 0; i < dun->player_cnt; i++) {
+            send_party_room_info_packet(party_players[i], dun->get_party_palyer(), dun->player_cnt, dun->get_dungeon_id());
+        }
+    }   
+    else pl->vl.unlock();
+
     for (auto& other : my_vl) {
         Player* target = reinterpret_cast<Player*>(players[other]);
         if (true == is_npc(target->get_id())) continue;   // npc일 경우 보내지 않는다
@@ -1931,77 +1944,19 @@ void process_packet(int client_id, unsigned char* p)
                 // 이 방에 대한 정보를 보내준다
                 send_party_room_packet(pl, dun->get_party_name(), dun->get_dungeon_id());
                 send_party_room_info_packet(pl, dun->get_party_palyer(), dun->player_cnt, dun->get_dungeon_id());
+                send_party_room_enter_ok_packet(pl, dun->get_dungeon_id());
                 break;
             }
             dun->state_lock.unlock();
         }
         break;
     }
-    /*
-    case CS_PACKET_GAIA_JOIN: {
-        // check player state
-        pl->state_lock.lock();
-        if (pl->get_state() != ST_INGAME || pl->join_dungeon_room==true) {
-            pl->state_lock.unlock();
-            break;
-        }
-        pl->state_lock.unlock();
-
-        // join dungeon party
-        for (int i = 0; i < MAX_USER / GAIA_ROOM; i++) {
-            dungeons[i]->state_lock.lock();
-            if (dungeons[i]->get_dun_st() == DUN_ST_START) {
-                dungeons[i]->state_lock.unlock();
-                continue;
-            }
-            dungeons[i]->state_lock.unlock();
-            dungeons[i]->join_player(pl);
-            dungeons[i]->state_lock.lock();
-            if (dungeons[i]->get_dun_st() == DUN_ST_START) {
-                dungeons[i]->state_lock.unlock();
-                
-                // 게임이 시작 되었으니 시야처리를 해주자
-                Player** vl_pl;
-                vl_pl = dungeons[i]->get_party_palyer();
-
-                unordered_set<int> indun_vl;
-                for (int j = 0; j < GAIA_ROOM; j++) indun_vl.insert(vl_pl[j]->get_id());
-
-                for (int j = 0; j < GAIA_ROOM; j++) {
-                    vl_pl[j]->vl.lock();
-                    unordered_set<int>temp_vl{ vl_pl[j]->viewlist };
-                    vl_pl[j]->viewlist = indun_vl;
-                    vl_pl[j]->viewlist.erase(vl_pl[j]->get_id());
-                    vl_pl[j]->vl.unlock();
-
-                    for (auto k : temp_vl) {
-                        send_remove_object_packet(vl_pl[j], players[k]);
-                        if (is_npc(k) == true) continue;
-                        reinterpret_cast<Player*>(players[k])->vl.lock();
-                        if (indun_vl.find(k) == indun_vl.end()) {
-                            reinterpret_cast<Player*>(players[k])->viewlist.erase(client_id);
-                            reinterpret_cast<Player*>(players[k])->vl.unlock();
-                            send_remove_object_packet(reinterpret_cast<Player*>(players[k]), vl_pl[j]);
-                            continue;
-                        }
-                        reinterpret_cast<Player*>(players[k])->vl.unlock();
-                    }
-
-                    for (auto k : indun_vl) {
-                        if (k == vl_pl[j]->get_id()) continue;
-                        send_put_object_packet(vl_pl[j], players[k]);
-                    }
-                    send_put_object_packet(vl_pl[j], dungeons[i]->boss);
-                }
-                break;
-            }
-            dungeons[i]->state_lock.unlock();
-            break;
-        }
+    case CS_PACKET_PARTY_ROOM_INFO_REQUEST: {
+        int r_id = reinterpret_cast<cs_packet_party_room_info_request*>(p)->room_id;
+        send_party_room_info_packet(pl, dungeons[r_id]->get_party_palyer(), 
+            dungeons[r_id]->player_cnt, dungeons[r_id]->get_dungeon_id());
         break;
     }
-    */
-
     case CS_PACKET_RAID_RANDER_OK: {
         dungeons[pl->indun_id]->player_rander_ok++;
 
@@ -2022,6 +1977,65 @@ void process_packet(int client_id, unsigned char* p)
             ev.target_id = -1;
             timer_queue.push(ev);
         }
+        break;
+    }
+    case CS_PACKET_PARTY_ROOM_ENTER_REQUEST: {
+        int r_id = (int)reinterpret_cast<cs_packet_party_room_enter_request*>(p)->room_id;
+        pl->state_lock.lock();
+        if (pl->get_state() != ST_INGAME || pl->join_dungeon_room == true) {
+            if(pl->get_state() == ST_INGAME) send_party_room_enter_failed_packet(pl, r_id, 2);
+            pl->state_lock.unlock();
+            break;
+        }
+        pl->state_lock.unlock();
+       
+        Gaia* dun = dungeons[r_id];
+        
+        // join dungeon party
+        dun->state_lock.lock();
+        if (dun->get_dun_st() != DUN_ST_ROBBY) {
+            // 던전입장 실패 패킷 보내기
+            if(dun->get_dun_st() == DUN_ST_FREE) send_party_room_enter_failed_packet(pl, r_id, 1);
+            else send_party_room_enter_failed_packet(pl, r_id, 0);
+            dun->state_lock.unlock();
+            break;
+        }
+        dun->state_lock.unlock();
+        // 이 방에 이 플레이어를 집어 넣는다
+        if (dun->player_cnt == GAIA_ROOM) {
+            send_party_room_enter_failed_packet(pl, r_id, 0);
+            break;
+        }
+        dun->join_player(pl);
+        
+        // 여기에 인원이 꽉찼으면 5초후 게임을 시작하는 타이머를 돌려주자
+
+
+
+        // 이 방에 대한 정보를 보내준다
+        Player** party_players = dun->get_party_palyer();
+        for (int i = 0; i < dun->player_cnt; i++) {
+            send_party_room_info_packet(party_players[i], dun->get_party_palyer(), dun->player_cnt, dun->get_dungeon_id());
+        }
+        send_party_room_enter_ok_packet(pl, dun->get_dungeon_id());
+        break;
+    }
+    case CS_PACKET_PARTY_ROOM_QUIT_REQUEST: {
+        int r_id = (int)reinterpret_cast<cs_packet_party_room_quit_request*>(p)->room_id;
+        Gaia* dun = dungeons[r_id];
+        dun->quit_palyer(pl);
+        // 나갔다는 정보를 player에게 보내준다
+        Player** party_players = dun->get_party_palyer();
+        for (int i = 0; i < dun->player_cnt; i++) {
+            send_party_room_info_packet(party_players[i], dun->get_party_palyer(), dun->player_cnt, dun->get_dungeon_id());
+        }
+        send_party_room_quit_ok_packet(pl);
+
+        break;
+    }
+    case CS_PACKET_PARTY_INVITE: {
+        cout << "방번호 : " << (int)reinterpret_cast<cs_packet_party_invite*>(p)->room_id << "에서 " <<
+
         break;
     }
     }

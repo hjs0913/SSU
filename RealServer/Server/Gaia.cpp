@@ -15,8 +15,6 @@ Gaia::Gaia(int d_id)
 	target_id = 0;
 	start_game = false;
 
-	party_id = new int[GAIA_ROOM];
-
 	running_pattern = false;
 
 	// Boss Npc Intialize	
@@ -71,38 +69,69 @@ void Gaia::join_player(Player* pl)
 	party_id[player_cnt] = pl->get_id();
 	player_cnt++;
 	cout << dungeon_id << "번 던전에 입장 중입니다" << endl;
+
+	pl->set_indun_id(dungeon_id);
 	pl->state_lock.lock();
 	pl->join_dungeon_room = true;
 	pl->state_lock.unlock();
+
 	//send_gaia_join_ok(pl, dungeon_id);
 
 	// game start
-	//if (player_cnt == GAIA_ROOM) {
-	//	// 모든 파티 인던 입장 및 게임 시작
-	//	player_rander_ok = 0;
-	//	// 가장 체력이 높은 플레이어를 일단 타겟으로 잡는다
-	//	int tmp_hp = 0;
+	if (player_cnt == GAIA_ROOM) {
+			
+	}
+}
 
-	//	state_lock.lock();
-	//	st = DUN_ST_START;
-	//	state_lock.unlock();
-	//	
-	//	boss->set_x(party[0]->get_x() + 10);
-	//	boss->set_z(party[0]->get_z() + 10);
+void Gaia::quit_palyer(Player* pl)
+{
+	int tmp = 0;
+	for (int i = 0; i < GAIA_ROOM; i++) {
+		if (party_id[i] == pl->get_id()) tmp = i;
+	}
 
-	//	for (int i = 0; i < GAIA_ROOM; i++) {
-	//		party[i]->state_lock.lock();
-	//		party[i]->set_state(ST_INDUN);
-	//		party[i]->state_lock.unlock();
-	//		send_start_gaia_packet(party[i], party_id);
-	//		party[i]->indun_id = dungeon_id;
+	// 앞으로 다 땡겨오기
+	for (int i = tmp; i < GAIA_ROOM; i++) {
+		if (i == GAIA_ROOM - 1) continue;
+		party[i] = party[i + 1];
+		party_id[i] = party_id[i + 1];
+	}
 
-	//		// 가장 체력이 높은 플레이어를 일단 타겟으로 잡는다
-	//		if (party[i]->get_hp() > tmp_hp) target_id = i;
-	//	}
 
-	//	cout << dungeon_id << "번 던전 시작합니다" << endl;
-	//}
+
+	pl->set_indun_id(-1);
+	pl->state_lock.lock();
+	pl->join_dungeon_room = false;
+	pl->state_lock.unlock();
+	player_cnt--;
+}
+
+void Gaia::game_start()
+{
+	// 모든 파티 인던 입장 및 게임 시작
+	player_rander_ok = 0;
+	// 가장 체력이 높은 플레이어를 일단 타겟으로 잡는다
+	int tmp_hp = 0;
+
+	state_lock.lock();
+	st = DUN_ST_START;
+	state_lock.unlock();
+
+	boss->set_x(party[0]->get_x() + 10);
+	boss->set_z(party[0]->get_z() + 10);
+
+	for (int i = 0; i < GAIA_ROOM; i++) {
+		party[i]->state_lock.lock();
+		party[i]->set_state(ST_INDUN);
+		party[i]->state_lock.unlock();
+		send_start_gaia_packet(party[i], party_id);
+		party[i]->indun_id = dungeon_id;
+
+		// 가장 체력이 높은 플레이어를 일단 타겟으로 잡는다
+		if (party[i]->get_hp() > tmp_hp) target_id = i;
+	}
+
+	cout << dungeon_id << "번 던전 시작합니다" << endl;
 }
 
 DUNGEON_STATE Gaia::get_dun_st()

@@ -40,9 +40,15 @@ int indun_death_count = 4;
 
 array<CPlayer*, MAX_USER+MAX_NPC> mPlayer;
 array<Party*, (MAX_USER / GAIA_ROOM)> m_party;
+vector<int> party_id_index_vector;
 Party* m_party_info;
 bool party_info_on = false;
 int  robby_cnt = 0;
+bool party_enter = false;
+int party_enter_room_id = -1;
+bool alramUI_ON = false;
+bool PartyInviteUI_ON = false;
+
 
 struct EXP_OVER {
 	WSAOVERLAPPED m_wsa_over;
@@ -206,6 +212,43 @@ void send_party_room_make()
 	cs_packet_party_room_make packet;
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET_PARTY_ROOM_MAKE;
+	do_send(sizeof(packet), &packet);
+}
+
+void send_party_room_info_request(int r_id)
+{
+	cs_packet_party_room_info_request packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_PARTY_ROOM_INFO_REQUEST;
+	packet.room_id = m_party[r_id]->get_party_id();
+	do_send(sizeof(packet), &packet);
+}
+
+void send_party_room_enter_request()
+{
+	cs_packet_party_room_enter_request packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_PARTY_ROOM_ENTER_REQUEST;
+	packet.room_id = m_party_info->get_party_id();
+	do_send(sizeof(packet), &packet);
+}
+
+void send_party_room_quit_request()
+{
+	cs_packet_party_room_quit_request packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_PARTY_ROOM_QUIT_REQUEST;
+	packet.room_id = party_enter_room_id;
+	do_send(sizeof(packet), &packet);
+}
+
+void send_party_invite(char* user)
+{
+	cs_packet_party_invite packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_PARTY_INVITE;
+	packet.room_id = party_enter_room_id;
+	strcpy_s(packet.user_name, user);
 	do_send(sizeof(packet), &packet);
 }
 
@@ -589,6 +632,7 @@ void process_packet(unsigned char* p)
 		if (m_party[(int)packet->room_id]->dst != DUN_ST_ROBBY) {
 			m_party[(int)packet->room_id]->dst = DUN_ST_ROBBY;
 			robby_cnt++;
+			party_id_index_vector.push_back((int)packet->room_id);
 		}
 		break;
 	}
@@ -606,9 +650,44 @@ void process_packet(unsigned char* p)
 		m_party[r_id]->set_player_name(packet->player_name1);
 		m_party[r_id]->player_cnt++;
 		if (packet->players_num == 2) {
-			m_party[packet->room_id]->set_player_name(packet->player_name1);
+			m_party[r_id]->set_player_name(packet->player_name2);
 		}
+		else m_party[r_id]->set_player_name("");
+		party_info_on = true;
+		m_party_info = m_party[r_id];
+		break;
+	}
+	case SC_PACKET_PARTY_ROOM_ENTER_OK: {
+		party_enter = true;
+		party_enter_room_id = reinterpret_cast<sc_packet_party_room_enter_ok*>(p)->room_id;
+		break;
+	}
+	case SC_PACKET_PARTY_ROOM_ENTER_FAILED: {
+		int f_reason = (int)reinterpret_cast<sc_packet_party_room_enter_failed*>(p)->failed_reason;
+		string msg = "";
+		switch (f_reason)
+		{
+		case 0:
+			msg  = "인원이 꽉차 방에 입장할 수 없습니다";
+			break;
+		case 1:
+			msg = "존재하지 않는 방이므로 입장할 수 없습니다";
+			break;
+		case 2:
+			msg = "이미 다른방에 참가중입니다";
+			break;
+		default:
+			break;
+		}
+		if (g_msg.size() >= 5 && (f_reason>=0 && f_reason<=2)) g_msg.erase(g_msg.begin());
+		g_msg.push_back(msg);
 
+		party_enter = false;
+		break;
+	}
+	case SC_PACKET_PARTY_ROOM_QUIT_OK: {
+		party_enter = false;
+		party_info_on = false;
 		break;
 	}
 	default:
