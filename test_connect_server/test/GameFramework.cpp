@@ -1459,7 +1459,11 @@ void CGameFramework::FrameAdvance()
 		if (i >= 7 && i <= 11) {
 			if (!InDungeon) continue;
 		}
-		if (i == 13 && !PartyUI_On) continue;
+		if (i == 13 && !PartyUI_On) {
+			if(PartyUI_On == true)
+				cout << PartyUI_On << endl;
+			continue;
+		}
 		if (i == 14 && !PartyInviteUI_ON) continue;
 		if (i == 15 && !InvitationCardUI_On) continue;
 		m_ppUILayer[i]->Render(m_nSwapChainBufferIndex);

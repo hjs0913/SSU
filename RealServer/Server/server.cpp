@@ -2051,6 +2051,48 @@ void process_packet(int client_id, unsigned char* p)
             send_party_room_info_packet(party_players[i], dun->get_party_palyer(), dun->player_cnt, dun->get_dungeon_id());
         }
         send_party_room_enter_ok_packet(pl, dun->get_dungeon_id());
+
+        // 던전 입장시 시야처리(나중에 바꿔야됨)
+        dun->state_lock.lock();
+        if (dun->get_dun_st() == DUN_ST_START) {
+            dun->state_lock.unlock();
+            dun->game_start();
+            // 게임이 시작 되었으니 시야처리를 해주자
+            Player** vl_pl;
+            vl_pl = dun->get_party_palyer();
+
+            unordered_set<int> indun_vl;
+            for (int j = 0; j < GAIA_ROOM; j++) indun_vl.insert(vl_pl[j]->get_id());
+
+            for (int j = 0; j < GAIA_ROOM; j++) {
+                vl_pl[j]->vl.lock();
+                unordered_set<int>temp_vl{ vl_pl[j]->viewlist };
+                vl_pl[j]->viewlist = indun_vl;
+                vl_pl[j]->viewlist.erase(vl_pl[j]->get_id());
+                vl_pl[j]->vl.unlock();
+
+                for (auto k : temp_vl) {
+                    send_remove_object_packet(vl_pl[j], players[k]);
+                    if (is_npc(k) == true) continue;
+                    reinterpret_cast<Player*>(players[k])->vl.lock();
+                    if (indun_vl.find(k) == indun_vl.end()) {
+                        reinterpret_cast<Player*>(players[k])->viewlist.erase(client_id);
+                        reinterpret_cast<Player*>(players[k])->vl.unlock();
+                        send_remove_object_packet(reinterpret_cast<Player*>(players[k]), vl_pl[j]);
+                        continue;
+                    }
+                    reinterpret_cast<Player*>(players[k])->vl.unlock();
+                }
+
+                for (auto k : indun_vl) {
+                    if (k == vl_pl[j]->get_id()) continue;
+                    send_put_object_packet(vl_pl[j], players[k]);
+                }
+                send_put_object_packet(vl_pl[j], dun->boss);
+            }
+            break;
+        }
+        dun->state_lock.unlock();
         break;
     }
     case CS_PACKET_PARTY_ROOM_QUIT_REQUEST: {

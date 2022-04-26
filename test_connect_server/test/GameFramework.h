@@ -17,7 +17,6 @@ extern wstring Chatting_Str;
 extern wstring Invite_Str;
 extern bool Chatting_On;
 extern bool Mouse_On;
-extern bool PartyUI_On;
 
 
 extern int effect_x;

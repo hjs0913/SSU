@@ -556,6 +556,11 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_START_GAIA: {
+		PartyUI_On = false;
+		party_info_on = false;
+		PartyInviteUI_ON = false;
+		InvitationCardUI_On = false;
+
 		sc_packet_start_gaia* packet = reinterpret_cast<sc_packet_start_gaia*>(p);
 		cout << "인던으로 입장해야됨" << endl;
 		combat_id = 101;
@@ -719,7 +724,9 @@ void process_packet(unsigned char* p)
 	}
 	case SC_PACKET_PARTY_ROOM_DESTROY: {
 		m_party[(int)reinterpret_cast<sc_packet_party_room_destroy*>(p)->room_id]->dst = DUN_ST_FREE;
-		robby_cnt--;
+		if (robby_cnt <= 0) robby_cnt = 0;
+		else robby_cnt--;
+
 		if (party_id_index_vector.size() == 0) break;
 
 		if (find(party_id_index_vector.begin(), party_id_index_vector.end(), (int)reinterpret_cast<sc_packet_party_room_destroy*>(p)->room_id)
