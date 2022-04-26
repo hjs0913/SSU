@@ -79,7 +79,23 @@ void Gaia::join_player(Player* pl)
 
 	// game start
 	if (player_cnt == GAIA_ROOM) {
-			
+		// 여기에 인원이 꽉찼으면 5초후 게임을 시작하는 타이머를 돌려주자
+		/*
+		timer_event ev;
+		ev.obj_id = dungeon_id;
+		ev.start_time = chrono::system_clock::now() + 5s;
+		ev.ev = EVENT_BOSS_ATTACK;
+		ev.target_id = dungeon_id;
+		timer_queue.push(ev);
+		// 5초후 게임을 시작한다는 패킷을 보내주자
+		*/
+
+		//game_start();
+
+		state_lock.lock();
+		st = DUN_ST_START;
+		state_lock.unlock();
+
 	}
 }
 
@@ -113,9 +129,9 @@ void Gaia::game_start()
 	// 가장 체력이 높은 플레이어를 일단 타겟으로 잡는다
 	int tmp_hp = 0;
 
-	state_lock.lock();
+	/*state_lock.lock();
 	st = DUN_ST_START;
-	state_lock.unlock();
+	state_lock.unlock();*/
 
 	boss->set_x(party[0]->get_x() + 10);
 	boss->set_z(party[0]->get_z() + 10);
@@ -318,7 +334,6 @@ void Gaia::boss_move()
 	//		값을 적용시키고 새로운 좌표를 클라이언트에게 보내주기
 	boss->set_x(mv.first);
 	boss->set_z(mv.second);
-	cout << mv.first << "," << mv.second << endl;
 	for (auto pt : party) {
 		send_move_packet(pt, boss);
 		send_look_packet(pt, boss);
@@ -348,7 +363,6 @@ void Gaia::boss_attack()
 		}
 	}
 
-	cout << "p : " << p << endl;
 	switch (p%5) {
 	case 0: {
 		running_pattern = true;
@@ -614,7 +628,6 @@ void Gaia::pattern_active(int pattern)
 	}
 	case 1: {
 		float movesize = 25.0f * (float)(sqrt(2) / 2);
-		cout << movesize << endl;
 		for (auto& p : party) {
 			if (pattern_two_number == 0 || pattern_two_number == 2) {
 				judge_pattern_two_rightup(p);

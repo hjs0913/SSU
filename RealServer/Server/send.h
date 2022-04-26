@@ -48,3 +48,9 @@ void send_party_room_enter_ok_packet(Player* pl, int room_id);
 void send_party_room_enter_failed_packet(Player* pl, int room_id, int failed_reason);
 
 void send_party_room_quit_ok_packet(Player* pl);
+
+void send_party_invitation(Player* pl, int r_id, int user_id);
+
+void send_party_invitation_failed(Player* pl, int failed_reason, char* invited_user);
+
+void send_party_room_destroy(Player* pl, int r_id);

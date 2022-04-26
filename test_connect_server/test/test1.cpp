@@ -216,6 +216,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					Invite_Str.pop_back();
 				}
 			}
+			else if ((wchar_t)wParam == '\r') break;
 			else {
 				if (Invite_Str.size() <= 20)
 				{
@@ -237,8 +238,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				}
 			}
 		}
-	}
+
 		break;
+	}
 
 	default:
 		return(::DefWindowProc(hWnd, message, wParam, lParam));

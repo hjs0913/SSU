@@ -44,13 +44,22 @@ extern int indun_death_count;
 
 extern array<Party*, (MAX_USER / GAIA_ROOM)> m_party;
 extern Party* m_party_info;
+extern bool PartyUI_On;
 extern bool party_info_on;
 extern int  robby_cnt;
 extern vector<int> party_id_index_vector;
 
 extern bool party_enter;
 extern int party_enter_room_id;
-extern bool PartyInviteUI_ON;
+
+// 파티 초대할떄 UI
+extern bool PartyInviteUI_ON;	
+
+// 초대장 관련 변수(초대 받을떄 UI)
+extern bool InvitationCardUI_On;
+extern chrono::system_clock::time_point InvitationCardTimer;
+extern int InvitationRoomId;
+extern int InvitationUser;
 
 void err_quit(const char* msg);
 
@@ -91,6 +100,8 @@ void send_party_invite(char* user);
 void send_party_add_partner();
 
 void send_partner_rander_ok_packet();
+
+void send_party_invitation_reply(int accept);
 
 int netInit();
 
