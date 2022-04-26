@@ -676,9 +676,9 @@ void process_packet(unsigned char* p)
 		int r_id = (int)packet->room_id;
 
 		for (int i = 0; i < packet->players_num; i++) {
-			m_party[r_id]->player_id[0] = (int)packet->players_id_in_server[0];
-			m_party[r_id]->player_lv[0] = (int)packet->players_lv[0];
-			m_party[r_id]->player_job[0] = static_cast<JOB>(packet->players_job[0]);
+			m_party[r_id]->player_id[i] = (int)packet->players_id_in_server[i];
+			m_party[r_id]->player_lv[i] = (int)packet->players_lv[i];
+			m_party[r_id]->player_job[i] = static_cast<JOB>(packet->players_job[i]);
 		}
 
 		m_party[r_id]->player_cnt = 0;
@@ -735,7 +735,26 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_PARTY_INVITATION_FAILED: {
-		cout << "초대 실패함" << endl;
+		int f_reason = (int)reinterpret_cast<sc_packet_party_invitation_failed*>(p)->failed_reason;
+		string msg = "";
+		switch (f_reason)
+		{
+		case 0:
+			msg = "현재 로그인되어있지 않거나 없는 유저";
+			break;
+		case 1:
+			msg = "(플레이어)";
+			msg += reinterpret_cast<sc_packet_party_invitation_failed*>(p)->invited_user;
+			msg += "  초대를 거부함";
+			break;
+		case 2:
+			msg = "이미 다른 파티에 참가중임";
+			break;
+		default:
+			break;
+		}
+		if (g_msg.size() >= 5 && (f_reason >= 0 && f_reason <= 2)) g_msg.erase(g_msg.begin());
+		g_msg.push_back(msg);
 		break;
 	}
 	case SC_PACKET_PARTY_ROOM_DESTROY: {
@@ -950,4 +969,14 @@ float get_combat_id_hp()
 float get_combat_id_max_hp()
 {
 	return mPlayer[combat_id]->m_max_hp;
+}
+
+
+wchar_t* get_user_name_to_server(int id)
+{
+	WCHAR* temp;
+	int len = 1 + strlen(mPlayer[id]->m_name);
+	temp = new TCHAR[len];
+	mbstowcs(temp, mPlayer[id]->m_name, len);
+	return temp;
 }
