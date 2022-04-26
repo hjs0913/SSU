@@ -8,6 +8,7 @@
 #include <DirectXMath.h>
 #include <array>
 #include <queue>
+#include <string>
 
 #include "../../RealServer/Server/protocol.h"
 #include "stdafx.h"
@@ -139,4 +140,6 @@ XMFLOAT3 get_look_to_server(int id);
 float get_combat_id_hp();
 
 float get_combat_id_max_hp();
+
+wchar_t* get_user_name_to_server(int id);
 

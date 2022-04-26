@@ -1431,7 +1431,7 @@ void CGameFramework::FrameAdvance()
 						temp = new TCHAR[len];
 						mbstowcs(temp, m_party[t]->get_room_name(), len);
 						party_name_index[tmp].append(temp);
-						delete temp;
+						delete []temp;
 						tmp++;
 					}
 				}
@@ -1449,7 +1449,14 @@ void CGameFramework::FrameAdvance()
 		}
 		case 15: {
 			if (!InvitationCardUI_On) break;
-			reinterpret_cast<InvitationCardUI*>(m_ppUILayer[i])->UpdateLabels(L"시모시모");
+			wstring temp;
+			wchar_t* temp2 = get_user_name_to_server(InvitationUser);
+			temp.append(temp2);
+			temp.append(L"가 ");
+			temp.append(std::to_wstring(InvitationRoomId));
+			temp.append(L"번 방에 초대하였습니다");
+			reinterpret_cast<InvitationCardUI*>(m_ppUILayer[i])->UpdateLabels(temp);
+			delete []temp2;
 			break;
 		}
 	}

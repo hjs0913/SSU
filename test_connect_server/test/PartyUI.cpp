@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "PartyUI.h"
+#include <string>
+#include <iostream>
 
 Party::Party()
 {
@@ -110,16 +112,34 @@ void PartyUI::UpdateLabels_PartyInfo(const std::wstring* strUIText, Party* p, bo
 
     int tmp = 0;
     for (int i = m_room_cnt - GAIA_ROOM; i < m_room_cnt; i++) {
+        std::wstring temp2 = L"";
         wchar_t* temp;
-        if (tmp > p->player_cnt) temp = L" ";
+        if (tmp >= p->player_cnt) {
+            m_vTextBlocks[i] = { temp2, D2D1::RectF(320, 60 + 50 * (tmp), 520, 100 + 50 * (tmp)), m_pdwTextFormat };
+        }
         else {
+            temp2 = L"";
+            temp2.append(L"LV : ");
+            temp2.append(std::to_wstring(p->player_lv[tmp]));
+            temp2.append(L"\tJOB : ");
+            switch (p->player_job[tmp])
+            {
+            case J_DILLER:  temp2.append(L"딜러\n"); break;
+            case J_TANKER:  temp2.append(L"탱커\n"); break;
+            case J_MAGICIAN:  temp2.append(L"마법사\n"); break;
+            case J_SUPPORTER:  temp2.append(L"서포터\n"); break;
+            default:
+                break;
+            }
+            temp2.append(L"이름 : ");
             int len = 1 + strlen(p->player_name[tmp]);
             temp = new TCHAR[len];
             mbstowcs(temp, p->player_name[tmp], len);
+            temp2.append(temp);
+            m_vTextBlocks[i] = { temp2, D2D1::RectF(320, 60 + 50 * (tmp), 520, 100 + 50 * (tmp)), m_pdwTextFormat };
+            delete []temp;
         }
-        m_vTextBlocks[i] = { temp, D2D1::RectF(320, 60 + 50 * (tmp), 520, 100 + 50 * (tmp)), m_pdwTextFormat };
         tmp++;
-        delete temp;
     }
 }
 
