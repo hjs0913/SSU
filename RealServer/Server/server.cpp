@@ -2049,7 +2049,7 @@ void process_packet(int client_id, unsigned char* p)
                 // 이름 비교
                 char* tmp = reinterpret_cast<cs_packet_party_invite*>(p)->user_name;
                 if (strcmp(check_pl->get_name(), reinterpret_cast<cs_packet_party_invite*>(p)->user_name) == 0) {
-                    send_party_invitation(reinterpret_cast<Player*>(check_pl), (int)reinterpret_cast<cs_packet_party_invite*>(p)->room_id, pl->get_name());
+                    send_party_invitation(reinterpret_cast<Player*>(check_pl), (int)reinterpret_cast<cs_packet_party_invite*>(p)->room_id, pl->get_id());
                     break;
                 }
                 else continue;
@@ -2058,6 +2058,20 @@ void process_packet(int client_id, unsigned char* p)
 
         break;
     }
+    case CS_PACKET_PARTY_INVITATION_REPLY: {
+        cs_packet_party_invitation_reply* packet = reinterpret_cast<cs_packet_party_invitation_reply*>(p);
+
+        if ((int)packet->accept == 1) {
+            cout << "true" << endl;
+        }
+        else if ((int)packet->accept == 0) cout << "false" << endl;
+        cout << pl->get_name() << "이 " << players[packet->invite_user_id]->get_name() << "가 보낸 " <<
+            (int)packet->room_id << "번 파티초대를 " << (int)packet->accept << "하였습니다" << endl;
+        break;
+    }
+    default:
+        cout << "잘못된 패킷 타입 : " << packet_type << endl;
+        break;
     }
 }
 

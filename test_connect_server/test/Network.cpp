@@ -48,7 +48,10 @@ bool party_enter = false;
 int party_enter_room_id = -1;
 bool alramUI_ON = false;
 bool PartyInviteUI_ON = false;
-
+bool InvitationCardUI_On = false;
+chrono::system_clock::time_point InvitationCardTimer = chrono::system_clock::now();
+int InvitationRoomId;
+int InvitationUser;
 
 struct EXP_OVER {
 	WSAOVERLAPPED m_wsa_over;
@@ -249,6 +252,17 @@ void send_party_invite(char* user)
 	packet.type = CS_PACKET_PARTY_INVITE;
 	packet.room_id = party_enter_room_id;
 	strcpy_s(packet.user_name, user);
+	do_send(sizeof(packet), &packet);
+}
+
+void send_party_invitation_reply(int accept)
+{
+	cs_packet_party_invitation_reply packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_PARTY_INVITATION_REPLY;
+	packet.room_id = InvitationRoomId;
+	packet.invite_user_id = InvitationUser;
+	packet.accept = accept;
 	do_send(sizeof(packet), &packet);
 }
 
@@ -691,8 +705,14 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_PARTY_INVITATION: {
-		cout << reinterpret_cast<sc_packet_party_invitation*>(p)->user_name << "이" <<
+		cout << reinterpret_cast<sc_packet_party_invitation*>(p)->invite_user_id << "이" <<
 			(int)reinterpret_cast<sc_packet_party_invitation*>(p)->room_id << "에 초대하였습니다" << endl;
+
+		InvitationRoomId = (int)reinterpret_cast<sc_packet_party_invitation*>(p)->room_id;
+		InvitationUser = (int)reinterpret_cast<sc_packet_party_invitation*>(p)->invite_user_id;
+
+		InvitationCardUI_On = true;
+		InvitationCardTimer = chrono::system_clock::now() + 10s;
 		break;
 	}
 	default:
