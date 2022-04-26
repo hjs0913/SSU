@@ -690,6 +690,11 @@ void process_packet(unsigned char* p)
 		party_info_on = false;
 		break;
 	}
+	case SC_PACKET_PARTY_INVITATION: {
+		cout << reinterpret_cast<sc_packet_party_invitation*>(p)->user_name << "이" <<
+			(int)reinterpret_cast<sc_packet_party_invitation*>(p)->room_id << "에 초대하였습니다" << endl;
+		break;
+	}
 	default:
 		cout << "잘못된 패킷 type : " << type << endl;
 		cout << "Process packet 오류" << endl;

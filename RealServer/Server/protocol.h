@@ -69,6 +69,8 @@ const char CS_PACKET_PARTY_ROOM_INFO_REQUEST = 16;
 const char CS_PACKET_PARTY_ROOM_ENTER_REQUEST = 17;
 const char CS_PACKET_PARTY_ROOM_QUIT_REQUEST = 18;
 const char CS_PACKET_PARTY_INVITE = 19;
+const char CS_PACKET_PARTY_INVITATION_OK = 20;
+const char CS_PACKET_PARTY_INVITATION_FAILED = 21;
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -106,6 +108,7 @@ const char SC_PACKET_PARTY_ROOM_INFO = 30;
 const char SC_PACKET_PARTY_ROOM_ENTER_OK = 31;
 const char SC_PACKET_PARTY_ROOM_ENTER_FAILED = 32;
 const char SC_PACKET_PARTY_ROOM_QUIT_OK = 33;
+const char SC_PACKET_PARTY_INVITATION = 34;
 
 
 //---------------------------------------------------
@@ -439,6 +442,13 @@ struct sc_packet_party_room_enter_failed {
 struct sc_packet_party_room_quit_ok {
 	unsigned char size;
 	char type;
+};
+
+struct sc_packet_party_invitation {
+	unsigned char size;
+	char type;
+	unsigned char room_id;
+	char user_name[MAX_NAME_SIZE];
 };
 
 #pragma pack(pop)

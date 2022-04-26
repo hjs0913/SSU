@@ -297,3 +297,13 @@ void send_party_room_quit_ok_packet(Player* pl)
     packet.type = SC_PACKET_PARTY_ROOM_QUIT_OK;
     pl->do_send(sizeof(packet), &packet);
 }
+
+void send_party_invitation(Player* pl, int r_id, char* invite_user)
+{
+    sc_packet_party_invitation packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_PARTY_INVITATION;
+    packet.room_id = r_id;
+    strcpy_s(packet.user_name, invite_user);
+    pl->do_send(sizeof(packet), &packet);
+}

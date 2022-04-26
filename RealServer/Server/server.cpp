@@ -2034,7 +2034,27 @@ void process_packet(int client_id, unsigned char* p)
         break;
     }
     case CS_PACKET_PARTY_INVITE: {
-        cout << "방번호 : " << (int)reinterpret_cast<cs_packet_party_invite*>(p)->room_id << "에서 " <<
+        for (auto& check_pl : players) {
+            check_pl->state_lock.lock();
+            if (check_pl->get_state() != ST_INGAME) {
+                check_pl->state_lock.unlock();
+                continue;
+            }
+            else {
+                if (check_pl->get_tribe() != HUMAN || reinterpret_cast<Player*>(check_pl)->join_dungeon_room == true) {
+                    check_pl->state_lock.unlock();
+                    continue;
+                }
+                check_pl->state_lock.unlock();
+                // 이름 비교
+                char* tmp = reinterpret_cast<cs_packet_party_invite*>(p)->user_name;
+                if (strcmp(check_pl->get_name(), reinterpret_cast<cs_packet_party_invite*>(p)->user_name) == 0) {
+                    send_party_invitation(reinterpret_cast<Player*>(check_pl), (int)reinterpret_cast<cs_packet_party_invite*>(p)->room_id, pl->get_name());
+                    break;
+                }
+                else continue;
+            }
+        }
 
         break;
     }

@@ -582,9 +582,8 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 				wcout << Invite_Str << endl;
 				len = 1 + Invite_Str.length();
 				send_str = new char[len * 4];
-				temp = Chatting_Str.c_str();
+				temp = Invite_Str.c_str();
 				wcstombs(send_str, temp, MAX_CHAT_SIZE);
-				send_chat_packet(send_str);
 				send_party_invite(send_str);
 				delete send_str;
 				break;
