@@ -46,3 +46,7 @@ void send_party_room_packet(Player* pl, char* room_name, int room_id);
 void send_party_room_info_packet(Player* pl, Player** room_pl, int players_num, int room_id);
 
 void send_partner_party_room_info_packet(Player* pl, Partner** room_pl, int players_num, int room_id);
+
+void send_partner_join_ok(Player* pl, int room_number);
+
+void send_start_partner_packet(Player* pl, int* id);

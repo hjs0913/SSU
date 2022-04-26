@@ -647,6 +647,23 @@ void process_packet(unsigned char* p)
 	case SC_PACKET_PARTNER_JOIN_OK: {
 		break;
 	}
+	case SC_PACKET_START_PARTNER: {
+		sc_packet_start_partner* packet = reinterpret_cast<sc_packet_start_partner*>(p);
+		cout << "인던으로 입장해야됨" << endl;
+		combat_id = 101; // ?
+		InDungeon = true;
+		for (int i = 0; i < GAIA_ROOM; i++) {
+			party_id[i] = packet->party_id[i];
+
+			wchar_t* temp;
+			int len = 1 + strlen(mPlayer[party_id[i]]->m_name);
+			temp = new TCHAR[len];
+			mbstowcs(temp, mPlayer[party_id[i]]->m_name, len);
+			party_name[i] = L"";
+			party_name[i].append(temp);
+		}
+		break;
+	}
 	default:
 		cout << "잘못된 패킷 type : " << type << endl;
 		cout << "Process packet 오류" << endl;

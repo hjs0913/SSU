@@ -286,3 +286,21 @@ void send_partner_party_room_info_packet(Player* pl, Partner** room_pl, int play
     }
     pl->do_send(sizeof(packet), &packet);
 }
+
+void send_partner_join_ok(Player* pl, int room_number)
+{
+    sc_packet_partner_join_ok packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_PARTNER_JOIN_OK;
+    packet.room_number = room_number;
+    pl->do_send(sizeof(packet), &packet);
+}
+
+void send_start_partner_packet(Player* pl, int* id)
+{
+    sc_packet_start_partner packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_START_PARTNER;
+    for (int i = 0; i < GAIA_ROOM; i++) packet.party_id[i] = id[i];
+    pl->do_send(sizeof(packet), &packet);
+}

@@ -2026,39 +2026,133 @@ void process_packet(int client_id, unsigned char* p)
             timer_queue.push(ev);
         }
         break;
-    }
-    case CS_PACKET_ADD_PARTNER: {
-        cout << "추가!" << endl;
-
-        int level_sum = 0;
-        int i = 0;
-        for (auto& dun : dungeons) {
-            dun->state_lock.lock();
-            if (dun->get_dun_st() == DUN_ST_ROBBY) {
-                level_sum += dun->get_party_palyer()[i]->get_lv();
-                dun->state_lock.unlock();
+    }  
+    case CS_PACKET_ADD_PARTNER: { //여기
+        if (dungeons[pl->indun_id]->player_cnt < 2) {
+            cout << "넣기 시작!" << endl;
+            int new_id = get_new_id();
+            if (-1 == new_id) {
+                cout << "Maxmum user overflow. Accept aborted.\n";
             }
-            dun->state_lock.unlock();
-            ++i;
-            partners[pl->indun_id]->set_level(level_sum / i);
-        }
-\
-        for (auto dun : partners) {
-            dun->set_dun_st(DUN_ST_ROBBY);
-            if (dun->get_dun_st() == DUN_ST_ROBBY) {
-                dun->state_lock.lock();
-                // 이 방에 이 플레이어를 집어 넣는다
-                dun->join_partner(partners[pl->indun_id]);  //이상
-                // 이 방에 대한 정보를 보내준다
-                send_partner_party_room_info_packet(pl, dun->get_party_partner(), dun->player_cnt, dun->get_dungeon_id());
-            
+            else {
+                Player* pl = reinterpret_cast<Player*>(players[new_id]);
+                pl->set_id(new_id);
+                pl->_prev_size = 0;
+                pl->_recv_over._comp_op = OP_RECV;
+                pl->_recv_over._wsa_buf.buf = reinterpret_cast<char*>(pl->_recv_over._net_buf);
+                pl->_recv_over._wsa_buf.len = sizeof(pl->_recv_over._net_buf);
+                pl->set_tribe(PARTNER);
+                ZeroMemory(&pl->_recv_over._wsa_over, sizeof(pl->_recv_over._wsa_over));
+            }
+            cs_packet_add_partner* packet = reinterpret_cast<cs_packet_add_partner*>(p);
+
+            // players 에서 파트너의 아이디와 기본정보 업데이트 
+            players[new_id]->set_tribe(PARTNER);
+            players[new_id]->set_id(new_id);
+            players[new_id]->set_name("AI");
+            players[new_id]->set_x(2100);
+            players[new_id]->set_y(0);
+            players[new_id]->set_z(1940);
+            reinterpret_cast<Player*>(players[new_id])->set_job(J_DILLER);
+            players[new_id]->set_lv(25);
+            players[new_id]->set_element(E_WATER);
+
+            reinterpret_cast<Player*>(players[new_id])->indun_id = 0;  // 이후 수정 
+            reinterpret_cast<Player*>(players[new_id])->join_dungeon_room = true;  //인던 상태 
+
+            switch (reinterpret_cast<Player*>(players[new_id])->get_job()) {
+            case J_DILLER: {
+                int lv = players[new_id]->get_lv();
+                players[new_id]->set_maxhp(20 * lv * lv + 80 * lv);
+                players[new_id]->set_hp(players[new_id]->get_maxhp());
+                players[new_id]->set_maxmp(10 * lv * lv + 50 * lv);
+                players[new_id]->set_mp(players[new_id]->get_maxmp());
+                players[new_id]->set_physical_attack(0.3 * lv * lv + 10 * lv);
+                players[new_id]->set_magical_attack(0.1 * lv * lv + 5 * lv);
+                players[new_id]->set_physical_defence(0.24 * lv * lv + 10 * lv);
+                players[new_id]->set_magical_defence(0.17 * lv * lv + 10 * lv);
+                players[new_id]->set_basic_attack_factor(50.0f);
+                players[new_id]->set_defence_factor(0.0002);
                 break;
             }
-            dun->state_lock.unlock();
+            case J_TANKER: {
+                int lv = pl->get_lv();
+                players[new_id]->set_maxhp(22 * lv * lv + 80 * lv);
+                players[new_id]->set_hp(players[new_id]->get_maxhp());
+                players[new_id]->set_maxmp(8.5 * lv * lv + 50 * lv);
+                players[new_id]->set_mp(players[new_id]->get_maxmp());
+                players[new_id]->set_physical_attack(0.25 * lv * lv + 10 * lv);
+                players[new_id]->set_magical_attack(0.08 * lv * lv + 5 * lv);
+                players[new_id]->set_physical_defence(0.27 * lv * lv + 10 * lv);
+                players[new_id]->set_magical_defence(0.2 * lv * lv + 10 * lv);
+                players[new_id]->set_basic_attack_factor(50.0f);
+                players[new_id]->set_defence_factor(0.0002);
+                players[new_id]->set_element(E_WATER);
+                break;
+            }
+            case J_SUPPORTER: {
+                int lv = players[new_id]->get_lv();
+                players[new_id]->set_maxhp(18 * lv * lv + 70 * lv);
+                players[new_id]->set_hp(players[new_id]->get_maxhp());
+                players[new_id]->set_maxmp(15 * lv * lv + 60 * lv);
+                players[new_id]->set_mp(players[new_id]->get_maxmp());
+                players[new_id]->set_physical_attack(0.1 * lv * lv + 5 * lv);
+                players[new_id]->set_magical_attack(0.25 * lv * lv + 8 * lv);
+                players[new_id]->set_physical_defence(0.17 * lv * lv + 10 * lv);
+                players[new_id]->set_magical_defence(0.24 * lv * lv + 10 * lv);
+                players[new_id]->set_basic_attack_factor(50.0f);
+                players[new_id]->set_defence_factor(0.0002);
+                break;
+            }
+            case J_MAGICIAN: {
+                int lv = players[new_id]->get_lv();
+                players[new_id]->set_maxhp(16 * lv * lv + 70 * lv);
+                players[new_id]->set_hp(players[new_id]->get_maxhp());
+                players[new_id]->set_maxmp(17 * lv * lv + 60 * lv);
+                players[new_id]->set_mp(players[new_id]->get_maxmp());
+                players[new_id]->set_physical_attack(0.1 * lv * lv + 5 * lv);
+                players[new_id]->set_magical_attack(0.3 * lv * lv + 10 * lv);
+                players[new_id]->set_physical_defence(0.17 * lv * lv + 10 * lv);
+                players[new_id]->set_magical_defence(0.24 * lv * lv + 10 * lv);
+                players[new_id]->set_basic_attack_factor(50.0f);
+                players[new_id]->set_defence_factor(0.0002);
+                break;
+            }
+            default: {
+                cout << "없는 직업" << endl;
+                break;
+            }
+            }
+            //  여기까지 클라에서 패킷 받으면, 새 player id 생성 후 정보 초기화  
+
+             //이후 이 파트너 플레이어 정보를 방에 넣고 플레이어들에게 보내주자 
+            players[new_id]->state_lock.lock();
+            if (players[new_id]->get_state() != ST_INDUN || pl->join_dungeon_room == false) {
+                players[new_id]->state_lock.unlock();
+                break;
+            }
+            players[new_id]->state_lock.unlock();
+
+            for (auto& dun : dungeons) {
+                // join dungeon party
+                dun->state_lock.lock();
+
+                if (dun->get_dun_st() == DUN_ST_ROBBY) {
+                    dun->state_lock.unlock();
+                    // 이 방에 이 플레이어를 집어 넣는다
+                    dun->set_party_name(players[new_id]->get_name());
+                    dun->join_player(reinterpret_cast<Player*> (players[new_id]));
+                    // 이 방에 대한 정보를 보내준다
+                    send_party_room_packet(pl, dun->get_party_name(), dun->get_dungeon_id());
+                    send_party_room_info_packet(pl, dun->get_party_palyer(), dun->player_cnt, dun->get_dungeon_id());
+                    break;
+                }
+                dun->state_lock.unlock();
+            }
+            cout << "넣기 끝!" << endl;
         }
-
-
-        cout << "추가 끝!" << endl;
+        else 
+             cout << "넣기 실패" << endl;
         break; 
     }
     case CS_PACKET_PARTNER_RENDER_OK: {
@@ -3256,13 +3350,7 @@ void initialise_DUNGEON()
     cout << "던전 초기화 완료" << endl;
 }
 
-void initialize_PARTNER()
-{
-    for (int i = 0; i < MAX_USER * 3; i++) {
-        partners[i] = new Partner(i);
-    }
-    cout << "파트너 초기화 완료" << endl;
-}
+
 
 int main()
 {
@@ -3305,7 +3393,7 @@ int main()
     // Initialise_DB();
     initialise_NPC();
     initialise_DUNGEON();
-    initialize_PARTNER();
+
 
     ifstream obstacles_read("tree_position.txt");
     if (!obstacles_read.is_open()) {
@@ -3335,7 +3423,7 @@ int main()
 
     timer_thread.join();
     for (auto& pl : players) {
-        if (pl->get_tribe() != HUMAN) break;
+        if (pl->get_tribe() != HUMAN && pl->get_tribe() != PARTNER ) break;
         if (ST_INGAME == pl->get_state())
             Disconnect(pl->get_id());
     }

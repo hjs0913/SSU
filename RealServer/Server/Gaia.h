@@ -68,5 +68,7 @@ public:
 	void judge_pattern_two_leftup(Player* p);
 
 	void player_death(Player* p);
+
+//	void join_partner(Partner* pl);
 };
 extern array <Gaia*, MAX_USER / GAIA_ROOM> dungeons;

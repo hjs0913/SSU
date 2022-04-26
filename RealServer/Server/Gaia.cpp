@@ -104,6 +104,18 @@ void Gaia::join_player(Player* pl)
 	//	cout << dungeon_id << "번 던전 시작합니다" << endl;
 	//}
 }
+/*
+void Gaia::join_partner(Partner* pl)
+{
+	party[player_cnt] = pl;
+	party_id[player_cnt] = pl->get_id();
+	player_cnt++;
+	cout << dungeon_id << "번 던전에 입장 중입니다" << endl;
+	pl->state_lock.lock();
+	pl->join_dungeon_room = true;
+	pl->state_lock.unlock();
+
+}*/
 
 DUNGEON_STATE Gaia::get_dun_st()
 {

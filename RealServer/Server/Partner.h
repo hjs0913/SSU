@@ -3,6 +3,11 @@
 #include "Player.h"
 #include "Gaia.h"
 
+struct Coord_P
+{
+    float x;
+    float z;
+};
 
 
 class Partner : public Player
@@ -15,7 +20,6 @@ protected:
     Partner* partner_party[GAIA_ROOM];	// 파트너 정보
     int* partner_party_id;	//서버에서의 파티원 id
 
-    int	_id;
     int dungeon_id;
 
 
@@ -63,7 +67,21 @@ public:
     DUNGEON_STATE get_dun_st();
     void set_dun_st(DUNGEON_STATE dst);
     void physical_skill_success(int p_id, int target, float skill_factor);
-    bool isInsideTriangle(Coord a, Coord b, Coord c, Coord n)
+
+    bool check_inside(Coord_P a, Coord_P b, Coord_P c, Coord_P n) {
+        Coord_P A, B, C;
+        A.x = b.x - a.x;
+        A.z = b.z - a.z;
+        B.x = c.x - a.x;
+        B.z = c.z - a.z;
+        C.x = n.x - a.x;
+        C.z = n.z - a.z;
+
+        if ((A.x * B.z - A.z * B.x) * (A.x * C.z - A.z * C.x) < 0)
+            return false;
+        return true;
+    }
+    bool isInsideTriangle(Coord_P a, Coord_P b, Coord_P c, Coord_P n)
     {
         if (!check_inside(a, b, c, n)) return false;
         if (!check_inside(b, c, a, n)) return false;
@@ -75,8 +93,3 @@ public:
 
 };
 extern array <Partner*, MAX_USER * 3> partners;
-struct Coord
-{
-    float x;
-    float z;
-};

@@ -106,6 +106,7 @@ const char SC_PACKET_PARTY_ROOM = 29;
 const char SC_PACKET_PARTY_ROOM_INFO = 30;
 const char SC_PACKET_PARTNER_PARTY_ROOM_INFO = 31;
 const char SC_PACKET_PARTNER_JOIN_OK = 32;
+const char SC_PACKET_START_PARTNER = 33;
 //---------------------------------------------------
 #pragma pack (push, 1)
 struct cs_packet_login {
@@ -419,6 +420,11 @@ struct sc_packet_partner_join_ok {
 	unsigned char size;
 	char type;
 	char room_number;
+};
+struct sc_packet_start_partner {
+	unsigned char size;
+	char type;
+	int party_id[GAIA_ROOM];
 };
 
 #pragma pack(pop)

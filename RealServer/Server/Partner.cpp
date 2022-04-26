@@ -6,10 +6,9 @@
 Partner::Partner(int d_id) : Player(d_id)
 {
 	dungeon_id = d_id;
-	st = DUN_ST_ROBBY;
+	st = DUN_ST_FREE;
 	player_cnt = 0;
-	
-	_id = 0;
+
 	player_rander_ok = 0;
 	start_game = false;
 	target_id = 0;
@@ -20,11 +19,13 @@ Partner::Partner(int d_id) : Player(d_id)
 	// Boss Npc Intialize	
 	partner = new Player(dungeon_id);
 	partner->set_name("ai"); 
+
+	partner->set_id(-1);
 	partner->set_tribe(PARTNER);
 	partner->state_lock.lock();
 	partner->set_state(ST_FREE);
 	partner->state_lock.unlock();
-	partner->set_id(102);
+
 
 
 
@@ -77,6 +78,37 @@ void Partner::join_partner(Partner* pa)
 	//pa->state_lock.unlock();
 
 
+    //send_gaia_join_ok(pl, dungeon_id);
+	/*
+	// game start
+	if (player_cnt == GAIA_ROOM) {
+		//	// ¸ðµç ÆÄÆ¼ ÀÎ´ø ÀÔÀå ¹× °ÔÀÓ ½ÃÀÛ
+		player_rander_ok = 0;
+		//	// °¡Àå Ã¼·ÂÀÌ ³ôÀº ÇÃ·¹ÀÌ¾î¸¦ ÀÏ´Ü Å¸°ÙÀ¸·Î Àâ´Â´Ù
+		int tmp_hp = 0;
+
+		state_lock.lock();
+		st = DUN_ST_START;
+		state_lock.unlock();
+
+		partner->set_x(party[0]->get_x() + 30);
+		partner->set_z(party[0]->get_z() + 30);
+
+		for (int i = 0; i < GAIA_ROOM; i++) {
+			party[i]->state_lock.lock();
+			party[i]->set_state(ST_INDUN);
+			party[i]->state_lock.unlock();
+			send_start_partner_packet(party[i], party_id);
+			party[i]->indun_id = dungeon_id;
+
+			//		// °¡Àå Ã¼·ÂÀÌ ³ôÀº ÇÃ·¹ÀÌ¾î¸¦ ÀÏ´Ü Å¸°ÙÀ¸·Î Àâ´Â´Ù
+	
+		}
+
+		//	cout << dungeon_id << "¹ø ´øÀü ½ÃÀÛÇÕ´Ï´Ù" << endl;
+	}
+	*/
+
 }
 
 Partner** Partner::get_party_partner()
@@ -119,12 +151,11 @@ void Partner::physical_skill_success(int p_id, int target, float skill_factor)
 
 	float give_damage = partners[p_id]->get_physical_attack() * skill_factor;
 	float defence_damage = (dungeons[target]->boss->get_defence_factor() *
-		dungeons[target]->boss->get_physical_defence()) / (1 + (dungeons[target]->boss->eget_defence_factor() *
+		dungeons[target]->boss->get_physical_defence()) / (1 + (dungeons[target]->boss->get_defence_factor() *
 			dungeons[target]->boss->get_physical_defence()));
 	float damage = give_damage * (1 - defence_damage);
 	int target_hp = dungeons[target]->boss->get_hp() - damage;
-	cout << dungeons[target]->boss->[target]->get_defence_factor() << endl;
-	cout << dungeons[target]->boss->[target]->get_physical_defence() << endl;
+
 	cout << "give_damage : " << give_damage << endl;
 	cout << "defence_damage : " << defence_damage << endl;
 	cout << dungeons[target]->boss->get_defence_factor() *
@@ -317,7 +348,7 @@ void Partner::partner_attack()  //ÀÏ¹Ý°ø°Ý ±âº», ½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °è¼Ó ¾²µ
 				partners[0]->set_skill_factor(0, 0);  // ÆÄÆ®³Ê¿Í °¡ÀÌ¾Æ¿ÍÀÇ ½ºÅ³ ¼®¼¼½º µû·Î ¸¸µéÀÚ 
 				physical_skill_success(_id, dungeons[i]->get_dungeon_id(), partners[0]->get_skill_factor(0, 0));
 				dungeons[i]->boss->set_target_id(partners[0]->partner_get_id());
-				send_status_change_packet(pl);
+				send_status_change_packet(partners[0]);
 				if (dungeons[i]->boss->get_active() == false && dungeons[i]->boss->get_tribe() == BOSS) {
 					dungeons[i]->boss->set_active(true);
 					timer_event ev;
@@ -345,10 +376,10 @@ void Partner::partner_attack()  //ÀÏ¹Ý°ø°Ý ±âº», ½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °è¼Ó ¾²µ
 
 
 
-		Coord a = { partners[0]->get_x(), partners[0]->get_z() };    //ÇÃ·¹ÀÌ¾î ±âÁØ Àü¹æ »ï°¢Çü ¹üÀ§ 
-		Coord b = { partners[0]->get_x() - partners[0]->get_right_x() * 40 + partners[0]->get_look_x() * 100,
+		Coord_P a = { partners[0]->get_x(), partners[0]->get_z() };    //ÇÃ·¹ÀÌ¾î ±âÁØ Àü¹æ »ï°¢Çü ¹üÀ§ 
+		Coord_P b = { partners[0]->get_x() - partners[0]->get_right_x() * 40 + partners[0]->get_look_x() * 100,
 			partners[0]->get_z() - partners[0]->get_right_z() * 40 + partners[0]->get_look_z() * 100 };  // ¿ÞÂÊ À§
-		Coord c = { partners[0]->get_x() + partners[0]->get_right_x() * 40 + partners[0]->get_look_x() * 100,
+		Coord_P c = { partners[0]->get_x() + partners[0]->get_right_x() * 40 + partners[0]->get_look_x() * 100,
 			partners[0]->get_z() + partners[0]->get_right_z() * 40 + partners[0]->get_look_z() * 100 };  // ¿À¸¥ÂÊ À§
 	
 		cout << "±¤¾ß ÀÏ°Ý !!!" << endl;
@@ -361,7 +392,7 @@ void Partner::partner_attack()  //ÀÏ¹Ý°ø°Ý ±âº», ½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °è¼Ó ¾²µ
 			}
 			dungeons[i]->state_lock.unlock();
 
-			Coord n = { dungeons[i]->boss->get_x(), dungeons[i]->boss->get_z() };
+			Coord_P n = { dungeons[i]->boss->get_x(), dungeons[i]->boss->get_z() };
 			float px = dungeons[i]->boss->get_x();
 			float pz = dungeons[i]->boss->get_z();
 
@@ -369,7 +400,7 @@ void Partner::partner_attack()  //ÀÏ¹Ý°ø°Ý ±âº», ½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °è¼Ó ¾²µ
 				partners[0]->set_skill_factor(1, 0);
 				physical_skill_success(_id, dungeons[i]->get_dungeon_id(), partners[0]->get_skill_factor(1, 0));
 				dungeons[i]->boss->set_target_id(partners[0]->get_id());
-				send_status_change_packet(pl);
+				send_status_change_packet(partners[0]);
 				if (dungeons[i]->boss->get_active() == false && dungeons[i]->boss->get_tribe() == BOSS) {
 					dungeons[i]->boss->set_active(true);
 					timer_event ev;
