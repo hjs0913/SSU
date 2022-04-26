@@ -297,3 +297,32 @@ void send_party_room_quit_ok_packet(Player* pl)
     packet.type = SC_PACKET_PARTY_ROOM_QUIT_OK;
     pl->do_send(sizeof(packet), &packet);
 }
+
+void send_party_invitation(Player* pl, int r_id, int user_id)
+{
+    sc_packet_party_invitation packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_PARTY_INVITATION;
+    packet.room_id = r_id;
+    packet.invite_user_id = user_id;
+    pl->do_send(sizeof(packet), &packet);
+}
+
+void send_party_invitation_failed(Player* pl, int failed_reason, char* invited_user)
+{
+    sc_packet_party_invitation_failed packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_PARTY_INVITATION_FAILED;
+    packet.failed_reason = failed_reason;
+    strcpy_s(packet.invited_user, invited_user);
+    pl->do_send(sizeof(packet), &packet);
+}
+
+void send_party_room_destroy(Player* pl, int r_id)
+{
+    sc_packet_party_room_destroy packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_PARTY_ROOM_DESTROY;
+    packet.room_id = r_id;
+    pl->do_send(sizeof(packet), &packet);
+}

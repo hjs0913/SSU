@@ -68,3 +68,16 @@ public:
 	virtual void Render(UINT nFrame);
 	virtual void Resize(ID3D12Resource** ppd3dRenderTargets, UINT width, UINT height, UINT TextAlignment, UINT ParagraphAlignment);
 };
+
+class InvitationCardUI : public UILayer
+{
+private:
+	IDWriteTextFormat* m_pdwTextFormat2 = NULL;
+	ID2D1SolidColorBrush* m_pTButtonBrush;
+public:
+	InvitationCardUI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor);
+	~InvitationCardUI();
+	virtual void UpdateLabels(const std::wstring& strUIText);
+	virtual void Resize(ID3D12Resource** ppd3dRenderTargets, UINT width, UINT height, UINT TextAlignment, UINT ParagraphAlignment);
+	virtual void Render(UINT nFrame);
+};

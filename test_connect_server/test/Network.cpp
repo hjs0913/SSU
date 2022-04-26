@@ -48,7 +48,10 @@ bool party_enter = false;
 int party_enter_room_id = -1;
 bool alramUI_ON = false;
 bool PartyInviteUI_ON = false;
-
+bool InvitationCardUI_On = false;
+chrono::system_clock::time_point InvitationCardTimer = chrono::system_clock::now();
+int InvitationRoomId;
+int InvitationUser;
 
 struct EXP_OVER {
 	WSAOVERLAPPED m_wsa_over;
@@ -249,6 +252,17 @@ void send_party_invite(char* user)
 	packet.type = CS_PACKET_PARTY_INVITE;
 	packet.room_id = party_enter_room_id;
 	strcpy_s(packet.user_name, user);
+	do_send(sizeof(packet), &packet);
+}
+
+void send_party_invitation_reply(int accept)
+{
+	cs_packet_party_invitation_reply packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_PARTY_INVITATION_REPLY;
+	packet.room_id = InvitationRoomId;
+	packet.invite_user_id = InvitationUser;
+	packet.accept = accept;
 	do_send(sizeof(packet), &packet);
 }
 
@@ -542,6 +556,11 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_START_GAIA: {
+		PartyUI_On = false;
+		party_info_on = false;
+		PartyInviteUI_ON = false;
+		InvitationCardUI_On = false;
+
 		sc_packet_start_gaia* packet = reinterpret_cast<sc_packet_start_gaia*>(p);
 		cout << "인던으로 입장해야됨" << endl;
 		combat_id = 101;
@@ -653,6 +672,7 @@ void process_packet(unsigned char* p)
 			m_party[r_id]->set_player_name(packet->player_name2);
 		}
 		else m_party[r_id]->set_player_name("");
+		PartyUI_On = true;
 		party_info_on = true;
 		m_party_info = m_party[r_id];
 		break;
@@ -688,6 +708,32 @@ void process_packet(unsigned char* p)
 	case SC_PACKET_PARTY_ROOM_QUIT_OK: {
 		party_enter = false;
 		party_info_on = false;
+		break;
+	}
+	case SC_PACKET_PARTY_INVITATION: {
+		InvitationRoomId = (int)reinterpret_cast<sc_packet_party_invitation*>(p)->room_id;
+		InvitationUser = reinterpret_cast<sc_packet_party_invitation*>(p)->invite_user_id;
+
+		InvitationCardUI_On = true;
+		InvitationCardTimer = chrono::system_clock::now() + 10s;
+		break;
+	}
+	case SC_PACKET_PARTY_INVITATION_FAILED: {
+		cout << "초대 실패함" << endl;
+		break;
+	}
+	case SC_PACKET_PARTY_ROOM_DESTROY: {
+		m_party[(int)reinterpret_cast<sc_packet_party_room_destroy*>(p)->room_id]->dst = DUN_ST_FREE;
+		if (robby_cnt <= 0) robby_cnt = 0;
+		else robby_cnt--;
+
+		if (party_id_index_vector.size() == 0) break;
+
+		if (find(party_id_index_vector.begin(), party_id_index_vector.end(), (int)reinterpret_cast<sc_packet_party_room_destroy*>(p)->room_id)
+			!= party_id_index_vector.end()) {
+			int in = find(party_id_index_vector.begin(), party_id_index_vector.end(), (int)reinterpret_cast<sc_packet_party_room_destroy*>(p)->room_id) - party_id_index_vector.begin(); // index 확인
+			party_id_index_vector.erase(party_id_index_vector.begin()+in);
+		}
 		break;
 	}
 	default:

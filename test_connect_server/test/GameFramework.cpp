@@ -453,13 +453,26 @@ bool CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 	case WM_LBUTTONDOWN: //좌클릭
 		::SetCapture(hWnd);
 		::GetCursorPos(&m_ptOldCursorPos);
-		if (PartyUI_On) {
-			POINT CursorPosInClient = m_ptOldCursorPos;
-			ScreenToClient(hWnd, &CursorPosInClient);
+		POINT CursorPosInClient = m_ptOldCursorPos;
+		ScreenToClient(hWnd, &CursorPosInClient);
+		if (InvitationCardUI_On) {
+			if (CursorPosInClient.y >= 420 && CursorPosInClient.y <= 460) {
+				if (CursorPosInClient.x >= 360 && CursorPosInClient.x <= 460) {
+					send_party_invitation_reply(1);
+					InvitationCardUI_On = false;
+				}
+				if (CursorPosInClient.x >= 520 && CursorPosInClient.x <= 620) {
+					send_party_invitation_reply(0);
+					InvitationCardUI_On = false;
+				}
+			}
+		}
 
+		if (PartyUI_On) {
 			if (PartyInviteUI_ON) {
 				break;
 			}
+
 
 			if (CursorPosInClient.y >= 360 && CursorPosInClient.y <= 400) {
 				if (CursorPosInClient.x >= 140 && CursorPosInClient.x <= 205) {
@@ -582,9 +595,8 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 				wcout << Invite_Str << endl;
 				len = 1 + Invite_Str.length();
 				send_str = new char[len * 4];
-				temp = Chatting_Str.c_str();
+				temp = Invite_Str.c_str();
 				wcstombs(send_str, temp, MAX_CHAT_SIZE);
-				send_chat_packet(send_str);
 				send_party_invite(send_str);
 				delete send_str;
 				break;
@@ -798,6 +810,9 @@ void CGameFramework::BuildObjects()
 		// 파티초대 UI
 		m_ppUILayer[14] = new PartyInviteUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::Black);
 
+		// 파티 초대장
+		m_ppUILayer[15] = new InvitationCardUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::DarkGray, D2D1::ColorF::White);
+
 
 		m_ppUILayer[0]->setAlpha(0.5, 1.0);
 		m_ppUILayer[1]->setAlpha(0.5, 1.0);
@@ -814,6 +829,7 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[12]->setAlpha(0.0, 1.0);
 		m_ppUILayer[13]->setAlpha(0.7, 1.0);
 		m_ppUILayer[14]->setAlpha(1.0, 1.0);
+		m_ppUILayer[15]->setAlpha(1.0, 1.0);
 
 		m_ppUILayer[0]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_FAR);
@@ -844,6 +860,8 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[13]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		reinterpret_cast<PartyInviteUI*>(m_ppUILayer[14])->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+		reinterpret_cast<InvitationCardUI*>(m_ppUILayer[15])->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 
 		// UIBar Setting
@@ -1426,6 +1444,11 @@ void CGameFramework::FrameAdvance()
 			reinterpret_cast<PartyInviteUI*>(m_ppUILayer[i])->UpdateLabels(Invite_Str);
 			break;
 		}
+		case 15: {
+			if (!InvitationCardUI_On) break;
+			reinterpret_cast<InvitationCardUI*>(m_ppUILayer[i])->UpdateLabels(L"시모시모");
+			break;
+		}
 	}
 	}
 
@@ -1436,8 +1459,13 @@ void CGameFramework::FrameAdvance()
 		if (i >= 7 && i <= 11) {
 			if (!InDungeon) continue;
 		}
-		if (i == 13 && !PartyUI_On) continue;
+		if (i == 13 && !PartyUI_On) {
+			if(PartyUI_On == true)
+				cout << PartyUI_On << endl;
+			continue;
+		}
 		if (i == 14 && !PartyInviteUI_ON) continue;
+		if (i == 15 && !InvitationCardUI_On) continue;
 		m_ppUILayer[i]->Render(m_nSwapChainBufferIndex);
 	}
 
@@ -1464,5 +1492,11 @@ void CGameFramework::FrameAdvance()
 	::SetWindowText(m_hWnd, m_pszFrameRate);
 
 	if (robby_cnt > 0) delete []party_name_index;
+	if (InvitationCardUI_On) {
+		if (chrono::system_clock::now() > InvitationCardTimer) {
+			InvitationCardUI_On = false;
+			// 초대 거절 패킷 보내기
+		}
+	}
 }
 
