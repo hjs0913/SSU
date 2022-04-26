@@ -28,6 +28,11 @@ void Player::set_job(JOB job)
     _job = job;
 }
 
+void Player::set_indun_id(int id)
+{
+    indun_id = id;
+}
+
 int Player::get_exp()
 {
 	return _exp;
@@ -36,4 +41,9 @@ int Player::get_exp()
 JOB Player::get_job()
 {
     return _job;
+}
+
+int Player::get_indun_id()
+{
+    return indun_id;
 }

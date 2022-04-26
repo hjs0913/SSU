@@ -53,3 +53,18 @@ public:
 	void UpdateLabels_PartyInfo(const std::wstring* strUIText, Party* p, bool party_enter);
 	virtual void Render(UINT nFrame);
 };
+
+class PartyInviteUI : public UILayer
+{
+private:
+	IDWriteTextFormat			*m_pdwTextFormat2 = NULL;
+	ID2D1SolidColorBrush		*m_pTextLayoutBrush;
+
+public:
+	PartyInviteUI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor);
+	~PartyInviteUI();
+
+	virtual void UpdateLabels(const std::wstring& strUIText);
+	virtual void Render(UINT nFrame);
+	virtual void Resize(ID3D12Resource** ppd3dRenderTargets, UINT width, UINT height, UINT TextAlignment, UINT ParagraphAlignment);
+};

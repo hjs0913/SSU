@@ -45,6 +45,8 @@ public:
 	void join_player(Player* pl);
 	void quit_palyer(Player* pl);
 
+	void game_start();
+
 	DUNGEON_STATE get_dun_st();
 	void set_dun_st(DUNGEON_STATE dst);
 	Player** get_party_palyer();

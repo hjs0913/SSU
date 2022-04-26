@@ -50,7 +50,7 @@ extern vector<int> party_id_index_vector;
 
 extern bool party_enter;
 extern int party_enter_room_id;
-
+extern bool PartyInviteUI_ON;
 
 void err_quit(const char* msg);
 

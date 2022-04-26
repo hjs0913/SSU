@@ -16,6 +16,9 @@
     <Filter Include="소스 파일\Network">
       <UniqueIdentifier>{b70b4062-8dd6-4528-b639-a60d2ad83fac}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\UI/Party">
+      <UniqueIdentifier>{1890b00f-b2a8-4c5b-9961-df543a0743a7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -60,9 +63,6 @@
     <ClInclude Include="Timer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="UILayer.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="cRay.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -72,14 +72,17 @@
     <ClInclude Include="Bitmap.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="PartyUI.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Network.h">
       <Filter>소스 파일\Network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\RealServer\Server\protocol.h">
       <Filter>소스 파일\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="UILayer.h">
+      <Filter>소스 파일\UI/Party</Filter>
+    </ClInclude>
+    <ClInclude Include="PartyUI.h">
+      <Filter>소스 파일\UI/Party</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -116,17 +119,17 @@
     <ClCompile Include="Timer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="UILayer.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="Pattern.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="PartyUI.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Network.cpp">
       <Filter>소스 파일\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="UILayer.cpp">
+      <Filter>소스 파일\UI/Party</Filter>
+    </ClCompile>
+    <ClCompile Include="PartyUI.cpp">
+      <Filter>소스 파일\UI/Party</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -46,6 +46,9 @@ bool party_info_on = false;
 int  robby_cnt = 0;
 bool party_enter = false;
 int party_enter_room_id = -1;
+bool alramUI_ON = false;
+bool PartyInviteUI_ON = false;
+
 
 struct EXP_OVER {
 	WSAOVERLAPPED m_wsa_over;
@@ -650,6 +653,25 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_PARTY_ROOM_ENTER_FAILED: {
+		int f_reason = (int)reinterpret_cast<sc_packet_party_room_enter_failed*>(p)->failed_reason;
+		string msg = "";
+		switch (f_reason)
+		{
+		case 0:
+			msg  = "인원이 꽉차 방에 입장할 수 없습니다";
+			break;
+		case 1:
+			msg = "존재하지 않는 방이므로 입장할 수 없습니다";
+			break;
+		case 2:
+			msg = "이미 다른방에 참가중입니다";
+			break;
+		default:
+			break;
+		}
+		if (g_msg.size() >= 5 && (f_reason>=0 && f_reason<=2)) g_msg.erase(g_msg.begin());
+		g_msg.push_back(msg);
+
 		party_enter = false;
 		break;
 	}

@@ -21,6 +21,7 @@ bool shoot = false;
 bool hit_check = false;
 
 wstring Chatting_Str = L"";
+wstring Invite_Str = L"";
 wstring Send_str = L"";
 wstring Hp_str = L"";
 wstring Mp_str = L"";
@@ -455,16 +456,26 @@ bool CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 		if (PartyUI_On) {
 			POINT CursorPosInClient = m_ptOldCursorPos;
 			ScreenToClient(hWnd, &CursorPosInClient);
+
+			if (PartyInviteUI_ON) {
+				break;
+			}
+
 			if (CursorPosInClient.y >= 360 && CursorPosInClient.y <= 400) {
 				if (CursorPosInClient.x >= 140 && CursorPosInClient.x <= 205) {
-					send_party_room_make();
+					if(!party_enter)send_party_room_make();
 				}
 				if (CursorPosInClient.x >= 215 && CursorPosInClient.x <= 280) {
 					if (!party_info_on) break;
 					if (party_enter == false) send_party_room_enter_request();
 					else send_party_room_quit_request();
 				}
-				if (CursorPosInClient.x >= 360 && CursorPosInClient.x <= 425) cout << "초대하기" << endl;
+				if (CursorPosInClient.x >= 360 && CursorPosInClient.x <= 425) {
+					if (party_enter) {
+						PartyInviteUI_ON = true;
+						Invite_Str = L"";
+					}
+				}
 				if (CursorPosInClient.x >= 435 && CursorPosInClient.x <= 500) {
 					cout << "AI넣기" << endl;
 				}
@@ -566,6 +577,12 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			::PostQuitMessage(0);
 			break;
 		case VK_RETURN:
+			if (PartyInviteUI_ON) {
+				PartyInviteUI_ON = false;
+				wcout << Invite_Str << endl;
+				break;
+			}
+
 			Chatting_On = !Chatting_On;
 			if (Chatting_On == false) {
 				len = 1 + Chatting_Str.length();
@@ -771,6 +788,10 @@ void CGameFramework::BuildObjects()
 		// Party UI
 		m_ppUILayer[13] = new PartyUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::White);
 
+		// 파티초대 UI
+		m_ppUILayer[14] = new PartyInviteUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::Black);
+
+
 		m_ppUILayer[0]->setAlpha(0.5, 1.0);
 		m_ppUILayer[1]->setAlpha(0.5, 1.0);
 		m_ppUILayer[2]->setAlpha(0.3, 1.0);
@@ -785,6 +806,7 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[11]->setAlpha(0.0, 1.0);
 		m_ppUILayer[12]->setAlpha(0.0, 1.0);
 		m_ppUILayer[13]->setAlpha(0.7, 1.0);
+		m_ppUILayer[14]->setAlpha(1.0, 1.0);
 
 		m_ppUILayer[0]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_FAR);
@@ -814,6 +836,9 @@ void CGameFramework::BuildObjects()
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		m_ppUILayer[13]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		reinterpret_cast<PartyInviteUI*>(m_ppUILayer[14])->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+
 		// UIBar Setting
 		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, 40, 20 + (m_nWndClientWidth / 10) * 3, 60);
 		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetColorBrush(D2D1::ColorF::Red, 1.0, 20, 40, 20 + (m_nWndClientWidth / 10) * 3, 60);
@@ -928,7 +953,7 @@ void CGameFramework::ProcessInput()
 
 		DWORD dwDirection = 0;
 
-		if (!Chatting_On && Mouse_On) {
+		if (!PartyInviteUI_ON&&!Chatting_On && Mouse_On) {
 			if (pKeysBuffer['W'] & 0xF0) {
 				//send_move_packet(0);
 				dwDirection |= DIR_FORWARD;
@@ -1389,6 +1414,11 @@ void CGameFramework::FrameAdvance()
 
 			break;
 		}
+		case 14: {
+			if (!PartyInviteUI_ON) break;
+			reinterpret_cast<PartyInviteUI*>(m_ppUILayer[i])->UpdateLabels(Invite_Str);
+			break;
+		}
 	}
 	}
 
@@ -1400,6 +1430,7 @@ void CGameFramework::FrameAdvance()
 			if (!InDungeon) continue;
 		}
 		if (i == 13 && !PartyUI_On) continue;
+		if (i == 14 && !PartyInviteUI_ON) continue;
 		m_ppUILayer[i]->Render(m_nSwapChainBufferIndex);
 	}
 

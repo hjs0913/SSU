@@ -97,6 +97,8 @@ public:
 
     void set_job(JOB job);
 
+    void set_indun_id(int id);
+
     char* get_login_id() {
         return _login_id;
     }
@@ -109,6 +111,8 @@ public:
     {
         return _skill_active[skill_type];
     }
+
+    int get_indun_id();
 
     int get_exp();
 

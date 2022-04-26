@@ -209,6 +209,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_IME_CHAR:
 	case WM_CHAR: {
+		if (PartyInviteUI_ON) {
+			if ((wchar_t)wParam == '\b') {
+				if (Invite_Str.size() > 0) {
+					Invite_Str.pop_back();
+				}
+			}
+			else {
+				if (Invite_Str.size() <= 20)
+				{
+					Invite_Str.push_back((wchar_t)wParam);
+				}
+			}
+		}
+
 		if (Chatting_On) {
 			if ((wchar_t)wParam == '\b') {
 				if (Chatting_Str.size() > 0) {
