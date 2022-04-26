@@ -254,6 +254,22 @@ void send_party_invite(char* user)
 	strcpy_s(packet.user_name, user);
 	do_send(sizeof(packet), &packet);
 }
+void send_party_add_partner()
+{
+	cs_packet_party_add_partner packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_PARTY_ADD_PARTNER;
+	packet.room_id = party_enter_room_id;
+	do_send(sizeof(packet), &packet);
+}
+void send_partner_rander_ok_packet()
+{
+	cs_packet_partner_rander_ok packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_PARTNER_RANDER_OK;
+	do_send(sizeof(packet), &packet);
+}
+
 
 void send_party_invitation_reply(int accept)
 {

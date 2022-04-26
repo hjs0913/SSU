@@ -69,6 +69,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 					gGameFramework.Release_OpenWorld_Object();
 					gGameFramework.Create_InDungeon_Object();
 					send_raid_rander_ok_packet();
+					send_partner_rander_ok_packet();
 				}
 				else {
 					gGameFramework.Release_InDungeon_Object();

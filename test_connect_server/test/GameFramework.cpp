@@ -490,7 +490,10 @@ bool CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 					}
 				}
 				if (CursorPosInClient.x >= 435 && CursorPosInClient.x <= 500) {
-					cout << "AI넣기" << endl;
+					if (party_enter) {
+						cout << "AI넣기 누름" << endl;
+						send_party_add_partner();
+					}
 				}
 			}
 			else {

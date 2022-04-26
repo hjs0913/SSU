@@ -95,7 +95,11 @@ void send_party_room_enter_request();
 
 void send_party_room_quit_request();
 
-void send_party_invite(char* user);
+void send_party_invite(char* user); 
+
+void send_party_add_partner();
+
+void send_partner_rander_ok_packet();
 
 void send_party_invitation_reply(int accept);
 
