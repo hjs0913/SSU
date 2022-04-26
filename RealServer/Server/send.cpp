@@ -317,3 +317,12 @@ void send_party_invitation_failed(Player* pl, int failed_reason, char* invited_u
     strcpy_s(packet.invited_user, invited_user);
     pl->do_send(sizeof(packet), &packet);
 }
+
+void send_party_room_destroy(Player* pl, int r_id)
+{
+    sc_packet_party_room_destroy packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_PARTY_ROOM_DESTROY;
+    packet.room_id = r_id;
+    pl->do_send(sizeof(packet), &packet);
+}

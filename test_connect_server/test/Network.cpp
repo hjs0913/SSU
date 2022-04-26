@@ -717,6 +717,18 @@ void process_packet(unsigned char* p)
 		cout << "초대 실패함" << endl;
 		break;
 	}
+	case SC_PACKET_PARTY_ROOM_DESTROY: {
+		m_party[(int)reinterpret_cast<sc_packet_party_room_destroy*>(p)->room_id]->dst = DUN_ST_FREE;
+		robby_cnt--;
+		if (party_id_index_vector.size() == 0) break;
+
+		if (find(party_id_index_vector.begin(), party_id_index_vector.end(), (int)reinterpret_cast<sc_packet_party_room_destroy*>(p)->room_id)
+			!= party_id_index_vector.end()) {
+			int in = find(party_id_index_vector.begin(), party_id_index_vector.end(), (int)reinterpret_cast<sc_packet_party_room_destroy*>(p)->room_id) - party_id_index_vector.begin(); // index 확인
+			party_id_index_vector.erase(party_id_index_vector.begin()+in);
+		}
+		break;
+	}
 	default:
 		cout << "잘못된 패킷 type : " << type << endl;
 		cout << "Process packet 오류" << endl;

@@ -79,7 +79,7 @@ void Gaia::join_player(Player* pl)
 
 	// game start
 	if (player_cnt == GAIA_ROOM) {
-			
+		// 여기에 인원이 꽉찼으면 5초후 게임을 시작하는 타이머를 돌려주자
 	}
 }
 

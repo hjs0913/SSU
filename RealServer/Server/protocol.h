@@ -110,6 +110,7 @@ const char SC_PACKET_PARTY_ROOM_ENTER_FAILED = 32;
 const char SC_PACKET_PARTY_ROOM_QUIT_OK = 33;
 const char SC_PACKET_PARTY_INVITATION = 34;
 const char SC_PACKET_PARTY_INVITATION_FAILED = 35;
+const char SC_PACKET_PARTY_ROOM_DESTROY = 36;
 
 //---------------------------------------------------
 #pragma pack (push, 1)
@@ -464,6 +465,12 @@ struct sc_packet_party_invitation_failed {
 	char type;
 	unsigned char failed_reason;	// 0 : 현재 로그인되어있지 않거나 없는 유저, 1 : 상대방이 초대를 거부함, 2: 이미 다른 파티에 참가중임
 	char invited_user[MAX_NAME_SIZE];
+};
+
+struct sc_packet_party_room_destroy {
+	unsigned char size;
+	char type;
+	unsigned char room_id;
 };
 
 #pragma pack(pop)

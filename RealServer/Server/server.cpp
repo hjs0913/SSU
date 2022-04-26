@@ -104,9 +104,28 @@ void Disconnect(int c_id)
         pl->vl.unlock();
         Gaia* dun = dungeons[pl->get_indun_id()];
         dun->quit_palyer(pl);
-        Player** party_players = dun->get_party_palyer();
-        for (int i = 0; i < dun->player_cnt; i++) {
-            send_party_room_info_packet(party_players[i], dun->get_party_palyer(), dun->player_cnt, dun->get_dungeon_id());
+
+        if (dun->player_cnt == 0) {
+            // 아무도 없다는 뜻
+            dun->state_lock.lock();
+            dun->set_dun_st(DUN_ST_FREE);
+            dun->state_lock.unlock();
+            for (auto& pls : players) {
+                if (true == is_npc(pls->get_id())) break;
+                pls->state_lock.lock();
+                if (ST_INGAME != pls->get_state()) {
+                    pls->state_lock.unlock();
+                    continue;
+                }
+                pls->state_lock.unlock();
+                send_party_room_destroy(reinterpret_cast<Player*>(pls), pl->get_indun_id());
+            }
+        }
+        else {
+            Player** party_players = dun->get_party_palyer();
+            for (int i = 0; i < dun->player_cnt; i++) {
+                send_party_room_info_packet(party_players[i], dun->get_party_palyer(), dun->player_cnt, dun->get_dungeon_id());
+            }
         }
     }   
     else pl->vl.unlock();
@@ -782,6 +801,13 @@ void process_packet(int client_id, unsigned char* p)
                 Disconnect(client_id);
                 return;
             }
+            if (strcmp(reinterpret_cast<Player*>(p)->get_name(), packet->name) == 0) {
+                cout << "중복된 닉네임 접속 확인" << endl;
+                send_login_fail_packet(pl, 1);   // 중복 로그인
+                Disconnect(client_id);
+                return;
+            }
+
         }
         // 원래는 DB에서 받아와야 하는 정보를 기본 정보로 대체
         pl->set_x(2100);
@@ -2008,10 +2034,6 @@ void process_packet(int client_id, unsigned char* p)
         }
         dun->join_player(pl);
         
-        // 여기에 인원이 꽉찼으면 5초후 게임을 시작하는 타이머를 돌려주자
-
-
-
         // 이 방에 대한 정보를 보내준다
         for (auto& dun : dungeons) {
             dun->state_lock.lock();
@@ -2037,10 +2059,30 @@ void process_packet(int client_id, unsigned char* p)
         dun->quit_palyer(pl);
         // 나갔다는 정보를 player에게 보내준다
         Player** party_players = dun->get_party_palyer();
-        for (int i = 0; i < dun->player_cnt; i++) {
-            send_party_room_info_packet(party_players[i], dun->get_party_palyer(), dun->player_cnt, dun->get_dungeon_id());
-        }
         send_party_room_quit_ok_packet(pl);
+
+        if (dun->player_cnt == 0) {
+            // 아무도 없다는 뜻
+            dun->state_lock.lock();
+            dun->set_dun_st(DUN_ST_FREE);
+            dun->state_lock.unlock();
+            for (auto& pls : players) {
+                if (true == is_npc(pls->get_id())) break;
+                pls->state_lock.lock();
+                if (ST_INGAME != pls->get_state()) {
+                    pls->state_lock.unlock();
+                    continue;
+                }
+                pls->state_lock.unlock();
+                send_party_room_destroy(reinterpret_cast<Player*>(pls), r_id);
+            }
+        }
+        else {
+            Player** party_players = dun->get_party_palyer();
+            for (int i = 0; i < dun->player_cnt; i++) {
+                send_party_room_info_packet(party_players[i], dun->get_party_palyer(), dun->player_cnt, dun->get_dungeon_id());
+            }
+        }
 
         break;
     }
@@ -2099,12 +2141,20 @@ void process_packet(int client_id, unsigned char* p)
             }
             dun->join_player(pl);
 
-            // 여기에 인원이 꽉찼으면 5초후 게임을 시작하는 타이머를 돌려주자
-
-
-
             // 이 방에 대한 정보를 보내준다
+            for (auto& duns : dungeons) {
+                duns->state_lock.lock();
+                if (duns->get_dun_st() == DUN_ST_ROBBY) {
+                    // 던전의 정보들을 보내준다
+                    duns->state_lock.unlock();
+                    send_party_room_packet(pl, duns->get_party_name(), duns->get_dungeon_id());
+                    continue;
+                }
+                duns->state_lock.unlock();
+            }
+
             Player** party_players = dun->get_party_palyer();
+
             for (int i = 0; i < dun->player_cnt; i++) {
                 send_party_room_info_packet(party_players[i], dun->get_party_palyer(), dun->player_cnt, dun->get_dungeon_id());
             }
