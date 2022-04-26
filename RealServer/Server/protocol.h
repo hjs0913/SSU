@@ -68,6 +68,7 @@ const char CS_PACKET_PARTY_ROOM_MAKE = 15;
 const char CS_PACKET_PARTY_ROOM_INFO_REQUEST = 16;
 const char CS_PACKET_PARTY_ROOM_ENTER_REQUEST = 17;
 const char CS_PACKET_PARTY_ROOM_QUIT_REQUEST = 18;
+const char CS_PACKET_PARTY_INVITE = 19;
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -211,6 +212,13 @@ struct cs_packet_party_room_quit_request {
 	unsigned char size;
 	char type;
 	unsigned char room_id;
+};
+
+struct cs_packet_party_invite {
+	unsigned char size;
+	char type;
+	unsigned char room_id;
+	char user_name[MAX_NAME_SIZE];
 };
 
 //---------------------------------------------

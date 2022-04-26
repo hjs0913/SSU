@@ -242,6 +242,16 @@ void send_party_room_quit_request()
 	do_send(sizeof(packet), &packet);
 }
 
+void send_party_invite(char* user)
+{
+	cs_packet_party_invite packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_PARTY_INVITE;
+	packet.room_id = party_enter_room_id;
+	strcpy_s(packet.user_name, user);
+	do_send(sizeof(packet), &packet);
+}
+
 void do_send(int num_bytes, void* mess)
 {
 	EXP_OVER* ex_over = new EXP_OVER;

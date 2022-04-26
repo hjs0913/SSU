@@ -86,6 +86,8 @@ void send_party_room_enter_request();
 
 void send_party_room_quit_request();
 
+void send_party_invite(char* user);
+
 int netInit();
 
 void process_packet(unsigned char* p);

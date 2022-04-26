@@ -2033,6 +2033,11 @@ void process_packet(int client_id, unsigned char* p)
 
         break;
     }
+    case CS_PACKET_PARTY_INVITE: {
+        cout << "방번호 : " << (int)reinterpret_cast<cs_packet_party_invite*>(p)->room_id << "에서 " <<
+
+        break;
+    }
     }
 }
 
