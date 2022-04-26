@@ -667,6 +667,7 @@ void process_packet(unsigned char* p)
 			m_party[r_id]->set_player_name(packet->player_name2);
 		}
 		else m_party[r_id]->set_player_name("");
+		PartyUI_On = true;
 		party_info_on = true;
 		m_party_info = m_party[r_id];
 		break;
@@ -705,14 +706,15 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_PARTY_INVITATION: {
-		cout << reinterpret_cast<sc_packet_party_invitation*>(p)->invite_user_id << "이" <<
-			(int)reinterpret_cast<sc_packet_party_invitation*>(p)->room_id << "에 초대하였습니다" << endl;
-
 		InvitationRoomId = (int)reinterpret_cast<sc_packet_party_invitation*>(p)->room_id;
-		InvitationUser = (int)reinterpret_cast<sc_packet_party_invitation*>(p)->invite_user_id;
+		InvitationUser = reinterpret_cast<sc_packet_party_invitation*>(p)->invite_user_id;
 
 		InvitationCardUI_On = true;
 		InvitationCardTimer = chrono::system_clock::now() + 10s;
+		break;
+	}
+	case SC_PACKET_PARTY_INVITATION_FAILED: {
+		cout << "초대 실패함" << endl;
 		break;
 	}
 	default:

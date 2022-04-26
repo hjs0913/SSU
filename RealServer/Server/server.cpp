@@ -2013,6 +2013,17 @@ void process_packet(int client_id, unsigned char* p)
 
 
         // 이 방에 대한 정보를 보내준다
+        for (auto& dun : dungeons) {
+            dun->state_lock.lock();
+            if (dun->get_dun_st() == DUN_ST_ROBBY) {
+                // 던전의 정보들을 보내준다
+                dun->state_lock.unlock();
+                send_party_room_packet(pl, dun->get_party_name(), dun->get_dungeon_id());
+                continue;
+            }
+            dun->state_lock.unlock();
+        }
+
         Player** party_players = dun->get_party_palyer();
         for (int i = 0; i < dun->player_cnt; i++) {
             send_party_room_info_packet(party_players[i], dun->get_party_palyer(), dun->player_cnt, dun->get_dungeon_id());
@@ -2034,6 +2045,8 @@ void process_packet(int client_id, unsigned char* p)
         break;
     }
     case CS_PACKET_PARTY_INVITE: {
+        cs_packet_party_invite* packet = reinterpret_cast<cs_packet_party_invite*>(p);
+        bool find_player = false;
         for (auto& check_pl : players) {
             check_pl->state_lock.lock();
             if (check_pl->get_state() != ST_INGAME) {
@@ -2041,32 +2054,66 @@ void process_packet(int client_id, unsigned char* p)
                 continue;
             }
             else {
-                if (check_pl->get_tribe() != HUMAN || reinterpret_cast<Player*>(check_pl)->join_dungeon_room == true) {
+                if (check_pl->get_tribe() != HUMAN ) {
                     check_pl->state_lock.unlock();
                     continue;
                 }
                 check_pl->state_lock.unlock();
                 // 이름 비교
-                char* tmp = reinterpret_cast<cs_packet_party_invite*>(p)->user_name;
-                if (strcmp(check_pl->get_name(), reinterpret_cast<cs_packet_party_invite*>(p)->user_name) == 0) {
-                    send_party_invitation(reinterpret_cast<Player*>(check_pl), (int)reinterpret_cast<cs_packet_party_invite*>(p)->room_id, pl->get_id());
+                char* tmp = packet->user_name;
+                if (strcmp(check_pl->get_name(), packet->user_name) == 0) {
+                    find_player = true;
+                    if (reinterpret_cast<Player*>(check_pl)->join_dungeon_room == true) {
+                        send_party_invitation_failed(pl, 2, packet->user_name);
+                    }
+                    else send_party_invitation(reinterpret_cast<Player*>(check_pl), (int)reinterpret_cast<cs_packet_party_invite*>(p)->room_id, pl->get_id());
                     break;
                 }
                 else continue;
             }
         }
+        if (find_player == false) send_party_invitation_failed(pl, 0, packet->user_name);
 
         break;
     }
     case CS_PACKET_PARTY_INVITATION_REPLY: {
         cs_packet_party_invitation_reply* packet = reinterpret_cast<cs_packet_party_invitation_reply*>(p);
-
+        int r_id = (int)packet->room_id;
         if ((int)packet->accept == 1) {
-            cout << "true" << endl;
+            Gaia* dun = dungeons[r_id];
+
+            // join dungeon party
+            dun->state_lock.lock();
+            if (dun->get_dun_st() != DUN_ST_ROBBY) {
+                // 던전입장 실패 패킷 보내기
+                if (dun->get_dun_st() == DUN_ST_FREE) send_party_room_enter_failed_packet(pl, r_id, 1);
+                else send_party_room_enter_failed_packet(pl, r_id, 0);
+                dun->state_lock.unlock();
+                break;
+            }
+            dun->state_lock.unlock();
+            // 이 방에 이 플레이어를 집어 넣는다
+            if (dun->player_cnt == GAIA_ROOM) {
+                send_party_room_enter_failed_packet(pl, r_id, 0);
+                break;
+            }
+            dun->join_player(pl);
+
+            // 여기에 인원이 꽉찼으면 5초후 게임을 시작하는 타이머를 돌려주자
+
+
+
+            // 이 방에 대한 정보를 보내준다
+            Player** party_players = dun->get_party_palyer();
+            for (int i = 0; i < dun->player_cnt; i++) {
+                send_party_room_info_packet(party_players[i], dun->get_party_palyer(), dun->player_cnt, dun->get_dungeon_id());
+            }
+            send_party_room_enter_ok_packet(pl, dun->get_dungeon_id());
+
         }
-        else if ((int)packet->accept == 0) cout << "false" << endl;
-        cout << pl->get_name() << "이 " << players[packet->invite_user_id]->get_name() << "가 보낸 " <<
-            (int)packet->room_id << "번 파티초대를 " << (int)packet->accept << "하였습니다" << endl;
+        else if ((int)packet->accept == 0) {
+            send_party_invitation_failed(reinterpret_cast<Player*>(players[packet->invite_user_id]), 1, pl->get_name());
+        }
         break;
     }
     default:
