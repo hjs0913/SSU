@@ -37,6 +37,7 @@ public:
 	mutex state_lock;
 	int player_rander_ok;
 	bool start_game;
+	int partner_cnt;
 
 public:
 	Gaia(int d_id);

@@ -1986,7 +1986,7 @@ void process_packet(int client_id, unsigned char* p)
     case CS_PACKET_RAID_RANDER_OK: {
         dungeons[pl->indun_id]->player_rander_ok++;
 
-        if (dungeons[pl->indun_id]->player_rander_ok == GAIA_ROOM) {
+        if (dungeons[pl->indun_id]->player_rander_ok == GAIA_ROOM - dungeons[pl->indun_id]->partner_cnt) {
             dungeons[pl->indun_id]->start_game = true;
             // BOSS NPC Timer Start
             timer_event ev;
@@ -2201,8 +2201,10 @@ void process_packet(int client_id, unsigned char* p)
                 send_party_room_info_packet(party_players[i], dun->get_party_palyer(), dun->player_cnt, dun->get_dungeon_id());
             }
             send_party_room_enter_ok_packet(pl, dun->get_dungeon_id());
-        cout << "방번호 : " << (int)reinterpret_cast<cs_packet_party_invite*>(p)->room_id << "에서 " << endl;
-
+        }
+        else if ((int)packet->accept == 0) {
+            send_party_invitation_failed(reinterpret_cast<Player*>(players[packet->invite_user_id]), 1, pl->get_name());
+        }
         break;
     }
     case CS_PACKET_PARTY_ADD_PARTNER: {
@@ -2237,7 +2239,7 @@ void process_packet(int client_id, unsigned char* p)
             reinterpret_cast<Player*>(players[new_id])->set_job(J_DILLER);
             players[new_id]->set_lv(25);
             players[new_id]->set_element(E_WATER);
-
+          
             switch (reinterpret_cast<Player*>(players[new_id])->get_job()) {
             case J_DILLER: {
                 int lv = players[new_id]->get_lv();
@@ -2307,7 +2309,7 @@ void process_packet(int client_id, unsigned char* p)
 
             // join dungeon party
             // 이 방에 이 플레이어를 집어 넣는다
-
+            dun->partner_cnt++;
             dun->join_player(reinterpret_cast<Player*>(players[new_id]));
 
             // 여기에 인원이 꽉찼으면 5초후 게임을 시작하는 타이머를 돌려주자
@@ -2322,6 +2324,47 @@ void process_packet(int client_id, unsigned char* p)
             }
             // send_party_room_enter_ok_packet(pl, dun->get_dungeon_id());
 
+            dun->state_lock.lock();
+            if (dun->get_dun_st() == DUN_ST_START) {
+                dun->state_lock.unlock();
+                dun->game_start();
+                // 게임이 시작 되었으니 시야처리를 해주자
+                Player** vl_pl;
+                vl_pl = dun->get_party_palyer();
+
+                unordered_set<int> indun_vl;
+                for (int j = 0; j < GAIA_ROOM; j++) indun_vl.insert(vl_pl[j]->get_id());
+
+                for (int j = 0; j < GAIA_ROOM; j++) {
+                    vl_pl[j]->vl.lock();
+                    unordered_set<int>temp_vl{ vl_pl[j]->viewlist };
+                    vl_pl[j]->viewlist = indun_vl;
+                    vl_pl[j]->viewlist.erase(vl_pl[j]->get_id());
+                    vl_pl[j]->vl.unlock();
+
+                    for (auto k : temp_vl) {
+                        send_remove_object_packet(vl_pl[j], players[k]);
+                        if (is_npc(k) == true) continue;
+                        reinterpret_cast<Player*>(players[k])->vl.lock();
+                        if (indun_vl.find(k) == indun_vl.end()) {
+                            reinterpret_cast<Player*>(players[k])->viewlist.erase(client_id);
+                            reinterpret_cast<Player*>(players[k])->vl.unlock();
+                            send_remove_object_packet(reinterpret_cast<Player*>(players[k]), vl_pl[j]);
+                            continue;
+                        }
+                        reinterpret_cast<Player*>(players[k])->vl.unlock();
+                    }
+
+                    for (auto k : indun_vl) {
+                        if (k == vl_pl[j]->get_id()) continue;
+                        send_put_object_packet(vl_pl[j], players[k]);
+                    }
+                    send_put_object_packet(vl_pl[j], dun->boss);
+                }
+                break;
+            }
+            dun->state_lock.unlock();
+
             cout << "넣기 끝" << endl;
 
         }
@@ -2329,7 +2372,7 @@ void process_packet(int client_id, unsigned char* p)
             cout << "가득 차서 불가능!" << endl;
         break;
     }
-     case CS_PACKET_PARTNER_RANDER_OK: {
+    case CS_PACKET_PARTNER_RANDER_OK: {
         // dungeons[pl->indun_id]->player_rander_ok++;
 
          if (dungeons[pl->indun_id]->player_rander_ok == GAIA_ROOM) {
@@ -2349,9 +2392,6 @@ void process_packet(int client_id, unsigned char* p)
              ev.target_id = -1;
              timer_queue.push(ev);
 
-        }
-        else if ((int)packet->accept == 0) {
-            send_party_invitation_failed(reinterpret_cast<Player*>(players[packet->invite_user_id]), 1, pl->get_name());
         }
         break;
     }

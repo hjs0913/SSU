@@ -14,7 +14,7 @@ Gaia::Gaia(int d_id)
 	player_rander_ok = 0;
 	target_id = 0;
 	start_game = false;
-
+	partner_cnt = 0;
 	running_pattern = false;
 
 	// Boss Npc Intialize	
@@ -144,7 +144,7 @@ void Gaia::game_start()
 		party[i]->indun_id = dungeon_id;
 
 		// 가장 체력이 높은 플레이어를 일단 타겟으로 잡는다
-		if (party[i]->get_hp() > tmp_hp) target_id = i;
+		if (party[i]->get_hp() > tmp_hp) target_id = 0;
 	}
 
 	cout << dungeon_id << "번 던전 시작합니다" << endl;
