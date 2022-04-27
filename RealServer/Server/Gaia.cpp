@@ -16,7 +16,7 @@ Gaia::Gaia(int d_id)
 	start_game = false;
 	partner_cnt = 0;
 	running_pattern = false;
-
+	
 	// Boss Npc Intialize	
 	boss = new Npc(dungeon_id);
 	boss->set_tribe(BOSS);
@@ -65,6 +65,7 @@ Gaia::~Gaia()
 
 void Gaia::join_player(Player* pl)
 {
+
 	party[player_cnt] = pl;
 	party_id[player_cnt] = pl->get_id();
 	player_cnt++;
@@ -177,7 +178,8 @@ void Gaia::set_party_name(char* name)
 
 void Gaia::partner_move(int p_id)
 {
-	if (party[p_id]->get_tribe() != PARTNER) return;
+
+	//if (party[p_id]->get_tribe() != PARTNER) return;
 
 	if ((boss->get_x() >= party[p_id]->get_x() - 8 && boss->get_x() <= boss->get_x() + 8) &&
 		(boss->get_z() >= party[p_id]->get_z() - 8 && boss->get_z() <= boss->get_z() + 8)) return;
@@ -188,11 +190,17 @@ void Gaia::partner_move(int p_id)
 	//		값을 적용시키고 새로운 좌표를 클라이언트에게 보내주기
 	party[p_id]->set_x(mv.first);
 	party[p_id]->set_z(mv.second);
-	cout << mv.first << "," << mv.second << endl;
+
+
 	for (auto pt : party) {
-		send_move_packet(pt, party[p_id]);
-		send_look_packet(pt, party[p_id]);
+		if (pt->get_tribe() == HUMAN) {
+	
+			send_move_packet(pt, party[p_id]);
+			send_look_packet(pt, party[p_id]);
+	
+		}
 	}
+
 
 }
 
@@ -203,16 +211,17 @@ void Gaia::partner_attack(int p_id)  //일반공격 기본, 스킬을 쿨타임 돌때마다 계�
 	uniform_int_distribution<int> pattern(0, 99);
 	timer_event ev;
 
-	int p = pattern(gen);
-	int _id = party[p_id]->get_id();
-	
-	cout << "p : " << p << endl;
 
-	switch (p % 4) { // 늘릴수록 늘리자
+	int p = pattern(gen);
+
+
+	//int _id = party[p_id]->get_id();
+
+	switch (0) { // 늘릴수록 늘리자
 	case 0: {
 		cout << "최후의 일격 !!!" << endl;
-		party[p_id]->set_mp(party[p_id]->get_mp() - 1000);
-
+		party[p_id]->set_mp(reinterpret_cast<Npc*>(party[p_id])->get_mp() - 1000);
+		cout << "최후의 일격2 !!!" << endl;
 		if ((boss->get_x() >= party[p_id]->get_x() - 10 && boss->get_x() <= party[p_id]->get_x() + 10) && (boss->get_z() >= party[p_id]->get_z() - 10 && boss->get_z() <= party[p_id]->get_z() + 10)) {
 			party[p_id]->set_skill_factor(0, 0);
 
@@ -223,14 +232,10 @@ void Gaia::partner_attack(int p_id)  //일반공격 기본, 스킬을 쿨타임 돌때마다 계�
 				send_change_hp_packet(send_pl, boss);
 			}
 
-			ev.obj_id = _id;
-			ev.start_time = chrono::system_clock::now() + 10s;
-			ev.ev = EVENT_PARTNER_PATTERN;
-			ev.target_id = 0;
-			timer_queue.push(ev);
+		
 
 			//
-			ev.obj_id = _id;
+			ev.obj_id = 1;
 			ev.start_time = chrono::system_clock::now() + 5s;
 			ev.ev = EVENT_PARTNER_ATTACK;
 			ev.target_id = -1;

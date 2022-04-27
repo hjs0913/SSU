@@ -5,13 +5,13 @@ class Gaia
 {
 private:
 // 기본정보
-	Player* party[GAIA_ROOM];	// 파티원 정보
+
 	int dungeon_id;
 	DUNGEON_STATE st;
 	char room_name[MAX_NAME_SIZE];
 
 	int target_id;	// agro_id (이때 id는 파티원에게 부여된 파티내 아이디(0~GAIA_ROOM)
-
+	Player* party[GAIA_ROOM];	// 파티원 정보
 	int party_id[GAIA_ROOM];	//서버에서의 파티원 id
 	int  player_death_count = 4;
 
@@ -28,7 +28,7 @@ private:
 	int pattern_five_count = 0;
 	// 특수
 	bool fifteen_pattern;
-
+	
 
 
 public:

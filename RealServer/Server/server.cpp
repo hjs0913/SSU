@@ -20,6 +20,8 @@ void return_npc_position(int npc_id);
 
 concurrency::concurrent_priority_queue<timer_event> timer_queue;
 
+
+
 void error_display(int err_no)
 {
     WCHAR* lpMsgBuf;
@@ -1988,6 +1990,8 @@ void process_packet(int client_id, unsigned char* p)
 
         if (dungeons[pl->indun_id]->player_rander_ok == GAIA_ROOM - dungeons[pl->indun_id]->partner_cnt) {
             dungeons[pl->indun_id]->start_game = true;
+
+        
             // BOSS NPC Timer Start
             timer_event ev;
             ev.obj_id = dungeons[pl->indun_id]->get_dungeon_id();
@@ -2002,6 +2006,7 @@ void process_packet(int client_id, unsigned char* p)
             ev.ev = EVENT_BOSS_ATTACK;
             ev.target_id = -1;
             timer_queue.push(ev);
+
         }
         break;
     }
@@ -2215,6 +2220,7 @@ void process_packet(int client_id, unsigned char* p)
         if (dun->player_cnt < GAIA_ROOM) {  // 제한 인원수 보다 적을 때만 추가 가능하도록 하자 
             cout << "넣기 시작!" << endl;
             int new_id = get_new_id();
+
             if (-1 == new_id) {
                 cout << "Maxmum user overflow. Accept aborted.\n";
             }
@@ -2228,18 +2234,25 @@ void process_packet(int client_id, unsigned char* p)
                 pl->set_tribe(PARTNER);
                 ZeroMemory(&pl->_recv_over._wsa_over, sizeof(pl->_recv_over._wsa_over));
             }
-
+            cout << "난 ai " << new_id << endl;
             // players 에서 파트너의 아이디와 기본정보 업데이트 
+            players[new_id]->state_lock.lock();
             players[new_id]->set_tribe(PARTNER);
             players[new_id]->set_id(new_id);
             players[new_id]->set_name("AI");
             players[new_id]->set_x(2100);
             players[new_id]->set_y(0);
             players[new_id]->set_z(1940);
+            players[new_id]->set_maxmp(10000);
+            players[new_id]->set_maxhp(10000);
+            players[new_id]->set_hp(500);
+            players[new_id]->set_mp(8000);
             reinterpret_cast<Player*>(players[new_id])->set_job(J_DILLER);
             players[new_id]->set_lv(25);
             players[new_id]->set_element(E_WATER);
+            players[new_id]->state_lock.unlock();
           
+          /*
             switch (reinterpret_cast<Player*>(players[new_id])->get_job()) {
             case J_DILLER: {
                 int lv = players[new_id]->get_lv();
@@ -2302,16 +2315,14 @@ void process_packet(int client_id, unsigned char* p)
                 cout << "없는 직업" << endl;
                 break;
             }
-            }
+            }*/
             //  여기까지 클라에서 패킷 받으면, 새 player id 생성 후 정보 초기화  
-
-
 
             // join dungeon party
             // 이 방에 이 플레이어를 집어 넣는다
             dun->partner_cnt++;
             dun->join_player(reinterpret_cast<Player*>(players[new_id]));
-
+       
             // 여기에 인원이 꽉찼으면 5초후 게임을 시작하는 타이머를 돌려주자
 
 
@@ -2325,7 +2336,7 @@ void process_packet(int client_id, unsigned char* p)
             // send_party_room_enter_ok_packet(pl, dun->get_dungeon_id());
 
             dun->state_lock.lock();
-            if (dun->get_dun_st() == DUN_ST_START) {
+            if (dun->get_dun_st() != DUN_ST_START) {  //들어가려면 여기 수정
                 dun->state_lock.unlock();
                 dun->game_start();
                 // 게임이 시작 되었으니 시야처리를 해주자
@@ -2375,24 +2386,21 @@ void process_packet(int client_id, unsigned char* p)
     case CS_PACKET_PARTNER_RANDER_OK: {
         // dungeons[pl->indun_id]->player_rander_ok++;
 
-         if (dungeons[pl->indun_id]->player_rander_ok == GAIA_ROOM) {
-             dungeons[pl->indun_id]->start_game = true;
-             Gaia* dun = dungeons[pl->indun_id];
-             int partner_id;
-             for (int i = 0; i < GAIA_ROOM; ++i) {
-                 if (dun->get_party_palyer()[i]->get_tribe() == PARTNER)
-                     partner_id = dun->get_party_palyer()[i]->get_id();
+        // PARTNER partner Timer Start
+        timer_event ev;
+        ev.obj_id = 1;
+        ev.start_time = chrono::system_clock::now() + 1s;
+        ev.ev = EVENT_PARTNER_ATTACK;
+        ev.target_id = 1;
+        timer_queue.push(ev);
 
-             }
-             // PARTNER partner Timer Start
-             timer_event ev;
-             ev.obj_id = partner_id;
-             ev.start_time = chrono::system_clock::now() + 1s;
-             ev.ev = EVENT_PARTNER_MOVE;
-             ev.target_id = -1;
-             timer_queue.push(ev);
-
-        }
+       /* ZeroMemory(&ev, sizeof(ev));
+        ev.obj_id = partner_id;
+        ev.start_time = chrono::system_clock::now() + 1s;
+        ev.ev = EVENT_PARTNER_MOVE;
+        ev.target_id = -1;
+        timer_queue.push(ev);
+        */
         break;
     }
     default:
@@ -2840,16 +2848,10 @@ void worker()
 
             Player* pl = reinterpret_cast<Player*>(players[client_id]);
 
-            int partner_id;
-            for (int i = 0; i < GAIA_ROOM; ++i) {
-                if (dungeons[pl->indun_id]->get_party_palyer()[i]->get_tribe() == PARTNER)
-                    partner_id = dungeons[pl->indun_id]->get_party_palyer()[i]->get_id();
-
-            } 
             //reinterpret_cast<Partner*>(players[partner_id])->partner_move();
 
            timer_event ev;
-            ev.obj_id = partner_id;
+            ev.obj_id = 1;
             ev.start_time = chrono::system_clock::now() + 1s;
             ev.ev = EVENT_PARTNER_MOVE;
             ev.target_id = -1;

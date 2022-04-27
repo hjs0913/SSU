@@ -56,7 +56,7 @@ void send_put_object_packet(Player* pl, Npc* target)
     packet.element = target->get_element();
 
     packet.object_type = target->get_tribe();
-    if (target->get_tribe() == HUMAN) {
+    if (target->get_tribe() == HUMAN || target->get_tribe() == PARTNER) {
         packet.object_class = reinterpret_cast<Player*>(target)->get_job();
     }
     else if (target->get_tribe() == MONSTER || target->get_tribe() == BOSS) {
