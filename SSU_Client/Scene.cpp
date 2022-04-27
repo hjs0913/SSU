@@ -101,7 +101,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// CHeightMapTerrain의 인자 BlockWidth, BlockHeignt는 더 수정해야 한다. //
 	//m_pTerrain = new CHeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Terrain/HeightMap.raw"), 257, 257, 0, 0, xmf3Scale, xmf4Color);
-	m_pTerrain = new CHeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Image/HeightMap.raw"), 512, 512, 13, 13, xmf3Scale, xmf4Color);
+	m_pTerrain = new CHeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Image/HeightMap.raw"), 256, 256, 13, 13, xmf3Scale, xmf4Color);
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	m_nHierarchicalGameObjects = 13;

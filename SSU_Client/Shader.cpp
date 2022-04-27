@@ -565,161 +565,7 @@ public:
 
 void CObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
 {
-	Obstacle obstacles[609];
-	ifstream obstacles_read("tree_position.txt");
-	if (!obstacles_read.is_open()) {
-		cout << "파일을 읽을 수 없습니다" << endl;
-		return;
-	}
-	for (int i = 0; i < 609; i++) {
-		float x, y, z;
-		obstacles_read >> x >> y >> z;
-		//	cout << x << "," << y << "," << z << endl;
-		obstacles[i]._id = i;
-		obstacles[i]._x = x + 2500;
-		obstacles[i]._y = y + 200;
-		obstacles[i]._z = z + 2500;
-	}
-
-	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)pContext;
-
-	map = pTerrain;
-	float fxPitch = 12.0f * 3.5f;
-	float fyPitch = 12.0f * 3.5f;
-	float fzPitch = 12.0f * 3.5f;
-
-	float fTerrainWidth = pTerrain->GetWidth();
-	float fTerrainLength = pTerrain->GetLength();
-
-	int xObjects = int(fTerrainWidth / fxPitch);   //97
-	int yObjects = 1;
-	int zObjects = int(fTerrainLength / fzPitch);
-	m_nObjects = (xObjects * yObjects * zObjects);  //97
-
-	m_nObjects += 1 + 2 * BULLETCNT + 1 + 4;
-
-#define TEXTURES 4
-	CTexture* pTexture[TEXTURES];
-	pTexture[0] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
-	pTexture[0]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/hp.dds", RESOURCE_TEXTURE2D, 0);   //여기 
-
-	pTexture[1] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
-	pTexture[1]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/tree02.dds", RESOURCE_TEXTURE2D, 0);
-
-	pTexture[2] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
-	pTexture[2]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/mp.dds", RESOURCE_TEXTURE2D, 0);
-
-	pTexture[3] = new CTexture(1, RESOURCE_TEXTURE2D_ARRAY, 0, 1);
-	pTexture[3]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/guard.dds", RESOURCE_TEXTURE2D, 0);
-
-	UINT ncbElementBytes = ((sizeof(CB_GAMEOBJECT_INFO) + 255) & ~255);
-
-	CreateCbvSrvDescriptorHeaps(pd3dDevice, m_nObjects, 4);
-	CreateShaderVariables(pd3dDevice, pd3dCommandList);
-	CreateConstantBufferViews(pd3dDevice, m_nObjects, m_pd3dcbGameObjects, ncbElementBytes);
-	for (int i = 0; i < TEXTURES; i++) CreateShaderResourceViews(pd3dDevice, pTexture[i], 0, 3);
-
-#ifdef _WITH_BATCH_MATERIAL
-	m_pMaterial = new CMaterial();
-	m_pMaterial->SetTexture(pTexture);
-#else
-	//CMaterial* pMaterials[TEXTURES];
-	for (int i = 0; i < TEXTURES; i++)
-	{
-		pMaterials[i] = new CMaterial();
-		pMaterials[i]->SetTexture(pTexture[i]);
-	}
-#endif
-	for (int i = 0; i < 100; ++i) {
-		newhp[i] = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, i, hp_height, 0.0f);
-		newmp[i] = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, i, hp_height, 0.0f);
-	}
-
-	pRectMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, hp_width, hp_height, 0.0f);
-
-	CTexturedRectMesh* part = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 2, 2, 0.0f);
-
-	CCubeMeshDiffused* bullet = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 1.0f, 1.0f, 1.0f);
-
-	m_ppObjects = new CGameObject * [m_nObjects];
-	//CBillboardObject* pBillboardObject = NULL;
-
-	CBulletObject* bulletmesh;
-	for (int i = 1; i < 1 + BULLETCNT; ++i) {
-		bulletmesh = new CBulletObject(1);
-		bulletmesh->SetMesh(0, bullet);
-		//bulletmesh->SetMaterial(pMaterials[(i - 2) % 2 + 3]);
-
-		bulletmesh->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
-		m_ppObjects[i] = bulletmesh;
-	}
-
-	for (int i = 1 + BULLETCNT; i < 1 + 2 * BULLETCNT; ++i) {
-		pBillboardObject = new CBillboardObject(1);
-		pBillboardObject->SetMesh(0, part);
-#ifndef _WITH_BATCH_MATERIAL
-		pBillboardObject->SetMaterial(pMaterials[5]);
-#endif
-		pBillboardObject->SetPosition(0, -100, 0);
-		pBillboardObject->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
-		m_ppObjects[i] = pBillboardObject;
-	}
-
-	std::default_random_engine dre;
-	std::uniform_int_distribution<> uid{ 0,2 };
-
-	int tmp;
-	int num = 0;
-	for (int i = 1 + 2 * BULLETCNT, x = 0; x < xObjects; x++)
-	{
-		for (int z = 0; z < zObjects; z++)
-		{
-			for (int y = 0; y < yObjects; y++)
-			{
-				//pBillboardObject = new CBillboardObject(1);
-				//pBillboardObject->SetMesh(0, pRectMesh);
-#ifndef _WITH_BATCH_MATERIAL    
-
-				if (i == 201) { // hp
-					pBillboardObject->SetMesh(0, newhp[50]);
-					pBillboardObject->SetMaterial(pMaterials[0]);  //여기
-
-				}
-				else if (i == 202) {// mp
-					pBillboardObject->SetMesh(0, newmp[50]);
-					pBillboardObject->SetMaterial(pMaterials[2]);
-
-				}
-				else {
-					pBillboardObject->SetMesh(0, pRectMesh);
-					pBillboardObject->SetMaterial(pMaterials[1]);
-					//	pBillboardObject->SetMaterial(pMaterials[uid(dre)]);
-				}
-
-#endif
-				// 장애물 인덱스 생각(기윤)
-				float xPosition = obstacles[x + z]._x;
-				float zPosition = obstacles[x + z]._z;
-				float fHeight = pTerrain->GetHeight(xPosition, zPosition);
-				//cout << xPosition << " " << fHeight << " " << zPosition << endl;
-			//	if (xPosition <= fTerrainWidth / 2 - 200 || xPosition >= fTerrainWidth / 2 + 200 ||   //나무 위치     
-				//	zPosition <= fTerrainLength / 2 - 200 || zPosition >= fTerrainLength / 2 + 200) {
-				pBillboardObject->SetPosition(xPosition, 35, zPosition);         //1028 168 1028
-				//cout << hp_pos.x << hp_pos.y << hp_pos.z << endl;
-
-		//	}
-			//if (x == 1)
-			//pBillboardObject->SetPosition(xPosition, fHeight, zPosition);
-				pBillboardObject->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
-				m_ppObjects[i++] = pBillboardObject;
-				tmp = i;
-
-			}
-			num += 1;
-			if (num > 9)
-				num = 9;
-		}
-	}
+	
 }
 
 void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext, ID3D12RootSignature* pd3dGraphicsRootSignature)
@@ -839,6 +685,7 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	//CAirplaneMeshDiffused* npc = new CAirplaneMeshDiffused(pd3dDevice, pd3dCommandList);
 
 	m_ppObjects = new CGameObject * [m_nObjects];
+	ZeroMemory(m_ppObjects, m_nObjects * sizeof(CGameObject*));
 
 	//CBillboardObject* pBillboardObject = NULL;
 
@@ -1236,6 +1083,7 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 
 	for (int j = 0; j < m_nObjects; j++)
 	{
+		if (m_ppObjects[j] == nullptr) continue;
 		if (j >= m_nObjects - server_id) {
 			pPlayer = reinterpret_cast<CAirplanePlayer*>(m_ppObjects[j]);
 			bool tp = pPlayer->GetUse();
@@ -1311,6 +1159,7 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 			}
 		}
 		else if (j <= bulletidx) { //총알 원위치 
+
 			if (m_ppObjects[j]->GetPosition().x < 0 || m_ppObjects[j]->GetPosition().x>5000 ||
 				m_ppObjects[j]->GetPosition().z < 0 || m_ppObjects[j]->GetPosition().z>5000) {
 				m_ppObjects[j]->SetPosition(0, 100, 0);

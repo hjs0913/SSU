@@ -23,7 +23,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	setlocale(LC_ALL, "");
 
 	// connect network
-	//netInit();
+	netInit();
 	//thread hThread{ worker };
 
 	UNREFERENCED_PARAMETER(hPrevInstance);
