@@ -14,9 +14,9 @@ Partner::Partner(int d_id) : Player(d_id)
 	start_game = false;
 	target_id = 0;
 	join_dungeon_room = false;
-	party_id = new int[GAIA_ROOM];
+
 	running_pattern = false;
-	partner_party_id = new int[GAIA_ROOM];
+
 	// Boss Npc Intialize	
 	partner = new Player(dungeon_id);
 	partner->set_name("ai");
@@ -34,7 +34,7 @@ Partner::Partner(int d_id) : Player(d_id)
 
 Partner::~Partner()
 {
-	delete party;
+	
 }
 
 
@@ -83,22 +83,7 @@ void Partner::set_dun_st(DUNGEON_STATE dst)
 
 void Partner::partner_move()
 {
-	// Raid Map은 장애물이 없으므로 A_star는 낭비다
-	if (running_pattern) return;
-
-	if ((party[target_id]->get_x() >= partner->get_x() - 15 && party[target_id]->get_x() <= partner->get_x() + 15) &&
-		(party[target_id]->get_z() >= partner->get_z() - 15 && party[target_id]->get_z() <= partner->get_z() + 15)) return;
-
-	pos mv = partner->non_a_star(party[target_id]->get_x(), party[target_id]->get_z(), partner->get_x(), partner->get_z());
-
-	//값을 적용시키고 새로운 좌표를 클라이언트에게 보내주기
-	partner->set_x(mv.first);
-	partner->set_z(mv.second);
-
-	for (auto pt : party) {
-		send_move_packet(pt, partner);
-		send_look_packet(pt, partner);
-	}
+	
 }
 void Partner::physical_skill_success(int p_id, int target, float skill_factor)
 {

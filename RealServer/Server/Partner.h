@@ -16,7 +16,7 @@ private:
 
 protected:
     char	_name[MAX_NAME_SIZE];
-    Player* party[GAIA_ROOM];	// 파티원 정보
+
     Partner* partner_party[GAIA_ROOM];	// 파트너 정보
     int* partner_party_id;	//서버에서의 파티원 id
 
