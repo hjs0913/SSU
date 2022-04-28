@@ -69,6 +69,7 @@ void Gaia::join_player(Player* pl)
 	party[player_cnt] = pl;
 	party_id[player_cnt] = pl->get_id();
 	player_cnt++;
+	cout << "player_cnt : " << player_cnt << endl;
 	cout << dungeon_id << "번 던전에 입장 중입니다" << endl;
 
 	pl->set_indun_id(dungeon_id);
@@ -81,22 +82,17 @@ void Gaia::join_player(Player* pl)
 	// game start
 	if (player_cnt == GAIA_ROOM) {
 		// 여기에 인원이 꽉찼으면 5초후 게임을 시작하는 타이머를 돌려주자
-		/*
+		
 		timer_event ev;
 		ev.obj_id = dungeon_id;
-		ev.start_time = chrono::system_clock::now() + 5s;
-		ev.ev = EVENT_BOSS_ATTACK;
+		ev.start_time = chrono::system_clock::now() + 10s;
+		ev.ev = EVENT_GAMESTART_TIMER;
 		ev.target_id = dungeon_id;
 		timer_queue.push(ev);
+
+		start_time = ev.start_time;
+		
 		// 5초후 게임을 시작한다는 패킷을 보내주자
-		*/
-
-		//game_start();
-
-		state_lock.lock();
-		st = DUN_ST_START;
-		state_lock.unlock();
-
 	}
 }
 
@@ -125,14 +121,19 @@ void Gaia::quit_palyer(Player* pl)
 
 void Gaia::game_start()
 {
+	// 게임을 시작할 수 있는 조건인지 확인
+	if (start_time > chrono::system_clock::now()) return;
+	if (player_cnt < GAIA_ROOM) return;
+
+
 	// 모든 파티 인던 입장 및 게임 시작
 	player_rander_ok = 0;
 	// 가장 체력이 높은 플레이어를 일단 타겟으로 잡는다
 	int tmp_hp = 0;
 
-	/*state_lock.lock();
+	state_lock.lock();
 	st = DUN_ST_START;
-	state_lock.unlock();*/
+	state_lock.unlock();
 
 	boss->set_x(party[0]->get_x() + 10);
 	boss->set_z(party[0]->get_z() + 10);
@@ -170,6 +171,7 @@ char* Gaia::get_party_name()
 {
 	return room_name;
 }
+
 void Gaia::set_party_name(char* name)
 {
 	strcpy_s(room_name, name);
@@ -325,6 +327,7 @@ void Gaia::partner_attack(int p_id)  //일반공격 기본, 스킬을 쿨타임 돌때마다 계�
 	}
 	
 }
+
 void Gaia::boss_move()
 {
 	// Raid Map은 장애물이 없으므로 A_star는 낭비다

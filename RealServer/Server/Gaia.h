@@ -30,6 +30,7 @@ private:
 	bool fifteen_pattern;
 	
 
+	chrono::system_clock::time_point start_time;
 
 public:
 	int player_cnt;
@@ -72,7 +73,5 @@ public:
 
 	void partner_move(int p_id);
 	void partner_attack(int p_id);
-
-	
 };
 

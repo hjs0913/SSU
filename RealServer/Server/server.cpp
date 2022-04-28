@@ -1966,9 +1966,11 @@ void process_packet(int client_id, unsigned char* p)
             if (dun->get_dun_st() == DUN_ST_FREE) {
                 dun->set_dun_st(DUN_ST_ROBBY);
                 dun->state_lock.unlock();
+
                 // 이 방에 이 플레이어를 집어 넣는다
                 dun->set_party_name(pl->get_name());
                 dun->join_player(pl);
+
                 // 이 방에 대한 정보를 보내준다
                 send_party_room_packet(pl, dun->get_party_name(), dun->get_dungeon_id());
                 send_party_room_info_packet(pl, dun->get_party_palyer(), dun->player_cnt, dun->get_dungeon_id());
@@ -1991,7 +1993,6 @@ void process_packet(int client_id, unsigned char* p)
         if (dungeons[pl->indun_id]->player_rander_ok == GAIA_ROOM - dungeons[pl->indun_id]->partner_cnt) {
             dungeons[pl->indun_id]->start_game = true;
 
-        
             // BOSS NPC Timer Start
             timer_event ev;
             ev.obj_id = dungeons[pl->indun_id]->get_dungeon_id();
@@ -2056,48 +2057,6 @@ void process_packet(int client_id, unsigned char* p)
             send_party_room_info_packet(party_players[i], dun->get_party_palyer(), dun->player_cnt, dun->get_dungeon_id());
         }
         send_party_room_enter_ok_packet(pl, dun->get_dungeon_id());
-
-        // 던전 입장시 시야처리(나중에 바꿔야됨)
-        dun->state_lock.lock();
-        if (dun->get_dun_st() == DUN_ST_START) {
-            dun->state_lock.unlock();
-            dun->game_start();
-            // 게임이 시작 되었으니 시야처리를 해주자
-            Player** vl_pl;
-            vl_pl = dun->get_party_palyer();
-
-            unordered_set<int> indun_vl;
-            for (int j = 0; j < GAIA_ROOM; j++) indun_vl.insert(vl_pl[j]->get_id());
-
-            for (int j = 0; j < GAIA_ROOM; j++) {
-                vl_pl[j]->vl.lock();
-                unordered_set<int>temp_vl{ vl_pl[j]->viewlist };
-                vl_pl[j]->viewlist = indun_vl;
-                vl_pl[j]->viewlist.erase(vl_pl[j]->get_id());
-                vl_pl[j]->vl.unlock();
-
-                for (auto k : temp_vl) {
-                    send_remove_object_packet(vl_pl[j], players[k]);
-                    if (is_npc(k) == true) continue;
-                    reinterpret_cast<Player*>(players[k])->vl.lock();
-                    if (indun_vl.find(k) == indun_vl.end()) {
-                        reinterpret_cast<Player*>(players[k])->viewlist.erase(client_id);
-                        reinterpret_cast<Player*>(players[k])->vl.unlock();
-                        send_remove_object_packet(reinterpret_cast<Player*>(players[k]), vl_pl[j]);
-                        continue;
-                    }
-                    reinterpret_cast<Player*>(players[k])->vl.unlock();
-                }
-
-                for (auto k : indun_vl) {
-                    if (k == vl_pl[j]->get_id()) continue;
-                    send_put_object_packet(vl_pl[j], players[k]);
-                }
-                send_put_object_packet(vl_pl[j], dun->boss);
-            }
-            break;
-        }
-        dun->state_lock.unlock();
         break;
     }
     case CS_PACKET_PARTY_ROOM_QUIT_REQUEST: {
@@ -2107,6 +2066,7 @@ void process_packet(int client_id, unsigned char* p)
         // 나갔다는 정보를 player에게 보내준다
         Player** party_players = dun->get_party_palyer();
         send_party_room_quit_ok_packet(pl);
+        pl->join_dungeon_room = false;
 
         if (dun->player_cnt == 0) {
             // 아무도 없다는 뜻
@@ -2322,10 +2282,6 @@ void process_packet(int client_id, unsigned char* p)
             // 이 방에 이 플레이어를 집어 넣는다
             dun->partner_cnt++;
             dun->join_player(reinterpret_cast<Player*>(players[new_id]));
-       
-            // 여기에 인원이 꽉찼으면 5초후 게임을 시작하는 타이머를 돌려주자
-
-
 
             // 이 방에 대한 정보를 보내준다
             Player** party_players = dun->get_party_palyer();
@@ -2333,49 +2289,6 @@ void process_packet(int client_id, unsigned char* p)
                 if (party_players[i]->get_tribe() == HUMAN)
                     send_party_room_info_packet(party_players[i], dun->get_party_palyer(), dun->player_cnt, dun->get_dungeon_id());
             }
-            // send_party_room_enter_ok_packet(pl, dun->get_dungeon_id());
-
-            dun->state_lock.lock();
-            if (dun->get_dun_st() != DUN_ST_START) {  //들어가려면 여기 수정
-                dun->state_lock.unlock();
-                dun->game_start();
-                // 게임이 시작 되었으니 시야처리를 해주자
-                Player** vl_pl;
-                vl_pl = dun->get_party_palyer();
-
-                unordered_set<int> indun_vl;
-                for (int j = 0; j < GAIA_ROOM; j++) indun_vl.insert(vl_pl[j]->get_id());
-
-                for (int j = 0; j < GAIA_ROOM; j++) {
-                    vl_pl[j]->vl.lock();
-                    unordered_set<int>temp_vl{ vl_pl[j]->viewlist };
-                    vl_pl[j]->viewlist = indun_vl;
-                    vl_pl[j]->viewlist.erase(vl_pl[j]->get_id());
-                    vl_pl[j]->vl.unlock();
-
-                    for (auto k : temp_vl) {
-                        send_remove_object_packet(vl_pl[j], players[k]);
-                        if (is_npc(k) == true) continue;
-                        reinterpret_cast<Player*>(players[k])->vl.lock();
-                        if (indun_vl.find(k) == indun_vl.end()) {
-                            reinterpret_cast<Player*>(players[k])->viewlist.erase(client_id);
-                            reinterpret_cast<Player*>(players[k])->vl.unlock();
-                            send_remove_object_packet(reinterpret_cast<Player*>(players[k]), vl_pl[j]);
-                            continue;
-                        }
-                        reinterpret_cast<Player*>(players[k])->vl.unlock();
-                    }
-
-                    for (auto k : indun_vl) {
-                        if (k == vl_pl[j]->get_id()) continue;
-                        send_put_object_packet(vl_pl[j], players[k]);
-                    }
-                    send_put_object_packet(vl_pl[j], dun->boss);
-                }
-                break;
-            }
-            dun->state_lock.unlock();
-
             cout << "넣기 끝" << endl;
 
         }
@@ -2866,6 +2779,53 @@ void worker()
         }
         case OP_PARTNER_PATTERN: {
           //  dungeons[client_id]->pattern_active(exp_over->_target);
+            delete exp_over;
+            break;
+        }
+        case OP_GAMESTART_TIMER: {
+            cout << "찐 게임 시작" << endl;
+            Gaia* dun = dungeons[exp_over->_target];
+            dun->game_start();
+            dun->state_lock.lock();
+            if (dun->get_dun_st() == DUN_ST_START) {
+                dun->state_lock.unlock();
+                dun->game_start();
+                // 게임이 시작 되었으니 시야처리를 해주자
+                Player** vl_pl;
+                vl_pl = dun->get_party_palyer();
+
+                unordered_set<int> indun_vl;
+                for (int j = 0; j < GAIA_ROOM; j++) indun_vl.insert(vl_pl[j]->get_id());
+
+                for (int j = 0; j < GAIA_ROOM; j++) {
+                    vl_pl[j]->vl.lock();
+                    unordered_set<int>temp_vl{ vl_pl[j]->viewlist };
+                    vl_pl[j]->viewlist = indun_vl;
+                    vl_pl[j]->viewlist.erase(vl_pl[j]->get_id());
+                    vl_pl[j]->vl.unlock();
+
+                    for (auto k : temp_vl) {
+                        send_remove_object_packet(vl_pl[j], players[k]);
+                        if (is_npc(k) == true) continue;
+                        reinterpret_cast<Player*>(players[k])->vl.lock();
+                        if (indun_vl.find(k) == indun_vl.end()) {
+                            reinterpret_cast<Player*>(players[k])->viewlist.erase(client_id);
+                            reinterpret_cast<Player*>(players[k])->vl.unlock();
+                            send_remove_object_packet(reinterpret_cast<Player*>(players[k]), vl_pl[j]);
+                            continue;
+                        }
+                        reinterpret_cast<Player*>(players[k])->vl.unlock();
+                    }
+
+                    for (auto k : indun_vl) {
+                        if (k == vl_pl[j]->get_id()) continue;
+                        send_put_object_packet(vl_pl[j], players[k]);
+                    }
+                    send_put_object_packet(vl_pl[j], dun->boss);
+                }
+                break;
+            }
+            dun->state_lock.unlock();
             delete exp_over;
             break;
         }
@@ -3504,7 +3464,9 @@ COMP_OP EVtoOP(EVENT_TYPE ev) {
     case EVENT_PARTNER_PATTERN:
         return OP_PARTNER_PATTERN;
         break;
-
+    case EVENT_GAMESTART_TIMER:
+        return OP_GAMESTART_TIMER;
+        break;
     }
 
 }
