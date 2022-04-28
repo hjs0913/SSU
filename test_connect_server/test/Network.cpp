@@ -675,20 +675,26 @@ void process_packet(unsigned char* p)
 		sc_packet_party_room_info* packet = reinterpret_cast<sc_packet_party_room_info*>(p);
 		int r_id = (int)packet->room_id;
 
+		m_party[r_id]->player_cnt = 0;
 		for (int i = 0; i < packet->players_num; i++) {
 			m_party[r_id]->player_id[i] = (int)packet->players_id_in_server[i];
 			m_party[r_id]->player_lv[i] = (int)packet->players_lv[i];
 			m_party[r_id]->player_job[i] = static_cast<JOB>(packet->players_job[i]);
-		}
-
-		m_party[r_id]->player_cnt = 0;
-		m_party[r_id]->set_player_name(packet->player_name1);
-		m_party[r_id]->player_cnt++;
-		if (packet->players_num == 2) {	//2 = GAIA_ROOM
-			m_party[r_id]->set_player_name(packet->player_name2);
+			switch (i) {
+			case 0: m_party[r_id]->set_player_name(packet->player_name1); break;
+			case 1: m_party[r_id]->set_player_name(packet->player_name2); break;
+			case 2: m_party[r_id]->set_player_name(packet->player_name3); break;
+			case 3: m_party[r_id]->set_player_name(packet->player_name4); break;
+			}
 			m_party[r_id]->player_cnt++;
 		}
-		else m_party[r_id]->set_player_name("");
+
+		for (int i = packet->players_num; i < GAIA_ROOM; i++) {
+			m_party[r_id]->set_player_name("");
+			m_party[r_id]->player_cnt++;
+		}
+		m_party[r_id]->player_cnt = packet->players_num;
+
 		PartyUI_On = true;
 		party_info_on = true;
 		m_party_info = m_party[r_id];

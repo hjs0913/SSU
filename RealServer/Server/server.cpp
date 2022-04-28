@@ -159,7 +159,7 @@ void Disconnect(int c_id)
 
 
     players[c_id]->state_lock.lock();
-    closesocket(reinterpret_cast<Player*>(players[c_id])->_socket);
+    reinterpret_cast<Player*>(players[c_id])->CloseSocketPlayer();
     players[c_id]->set_state(ST_FREE);
     players[c_id]->state_lock.unlock();
 }
@@ -2508,7 +2508,8 @@ void worker()
                 pl->_recv_over._wsa_buf.len = sizeof(pl->_recv_over._net_buf);
                 pl->set_tribe(HUMAN);
                 ZeroMemory(&pl->_recv_over._wsa_over, sizeof(pl->_recv_over._wsa_over));
-                pl->_socket = c_socket;
+                //pl->_socket = c_socket;
+                pl->set_socket(c_socket);
 
                 CreateIoCompletionPort(reinterpret_cast<HANDLE>(c_socket), g_h_iocp, new_id, 0);
                 pl->do_recv();

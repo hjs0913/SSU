@@ -50,7 +50,7 @@ const int  MAX_USER = 1000;
 const int  MAX_NPC = 180;		// 디버깅 용
 constexpr int NPC_ID_START = MAX_USER;
 constexpr int NPC_ID_END = MAX_USER + MAX_NPC - 1;
-#define GAIA_ROOM 2
+const int GAIA_ROOM = 4;
 
 
 const char CS_PACKET_LOGIN = 1;
@@ -443,8 +443,8 @@ struct sc_packet_party_room_info {
 	unsigned char players_num;	// 몇명이 들어와있는지 보내줌
 	char player_name1[MAX_NAME_SIZE];
 	char player_name2[MAX_NAME_SIZE];
-	/*char player_name3[MAX_CHAT_SIZE];
-	char player_name4[MAX_CHAT_SIZE];*/
+	char player_name3[MAX_NAME_SIZE];
+	char player_name4[MAX_NAME_SIZE];
 	unsigned char players_lv[GAIA_ROOM];
 	unsigned char players_job[GAIA_ROOM];
 	int players_id_in_server[GAIA_ROOM];

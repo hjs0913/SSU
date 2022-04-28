@@ -48,3 +48,13 @@ int Player::get_indun_id()
 {
     return indun_id;
 }
+
+void Player::set_socket(SOCKET c_socket)
+{
+    _socket = c_socket;
+}
+
+void Player::CloseSocketPlayer()
+{
+    closesocket(_socket);
+}

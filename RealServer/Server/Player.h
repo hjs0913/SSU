@@ -4,6 +4,8 @@
 #include "SkillBuf.h"
 class Player : public Npc
 {
+private:
+    SOCKET				_socket;
 protected:
     char                _login_id[MAX_NAME_SIZE];
     int		            _exp;
@@ -12,7 +14,6 @@ protected:
     atomic_bool         _skill_active[3] = { false };
 public:
     atomic_bool         _auto_hp = false;
-	SOCKET				_socket;
 	EXP_OVER			_recv_over;
 	int					_prev_size;
 
@@ -124,6 +125,8 @@ public:
     int get_Pmaxmp();
     void set_Pmaxmp(int mp);
 
+    void set_socket(SOCKET c_socket);
+    void CloseSocketPlayer();
 
  
 };
