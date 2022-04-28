@@ -248,8 +248,9 @@ struct cs_packet_partner_rander_ok {
 	unsigned char size;
 	char type;
 };
-//---------------------------------------------
 
+
+//---------------------------------------------
 struct sc_packet_login_ok {
 	unsigned char size;
 	char type;

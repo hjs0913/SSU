@@ -16,7 +16,6 @@ Player::Player(int id) : Npc(id)
     superposition = false;
     join_dungeon_room = false;
     indun_id = -1;
-
 }
 
 void Player::set_exp(int exp)
@@ -47,6 +46,25 @@ JOB Player::get_job()
 int Player::get_indun_id()
 {
     return indun_id;
+}
+
+int Player::get_prev_size()
+{
+    return _prev_size;
+}
+
+void Player::set_prev_size(int prev_size)
+{
+    _prev_size = prev_size;
+}
+
+void Player::accept_initialize()
+{
+    _prev_size = 0;
+    _recv_over._comp_op = OP_RECV;
+    _recv_over._wsa_buf.buf = reinterpret_cast<char*>(_recv_over._net_buf);
+    _recv_over._wsa_buf.len = sizeof(_recv_over._net_buf);
+    ZeroMemory(&_recv_over._wsa_over, sizeof(_recv_over._wsa_over));
 }
 
 void Player::set_socket(SOCKET c_socket)

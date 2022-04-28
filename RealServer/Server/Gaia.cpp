@@ -142,9 +142,9 @@ void Gaia::game_start()
 		party[i]->state_lock.lock();
 		party[i]->set_state(ST_INDUN);
 		party[i]->state_lock.unlock();
-		send_start_gaia_packet(party[i], party_id);
+		if(party[i]->get_tribe() == HUMAN)
+			send_start_gaia_packet(party[i], party_id);
 		party[i]->indun_id = dungeon_id;
-
 		// 가장 체력이 높은 플레이어를 일단 타겟으로 잡는다
 		if (party[i]->get_hp() > tmp_hp) target_id = 0;
 	}
@@ -343,6 +343,7 @@ void Gaia::boss_move()
 	boss->set_x(mv.first);
 	boss->set_z(mv.second);
 	for (auto pt : party) {
+		if (pt->get_tribe() != HUMAN) continue;
 		send_move_packet(pt, boss);
 		send_look_packet(pt, boss);
 	}
@@ -389,6 +390,7 @@ void Gaia::boss_attack()
 		pattern_one_position[3].second = boss->get_z() - boss->get_right_z() * 50;
 
 		for (int i = 0; i < GAIA_ROOM; i++) {
+			if (party[i]->get_tribe() != HUMAN) continue;
 			send_gaia_pattern_one_packet(party[i], pattern_one_position);
 		}
 		//
@@ -456,6 +458,7 @@ void Gaia::boss_attack()
 		}
 
 		for (int i = 0; i < GAIA_ROOM; i++) {
+			if (party[i]->get_tribe() != HUMAN) continue;
 			send_gaia_pattern_two_packet(party[i], pattern_two_position, pattern_two_number);
 		}
 		//
@@ -496,6 +499,7 @@ void Gaia::boss_attack()
 		running_pattern = true;
 		pattern_five_position[0] = pos(boss->get_x()+ boss->get_look_x(), boss->get_z() + boss->get_look_z());
 		for (int i = 0; i < GAIA_ROOM; i++) {
+			if (party[i]->get_tribe() != HUMAN) continue;
 			send_gaia_pattern_five_packet(party[i], &pattern_five_position[0]);
 		}
 		//
