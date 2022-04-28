@@ -684,8 +684,9 @@ void process_packet(unsigned char* p)
 		m_party[r_id]->player_cnt = 0;
 		m_party[r_id]->set_player_name(packet->player_name1);
 		m_party[r_id]->player_cnt++;
-		if (packet->players_num == 2) {
+		if (packet->players_num == 2) {	//2 = GAIA_ROOM
 			m_party[r_id]->set_player_name(packet->player_name2);
+			m_party[r_id]->player_cnt++;
 		}
 		else m_party[r_id]->set_player_name("");
 		PartyUI_On = true;

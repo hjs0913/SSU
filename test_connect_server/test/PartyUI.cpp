@@ -114,6 +114,7 @@ void PartyUI::UpdateLabels_PartyInfo(const std::wstring* strUIText, Party* p, bo
     for (int i = m_room_cnt - GAIA_ROOM; i < m_room_cnt; i++) {
         std::wstring temp2 = L"";
         wchar_t* temp;
+        std::cout << "방 인원수 : " << p->player_cnt << std::endl;
         if (tmp >= p->player_cnt) {
             m_vTextBlocks[i] = { temp2, D2D1::RectF(320, 60 + 50 * (tmp), 520, 100 + 50 * (tmp)), m_pdwTextFormat };
         }
