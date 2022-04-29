@@ -17,7 +17,7 @@ wstring my_element_str = L"";
 wstring Info_str = L"";
 wstring Combat_str = L"";
 bool Combat_On = false;
-bool InDungeon = false;
+atomic_bool InDungeon = false;
 
 // locale variable
 XMFLOAT3 my_position(-1.0f, 5.0f, -1.0f);
@@ -262,14 +262,6 @@ void send_party_add_partner()
 	packet.room_id = party_enter_room_id;
 	do_send(sizeof(packet), &packet);
 }
-void send_partner_rander_ok_packet()
-{
-	cs_packet_partner_rander_ok packet;
-	packet.size = sizeof(packet);
-	packet.type = CS_PACKET_PARTNER_RANDER_OK;
-	do_send(sizeof(packet), &packet);
-}
-
 
 void send_party_invitation_reply(int accept)
 {

@@ -2008,6 +2008,25 @@ void process_packet(int client_id, unsigned char* p)
             ev.target_id = -1;
             timer_queue.push(ev);
 
+            // Ai움직이기 시작
+            Player** party_players = dungeons[pl->indun_id]->get_party_palyer();
+
+            for (int i = 0; i < GAIA_ROOM; i++) {
+                if (party_players[i]->get_tribe() == PARTNER) {
+                    ev.obj_id = party_players[i]->get_id();
+                    ev.start_time = chrono::system_clock::now() + 10s;
+                    ev.ev = EVENT_PARTNER_MOVE;
+                    ev.target_id = 1;
+                    timer_queue.push(ev);
+
+                    ev.obj_id = party_players[i]->get_id();
+                    ev.start_time = chrono::system_clock::now() + 1s;
+                    ev.ev = EVENT_PARTNER_ATTACK;
+                    ev.target_id = 1;
+                    timer_queue.push(ev);
+                }
+            }
+
         }
         break;
     }
@@ -2226,16 +2245,6 @@ void process_packet(int client_id, unsigned char* p)
         }
         else 
             cout << "가득 차서 불가능!" << endl;
-        break;
-    }
-    case CS_PACKET_PARTNER_RANDER_OK: {
-        timer_event ev;
-        ev.obj_id = 1;
-        ev.start_time = chrono::system_clock::now() + 1s;
-        ev.ev = EVENT_PARTNER_ATTACK;
-        ev.target_id = 1;
-        timer_queue.push(ev);
-
         break;
     }
     default:
@@ -2676,14 +2685,15 @@ void worker()
             break;
         }
         case OP_PARTNER_MOVE: {
-            dungeons[client_id]->partner_move(1); // 가이아 던전에서 내부 파티 내 파트너를 이동시킨다 
+            Partner* pl = reinterpret_cast<Partner*>(players[client_id]);
+            pl->partner_move();
+            Player** pp = dungeons[pl->get_indun_id()]->get_party_palyer();
+            for (int i = 0; i < GAIA_ROOM; i++) {
+                send_move_packet(pp[i], pl);
+            }
 
-            Player* pl = reinterpret_cast<Player*>(players[client_id]);
-
-            //reinterpret_cast<Partner*>(players[partner_id])->partner_move();
-
-           timer_event ev;
-            ev.obj_id = 1;
+            timer_event ev;
+            ev.obj_id = client_id;
             ev.start_time = chrono::system_clock::now() + 1s;
             ev.ev = EVENT_PARTNER_MOVE;
             ev.target_id = -1;
@@ -2692,7 +2702,7 @@ void worker()
             break;
         }
         case OP_PARTNER_ATTACK: {
-            dungeons[client_id]->partner_attack(1);
+            //dungeons[client_id]->partner_attack(1);
             delete exp_over;
             break;
         }
@@ -2702,9 +2712,9 @@ void worker()
             break;
         }
         case OP_GAMESTART_TIMER: {
-            cout << "찐 게임 시작" << endl;
             Gaia* dun = dungeons[exp_over->_target];
             dun->game_start();
+            cout << "찐 게임 시작" << endl;
             dun->state_lock.lock();
             if (dun->get_dun_st() == DUN_ST_START) {
                 dun->state_lock.unlock();

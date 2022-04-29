@@ -85,7 +85,7 @@ void Gaia::join_player(Player* pl)
 		
 		timer_event ev;
 		ev.obj_id = dungeon_id;
-		ev.start_time = chrono::system_clock::now() + 10s;
+		ev.start_time = chrono::system_clock::now() + 5s;
 		ev.ev = EVENT_GAMESTART_TIMER;
 		ev.target_id = dungeon_id;
 		timer_queue.push(ev);

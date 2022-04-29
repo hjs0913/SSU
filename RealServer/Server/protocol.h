@@ -74,7 +74,6 @@ const char CS_PACKET_PARTY_ROOM_QUIT_REQUEST = 18;
 const char CS_PACKET_PARTY_INVITE = 19;
 const char CS_PACKET_PARTY_INVITATION_REPLY = 20;
 const char CS_PACKET_PARTY_ADD_PARTNER = 21;
-const char CS_PACKET_PARTNER_RANDER_OK = 22;
 
 
 const char SC_PACKET_LOGIN_OK = 1;
@@ -242,11 +241,6 @@ struct cs_packet_party_add_partner {
 	unsigned char size;
 	char type;
 	unsigned char room_id;
-};
-
-struct cs_packet_partner_rander_ok {
-	unsigned char size;
-	char type;
 };
 
 
