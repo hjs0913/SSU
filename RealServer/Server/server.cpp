@@ -159,7 +159,7 @@ void Disconnect(int c_id)
 
 
     players[c_id]->state_lock.lock();
-    closesocket(reinterpret_cast<Player*>(players[c_id])->_socket);
+    reinterpret_cast<Player*>(players[c_id])->CloseSocketPlayer();
     players[c_id]->set_state(ST_FREE);
     players[c_id]->state_lock.unlock();
 }
@@ -2008,6 +2008,25 @@ void process_packet(int client_id, unsigned char* p)
             ev.target_id = -1;
             timer_queue.push(ev);
 
+            // Ai움직이기 시작
+            Player** party_players = dungeons[pl->indun_id]->get_party_palyer();
+
+            for (int i = 0; i < GAIA_ROOM; i++) {
+                if (party_players[i]->get_tribe() == PARTNER) {
+                    ev.obj_id = party_players[i]->get_id();
+                    ev.start_time = chrono::system_clock::now() + 10s;
+                    ev.ev = EVENT_PARTNER_MOVE;
+                    ev.target_id = 1;
+                    timer_queue.push(ev);
+
+                    ev.obj_id = party_players[i]->get_id();
+                    ev.start_time = chrono::system_clock::now() + 1s;
+                    ev.ev = EVENT_PARTNER_ATTACK;
+                    ev.target_id = 1;
+                    timer_queue.push(ev);
+                }
+            }
+
         }
         break;
     }
@@ -2180,102 +2199,35 @@ void process_packet(int client_id, unsigned char* p)
         if (dun->player_cnt < GAIA_ROOM) {  // 제한 인원수 보다 적을 때만 추가 가능하도록 하자 
             cout << "넣기 시작!" << endl;
             int new_id = get_new_id();
-
             if (-1 == new_id) {
-                cout << "Maxmum user overflow. Accept aborted.\n";
+                cout << "Maxmum user overflow.Accept aborted.\n";
             }
-            else {
-                Player* pl = reinterpret_cast<Player*>(players[new_id]);
-                pl->set_id(new_id);
-                pl->_prev_size = 0;
-                pl->_recv_over._comp_op = OP_RECV;
-                pl->_recv_over._wsa_buf.buf = reinterpret_cast<char*>(pl->_recv_over._net_buf);
-                pl->_recv_over._wsa_buf.len = sizeof(pl->_recv_over._net_buf);
-                pl->set_tribe(PARTNER);
-                ZeroMemory(&pl->_recv_over._wsa_over, sizeof(pl->_recv_over._wsa_over));
-            }
-            cout << "난 ai " << new_id << endl;
-            // players 에서 파트너의 아이디와 기본정보 업데이트 
+            delete players[new_id];
+            players[new_id] = new Partner(new_id);
             players[new_id]->state_lock.lock();
-            players[new_id]->set_tribe(PARTNER);
-            players[new_id]->set_id(new_id);
-            players[new_id]->set_name("AI");
-            players[new_id]->set_x(2100);
-            players[new_id]->set_y(0);
-            players[new_id]->set_z(1940);
-            players[new_id]->set_maxmp(10000);
-            players[new_id]->set_maxhp(10000);
-            players[new_id]->set_hp(500);
-            players[new_id]->set_mp(8000);
-            reinterpret_cast<Player*>(players[new_id])->set_job(J_DILLER);
-            players[new_id]->set_lv(25);
-            players[new_id]->set_element(E_WATER);
+            players[new_id]->set_state(ST_ACCEPT);
             players[new_id]->state_lock.unlock();
-          
-          /*
-            switch (reinterpret_cast<Player*>(players[new_id])->get_job()) {
-            case J_DILLER: {
-                int lv = players[new_id]->get_lv();
-                players[new_id]->set_maxhp(20 * lv * lv + 80 * lv);
-                players[new_id]->set_hp(players[new_id]->get_maxhp());
-                players[new_id]->set_maxmp(10 * lv * lv + 50 * lv);
-                players[new_id]->set_mp(players[new_id]->get_maxmp());
-                players[new_id]->set_physical_attack(0.3 * lv * lv + 10 * lv);
-                players[new_id]->set_magical_attack(0.1 * lv * lv + 5 * lv);
-                players[new_id]->set_physical_defence(0.24 * lv * lv + 10 * lv);
-                players[new_id]->set_magical_defence(0.17 * lv * lv + 10 * lv);
-                players[new_id]->set_basic_attack_factor(50.0f);
-                players[new_id]->set_defence_factor(0.0002);
-                break;
-            }
-            case J_TANKER: {
-                int lv = pl->get_lv();
-                players[new_id]->set_maxhp(22 * lv * lv + 80 * lv);
-                players[new_id]->set_hp(players[new_id]->get_maxhp());
-                players[new_id]->set_maxmp(8.5 * lv * lv + 50 * lv);
-                players[new_id]->set_mp(players[new_id]->get_maxmp());
-                players[new_id]->set_physical_attack(0.25 * lv * lv + 10 * lv);
-                players[new_id]->set_magical_attack(0.08 * lv * lv + 5 * lv);
-                players[new_id]->set_physical_defence(0.27 * lv * lv + 10 * lv);
-                players[new_id]->set_magical_defence(0.2 * lv * lv + 10 * lv);
-                players[new_id]->set_basic_attack_factor(50.0f);
-                players[new_id]->set_defence_factor(0.0002);
-                players[new_id]->set_element(E_WATER);
-                break;
-            }
-            case J_SUPPORTER: {
-                int lv = players[new_id]->get_lv();
-                players[new_id]->set_maxhp(18 * lv * lv + 70 * lv);
-                players[new_id]->set_hp(players[new_id]->get_maxhp());
-                players[new_id]->set_maxmp(15 * lv * lv + 60 * lv);
-                players[new_id]->set_mp(players[new_id]->get_maxmp());
-                players[new_id]->set_physical_attack(0.1 * lv * lv + 5 * lv);
-                players[new_id]->set_magical_attack(0.25 * lv * lv + 8 * lv);
-                players[new_id]->set_physical_defence(0.17 * lv * lv + 10 * lv);
-                players[new_id]->set_magical_defence(0.24 * lv * lv + 10 * lv);
-                players[new_id]->set_basic_attack_factor(50.0f);
-                players[new_id]->set_defence_factor(0.0002);
-                break;
-            }
-            case J_MAGICIAN: {
-                int lv = players[new_id]->get_lv();
-                players[new_id]->set_maxhp(16 * lv * lv + 70 * lv);
-                players[new_id]->set_hp(players[new_id]->get_maxhp());
-                players[new_id]->set_maxmp(17 * lv * lv + 60 * lv);
-                players[new_id]->set_mp(players[new_id]->get_maxmp());
-                players[new_id]->set_physical_attack(0.1 * lv * lv + 5 * lv);
-                players[new_id]->set_magical_attack(0.3 * lv * lv + 10 * lv);
-                players[new_id]->set_physical_defence(0.17 * lv * lv + 10 * lv);
-                players[new_id]->set_magical_defence(0.24 * lv * lv + 10 * lv);
-                players[new_id]->set_basic_attack_factor(50.0f);
-                players[new_id]->set_defence_factor(0.0002);
-                break;
-            }
-            default: {
-                cout << "없는 직업" << endl;
-                break;
-            }
-            }*/
+
+            Partner* partner = reinterpret_cast<Partner*>(players[new_id]);
+
+            // players 에서 파트너의 아이디와 기본정보 업데이트 
+            char ai_name[MAX_NAME_SIZE];
+            sprintf_s(ai_name, "%s%d", "AI", dun->partner_cnt);
+
+
+            partner->set_tribe(PARTNER);
+            partner->set_id(new_id);
+            partner->set_name(ai_name);
+            partner->set_x(2100);
+            partner->set_y(0);
+            partner->set_z(1940);
+            partner->set_maxmp(10000);
+            partner->set_maxhp(10000);
+            partner->set_hp(500);
+            partner->set_mp(8000);
+            partner->set_job(J_DILLER);
+            partner->set_lv(25);
+            partner->set_element(E_WATER);
             //  여기까지 클라에서 패킷 받으면, 새 player id 생성 후 정보 초기화  
 
             // join dungeon party
@@ -2290,30 +2242,9 @@ void process_packet(int client_id, unsigned char* p)
                     send_party_room_info_packet(party_players[i], dun->get_party_palyer(), dun->player_cnt, dun->get_dungeon_id());
             }
             cout << "넣기 끝" << endl;
-
         }
         else 
             cout << "가득 차서 불가능!" << endl;
-        break;
-    }
-    case CS_PACKET_PARTNER_RANDER_OK: {
-        // dungeons[pl->indun_id]->player_rander_ok++;
-
-        // PARTNER partner Timer Start
-        timer_event ev;
-        ev.obj_id = 1;
-        ev.start_time = chrono::system_clock::now() + 1s;
-        ev.ev = EVENT_PARTNER_ATTACK;
-        ev.target_id = 1;
-        timer_queue.push(ev);
-
-       /* ZeroMemory(&ev, sizeof(ev));
-        ev.obj_id = partner_id;
-        ev.start_time = chrono::system_clock::now() + 1s;
-        ev.ev = EVENT_PARTNER_MOVE;
-        ev.target_id = -1;
-        timer_queue.push(ev);
-        */
         break;
     }
     default:
@@ -2463,7 +2394,7 @@ void worker()
             }
 
             Player* pl = reinterpret_cast<Player*>(players[client_id]);
-            int remain_data = num_byte + pl->_prev_size;
+            int remain_data = num_byte + pl->get_prev_size();
             unsigned char* packet_start = exp_over->_net_buf;
             int packet_size = packet_start[0];
 
@@ -2476,10 +2407,10 @@ void worker()
             }
 
             if (0 < remain_data) {
-                pl->_prev_size = remain_data;
+                pl->set_prev_size(remain_data);
                 memcpy(&exp_over->_net_buf, packet_start, remain_data);
             }
-            if (remain_data == 0) pl->_prev_size = 0;
+            if (remain_data == 0) pl->set_prev_size(0);
             if (pl->get_state() == ST_FREE) continue;
             pl->do_recv();
             break;
@@ -2502,13 +2433,10 @@ void worker()
                 //players[new_id] = new Player(new_id);
                 Player* pl = reinterpret_cast<Player*>(players[new_id]);
                 pl->set_id(new_id);
-                pl->_prev_size = 0;
-                pl->_recv_over._comp_op = OP_RECV;
-                pl->_recv_over._wsa_buf.buf = reinterpret_cast<char*>(pl->_recv_over._net_buf);
-                pl->_recv_over._wsa_buf.len = sizeof(pl->_recv_over._net_buf);
+                pl->accept_initialize();
                 pl->set_tribe(HUMAN);
-                ZeroMemory(&pl->_recv_over._wsa_over, sizeof(pl->_recv_over._wsa_over));
-                pl->_socket = c_socket;
+                //pl->_socket = c_socket;
+                pl->set_socket(c_socket);
 
                 CreateIoCompletionPort(reinterpret_cast<HANDLE>(c_socket), g_h_iocp, new_id, 0);
                 pl->do_recv();
@@ -2757,14 +2685,15 @@ void worker()
             break;
         }
         case OP_PARTNER_MOVE: {
-            dungeons[client_id]->partner_move(1); // 가이아 던전에서 내부 파티 내 파트너를 이동시킨다 
+            Partner* pl = reinterpret_cast<Partner*>(players[client_id]);
+            pl->partner_move();
+            Player** pp = dungeons[pl->get_indun_id()]->get_party_palyer();
+            for (int i = 0; i < GAIA_ROOM; i++) {
+                send_move_packet(pp[i], pl);
+            }
 
-            Player* pl = reinterpret_cast<Player*>(players[client_id]);
-
-            //reinterpret_cast<Partner*>(players[partner_id])->partner_move();
-
-           timer_event ev;
-            ev.obj_id = 1;
+            timer_event ev;
+            ev.obj_id = client_id;
             ev.start_time = chrono::system_clock::now() + 1s;
             ev.ev = EVENT_PARTNER_MOVE;
             ev.target_id = -1;
@@ -2773,7 +2702,7 @@ void worker()
             break;
         }
         case OP_PARTNER_ATTACK: {
-            dungeons[client_id]->partner_attack(1);
+            //dungeons[client_id]->partner_attack(1);
             delete exp_over;
             break;
         }
@@ -2783,9 +2712,9 @@ void worker()
             break;
         }
         case OP_GAMESTART_TIMER: {
-            cout << "찐 게임 시작" << endl;
             Gaia* dun = dungeons[exp_over->_target];
             dun->game_start();
+            cout << "찐 게임 시작" << endl;
             dun->state_lock.lock();
             if (dun->get_dun_st() == DUN_ST_START) {
                 dun->state_lock.unlock();
@@ -2798,6 +2727,7 @@ void worker()
                 for (int j = 0; j < GAIA_ROOM; j++) indun_vl.insert(vl_pl[j]->get_id());
 
                 for (int j = 0; j < GAIA_ROOM; j++) {
+                    if (vl_pl[j]->get_tribe() != HUMAN) continue;
                     vl_pl[j]->vl.lock();
                     unordered_set<int>temp_vl{ vl_pl[j]->viewlist };
                     vl_pl[j]->viewlist = indun_vl;

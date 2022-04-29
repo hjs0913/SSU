@@ -262,7 +262,15 @@ void send_party_room_info_packet(Player* pl, Player** room_pl, int players_num, 
     packet.room_id = room_id;
     packet.players_num = players_num;
     strcpy_s(packet.player_name1, room_pl[0]->get_name());
-    if(players_num == 2) strcpy_s(packet.player_name2, room_pl[1]->get_name());
+    
+    if (players_num >= 2) {
+        strcpy_s(packet.player_name2, room_pl[1]->get_name());
+        if (players_num >= 3) {
+            strcpy_s(packet.player_name3, room_pl[2]->get_name());
+            if(players_num == 4) strcpy_s(packet.player_name4, room_pl[3]->get_name());
+        }
+    }
+
     for (int i = 0; i < players_num; i++) {
         packet.players_lv[i] = room_pl[i]->get_lv();
         packet.players_job[i] = room_pl[i]->get_job();

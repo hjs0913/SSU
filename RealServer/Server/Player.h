@@ -4,17 +4,18 @@
 #include "SkillBuf.h"
 class Player : public Npc
 {
-protected:
+private:
+    SOCKET				_socket;
     char                _login_id[MAX_NAME_SIZE];
     int		            _exp;
+	EXP_OVER			_recv_over;
+	int					_prev_size;
+protected:
     JOB                 _job;
     atomic_bool	        _attack_active;		// NPC가 가만히 안있고 움직일때
     atomic_bool         _skill_active[3] = { false };
 public:
     atomic_bool         _auto_hp = false;
-	SOCKET				_socket;
-	EXP_OVER			_recv_over;
-	int					_prev_size;
 
 	mutex		        vl;
 	unordered_set<int>	viewlist;
@@ -61,6 +62,7 @@ public:
 
     void do_send(int num_bytes, void* mess)
     {
+        if (_tribe != HUMAN) return;
         EXP_OVER* ex_over = new EXP_OVER(OP_SEND, num_bytes, mess);
         int ret = WSASend(_socket, &ex_over->_wsa_buf, 1, 0, 0, &ex_over->_wsa_over, NULL);
         if (SOCKET_ERROR == ret) {
@@ -124,6 +126,12 @@ public:
     int get_Pmaxmp();
     void set_Pmaxmp(int mp);
 
+    int get_prev_size();
+    void set_prev_size(int prev_size);
+
+    void accept_initialize();
+    void set_socket(SOCKET c_socket);
+    void CloseSocketPlayer();
 
  
 };

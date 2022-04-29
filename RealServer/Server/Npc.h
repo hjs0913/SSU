@@ -4,7 +4,7 @@ class Npc : public Obstacle
 {
 private:
 	MONSTER_SPECIES _mon_species;
-	int _target_id;
+	int				_target_id;
 protected:
 	char	_name[MAX_NAME_SIZE];
 	int		_hp;	

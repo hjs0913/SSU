@@ -37,7 +37,7 @@ extern wstring Info_str;
 extern wstring Combat_str;
 extern bool Combat_On;
 
-extern bool InDungeon;
+extern atomic_bool InDungeon;
 extern int party_id[GAIA_ROOM];
 extern wstring party_name[GAIA_ROOM];
 extern CPattern m_gaiaPattern;
@@ -99,8 +99,6 @@ void send_party_room_quit_request();
 void send_party_invite(char* user); 
 
 void send_party_add_partner();
-
-void send_partner_rander_ok_packet();
 
 void send_party_invitation_reply(int accept);
 
