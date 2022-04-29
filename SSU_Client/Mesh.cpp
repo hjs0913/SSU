@@ -5,6 +5,8 @@
 #include "stdafx.h"
 #include "Mesh.h"
 #include "Object.h"
+#include "Network.h"
+#include <fstream>
 
 CMesh::CMesh(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
 {
@@ -95,7 +97,9 @@ CHeightMapImage::CHeightMapImage(LPCTSTR pFileName, int nWidth, int nLength, XMF
 	{
 		for (int x = 0; x < m_nWidth; x++)
 		{
-			m_pHeightMapPixels[x + ((m_nLength - 1 - y)*m_nWidth)] = pHeightMapPixels[x + (y*m_nWidth)];
+			/*m_pHeightMapPixels[x + ((m_nLength - 1 - y)*m_nWidth)] = pHeightMapPixels[x + (y*m_nWidth)];*/
+			if (!InDungeon) m_pHeightMapPixels[x + ((m_nLength - 1 - y) * m_nWidth)] = pHeightMapPixels[x + (y * m_nWidth)];
+			else m_pHeightMapPixels[x + ((m_nLength - 1 - y) * m_nWidth)] = pHeightMapPixels[x + (y * m_nWidth)] * 8;
 		}
 	}
 
@@ -766,123 +770,123 @@ void CSkinnedMesh::OnPreRender(ID3D12GraphicsCommandList *pd3dCommandList, void 
 //
 CAirplaneMeshDiffused::CAirplaneMeshDiffused(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, float fWidth, float fHeight, float fDepth, XMFLOAT4 xmf4Color) : CMesh(pd3dDevice, pd3dCommandList)
 {
-	//m_nVertices = 36;
-	////m_nStride = sizeof(CTexturedVertex);
-	//m_nStride = sizeof(CDiffusedVertex);
-	//m_nOffset = 0;
-	//m_nSlot = 0;
-	//m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+	m_nVertices = 36;
+	//m_nStride = sizeof(CTexturedVertex);
+	m_nStride = sizeof(CDiffusedVertex);
+	m_nOffset = 0;
+	m_nSlot = 0;
+	m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
-	//float fx = fWidth * 0.5f, fy = fHeight * 0.5f, fz = fDepth * 0.5f;
-	//CDiffusedVertex pVertices[36];
+	float fx = fWidth * 0.5f, fy = fHeight * 0.5f, fz = fDepth * 0.5f;
+	CDiffusedVertex pVertices[36];
 
-	//int i = 0;
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, +fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	int i = 0;
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, +fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
 
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
 
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, -fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, -fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
 
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
 
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
 
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, +fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, +fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
 
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, -fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, -fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
 
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
 
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
 
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, +fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, +fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(+fx, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
 
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, -fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, -fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
 
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	//pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	//pVertices[i] = CDiffusedVertex(XMFLOAT3(-fx, +fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
-	///*
-	//CTexturedVertex pVertices[36];
-	//int i = 0;
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, +fy, -fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i++] = CDiffusedVertex(XMFLOAT3(-fx, -fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	pVertices[i] = CDiffusedVertex(XMFLOAT3(-fx, +fy, +fz), Vector4::Add(xmf4Color, XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f)));
+	/*
+	CTexturedVertex pVertices[36];
+	int i = 0;
 
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, -fy, -fz), XMFLOAT2(0.0f, 0.0f));
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, -fy, -fz), XMFLOAT2(1.0f, 0.0f));
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, -fy, +fz), XMFLOAT2(1.0f, 1.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, -fy, -fz), XMFLOAT2(0.0f, 0.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, -fy, -fz), XMFLOAT2(1.0f, 0.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, -fy, +fz), XMFLOAT2(1.0f, 1.0f));
 
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, -fy, -fz), XMFLOAT2(0.0f, 0.0f));
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, -fy, +fz), XMFLOAT2(1.0f, 1.0f));
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, -fy, +fz), XMFLOAT2(0.0f, 1.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, -fy, -fz), XMFLOAT2(0.0f, 0.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, -fy, +fz), XMFLOAT2(1.0f, 1.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, -fy, +fz), XMFLOAT2(0.0f, 1.0f));
 
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, +fy, +fz), XMFLOAT2(0.0f, 0.0f));
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, +fy, +fz), XMFLOAT2(1.0f, 0.0f));
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, +fy, -fz), XMFLOAT2(1.0f, 1.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, +fy, +fz), XMFLOAT2(0.0f, 0.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, +fy, +fz), XMFLOAT2(1.0f, 0.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, +fy, -fz), XMFLOAT2(1.0f, 1.0f));
 
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, +fy, +fz), XMFLOAT2(0.0f, 0.0f));
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, +fy, -fz), XMFLOAT2(1.0f, 1.0f));
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, +fy, -fz), XMFLOAT2(0.0f, 1.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, +fy, +fz), XMFLOAT2(0.0f, 0.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, +fy, -fz), XMFLOAT2(1.0f, 1.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, +fy, -fz), XMFLOAT2(0.0f, 1.0f));
 
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, -fy, +fz), XMFLOAT2(0.0f, 0.0f));
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, -fy, +fz), XMFLOAT2(1.0f, 0.0f));
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, +fy, +fz), XMFLOAT2(1.0f, 1.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, -fy, +fz), XMFLOAT2(0.0f, 0.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, -fy, +fz), XMFLOAT2(1.0f, 0.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, +fy, +fz), XMFLOAT2(1.0f, 1.0f));
 
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, -fy, +fz), XMFLOAT2(0.0f, 0.0f));
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, +fy, +fz), XMFLOAT2(1.0f, 1.0f));
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, +fy, +fz), XMFLOAT2(0.0f, 1.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, -fy, +fz), XMFLOAT2(0.0f, 0.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, +fy, +fz), XMFLOAT2(1.0f, 1.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, +fy, +fz), XMFLOAT2(0.0f, 1.0f));
 
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, +fy, -fz), XMFLOAT2(0.0f, 0.0f));
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, +fy, -fz), XMFLOAT2(1.0f, 0.0f));
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, -fy, -fz), XMFLOAT2(1.0f, 1.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, +fy, -fz), XMFLOAT2(0.0f, 0.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, +fy, -fz), XMFLOAT2(1.0f, 0.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, -fy, -fz), XMFLOAT2(1.0f, 1.0f));
 
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, +fy, -fz), XMFLOAT2(0.0f, 0.0f));
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, -fy, -fz), XMFLOAT2(1.0f, 1.0f));
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, -fy, -fz), XMFLOAT2(0.0f, 1.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, +fy, -fz), XMFLOAT2(0.0f, 0.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, -fy, -fz), XMFLOAT2(1.0f, 1.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, -fy, -fz), XMFLOAT2(0.0f, 1.0f));
 
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, +fy, +fz), XMFLOAT2(0.0f, 0.0f));
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, +fy, -fz), XMFLOAT2(1.0f, 0.0f));
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, -fy, -fz), XMFLOAT2(1.0f, 1.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, +fy, +fz), XMFLOAT2(0.0f, 0.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, +fy, -fz), XMFLOAT2(1.0f, 0.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, -fy, -fz), XMFLOAT2(1.0f, 1.0f));
 
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, +fy, +fz), XMFLOAT2(0.0f, 0.0f));
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, -fy, -fz), XMFLOAT2(1.0f, 1.0f));
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, -fy, +fz), XMFLOAT2(0.0f, 1.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, +fy, +fz), XMFLOAT2(0.0f, 0.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, -fy, -fz), XMFLOAT2(1.0f, 1.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(-fx, -fy, +fz), XMFLOAT2(0.0f, 1.0f));
 
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, +fy, -fz), XMFLOAT2(0.0f, 0.0f));
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, +fy, +fz), XMFLOAT2(1.0f, 0.0f));
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, -fy, +fz), XMFLOAT2(1.0f, 1.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, +fy, -fz), XMFLOAT2(0.0f, 0.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, +fy, +fz), XMFLOAT2(1.0f, 0.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, -fy, +fz), XMFLOAT2(1.0f, 1.0f));
 
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, +fy, -fz), XMFLOAT2(0.0f, 0.0f));
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, -fy, +fz), XMFLOAT2(1.0f, 1.0f));
-	//pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, -fy, -fz), XMFLOAT2(0.0f, 1.0f));
-	//*/
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, +fy, -fz), XMFLOAT2(0.0f, 0.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, -fy, +fz), XMFLOAT2(1.0f, 1.0f));
+	pVertices[i++] = CTexturedVertex(XMFLOAT3(+fx, -fy, -fz), XMFLOAT2(0.0f, 1.0f));
+	*/
 
 
-	//m_pd3dVertexBuffer = CreateBufferResource(pd3dDevice, pd3dCommandList, pVertices, m_nStride * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dVertexUploadBuffer);
+	m_pd3dVertexBuffer = CreateBufferResource(pd3dDevice, pd3dCommandList, pVertices, m_nStride * m_nVertices, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, &m_pd3dVertexUploadBuffer);
 
-	//m_d3dVertexBufferView.BufferLocation = m_pd3dVertexBuffer->GetGPUVirtualAddress();
-	//m_d3dVertexBufferView.StrideInBytes = m_nStride;
-	//m_d3dVertexBufferView.SizeInBytes = m_nStride * m_nVertices;
+	m_d3dVertexBufferView.BufferLocation = m_pd3dVertexBuffer->GetGPUVirtualAddress();
+	m_d3dVertexBufferView.StrideInBytes = m_nStride;
+	m_d3dVertexBufferView.SizeInBytes = m_nStride * m_nVertices;
 }
 
 CAirplaneMeshDiffused::~CAirplaneMeshDiffused()

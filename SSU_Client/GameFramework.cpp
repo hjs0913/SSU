@@ -76,13 +76,9 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 	CreateCommandQueueAndList();
 	CreateRtvAndDsvDescriptorHeaps();
 	CreateSwapChain();
-
-#ifndef _WITH_SWAPCHAIN_FULLSCREEN_STATE
-	CreateRenderTargetViews();
-#endif
 	CreateDepthStencilView();
 
-	//CoInitialize(NULL);
+	CoInitialize(NULL);
 
 	BuildObjects();
 
@@ -160,6 +156,10 @@ void CGameFramework::CreateSwapChain()
 
 	hResult = m_pdxgiFactory->MakeWindowAssociation(m_hWnd, DXGI_MWA_NO_ALT_ENTER);
 	m_nSwapChainBufferIndex = m_pdxgiSwapChain->GetCurrentBackBufferIndex();
+
+#ifndef _WITH_SWAPCHAIN_FULLSCREEN_STATE
+	CreateRenderTargetViews();
+#endif
 }
 
 void CGameFramework::CreateDirect3DDevice()
@@ -704,7 +704,6 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[7]->setAlpha(0.3, 1.0);
 		m_ppUILayer[8]->setAlpha(0.0, 1.0);
 
-
 		m_ppUILayer[0]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_FAR);
 		m_ppUILayer[1]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
@@ -736,31 +735,6 @@ void CGameFramework::BuildObjects()
 	}
 
 	Create_OpenWorld_Object();
-	/*m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
-
-	m_pScene = new CScene();
-	if (m_pScene) m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
-
-#ifdef _WITH_TERRAIN_PLAYER
-	CTerrainPlayer *pPlayer = new CTerrainPlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->m_pTerrain);
-#else
-	CAirplanePlayer *pPlayer = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), NULL);
-	pPlayer->SetPosition(XMFLOAT3(425.0f, 240.0f, 640.0f));
-#endif
-
-	m_pScene->m_pPlayer = m_pPlayer = pPlayer;
-	m_pCamera = m_pPlayer->GetCamera();
-
-	m_pd3dCommandList->Close();
-	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList };
-	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
-
-	WaitForGpuComplete();
-
-	if (m_pScene) m_pScene->ReleaseUploadBuffers();
-	if (m_pPlayer) m_pPlayer->ReleaseUploadBuffers();
-
-	m_GameTimer.Reset();*/
 }
 
 void CGameFramework::ReleaseObjects()
@@ -790,9 +764,11 @@ void CGameFramework::Create_OpenWorld_Object()
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
 
 	m_pScene = new CScene();
-	m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
+	if (m_pScene) m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
 
-	m_pPlayer = new CTerrainPlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->GetTerrain());
+	CTerrainPlayer* pPlayer = new CTerrainPlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->m_pTerrain);
+	m_pScene->m_pPlayer = m_pPlayer = pPlayer;
+
 	m_pCamera = m_pPlayer->GetCamera();
 	m_pPlayer->SetUse(true);
 
@@ -803,6 +779,8 @@ void CGameFramework::Create_OpenWorld_Object()
 	WaitForGpuComplete();
 
 	if (m_pScene) m_pScene->ReleaseUploadBuffers();
+	if (m_pPlayer) m_pPlayer->ReleaseUploadBuffers();
+
 	m_GameTimer.Reset();
 }
 
@@ -824,6 +802,7 @@ void CGameFramework::Create_InDungeon_Object()
 	WaitForGpuComplete();
 
 	if (m_pRaid_Scene) m_pRaid_Scene->ReleaseUploadBuffers();
+	if (m_pPlayer) m_pPlayer->ReleaseUploadBuffers();
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
 	m_GameTimer.Reset();
 }
@@ -873,13 +852,11 @@ void CGameFramework::AnimateObjects()
 {
 	float fTimeElapsed = m_GameTimer.GetTimeElapsed();
 
-	m_pPlayer->Animate(fTimeElapsed);
-
 	if (InDungeon == false) {
 		if (m_pScene)
 		{
 			// 캐릭터
-			m_pScene->AnimateObjects(m_GameTimer, m_pCamera, m_pPlayer, bulletidx);
+			//m_pScene->AnimateObjects(m_GameTimer, m_pCamera, m_pPlayer, bulletidx);
 			// 오브젝트
 			m_pScene->AnimateObjects(fTimeElapsed);
 		}
@@ -888,6 +865,7 @@ void CGameFramework::AnimateObjects()
 		if (m_pRaid_Scene) m_pRaid_Scene->AnimateObjects(m_GameTimer, m_pCamera, m_pPlayer, bulletidx);
 	}
 
+	m_pPlayer->Animate(fTimeElapsed);
 }
 
 void CGameFramework::WaitForGpuComplete()
@@ -921,7 +899,7 @@ void CGameFramework::MoveToNextFrame()
 void CGameFramework::FrameAdvance()
 {    
 	//m_GameTimer.Tick(30.0f);
-	m_GameTimer.Tick(0.0f);
+	m_GameTimer.Tick(30.0f);
 
 	//get_basic_information(m_pPlayer, my_id);
 	//m_pPlayer->SetPosition(return_myPosition());

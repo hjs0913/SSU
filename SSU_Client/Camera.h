@@ -103,7 +103,7 @@ public:
 class CThirdPersonCamera : public CCamera
 {
 public:
-	CThirdPersonCamera(/*CCamera *pCamera*/);
+	CThirdPersonCamera(CCamera *pCamera);
 	virtual ~CThirdPersonCamera() { }
 
 	virtual void Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed);

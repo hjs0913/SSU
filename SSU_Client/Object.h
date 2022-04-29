@@ -28,6 +28,12 @@ class CStandardShader;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
+struct SRVROOTARGUMENTINFO
+{
+	int								m_nRootParameterIndex = 0;
+	D3D12_GPU_DESCRIPTOR_HANDLE		m_d3dSrvGpuDescriptorHandle;
+};
+
 struct MATERIAL
 {
 	XMFLOAT4						m_xmf4Ambient;
@@ -39,12 +45,6 @@ struct MATERIAL
 struct CB_GAMEOBJECT_INFO
 {
 	XMFLOAT4X4						m_xmf4x4World;
-};
-
-struct SRVROOTARGUMENTINFO
-{
-	int								m_nRootParameterIndex = 0;
-	D3D12_GPU_DESCRIPTOR_HANDLE		m_d3dSrvGpuDescriptorHandle;
 };
 
 class CTexture
@@ -148,8 +148,8 @@ public:
 
 	void SetShader(CShader *pShader);
 	void SetMaterialType(UINT nType) { m_nType |= nType; }
-	void SetTexture(CTexture* pTexture);
-	//void SetTexture(CTexture *pTexture, UINT nTexture);
+	//void SetTexture(CTexture* pTexture);
+	void SetTexture(CTexture *pTexture, UINT nTexture = 0);
 
 	virtual void UpdateShaderVariable(ID3D12GraphicsCommandList *pd3dCommandList);
 
@@ -373,7 +373,7 @@ public:
 
 	CMesh							*m_pMesh = NULL;
 	int								m_nMeshes;
-	CMesh** m_ppMeshes;
+	CMesh							**m_ppMeshes = NULL;
 
 	int								m_nMaterials = 0;
 	CMaterial						**m_ppMaterials = NULL;

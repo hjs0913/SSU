@@ -22,7 +22,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 {
 	setlocale(LC_ALL, "");
 
-	// connect network
+	//connect network
 	//netInit();
 	//thread hThread{ worker };
 

@@ -43,7 +43,7 @@ CShader::~CShader()
 		delete[] m_ppd3dPipelineStates;
 	}
 
-	if (m_pd3dPipelineState) m_pd3dPipelineState->Release();
+	//if (m_pd3dPipelineState) m_pd3dPipelineState->Release();
 }
 
 D3D12_SHADER_BYTECODE CShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
@@ -270,8 +270,8 @@ void CShader::CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature *pd3dGr
 	m_d3dPipelineStateDesc.SampleDesc.Count = 1;
 	m_d3dPipelineStateDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
 
-	HRESULT hResult = pd3dDevice->CreateGraphicsPipelineState(&m_d3dPipelineStateDesc, __uuidof(ID3D12PipelineState), (void **)&m_pd3dPipelineState);
-
+	//HRESULT hResult = pd3dDevice->CreateGraphicsPipelineState(&m_d3dPipelineStateDesc, __uuidof(ID3D12PipelineState), (void **)&m_pd3dPipelineState);
+	HRESULT hResult = pd3dDevice->CreateGraphicsPipelineState(&m_d3dPipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&m_ppd3dPipelineStates[0]);
 	if (m_pd3dVertexShaderBlob) m_pd3dVertexShaderBlob->Release();
 	if (m_pd3dPixelShaderBlob) m_pd3dPixelShaderBlob->Release();
 
@@ -280,12 +280,24 @@ void CShader::CreateShader(ID3D12Device *pd3dDevice, ID3D12RootSignature *pd3dGr
 
 void CShader::OnPrepareRender(ID3D12GraphicsCommandList *pd3dCommandList, int nPipelineState)
 {
-	if (m_pd3dPipelineState) pd3dCommandList->SetPipelineState(m_pd3dPipelineState);
+	//if (m_pd3dPipelineState) pd3dCommandList->SetPipelineState(m_pd3dPipelineState);
+	if (m_ppd3dPipelineStates) pd3dCommandList->SetPipelineState(m_ppd3dPipelineStates[nPipelineState]);
 }
+
+void CShader::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, void* pContext)
+{
+	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
+	if (m_ppd3dPipelineStates) pd3dCommandList->SetPipelineState(m_ppd3dPipelineStates[0]);
+	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
+
+	UpdateShaderVariables(pd3dCommandList);
+}
+
 
 void CShader::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera)
 {
 	OnPrepareRender(pd3dCommandList);
+	//OnPrepareRender(pd3dCommandList, pCamera, NULL);
 }
 
 void CShader::CreateCbvSrvDescriptorHeaps(ID3D12Device* pd3dDevice, int nConstantBufferViews, int nShaderResourceViews)
@@ -377,6 +389,119 @@ D3D12_SHADER_BYTECODE CTerrainShader::CreatePixelShader()
 {
 	return(CShader::CompileShaderFromFile(L"b_Shaders.hlsl", "PSTerrain", "ps_5_1", &m_pd3dPixelShaderBlob));
 }
+
+//////////////////////////
+//D3D12_INPUT_LAYOUT_DESC CTerrainTessellationShader::CreateInputLayout()
+//{
+//	UINT nInputElementDescs = 4;
+//	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
+//
+//	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+//	pd3dInputElementDescs[1] = { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+//	pd3dInputElementDescs[2] = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 28, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+//	pd3dInputElementDescs[3] = { "TEXCOORD", 1, DXGI_FORMAT_R32G32_FLOAT, 0, 36, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+//
+//	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
+//	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
+//	d3dInputLayoutDesc.NumElements = nInputElementDescs;
+//
+//	return(d3dInputLayoutDesc);
+//}
+//
+//D3D12_RASTERIZER_DESC CTerrainTessellationShader::CreateRasterizerState()
+//{
+//	D3D12_RASTERIZER_DESC d3dRasterizerDesc;
+//	::ZeroMemory(&d3dRasterizerDesc, sizeof(D3D12_RASTERIZER_DESC));
+//	d3dRasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+//	d3dRasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+//	d3dRasterizerDesc.FrontCounterClockwise = FALSE;
+//	d3dRasterizerDesc.DepthBias = 0;
+//	d3dRasterizerDesc.DepthBiasClamp = 0.0f;
+//	d3dRasterizerDesc.SlopeScaledDepthBias = 0.0f;
+//	d3dRasterizerDesc.DepthClipEnable = TRUE;
+//	d3dRasterizerDesc.MultisampleEnable = FALSE;
+//	d3dRasterizerDesc.AntialiasedLineEnable = FALSE;
+//	d3dRasterizerDesc.ForcedSampleCount = 0;
+//	d3dRasterizerDesc.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
+//
+//	return(d3dRasterizerDesc);
+//}
+//
+//D3D12_SHADER_BYTECODE CTerrainTessellationShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
+//{
+//	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "VSTerrainTessellation", "vs_5_1", ppd3dShaderBlob));
+//}
+//
+//D3D12_SHADER_BYTECODE CTerrainTessellationShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
+//{
+//	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PSTerrainTessellation", "ps_5_1", ppd3dShaderBlob));
+//}
+//
+//D3D12_SHADER_BYTECODE CTerrainTessellationShader::CreateHullShader(ID3DBlob** ppd3dShaderBlob)
+//{
+//	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "HSTerrainTessellation", "hs_5_1", ppd3dShaderBlob));
+//}
+//
+//D3D12_SHADER_BYTECODE CTerrainTessellationShader::CreateDomainShader(ID3DBlob** ppd3dShaderBlob)
+//{
+//	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "DSTerrainTessellation", "ds_5_1", ppd3dShaderBlob));
+//}
+//
+//void CTerrainTessellationShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature)
+//{
+//
+//	if (pd3dGraphicsRootSignature)
+//	{
+//		m_pd3dGraphicsRootSignature = pd3dGraphicsRootSignature;
+//		pd3dGraphicsRootSignature->AddRef();
+//	}
+//
+//	m_nPipelineStates = 2;
+//	m_ppd3dPipelineStates = new ID3D12PipelineState * [m_nPipelineStates];
+//
+//	ID3DBlob* pd3dVertexShaderBlob = NULL, * pd3dPixelShaderBlob = NULL, * pd3dHullShaderBlob = NULL, * pd3dDomainShaderBlob = NULL;
+//
+//	D3D12_GRAPHICS_PIPELINE_STATE_DESC d3dPipelineStateDesc;
+//	::ZeroMemory(&d3dPipelineStateDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
+//	d3dPipelineStateDesc.pRootSignature = pd3dGraphicsRootSignature;
+//	d3dPipelineStateDesc.VS = CreateVertexShader(&pd3dVertexShaderBlob);
+//	d3dPipelineStateDesc.PS = CreatePixelShader(&pd3dPixelShaderBlob);
+//	d3dPipelineStateDesc.HS = CreateHullShader(&pd3dHullShaderBlob);
+//	d3dPipelineStateDesc.DS = CreateDomainShader(&pd3dDomainShaderBlob);
+//	d3dPipelineStateDesc.RasterizerState = CreateRasterizerState();
+//	d3dPipelineStateDesc.BlendState = CreateBlendState();
+//	d3dPipelineStateDesc.DepthStencilState = CreateDepthStencilState();
+//	d3dPipelineStateDesc.InputLayout = CreateInputLayout();
+//	d3dPipelineStateDesc.SampleMask = UINT_MAX;
+//	d3dPipelineStateDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_PATCH;
+//	d3dPipelineStateDesc.NumRenderTargets = 1;
+//	d3dPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+//	d3dPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+//	d3dPipelineStateDesc.SampleDesc.Count = 1;
+//	d3dPipelineStateDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
+//
+//	HRESULT hResult = pd3dDevice->CreateGraphicsPipelineState(&d3dPipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&m_ppd3dPipelineStates[0]);
+//
+//	d3dPipelineStateDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
+//	hResult = pd3dDevice->CreateGraphicsPipelineState(&d3dPipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&m_ppd3dPipelineStates[1]);
+//
+//	if (pd3dVertexShaderBlob) pd3dVertexShaderBlob->Release();
+//	if (pd3dPixelShaderBlob) pd3dPixelShaderBlob->Release();
+//	if (pd3dHullShaderBlob) pd3dHullShaderBlob->Release();
+//	if (pd3dDomainShaderBlob) pd3dDomainShaderBlob->Release();
+//
+//	if (d3dPipelineStateDesc.InputLayout.pInputElementDescs) delete[] d3dPipelineStateDesc.InputLayout.pInputElementDescs;
+//}
+//
+//void CTerrainTessellationShader::OnPrepareRender(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, void* pContext)
+//{
+//	if (m_pd3dGraphicsRootSignature) pd3dCommandList->SetGraphicsRootSignature(m_pd3dGraphicsRootSignature);
+//	if (m_ppd3dPipelineStates) pd3dCommandList->SetPipelineState((::gbTerrainTessellationWireframe) ? m_ppd3dPipelineStates[1] : m_ppd3dPipelineStates[0]);
+//	if (m_pd3dCbvSrvDescriptorHeap) pd3dCommandList->SetDescriptorHeaps(1, &m_pd3dCbvSrvDescriptorHeap);
+//
+//	UpdateShaderVariables(pd3dCommandList);
+//}
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -563,165 +688,6 @@ public:
 	float _z;
 };
 
-void CObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext)
-{
-	Obstacle obstacles[609];
-	ifstream obstacles_read("tree_position.txt");
-	if (!obstacles_read.is_open()) {
-		cout << "파일을 읽을 수 없습니다" << endl;
-		return;
-	}
-	for (int i = 0; i < 609; i++) {
-		float x, y, z;
-		obstacles_read >> x >> y >> z;
-		//	cout << x << "," << y << "," << z << endl;
-		obstacles[i]._id = i;
-		obstacles[i]._x = x + 2500;
-		obstacles[i]._y = y + 200;
-		obstacles[i]._z = z + 2500;
-	}
-
-	CHeightMapTerrain* pTerrain = (CHeightMapTerrain*)pContext;
-
-	map = pTerrain;
-	float fxPitch = 12.0f * 3.5f;
-	float fyPitch = 12.0f * 3.5f;
-	float fzPitch = 12.0f * 3.5f;
-
-	float fTerrainWidth = pTerrain->GetWidth();
-	float fTerrainLength = pTerrain->GetLength();
-
-	int xObjects = int(fTerrainWidth / fxPitch);   //97
-	int yObjects = 1;
-	int zObjects = int(fTerrainLength / fzPitch);
-	m_nObjects = (xObjects * yObjects * zObjects);  //97
-
-	m_nObjects += 1 + 2 * BULLETCNT + 1 + 4;
-
-#define TEXTURES 4
-	CTexture* pTexture[TEXTURES];
-	pTexture[0] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
-	pTexture[0]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/hp.dds", RESOURCE_TEXTURE2D, 0);   //여기 
-
-	pTexture[1] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
-	pTexture[1]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/tree02.dds", RESOURCE_TEXTURE2D, 0);
-
-	pTexture[2] = new CTexture(1, RESOURCE_TEXTURE2D, 0, 1);
-	pTexture[2]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/mp.dds", RESOURCE_TEXTURE2D, 0);
-
-	pTexture[3] = new CTexture(1, RESOURCE_TEXTURE2D_ARRAY, 0, 1);
-	pTexture[3]->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/guard.dds", RESOURCE_TEXTURE2D, 0);
-
-	UINT ncbElementBytes = ((sizeof(CB_GAMEOBJECT_INFO) + 255) & ~255);
-
-	CreateCbvSrvDescriptorHeaps(pd3dDevice, m_nObjects, 4);
-	CreateShaderVariables(pd3dDevice, pd3dCommandList);
-	CreateConstantBufferViews(pd3dDevice, m_nObjects, m_pd3dcbGameObjects, ncbElementBytes);
-	for (int i = 0; i < TEXTURES; i++) CreateShaderResourceViews(pd3dDevice, pTexture[i], 0, 3);
-
-#ifdef _WITH_BATCH_MATERIAL
-	m_pMaterial = new CMaterial();
-	m_pMaterial->SetTexture(pTexture);
-#else
-	//CMaterial* pMaterials[TEXTURES];
-	for (int i = 0; i < TEXTURES; i++)
-	{
-		pMaterials[i] = new CMaterial();
-		pMaterials[i]->SetTexture(pTexture[i]);
-	}
-#endif
-	for (int i = 0; i < 100; ++i) {
-		newhp[i] = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, i, hp_height, 0.0f);
-		newmp[i] = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, i, hp_height, 0.0f);
-	}
-
-	pRectMesh = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, hp_width, hp_height, 0.0f);
-
-	CTexturedRectMesh* part = new CTexturedRectMesh(pd3dDevice, pd3dCommandList, 2, 2, 0.0f);
-
-	CCubeMeshDiffused* bullet = new CCubeMeshDiffused(pd3dDevice, pd3dCommandList, 1.0f, 1.0f, 1.0f);
-
-	m_ppObjects = new CGameObject * [m_nObjects];
-	//CBillboardObject* pBillboardObject = NULL;
-
-	CBulletObject* bulletmesh;
-	for (int i = 1; i < 1 + BULLETCNT; ++i) {
-		bulletmesh = new CBulletObject(1);
-		bulletmesh->SetMesh(0, bullet);
-		//bulletmesh->SetMaterial(pMaterials[(i - 2) % 2 + 3]);
-
-		bulletmesh->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
-		m_ppObjects[i] = bulletmesh;
-	}
-
-	for (int i = 1 + BULLETCNT; i < 1 + 2 * BULLETCNT; ++i) {
-		pBillboardObject = new CBillboardObject(1);
-		pBillboardObject->SetMesh(0, part);
-#ifndef _WITH_BATCH_MATERIAL
-		pBillboardObject->SetMaterial(pMaterials[5]);
-#endif
-		pBillboardObject->SetPosition(0, -100, 0);
-		pBillboardObject->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
-		m_ppObjects[i] = pBillboardObject;
-	}
-
-	std::default_random_engine dre;
-	std::uniform_int_distribution<> uid{ 0,2 };
-
-	int tmp;
-	int num = 0;
-	for (int i = 1 + 2 * BULLETCNT, x = 0; x < xObjects; x++)
-	{
-		for (int z = 0; z < zObjects; z++)
-		{
-			for (int y = 0; y < yObjects; y++)
-			{
-				//pBillboardObject = new CBillboardObject(1);
-				//pBillboardObject->SetMesh(0, pRectMesh);
-#ifndef _WITH_BATCH_MATERIAL    
-
-				if (i == 201) { // hp
-					pBillboardObject->SetMesh(0, newhp[50]);
-					pBillboardObject->SetMaterial(pMaterials[0]);  //여기
-
-				}
-				else if (i == 202) {// mp
-					pBillboardObject->SetMesh(0, newmp[50]);
-					pBillboardObject->SetMaterial(pMaterials[2]);
-
-				}
-				else {
-					pBillboardObject->SetMesh(0, pRectMesh);
-					pBillboardObject->SetMaterial(pMaterials[1]);
-					//	pBillboardObject->SetMaterial(pMaterials[uid(dre)]);
-				}
-
-#endif
-				// 장애물 인덱스 생각(기윤)
-				float xPosition = obstacles[x + z]._x;
-				float zPosition = obstacles[x + z]._z;
-				float fHeight = pTerrain->GetHeight(xPosition, zPosition);
-				//cout << xPosition << " " << fHeight << " " << zPosition << endl;
-			//	if (xPosition <= fTerrainWidth / 2 - 200 || xPosition >= fTerrainWidth / 2 + 200 ||   //나무 위치     
-				//	zPosition <= fTerrainLength / 2 - 200 || zPosition >= fTerrainLength / 2 + 200) {
-				pBillboardObject->SetPosition(xPosition, 35, zPosition);         //1028 168 1028
-				//cout << hp_pos.x << hp_pos.y << hp_pos.z << endl;
-
-		//	}
-			//if (x == 1)
-			//pBillboardObject->SetPosition(xPosition, fHeight, zPosition);
-				pBillboardObject->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
-				m_ppObjects[i++] = pBillboardObject;
-				tmp = i;
-
-			}
-			num += 1;
-			if (num > 9)
-				num = 9;
-		}
-	}
-}
-
 void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext, ID3D12RootSignature* pd3dGraphicsRootSignature)
 {
 	Obstacle obstacles[609];
@@ -753,9 +719,10 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	int xObjects = int(fTerrainWidth / fxPitch);   //97
 	int yObjects = 1;
 	int zObjects = int(fTerrainLength / fzPitch);
-	m_nObjects = (xObjects * yObjects * zObjects);  //97
+	//m_nObjects = (xObjects * yObjects * zObjects);  //97
 	// m_nObjects += 1 + 2 * BULLETCNT + 1 + 4;
-	m_nObjects += 1 + 2 * BULLETCNT + 1 + 4 + MAX_NPC + MAX_USER;
+	//m_nObjects += 1 + 2 * BULLETCNT + 1 + 4 + MAX_NPC + MAX_USER;
+	m_nObjects = 50;
 
 #define TEXTURES 11
 	CTexture* pTexture[TEXTURES];
@@ -794,10 +761,11 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 
 	UINT ncbElementBytes = ((sizeof(CB_GAMEOBJECT_INFO) + 255) & ~255);
 
-	CreateCbvSrvDescriptorHeaps(pd3dDevice, m_nObjects, 11);//8
-	CreateShaderVariables(pd3dDevice, pd3dCommandList);
-	CreateConstantBufferViews(pd3dDevice, m_nObjects, m_pd3dcbGameObjects, ncbElementBytes);
-	for (int i = 0; i < TEXTURES; i++) CreateShaderResourceViews(pd3dDevice, pTexture[i], 0, 3);
+	//CreateCbvSrvDescriptorHeaps(pd3dDevice, m_nObjects, 11);//8
+	//CreateShaderVariables(pd3dDevice, pd3dCommandList);
+	//CreateConstantBufferViews(pd3dDevice, m_nObjects, m_pd3dcbGameObjects, ncbElementBytes);
+	//for (int i = 0; i < TEXTURES; i++) CreateShaderResourceViews(pd3dDevice, pTexture[i], 0, 3);
+	//for (int i = 0; i < TEXTURES; i++) CreateShaderResourceViews(pd3dDevice, pTexture[i], 0, 3);
 
 #ifdef _WITH_BATCH_MATERIAL
 	m_pMaterial = new CMaterial();
@@ -838,129 +806,140 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		20.0f, 20.0f, 4.0f, XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
 	//CAirplaneMeshDiffused* npc = new CAirplaneMeshDiffused(pd3dDevice, pd3dCommandList);
 
+	// 50개
 	m_ppObjects = new CGameObject * [m_nObjects];
+	ZeroMemory(m_ppObjects, 50 * sizeof(CGameObject*));
 
-	//CBillboardObject* pBillboardObject = NULL;
+//	CBillboardObject* pBillboardObject = NULL;
+//
+//	CGameObject* phouseObject = new CGameObject(1);
+//
+//	CBulletObject* bulletmesh;
+//	for (int i = 1; i < 1 + BULLETCNT; ++i) {
+//		bulletmesh = new CBulletObject(1);
+//		bulletmesh->SetMesh(0, bullet);
+//		bulletmesh->SetMaterial(pMaterials[7]);
+//
+//		bulletmesh->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+//		m_ppObjects[i] = bulletmesh;
+//	}
+//
+//	for (int i = 1 + BULLETCNT; i < 1 + 2 * BULLETCNT; ++i) {
+//		pBillboardObject = new CBillboardObject(1);
+//		pBillboardObject->SetMesh(0, part);
+//#ifndef _WITH_BATCH_MATERIAL
+//		pBillboardObject->SetMaterial(pMaterials[8]);
+//#endif
+//		pBillboardObject->SetPosition(0, -100, 0);
+//		pBillboardObject->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+//		m_ppObjects[i] = pBillboardObject;
+//	}
+//
+//	std::default_random_engine dre;
+//	std::uniform_int_distribution<> uid{ 0,2 };
+//
+//	int tmp;
+//	int num = 0;
+//	for (int i = 1 + 2 * BULLETCNT, x = 0; x < xObjects; x++)
+//	{
+//		for (int z = 0; z < zObjects; z++)
+//		{
+//			for (int y = 0; y < yObjects; y++)
+//			{
+//				if (i == 201) {
+//					pBillboardObject = new CBillboardObject(1);
+//					pBillboardObject->SetMesh(0, pRectMesh);
+//				}
+//				else if (i == 202) {
+//					pBillboardObject = new CBillboardObject(1);
+//					pBillboardObject->SetMesh(0, pRectMesh);
+//				}
+//				else if ((811 < i) && (i < 992)) { // npc hp
+//					pBillboardObject = new CBillboardObject(1);
+//					pBillboardObject->SetMesh(0, pRectMesh);
+//				}
+//				else {
+//					pBillboardObject = new CBillboardObject(1);
+//					pBillboardObject->SetMesh(0, pRectMesh);
+//				}
+//#ifndef _WITH_BATCH_MATERIAL    
+//
+//				if (i == 201) //HP
+//					pBillboardObject->SetMaterial(pMaterials[1]);  //여기
+//				else if (i == 202) { // mp
+//
+//					pBillboardObject->SetMaterial(pMaterials[1]);
+//
+//				}
+//				else if ((811 < i) && (i < 992)) { // npc hp
+//					pBillboardObject->SetMaterial(pMaterials[0]);
+//				}
+//				else {
+//					pBillboardObject->SetMaterial(pMaterials[1]);
+//				}
+//				//	pBillboardObject->SetMaterial(pMaterials[uid(dre)]);
+//
+//#endif
+//				// 장애물 인덱스 생각(기윤)
+//				float xPosition;
+//				float zPosition;
+//				if (x * 97 + z >= 609) {
+//					xPosition = 0.0f;
+//					zPosition = 0.0f;
+//				}
+//				else {
+//					xPosition = obstacles[x * 97 + z]._x + 100;
+//					zPosition = obstacles[x * 97 + z]._z + 300;
+//				}
+//
+//				float fHeight = pTerrain->GetHeight(xPosition, zPosition);
+//				//cout << xPosition << " " << fHeight << " " << zPosition << endl;
+//			//	if (xPosition <= fTerrainWidth / 2 - 200 || xPosition >= fTerrainWidth / 2 + 200 ||   //나무 위치     
+//				//	zPosition <= fTerrainLength / 2 - 200 || zPosition >= fTerrainLength / 2 + 200) {
+//				pBillboardObject->SetPosition(xPosition, fHeight + 23, zPosition);         //1028 168 1028
+//				if (pBillboardObject->GetPosition().y >= 50) {
+//					pBillboardObject->SetPosition(xPosition, 23, zPosition);
+//				}
+//
+//				pBillboardObject->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
+//				m_ppObjects[i++] = pBillboardObject;
+//
+//				tmp = i;
+//			}
+//			num += 1;
+//			if (num > 9)
+//				num = 9;
+//		}
+//
+//	}
+//
+	//// 플레이어
+	//for (int i = m_nObjects - MAX_NPC - MAX_USER; i < m_nObjects - MAX_NPC; i++) {
+	//	CTerrainPlayer* pOtherPlayer = new CTerrainPlayer(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, pTerrain);
+	//	pOtherPlayer->SetMesh(0, pOtherPlayerMesh[2]);
+	//	pOtherPlayer->SetPosition(XMFLOAT3(0, -100, 0));
+	//	pOtherPlayer->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr);
+	//	m_ppObjects[i] = pOtherPlayer;
+	//}
 
-	CGameObject* phouseObject = new CGameObject(1);
-
-	CBulletObject* bulletmesh;
-	for (int i = 1; i < 1 + BULLETCNT; ++i) {
-		bulletmesh = new CBulletObject(1);
-		bulletmesh->SetMesh(0, bullet);
-		//	bulletmesh->SetMaterial(pMaterials[7]);
-
-		bulletmesh->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
-		m_ppObjects[i] = bulletmesh;
-	}
-
-	for (int i = 1 + BULLETCNT; i < 1 + 2 * BULLETCNT; ++i) {
-		pBillboardObject = new CBillboardObject(1);
-		pBillboardObject->SetMesh(0, part);
-#ifndef _WITH_BATCH_MATERIAL
-		pBillboardObject->SetMaterial(pMaterials[8]);
-#endif
-		pBillboardObject->SetPosition(0, -100, 0);
-		pBillboardObject->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
-		m_ppObjects[i] = pBillboardObject;
-	}
-
-	std::default_random_engine dre;
-	std::uniform_int_distribution<> uid{ 0,2 };
-
-	int tmp;
-	int num = 0;
-	for (int i = 1 + 2 * BULLETCNT, x = 0; x < xObjects; x++)
-	{
-		for (int z = 0; z < zObjects; z++)
-		{
-			for (int y = 0; y < yObjects; y++)
-			{
-				if (i == 201) {
-					pBillboardObject = new CBillboardObject(1);
-					pBillboardObject->SetMesh(0, pRectMesh);
-				}
-				else if (i == 202) {
-					pBillboardObject = new CBillboardObject(1);
-					pBillboardObject->SetMesh(0, pRectMesh);
-				}
-				else if ((811 < i) && (i < 992)) { // npc hp
-					pBillboardObject = new CBillboardObject(1);
-					pBillboardObject->SetMesh(0, pRectMesh);
-				}
-				else {
-					pBillboardObject = new CBillboardObject(1);
-					pBillboardObject->SetMesh(0, pRectMesh);
-				}
-#ifndef _WITH_BATCH_MATERIAL    
-
-				if (i == 201) //HP
-					pBillboardObject->SetMaterial(pMaterials[1]);  //여기
-				else if (i == 202) { // mp
-
-					pBillboardObject->SetMaterial(pMaterials[1]);
-
-				}
-				else if ((811 < i) && (i < 992)) { // npc hp
-					pBillboardObject->SetMaterial(pMaterials[0]);
-				}
-				else {
-					pBillboardObject->SetMaterial(pMaterials[1]);
-				}
-				//	pBillboardObject->SetMaterial(pMaterials[uid(dre)]);
-
-#endif
-				// 장애물 인덱스 생각(기윤)
-				float xPosition;
-				float zPosition;
-				if (x * 97 + z >= 609) {
-					xPosition = 0.0f;
-					zPosition = 0.0f;
-				}
-				else {
-					xPosition = obstacles[x * 97 + z]._x + 100;
-					zPosition = obstacles[x * 97 + z]._z + 300;
-				}
-
-				float fHeight = pTerrain->GetHeight(xPosition, zPosition);
-				//cout << xPosition << " " << fHeight << " " << zPosition << endl;
-			//	if (xPosition <= fTerrainWidth / 2 - 200 || xPosition >= fTerrainWidth / 2 + 200 ||   //나무 위치     
-				//	zPosition <= fTerrainLength / 2 - 200 || zPosition >= fTerrainLength / 2 + 200) {
-				pBillboardObject->SetPosition(xPosition, fHeight + 23, zPosition);         //1028 168 1028
-				if (pBillboardObject->GetPosition().y >= 50) {
-					pBillboardObject->SetPosition(xPosition, 23, zPosition);
-				}
-
-				pBillboardObject->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
-				m_ppObjects[i++] = pBillboardObject;
-
-				tmp = i;
-			}
-			num += 1;
-			if (num > 9)
-				num = 9;
-		}
-
-	}
-
-	// 플레이어
-	for (int i = m_nObjects - MAX_NPC - MAX_USER; i < m_nObjects - MAX_NPC; i++) {
-		CAirplanePlayer* pOtherPlayer = new CAirplanePlayer(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, pTerrain);
+	for (int i = 0; i < m_nObjects; i++) {
+		CTerrainPlayer* pOtherPlayer = new CTerrainPlayer(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, pTerrain);
 		pOtherPlayer->SetMesh(0, pOtherPlayerMesh[2]);
 		pOtherPlayer->SetPosition(XMFLOAT3(0, -100, 0));
-		pOtherPlayer->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr);
+		//pOtherPlayer->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr);
 		m_ppObjects[i] = pOtherPlayer;
+		m_ppObjects[i]->OnPrepareAnimate();
 	}
+	//CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
-	// NPC
-	for (int i = m_nObjects - MAX_NPC; i < m_nObjects; i++) {
-		CAirplanePlayer* pNpc = new CAirplanePlayer(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, pTerrain);
-		pNpc->SetMesh(0, pOtherPlayerMesh[1]);
-		pNpc->SetPosition(XMFLOAT3(0, -100, 0));
-		pNpc->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr);
-		m_ppObjects[i] = pNpc;
-
-	}
+	//// NPC
+	//for (int i = m_nObjects - MAX_NPC; i < m_nObjects; i++) {
+	//	CTerrainPlayer* pNpc = new CTerrainPlayer(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, pTerrain);
+	//	pNpc->SetMesh(0, pOtherPlayerMesh[1]);
+	//	pNpc->SetPosition(XMFLOAT3(0, -100, 0));
+	//	pNpc->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr);
+	//	m_ppObjects[i] = pNpc;
+	//}
 
 }
 
@@ -1051,7 +1030,7 @@ void CObjectsShader::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 	CreateCbvSrvDescriptorHeaps(pd3dDevice, m_nObjects, 14);//8
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	CreateConstantBufferViews(pd3dDevice, m_nObjects, m_pd3dcbGameObjects, ncbElementBytes);
-	for (int i = 0; i < TEXTURES; i++) CreateShaderResourceViews(pd3dDevice, pTexture[i], 0, 3);
+	for (int i = 0; i < TEXTURES; i++) CreateShaderResourceViews(pd3dDevice, pTexture[i], 0, 1);
 
 #ifdef _WITH_BATCH_MATERIAL
 	m_pMaterial = new CMaterial();
@@ -1196,23 +1175,23 @@ void CObjectsShader::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 
 	}
 
-	// 플레이어
-	for (int i = m_nObjects - MAX_NPC - MAX_USER; i < m_nObjects - MAX_NPC; i++) {
-		CAirplanePlayer* pOtherPlayer = new CAirplanePlayer(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, pTerrain);
-		pOtherPlayer->SetMesh(0, pOtherPlayerMesh[2]);
-		pOtherPlayer->SetPosition(XMFLOAT3(0, -100, 0));
-		pOtherPlayer->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr);
-		m_ppObjects[i] = pOtherPlayer;
-	}
+	//// 플레이어
+	//for (int i = m_nObjects - MAX_NPC - MAX_USER; i < m_nObjects - MAX_NPC; i++) {
+	//	CTerrainPlayer* pOtherPlayer = new CTerrainPlayer(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, pTerrain);
+	//	pOtherPlayer->SetMesh(0, pOtherPlayerMesh[2]);
+	//	pOtherPlayer->SetPosition(XMFLOAT3(0, -100, 0));
+	//	pOtherPlayer->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr);
+	//	m_ppObjects[i] = pOtherPlayer;
+	//}
 
-	// NPC
-	for (int i = m_nObjects - MAX_NPC; i < m_nObjects; i++) {
-		CAirplanePlayer* pNpc = new CAirplanePlayer(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, pTerrain);
-		pNpc->SetMesh(0, pOtherPlayerMesh[1]);
-		pNpc->SetPosition(XMFLOAT3(0, -100, 0));
-		pNpc->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr);
-		m_ppObjects[i] = pNpc;
-	}
+	//// NPC
+	//for (int i = m_nObjects - MAX_NPC; i < m_nObjects; i++) {
+	//	CTerrainPlayer* pNpc = new CTerrainPlayer(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, pTerrain);
+	//	pNpc->SetMesh(0, pOtherPlayerMesh[1]);
+	//	pNpc->SetPosition(XMFLOAT3(0, -100, 0));
+	//	pNpc->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr);
+	//	m_ppObjects[i] = pNpc;
+	//}
 }
 
 void CObjectsShader::ReleaseObjects()
@@ -1230,14 +1209,15 @@ void CObjectsShader::ReleaseObjects()
 
 void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameObject* player, int bulletidx)
 {
-	CAirplanePlayer* pPlayer = NULL;
+	CTerrainPlayer* pPlayer = NULL;
 	int server_id = MAX_USER + MAX_NPC;
 	int MAX_WORLD_SHADER = m_nObjects - server_id;
 
 	for (int j = 0; j < m_nObjects; j++)
 	{
+		if (m_ppObjects[j] == nullptr) continue;
 		if (j >= m_nObjects - server_id) {
-			pPlayer = reinterpret_cast<CAirplanePlayer*>(m_ppObjects[j]);
+			pPlayer = reinterpret_cast<CTerrainPlayer*>(m_ppObjects[j]);
 			bool tp = pPlayer->GetUse();
 			pPlayer->SetUse(get_use_to_server(j - MAX_WORLD_SHADER));
 			if (pPlayer->GetUse()) {
@@ -1288,7 +1268,7 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 				}
 				// 이때만 렌더링
 
-				reinterpret_cast<CAirplanePlayer*>(m_ppObjects[j])->m_hp = get_hp_to_server(j - MAX_WORLD_SHADER);
+				reinterpret_cast<CTerrainPlayer*>(m_ppObjects[j])->m_hp = get_hp_to_server(j - MAX_WORLD_SHADER);
 				m_ppObjects[j]->SetPosition(get_position_to_server(j - MAX_WORLD_SHADER));
 				if (j >= 10615 && j < 10795) {
 					//m_ppObjects[j]->SetPosition(get_position_to_server(j - 9614));
@@ -1343,7 +1323,7 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 
 				}
 				else {
-					cout << "우아2" << endl;
+
 					//m_ppObjects[j + BULLETCNT - 30]->SetPosition(effect_x - 10, effect_y + 10, effect_z);
 					//m_ppObjects[j + BULLETCNT - 31]->SetPosition(effect_x, effect_y , effect_z);
 					//m_ppObjects[j + BULLETCNT - 32]->SetPosition(effect_x - 10, effect_y + 10, effect_z);
@@ -1364,7 +1344,7 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 			m_ppObjects[j]->SyncPlayer(pTimer, pCamera, player);
 		}
 		else if (j >= 812 && j < 992) {
-			pPlayer = reinterpret_cast<CAirplanePlayer*>(m_ppObjects[MAX_WORLD_SHADER + MAX_USER + j - 812]);
+			pPlayer = reinterpret_cast<CTerrainPlayer*>(m_ppObjects[MAX_WORLD_SHADER + MAX_USER + j - 812]);
 			if (pPlayer->GetUse()) {
 				int width = ((float)pPlayer->m_hp / pPlayer->m_max_hp) * 50.0f;
 				m_ppObjects[j]->SetMesh(0, newhp[width]);
@@ -1385,7 +1365,11 @@ void CObjectsShader::ReleaseUploadBuffers()
 {
 	if (m_ppObjects)
 	{
-		for (int j = 0; j < m_nObjects; j++) if (m_ppObjects[j]) m_ppObjects[j]->ReleaseUploadBuffers();
+		for (int j = 0; j < m_nObjects; j++) { 
+			if (m_ppObjects[j]) { 
+				m_ppObjects[j]->ReleaseUploadBuffers();
+			}
+		}
 	}
 #ifdef _WITH_BATCH_MATERIAL
 	if (m_pMaterial) m_pMaterial->ReleaseUploadBuffers();
@@ -1400,25 +1384,29 @@ void CObjectsShader::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera*
 	if (m_pMaterial) m_pMaterial->UpdateShaderVariables(pd3dCommandList);
 #endif
 
-	for (int j = 0; j < m_nObjects - 4; j++)
+	for (int j = 0; j < m_nObjects/* - 4*/; j++)
 	{
-		if (m_ppObjects[j]) m_ppObjects[j]->Render(pd3dCommandList, pCamera);
+		if (m_ppObjects[j])
+		{
+			m_ppObjects[j]->Animate(m_fElapsedTime);
+			m_ppObjects[j]->Render(pd3dCommandList, pCamera);
+		}
 	}
 	pd3dCommandList->OMSetStencilRef(1);
 	if (m_ppd3dPipelineStates) pd3dCommandList->SetPipelineState(m_ppd3dPipelineStates[1]);
 
-	if (m_ppObjects[m_nObjects - 1]) m_ppObjects[m_nObjects - 1]->Render(pd3dCommandList, pCamera);  //거울 스텐실에
+	//if (m_ppObjects[m_nObjects - 1]) m_ppObjects[m_nObjects - 1]->Render(pd3dCommandList, pCamera);  //거울 스텐실에
 
-	if (m_ppd3dPipelineStates) pd3dCommandList->SetPipelineState(m_ppd3dPipelineStates[2]);
+	//if (m_ppd3dPipelineStates) pd3dCommandList->SetPipelineState(m_ppd3dPipelineStates[2]);
 
-	for (int j = m_nObjects - 4; j < m_nObjects - 1; j++)
-	{
-		if (m_ppObjects[j]) m_ppObjects[j]->Render(pd3dCommandList, pCamera);   //반사 객체
-	}
+	//for (int j = m_nObjects - 4; j < m_nObjects - 1; j++)
+	//{
+	//	if (m_ppObjects[j]) m_ppObjects[j]->Render(pd3dCommandList, pCamera);   //반사 객체
+	//}
 
-	if (m_ppd3dPipelineStates) pd3dCommandList->SetPipelineState(m_ppd3dPipelineStates[3]);
+	//if (m_ppd3dPipelineStates) pd3dCommandList->SetPipelineState(m_ppd3dPipelineStates[3]);
 
-	if (m_ppObjects[m_nObjects - 1]) m_ppObjects[m_nObjects - 1]->Render(pd3dCommandList, pCamera);  //거울
+	//if (m_ppObjects[m_nObjects - 1]) m_ppObjects[m_nObjects - 1]->Render(pd3dCommandList, pCamera);  //거울
 }
 
 void CObjectsShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature) {
@@ -1427,30 +1415,12 @@ void CObjectsShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature*
 		m_pd3dGraphicsRootSignature = pd3dGraphicsRootSignature;
 		pd3dGraphicsRootSignature->AddRef();
 	}
-	m_nPipelineStates = 4;
+	m_nPipelineStates = 3;
 	m_ppd3dPipelineStates = new ID3D12PipelineState * [m_nPipelineStates];
 
 	CShader::CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
 
-	D3D12_DEPTH_STENCIL_DESC mirror;
-	mirror.DepthEnable = true;
-	mirror.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-	mirror.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
-	mirror.StencilEnable = true;
-	mirror.StencilReadMask = 0xff;
-	mirror.StencilWriteMask = 0xff;
-	mirror.FrontFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
-	mirror.FrontFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
-	mirror.FrontFace.StencilPassOp = D3D12_STENCIL_OP_REPLACE;
-	mirror.FrontFace.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS;
-	mirror.BackFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
-	mirror.BackFace.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP;
-	mirror.BackFace.StencilPassOp = D3D12_STENCIL_OP_REPLACE;
-	mirror.BackFace.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS;
-
-
 	ID3DBlob* pd3dVertexShaderBlob = NULL, * pd3dPixelShaderBlob = NULL;
-
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC d3dPipelineStateDesc;
 	::ZeroMemory(&d3dPipelineStateDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
@@ -1469,11 +1439,13 @@ void CObjectsShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature*
 	d3dPipelineStateDesc.SampleDesc.Count = 1;
 	d3dPipelineStateDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
 	d3dPipelineStateDesc.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
+
 	//거울
 	//d3dPipelineStateDesc.RasterizerState.FrontCounterClockwise = true;
-	HRESULT hResult = pd3dDevice->CreateGraphicsPipelineState(&d3dPipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&m_ppd3dPipelineStates[1]);
 
-	hResult = pd3dDevice->CreateGraphicsPipelineState(&d3dPipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&m_ppd3dPipelineStates[2]);
+	//HRESULT hResult = pd3dDevice->CreateGraphicsPipelineState(&d3dPipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&m_ppd3dPipelineStates[1]);
+
+	//HRESULT hResult = pd3dDevice->CreateGraphicsPipelineState(&d3dPipelineStateDesc, __uuidof(ID3D12PipelineState), (void**)&m_ppd3dPipelineStates[1]);
 
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC transparentPsoDesc = DefaultPipelineState;
@@ -1495,7 +1467,7 @@ void CObjectsShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature*
 
 	transparentPsoDesc.BlendState.RenderTarget[0] = transparencyBlendDesc;
 
-	hResult = pd3dDevice->CreateGraphicsPipelineState(&transparentPsoDesc, __uuidof(ID3D12PipelineState), (void**)&m_ppd3dPipelineStates[3]);
+	//hResult = pd3dDevice->CreateGraphicsPipelineState(&transparentPsoDesc, __uuidof(ID3D12PipelineState), (void**)&m_ppd3dPipelineStates[2]);
 
 	if (pd3dVertexShaderBlob) pd3dVertexShaderBlob->Release();
 	if (pd3dPixelShaderBlob) pd3dPixelShaderBlob->Release();
@@ -1823,4 +1795,47 @@ void CEthanObjectsShader::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsC
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
 	if (!pModel && pEthanModel) delete pEthanModel;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+CPlayerShader::CPlayerShader()
+{
+}
+
+CPlayerShader::~CPlayerShader()
+{
+}
+
+D3D12_INPUT_LAYOUT_DESC CPlayerShader::CreateInputLayout()
+{
+	UINT nInputElementDescs = 2;
+	D3D12_INPUT_ELEMENT_DESC* pd3dInputElementDescs = new D3D12_INPUT_ELEMENT_DESC[nInputElementDescs];
+
+	pd3dInputElementDescs[0] = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	pd3dInputElementDescs[1] = { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+
+	D3D12_INPUT_LAYOUT_DESC d3dInputLayoutDesc;
+	d3dInputLayoutDesc.pInputElementDescs = pd3dInputElementDescs;
+	d3dInputLayoutDesc.NumElements = nInputElementDescs;
+
+	return(d3dInputLayoutDesc);
+}
+
+D3D12_SHADER_BYTECODE CPlayerShader::CreateVertexShader(ID3DBlob** ppd3dShaderBlob)
+{
+	return(CShader::CompileShaderFromFile(L"b_Shaders.hlsl", "VSPlayer", "vs_5_1", ppd3dShaderBlob));
+}
+
+D3D12_SHADER_BYTECODE CPlayerShader::CreatePixelShader(ID3DBlob** ppd3dShaderBlob)
+{
+	return(CShader::CompileShaderFromFile(L"b_Shaders.hlsl", "PSPlayer", "ps_5_1", ppd3dShaderBlob));
+}
+
+void CPlayerShader::CreateShader(ID3D12Device* pd3dDevice, ID3D12RootSignature* pd3dGraphicsRootSignature)
+{
+	m_nPipelineStates = 1;
+	m_ppd3dPipelineStates = new ID3D12PipelineState * [m_nPipelineStates];
+
+	CShader::CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
 }

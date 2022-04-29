@@ -22,6 +22,7 @@
 #include <fstream>
 #include <vector>
 
+#include <iostream>
 using namespace std;
 
 #include <d3d12.h>
@@ -82,9 +83,6 @@ extern HINSTANCE						ghAppInstance;
 #else
 #pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
 #endif
-
-#include <iostream>
-using namespace std;
 
 extern UINT	gnCbvSrvDescriptorIncrementSize;
 extern UINT	gnRtvDescriptorIncrementSize;

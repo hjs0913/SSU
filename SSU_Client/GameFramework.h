@@ -26,7 +26,7 @@ extern bool hit_check;
 
 extern int nnn;
 
-extern CCamera* m_pCamera;
+//extern CCamera* m_pCamera;
 
 class CGameFramework
 {
@@ -144,6 +144,9 @@ private:
 	UILayer** m_ppUILayer = NULL;
 
 	CScene* m_pRaid_Scene = NULL;
+
+protected:
+		CCamera* m_pCamera = NULL;
 };
 
 class cRay :public CGameFramework

@@ -25,8 +25,8 @@ ID3D12GraphicsCommandList* pd3dCommandList;
 CTexture::CTexture(int nTextures, UINT nTextureType, int nSamplers, int nRootParameters)
 {
 	m_nTextureType = nTextureType;
-
 	m_nTextures = nTextures;
+
 	if (m_nTextures > 0)
 	{
 		m_pRootArgumentInfos = new SRVROOTARGUMENTINFO[m_nTextures];
@@ -34,6 +34,7 @@ CTexture::CTexture(int nTextures, UINT nTextureType, int nSamplers, int nRootPar
 		for (int i = 0; i < m_nTextures; i++) m_ppd3dTextures[i] = NULL;
 		m_ppd3dTextureUploadBuffers = new ID3D12Resource * [m_nTextures];
 		for (int i = 0; i < m_nTextures; i++) m_ppd3dTextureUploadBuffers[i] = NULL;
+
 		m_pd3dSrvGpuDescriptorHandles = new D3D12_GPU_DESCRIPTOR_HANDLE[m_nTextures];
 		for (int i = 0; i < m_nTextures; i++) m_pd3dSrvGpuDescriptorHandles[i].ptr = NULL;
 
@@ -42,6 +43,7 @@ CTexture::CTexture(int nTextures, UINT nTextureType, int nSamplers, int nRootPar
 
 		m_pdxgiBufferFormats = new DXGI_FORMAT[m_nTextures];
 		for (int i = 0; i < m_nTextures; i++) m_pnResourceTypes[i] = DXGI_FORMAT_UNKNOWN;
+
 		m_pnBufferElements = new int[m_nTextures];
 		for (int i = 0; i < m_nTextures; i++) m_pnBufferElements[i] = 0;
 	}
@@ -74,6 +76,8 @@ void CTexture::SetRootArgument(int nIndex, UINT nRootParameterIndex, D3D12_GPU_D
 {
 	m_pRootArgumentInfos[nIndex].m_nRootParameterIndex = nRootParameterIndex;
 	m_pRootArgumentInfos[nIndex].m_d3dSrvGpuDescriptorHandle = d3dSrvGpuDescriptorHandle;
+	cout << "rootArgumentInfos.RootParameterIndex - " << m_pRootArgumentInfos[nIndex].m_nRootParameterIndex << endl;
+	cout << "rootArgumentInfos.descriptorHandle.ptr - " << m_pRootArgumentInfos[nIndex].m_d3dSrvGpuDescriptorHandle.ptr << endl;
 }
 
 void CTexture::SetGpuDescriptorHandle(int nIndex, D3D12_GPU_DESCRIPTOR_HANDLE d3dSrvGpuDescriptorHandle)
@@ -93,32 +97,33 @@ void CTexture::SetSampler(int nIndex, D3D12_GPU_DESCRIPTOR_HANDLE d3dSamplerGpuD
 
 void CTexture::UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList)
 {
-	//if (m_nTextureType == RESOURCE_TEXTURE2D_ARRAY)
-	//{
-	//	pd3dCommandList->SetGraphicsRootDescriptorTable(m_pRootArgumentInfos[0].m_nRootParameterIndex, m_pRootArgumentInfos[0].m_d3dSrvGpuDescriptorHandle);
-	//}
-	//else
-	//{
-	//	for (int i = 0; i < m_nTextures; i++)
-	//	{
-	//		pd3dCommandList->SetGraphicsRootDescriptorTable(m_pRootArgumentInfos[i].m_nRootParameterIndex, m_pRootArgumentInfos[i].m_d3dSrvGpuDescriptorHandle);
-	//	}
-	//}
-	if (m_nRootParameters == m_nTextures)
+	if (m_nTextureType == RESOURCE_TEXTURE2D_ARRAY)
 	{
-		for (int i = 0; i < m_nRootParameters; i++)
-		{
-			pd3dCommandList->SetGraphicsRootDescriptorTable(m_pnRootParameterIndices[i], m_pd3dSrvGpuDescriptorHandles[i]);
-		}
+		pd3dCommandList->SetGraphicsRootDescriptorTable(m_pRootArgumentInfos[0].m_nRootParameterIndex, m_pRootArgumentInfos[0].m_d3dSrvGpuDescriptorHandle);
 	}
 	else
 	{
-		pd3dCommandList->SetGraphicsRootDescriptorTable(m_pnRootParameterIndices[0], m_pd3dSrvGpuDescriptorHandles[0]);
+		for (int i = 0; i < m_nTextures; i++)
+		{
+			pd3dCommandList->SetGraphicsRootDescriptorTable(m_pRootArgumentInfos[i].m_nRootParameterIndex, m_pRootArgumentInfos[i].m_d3dSrvGpuDescriptorHandle);
+		}
 	}
+	//if (m_nRootParameters == m_nTextures)
+	//{
+	//	for (int i = 0; i < m_nRootParameters; i++)
+	//	{
+	//		pd3dCommandList->SetGraphicsRootDescriptorTable(m_pnRootParameterIndices[i], m_pd3dSrvGpuDescriptorHandles[i]);
+	//	}
+	//}
+	//else
+	//{
+	//	pd3dCommandList->SetGraphicsRootDescriptorTable(m_pnRootParameterIndices[0], m_pd3dSrvGpuDescriptorHandles[0]);
+	//}
 }
 
 void CTexture::UpdateShaderVariable(ID3D12GraphicsCommandList *pd3dCommandList, int nIndex)
 {
+	cout << "여기!" << endl;
 	pd3dCommandList->SetGraphicsRootDescriptorTable(m_pRootArgumentInfos[nIndex].m_nRootParameterIndex, m_pRootArgumentInfos[nIndex].m_d3dSrvGpuDescriptorHandle);
 }
 
@@ -246,19 +251,19 @@ void CMaterial::SetShader(CShader *pShader)
 	if (m_pShader) m_pShader->AddRef();
 }
 
-void CMaterial::SetTexture(CTexture* pTexture)
-{
-	if (m_pTexture) m_pTexture->Release();
-	m_pTexture = pTexture;
-	if (m_pTexture) m_pTexture->AddRef();
-}
-
-//void CMaterial::SetTexture(CTexture *pTexture, UINT nTexture) 
-//{ 
-//	if (m_ppTextures[nTexture]) m_ppTextures[nTexture]->Release();
-//	m_ppTextures[nTexture] = pTexture; 
-//	if (m_ppTextures[nTexture]) m_ppTextures[nTexture]->AddRef();  
+//void CMaterial::SetTexture(CTexture* pTexture)
+//{
+//	if (m_pTexture) m_pTexture->Release();
+//	m_pTexture = pTexture;
+//	if (m_pTexture) m_pTexture->AddRef();
 //}
+
+void CMaterial::SetTexture(CTexture *pTexture, UINT nTexture) 
+{ 
+	if (m_ppTextures[nTexture]) m_ppTextures[nTexture]->Release();
+	m_ppTextures[nTexture] = pTexture; 
+	if (m_ppTextures[nTexture]) m_ppTextures[nTexture]->AddRef();  
+}
 
 void CMaterial::ReleaseUploadBuffers()
 {
@@ -291,11 +296,11 @@ void CMaterial::UpdateShaderVariable(ID3D12GraphicsCommandList *pd3dCommandList)
 
 	pd3dCommandList->SetGraphicsRoot32BitConstants(1, 1, &m_nType, 32);
 
-	//for (int i = 0; i < m_nTextures; i++)
-	//{
-	//	if (m_ppTextures[i]) m_ppTextures[i]->UpdateShaderVariable(pd3dCommandList, 0);
-	//}
-	if (m_pTexture) m_pTexture->UpdateShaderVariables(pd3dCommandList);
+	for (int i = 0; i < m_nTextures; i++)
+	{
+		if (m_ppTextures[i]) m_ppTextures[i]->UpdateShaderVariable(pd3dCommandList, 0);
+	}
+	//if (m_pTexture) m_pTexture->UpdateShaderVariables(pd3dCommandList);
 }
 
 void CMaterial::LoadTextureFromFile(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, UINT nType, UINT nRootParameter, _TCHAR *pwstrTextureName, CTexture **ppTexture, CGameObject *pParent, FILE *pInFile, CShader *pShader)
@@ -305,6 +310,7 @@ void CMaterial::LoadTextureFromFile(ID3D12Device *pd3dDevice, ID3D12GraphicsComm
 	BYTE nStrLength = ::ReadStringFromFile(pInFile, pstrTextureName); 
 
 	bool bDuplicated = false;
+
 	if (strcmp(pstrTextureName, "null"))
 	{
 		SetMaterialType(nType);
@@ -334,6 +340,7 @@ void CMaterial::LoadTextureFromFile(ID3D12Device *pd3dDevice, ID3D12GraphicsComm
 			(*ppTexture)->LoadTextureFromFile(pd3dDevice, pd3dCommandList, pwstrTextureName, RESOURCE_TEXTURE2D, 0);
 			if (*ppTexture) (*ppTexture)->AddRef();
 			
+			//CShader::CreateShaderResourceViews(pd3dDevice, **ppTexture, )
 			CScene::CreateShaderResourceViews(pd3dDevice, *ppTexture, nRootParameter, false);
 		}
 		else
@@ -744,6 +751,13 @@ void CGameObject::SetMesh(int nIndex, CMesh* pMesh)
 
 void CGameObject::SetShader(CShader *pShader)
 {
+	//if (!m_ppMaterials[0])
+	//{
+	//	CMaterial* pMaterial = new CMaterial(0);
+	//	SetMaterial(pMaterial);
+	//}
+	//if (m_ppMaterials[0]) m_ppMaterials[0]->SetShader(pShader);
+
 	m_nMaterials = 1;
 	m_ppMaterials = new CMaterial*[m_nMaterials];
 	m_ppMaterials[0] = new CMaterial(0);
@@ -757,7 +771,9 @@ void CGameObject::SetShader(int nMaterial, CShader *pShader)
 
 void CGameObject::SetMaterial(CMaterial* pMaterial)
 {
-	
+	if (m_ppMaterials[0]) m_ppMaterials[0]->Release();
+	m_ppMaterials[0] = pMaterial;
+	if (m_ppMaterials[0]) m_ppMaterials[0]->AddRef();
 }
 
 void CGameObject::SetMaterial(int nMaterial, CMaterial *pMaterial)
@@ -888,10 +904,10 @@ void CGameObject::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pC
 
 void CGameObject::CreateShaderVariables(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
 {
-	UINT ncbElementBytes = ((sizeof(CB_GAMEOBJECT_INFO) + 255) & ~255); //256의 배수
-	m_pd3dcbGameObject = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, ncbElementBytes, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, NULL);
+	//UINT ncbElementBytes = ((sizeof(CB_GAMEOBJECT_INFO) + 255) & ~255); //256의 배수
+	//m_pd3dcbGameObject = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, ncbElementBytes, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, NULL);
 
-	m_pd3dcbGameObject->Map(0, NULL, (void**)&m_pcbMappedGameObject);
+	//m_pd3dcbGameObject->Map(0, NULL, (void**)&m_pcbMappedGameObject);
 }
 
 void CGameObject::UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList)
@@ -1428,24 +1444,41 @@ CHeightMapTerrain::CHeightMapTerrain(ID3D12Device *pd3dDevice, ID3D12GraphicsCom
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
+	CTexture* pTerrainBaseTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	pTerrainBaseTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/Base_Texture.dds", RESOURCE_TEXTURE2D, 0);
+	
+	CTexture* pTerrainDetailTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	pTerrainDetailTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/load.dds", RESOURCE_TEXTURE2D, 0);
+
 	CTexture* pTerrainTexture = new CTexture(2, RESOURCE_TEXTURE2D, 0, 2);
 
-	pTerrainTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/Base_Texture.dds", RESOURCE_TEXTURE2D, 0);
-	pTerrainTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/load.dds", RESOURCE_TEXTURE2D, 1);
-
-	//CTexture *pTerrainBaseTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
-	//pTerrainBaseTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Terrain/Base_Texture.dds", 0);
-
-	//CTexture *pTerrainDetailTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
-	//pTerrainDetailTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Terrain/Detail_Texture_7.dds", 0);
-
-	UINT ncbElementBytes = ((sizeof(CB_GAMEOBJECT_INFO) + 255) & ~255); //256의 배수
-	CTerrainShader *pTerrainShader = new CTerrainShader();
+	CTerrainShader* pTerrainShader = new CTerrainShader();
 	pTerrainShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
 	pTerrainShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
-	pTerrainShader->CreateCbvSrvDescriptorHeaps(pd3dDevice, 1, 2);
-	pTerrainShader->CreateConstantBufferViews(pd3dDevice, 1, m_pd3dcbGameObject, ncbElementBytes);
-	pTerrainShader->CreateShaderResourceViews(pd3dDevice, pTerrainTexture, 0, 4);
+
+	CScene::CreateShaderResourceViews(pd3dDevice, pTerrainBaseTexture, 13, false);
+	CScene::CreateShaderResourceViews(pd3dDevice, pTerrainDetailTexture, 14, false);
+
+	CMaterial* pTerrainMaterial = new CMaterial(2);
+	pTerrainMaterial->SetTexture(pTerrainBaseTexture, 0);
+	pTerrainMaterial->SetTexture(pTerrainDetailTexture, 1);
+	pTerrainMaterial->SetShader(pTerrainShader);
+
+	SetMaterial(0, pTerrainMaterial);
+
+	//pTerrainTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/Base_Texture.dds", RESOURCE_TEXTURE2D, 0);
+	//pTerrainTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/load.dds", RESOURCE_TEXTURE2D, 1);
+
+	//UINT ncbElementBytes = ((sizeof(CB_GAMEOBJECT_INFO) + 255) & ~255); //256의 배수
+
+	//CTerrainTessellationShader* pTerrainShader = new CTerrainTessellationShader();
+	//pTerrainShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
+	//pTerrainShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
+
+
+	//pTerrainShader->CreateCbvSrvDescriptorHeaps(pd3dDevice, 1, 2);
+	//pTerrainShader->CreateConstantBufferViews(pd3dDevice, 1, m_pd3dcbGameObject, ncbElementBytes);
+	//pTerrainShader->CreateShaderResourceViews(pd3dDevice, pTerrainTexture, 0, 4);
 	
 	/*CScene::CreateShaderResourceViews(pd3dDevice, pTerrainBaseTexture, 13, false);
 	CScene::CreateShaderResourceViews(pd3dDevice, pTerrainDetailTexture, 14, false);*/
@@ -1455,14 +1488,14 @@ CHeightMapTerrain::CHeightMapTerrain(ID3D12Device *pd3dDevice, ID3D12GraphicsCom
 	//pTerrainMaterial->SetTexture(pTerrainDetailTexture, 1);
 	//pTerrainMaterial->SetShader(pTerrainShader);
 
-	CMaterial* pTerrainMaterial = new CMaterial();
-	pTerrainMaterial->SetTexture(pTerrainTexture);
+	//CMaterial* pTerrainMaterial = new CMaterial();
+	//pTerrainMaterial->SetTexture(pTerrainTexture);
 
-	SetMaterial(0, pTerrainMaterial);
+	//SetMaterial(0, pTerrainMaterial);
 
-	SetCbvGPUDescriptorHandle(pTerrainShader->GetGPUCbvDescriptorStartHandle());
+	//SetCbvGPUDescriptorHandle(pTerrainShader->GetGPUCbvDescriptorStartHandle());
 
-	SetShader(pTerrainShader);
+	//SetShader(pTerrainShader);
 }
 
 CHeightMapTerrain::~CHeightMapTerrain(void)
@@ -1510,7 +1543,7 @@ CSkyBox::CSkyBox(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dComman
 
 	UINT ncbElementBytes = ((sizeof(CB_GAMEOBJECT_INFO) + 255) & ~255); //256의 배수
 
-	CSkyBoxShader* pSkyBoxShader = new CSkyBoxShader();
+	/*CSkyBoxShader* pSkyBoxShader = new CSkyBoxShader();
 	pSkyBoxShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
 	pSkyBoxShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	pSkyBoxShader->CreateCbvSrvDescriptorHeaps(pd3dDevice, 1, 6);
@@ -1524,9 +1557,9 @@ CSkyBox::CSkyBox(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dComman
 
 	SetCbvGPUDescriptorHandle(pSkyBoxShader->GetGPUCbvDescriptorStartHandle());
 
-	SetShader(pSkyBoxShader);
+	SetShader(pSkyBoxShader);*/
 
-	/*CSkyBoxShader *pSkyBoxShader = new CSkyBoxShader();
+	CSkyBoxShader *pSkyBoxShader = new CSkyBoxShader();
 	pSkyBoxShader->CreateShader(pd3dDevice, pd3dGraphicsRootSignature);
 	pSkyBoxShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
@@ -1536,7 +1569,7 @@ CSkyBox::CSkyBox(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dComman
 	pSkyBoxMaterial->SetTexture(pSkyBoxTexture);
 	pSkyBoxMaterial->SetShader(pSkyBoxShader);
 
-	SetMaterial(0, pSkyBoxMaterial);*/
+	SetMaterial(0, pSkyBoxMaterial);
 }
 
 CSkyBox::~CSkyBox()
@@ -1787,7 +1820,16 @@ void CBillboardObject::Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject*
 }
 void CBillboardObject::Animate2(int num, CGameTimer pTimer, CCamera* pCamera, CGameObject* player) {
 
-	bool live = reinterpret_cast<CAirplanePlayer*>(player)->GetUse();
+	bool live = reinterpret_cast<CTerrainPlayer*>(player)->GetUse();
+	if (live) {
+		m_ppObjects[num]->SetPosition(player->GetPosition().x, reinterpret_cast<CTerrainPlayer*>(player)->GetHeightToTerrain(player) + 18, player->GetPosition().z);
+		XMFLOAT3 xmf3CameraPosition = pCamera->GetPosition();
+		SetLookAt(xmf3CameraPosition);
+	}
+	else {
+		m_ppObjects[num]->SetPosition(0, -100, 0);
+	}
+	/*bool live = reinterpret_cast<CAirplanePlayer*>(player)->GetUse();
 	if (live) {
 		m_ppObjects[num]->SetPosition(player->GetPosition().x, reinterpret_cast<CAirplanePlayer*>(player)->GetHeightToTerrain(player) + 18, player->GetPosition().z);
 		XMFLOAT3 xmf3CameraPosition = pCamera->GetPosition();
@@ -1795,7 +1837,7 @@ void CBillboardObject::Animate2(int num, CGameTimer pTimer, CCamera* pCamera, CG
 	}
 	else {
 		m_ppObjects[num]->SetPosition(0, -100, 0);
-	}
+	}*/
 
 }
 //void CGameObject::Animate2(int num, CGameTimer pTimer, CCamera* pCamera, CGameObject* player)
