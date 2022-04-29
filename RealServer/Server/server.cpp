@@ -107,7 +107,8 @@ void Disconnect(int c_id)
         Gaia* dun = dungeons[pl->get_indun_id()];
         dun->quit_palyer(pl);
 
-        if (dun->player_cnt == 0) {
+        Player** party_players = dun->get_party_palyer();
+        if (dun->player_cnt - dun->partner_cnt == 0) {
             // 아무도 없다는 뜻
             dun->state_lock.lock();
             dun->set_dun_st(DUN_ST_FREE);
@@ -122,9 +123,15 @@ void Disconnect(int c_id)
                 pls->state_lock.unlock();
                 send_party_room_destroy(reinterpret_cast<Player*>(pls), pl->get_indun_id());
             }
+
+            for (int i = 0; i < dun->player_cnt; i++) {
+                int delete_id = party_players[i]->get_id();
+                delete players[delete_id];
+                players[delete_id] = new Player(delete_id);
+            }
+            dun->destroy_dungeon();
         }
         else {
-            Player** party_players = dun->get_party_palyer();
             for (int i = 0; i < dun->player_cnt; i++) {
                 send_party_room_info_packet(party_players[i], dun->get_party_palyer(), dun->player_cnt, dun->get_dungeon_id());
             }
@@ -2083,15 +2090,12 @@ void process_packet(int client_id, unsigned char* p)
         Gaia* dun = dungeons[r_id];
         dun->quit_palyer(pl);
         // 나갔다는 정보를 player에게 보내준다
-        Player** party_players = dun->get_party_palyer();
         send_party_room_quit_ok_packet(pl);
         pl->join_dungeon_room = false;
 
-        if (dun->player_cnt == 0) {
+        Player** party_players = dun->get_party_palyer();
+        if (dun->player_cnt - dun->partner_cnt == 0) {
             // 아무도 없다는 뜻
-            dun->state_lock.lock();
-            dun->set_dun_st(DUN_ST_FREE);
-            dun->state_lock.unlock();
             for (auto& pls : players) {
                 if (true == is_npc(pls->get_id())) break;
                 pls->state_lock.lock();
@@ -2102,9 +2106,16 @@ void process_packet(int client_id, unsigned char* p)
                 pls->state_lock.unlock();
                 send_party_room_destroy(reinterpret_cast<Player*>(pls), r_id);
             }
+
+            for (int i = 0; i < dun->player_cnt; i++) {
+                int delete_id = party_players[i]->get_id();
+                delete players[delete_id];
+                players[delete_id] = new Player(delete_id);
+            }
+            dun->destroy_dungeon();
+
         }
         else {
-            Player** party_players = dun->get_party_palyer();
             for (int i = 0; i < dun->player_cnt; i++) {
                 send_party_room_info_packet(party_players[i], dun->get_party_palyer(), dun->player_cnt, dun->get_dungeon_id());
             }

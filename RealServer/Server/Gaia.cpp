@@ -152,6 +152,58 @@ void Gaia::game_start()
 	cout << dungeon_id << "번 던전 시작합니다" << endl;
 }
 
+void Gaia::destroy_dungeon()
+{
+	state_lock.lock();
+	set_dun_st(DUN_ST_FREE);
+	state_lock.unlock();
+	
+	player_cnt = 0;
+	partner_cnt = 0;
+
+	fifteen_pattern = false;
+
+	player_rander_ok = 0;
+	target_id = 0;
+	start_game = false;
+	running_pattern = false;
+
+	ZeroMemory(party, sizeof(Player*)*4);
+	ZeroMemory(party_id, sizeof(int) * 4);
+	player_death_count = 4;
+
+	// Boss Npc Intialize	
+	boss->state_lock.lock();
+	boss->set_state(ST_FREE);
+	boss->state_lock.unlock();
+	boss->set_id(101);
+
+	// 루아를 이용한 초기화
+	lua_State* L = boss->L;
+	lua_getglobal(L, "set_uid");
+	lua_pushnumber(L, dungeon_id);
+	int error = lua_pcall(L, 1, 10, 0);
+	boss->set_element(static_cast<ELEMENT>(lua_tointeger(L, -10)));
+	boss->set_lv(lua_tointeger(L, -9));
+
+	boss->set_name(lua_tostring(L, -8));
+
+	boss->set_hp(lua_tointeger(L, -7));
+	boss->set_maxhp(lua_tointeger(L, -7));
+
+	boss->set_physical_attack(lua_tonumber(L, -6));
+	boss->set_magical_attack(lua_tonumber(L, -5));
+	boss->set_physical_defence(lua_tonumber(L, -4));
+	boss->set_magical_defence(lua_tonumber(L, -3));
+	boss->set_basic_attack_factor(lua_tointeger(L, -2));
+	boss->set_defence_factor(lua_tonumber(L, -1));
+
+	lua_pop(L, 11);// eliminate set_uid from stack after call
+
+	boss->set_x(310);
+	boss->set_x(110);
+}
+
 DUNGEON_STATE Gaia::get_dun_st()
 {
 	return st;
