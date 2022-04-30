@@ -125,6 +125,15 @@ void Gaia::game_start()
 	if (start_time > chrono::system_clock::now()) return;
 	if (player_cnt < GAIA_ROOM) return;
 
+	// AI의 정보를 클라이언트에게 보내주어야한다
+	for (int i = 0; i < GAIA_ROOM; i++) {
+		if (party[i]->get_tribe() == PARTNER) {
+			for (int j = 0; j < GAIA_ROOM; j++) {
+				if(party[j]->get_tribe() == HUMAN) send_put_object_packet(party[j], party[i]);
+			}
+		}
+	}
+
 
 	// 모든 파티 인던 입장 및 게임 시작
 	player_rander_ok = 0;

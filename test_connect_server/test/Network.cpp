@@ -575,7 +575,7 @@ void process_packet(unsigned char* p)
 		InDungeon = true;
 		for (int i = 0; i < GAIA_ROOM; i++) {
 			party_id[i] = packet->party_id[i];
-
+			cout << party_id[i] << " : " << mPlayer[party_id[i]]->m_name << endl;
 			wchar_t* temp;
 			int len = 1 + strlen(mPlayer[party_id[i]]->m_name);
 			temp = new TCHAR[len];

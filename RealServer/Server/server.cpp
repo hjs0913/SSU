@@ -2675,6 +2675,13 @@ void worker()
             break;
         }
         case OP_BOSS_MOVE: {
+            dungeons[client_id]->state_lock.lock();
+            if (dungeons[client_id]->get_dun_st() != DUN_ST_START) {
+                dungeons[client_id]->state_lock.unlock();
+                break;
+            }
+            dungeons[client_id]->state_lock.unlock();
+
             dungeons[client_id]->boss_move();
             timer_event ev;
             ev.obj_id = client_id;
@@ -2686,18 +2693,38 @@ void worker()
             break;
         }
         case OP_BOSS_ATTACK: {
+            dungeons[client_id]->state_lock.lock();
+            if (dungeons[client_id]->get_dun_st() != DUN_ST_START) {
+                dungeons[client_id]->state_lock.unlock();
+                break;
+            }
+            dungeons[client_id]->state_lock.unlock();
             dungeons[client_id]->boss_attack();
             delete exp_over;
             break;
         }
         case OP_GAIA_PATTERN: {
+            dungeons[client_id]->state_lock.lock();
+            if (dungeons[client_id]->get_dun_st() != DUN_ST_START) {
+                dungeons[client_id]->state_lock.unlock();
+                break;
+            }
+            dungeons[client_id]->state_lock.unlock();
             dungeons[client_id]->pattern_active(exp_over->_target);
             delete exp_over;
             break;
         }
         case OP_PARTNER_MOVE: {
+            players[client_id]->state_lock.lock();
+            if (players[client_id]->get_state() != ST_INDUN) {
+                players[client_id]->state_lock.unlock();
+                break;
+            }
+            players[client_id]->state_lock.unlock();
+
             Partner* pl = reinterpret_cast<Partner*>(players[client_id]);
             pl->partner_move();
+            cout << "에러발생구간 찾기 " << endl;
             Player** pp = dungeons[pl->get_indun_id()]->get_party_palyer();
             for (int i = 0; i < GAIA_ROOM; i++) {
                 send_move_packet(pp[i], pl);
@@ -2713,11 +2740,23 @@ void worker()
             break;
         }
         case OP_PARTNER_ATTACK: {
+            players[client_id]->state_lock.lock();
+            if (players[client_id]->get_state() != ST_INDUN) {
+                players[client_id]->state_lock.unlock();
+                break;
+            }
+            players[client_id]->state_lock.unlock();
             //dungeons[client_id]->partner_attack(1);
             delete exp_over;
             break;
         }
         case OP_PARTNER_PATTERN: {
+            players[client_id]->state_lock.lock();
+            if (players[client_id]->get_state() != ST_INDUN) {
+                players[client_id]->state_lock.unlock();
+                break;
+            }
+            players[client_id]->state_lock.unlock();
           //  dungeons[client_id]->pattern_active(exp_over->_target);
             delete exp_over;
             break;
@@ -2729,7 +2768,6 @@ void worker()
             dun->state_lock.lock();
             if (dun->get_dun_st() == DUN_ST_START) {
                 dun->state_lock.unlock();
-                dun->game_start();
                 // 게임이 시작 되었으니 시야처리를 해주자
                 Player** vl_pl;
                 vl_pl = dun->get_party_palyer();
