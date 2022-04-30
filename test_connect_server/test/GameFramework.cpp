@@ -473,6 +473,27 @@ bool CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 				break;
 			}
 
+			if (AddAIUI_On) {
+				if (CursorPosInClient.y >= 240 && CursorPosInClient.y <= 260) {
+					if (CursorPosInClient.x >= 205 && CursorPosInClient.x <= 255) {
+						send_party_add_partner(J_DILLER);
+						AddAIUI_On = false;
+					}
+					if (CursorPosInClient.x >= 265 && CursorPosInClient.x <= 315) {
+						send_party_add_partner(J_TANKER);
+						AddAIUI_On = false;
+					}
+					if (CursorPosInClient.x >= 325 && CursorPosInClient.x <= 375) {
+						send_party_add_partner(J_MAGICIAN);
+						AddAIUI_On = false;
+					}
+					if (CursorPosInClient.x >= 385 && CursorPosInClient.x <= 435) {
+						send_party_add_partner(J_SUPPORTER);
+						AddAIUI_On = false;
+					}
+				}
+				break;
+			}
 
 			if (CursorPosInClient.y >= 360 && CursorPosInClient.y <= 400) {
 				if (CursorPosInClient.x >= 140 && CursorPosInClient.x <= 205) {
@@ -491,8 +512,7 @@ bool CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 				}
 				if (CursorPosInClient.x >= 435 && CursorPosInClient.x <= 500) {
 					if (party_enter) {
-						cout << "AI넣기 누름" << endl;
-						send_party_add_partner();
+						AddAIUI_On = true;
 					}
 				}
 			}
@@ -818,6 +838,8 @@ void CGameFramework::BuildObjects()
 		// 파티 초대장
 		m_ppUILayer[17] = new InvitationCardUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::DarkGray, D2D1::ColorF::White);
 
+		// AI추가 UI
+		m_ppUILayer[18] = new AddAIUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::White);
 
 		m_ppUILayer[0]->setAlpha(0.5, 1.0);
 		m_ppUILayer[1]->setAlpha(0.5, 1.0);
@@ -839,6 +861,7 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[15]->setAlpha(0.7, 1.0);
 		m_ppUILayer[16]->setAlpha(1.0, 1.0);
 		m_ppUILayer[17]->setAlpha(1.0, 1.0);
+		m_ppUILayer[18]->setAlpha(1.0, 1.0);
 
 		m_ppUILayer[0]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_FAR);
@@ -878,6 +901,8 @@ void CGameFramework::BuildObjects()
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 		reinterpret_cast<InvitationCardUI*>(m_ppUILayer[17])->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+		m_ppUILayer[18]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 		// UIBar Setting
 		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, 40, 20 + (m_nWndClientWidth / 10) * 3, 60);
@@ -1486,6 +1511,11 @@ void CGameFramework::FrameAdvance()
 			delete []temp2;
 			break;
 		}
+		case 18: {
+			if (!AddAIUI_On) break;
+			reinterpret_cast<AddAIUI*>(m_ppUILayer[i])->UpdateLabels();
+			break;
+		}
 	}
 	}
 
@@ -1503,6 +1533,7 @@ void CGameFramework::FrameAdvance()
 		}
 		if (i == 16 && !PartyInviteUI_ON) continue;
 		if (i == 17 && !InvitationCardUI_On) continue;
+		if (i == 18 && !AddAIUI_On) break;
 		m_ppUILayer[i]->Render(m_nSwapChainBufferIndex);
 	}
 

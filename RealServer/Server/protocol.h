@@ -241,6 +241,7 @@ struct cs_packet_party_add_partner {
 	unsigned char size;
 	char type;
 	unsigned char room_id;
+	unsigned char job;
 };
 
 

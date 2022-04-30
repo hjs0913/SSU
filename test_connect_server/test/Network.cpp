@@ -49,6 +49,7 @@ int party_enter_room_id = -1;
 bool alramUI_ON = false;
 bool PartyInviteUI_ON = false;
 bool InvitationCardUI_On = false;
+bool AddAIUI_On = false;
 chrono::system_clock::time_point InvitationCardTimer = chrono::system_clock::now();
 int InvitationRoomId;
 int InvitationUser;
@@ -254,12 +255,13 @@ void send_party_invite(char* user)
 	strcpy_s(packet.user_name, user);
 	do_send(sizeof(packet), &packet);
 }
-void send_party_add_partner()
+void send_party_add_partner(JOB j)
 {
 	cs_packet_party_add_partner packet;
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET_PARTY_ADD_PARTNER;
 	packet.room_id = party_enter_room_id;
+	packet.job = j;
 	do_send(sizeof(packet), &packet);
 }
 

@@ -47,6 +47,7 @@ extern array<Party*, (MAX_USER / GAIA_ROOM)> m_party;
 extern Party* m_party_info;
 extern bool PartyUI_On;
 extern bool party_info_on;
+extern bool AddAIUI_On;
 extern int  robby_cnt;
 extern vector<int> party_id_index_vector;
 
@@ -98,7 +99,7 @@ void send_party_room_quit_request();
 
 void send_party_invite(char* user); 
 
-void send_party_add_partner();
+void send_party_add_partner(JOB j);
 
 void send_party_invitation_reply(int accept);
 

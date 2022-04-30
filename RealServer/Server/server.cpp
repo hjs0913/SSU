@@ -2236,7 +2236,7 @@ void process_packet(int client_id, unsigned char* p)
             partner->set_maxhp(10000);
             partner->set_hp(500);
             partner->set_mp(8000);
-            partner->set_job(J_DILLER);
+            partner->set_job(static_cast<JOB>(packet->job));
             partner->set_lv(25);
             partner->set_element(E_WATER);
             //  여기까지 클라에서 패킷 받으면, 새 player id 생성 후 정보 초기화  
@@ -2724,7 +2724,6 @@ void worker()
 
             Partner* pl = reinterpret_cast<Partner*>(players[client_id]);
             pl->partner_move();
-            cout << "에러발생구간 찾기 " << endl;
             Player** pp = dungeons[pl->get_indun_id()]->get_party_palyer();
             for (int i = 0; i < GAIA_ROOM; i++) {
                 send_move_packet(pp[i], pl);
