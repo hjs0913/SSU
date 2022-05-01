@@ -797,8 +797,6 @@ void CGameFramework::OnDestroy()
 
 void CGameFramework::BuildObjects()
 {
-	
-
 	if (!m_ppUILayer) {
 		m_ppUILayer = new UILayer * [UICOUNT];
 
@@ -1216,6 +1214,8 @@ void CGameFramework::MoveToNextFrame()
 
 void CGameFramework::FrameAdvance()
 {
+	EnterCriticalSection(&cs);
+
 	m_GameTimer.Tick(0.0f);
 
 	get_basic_information(m_pPlayer, my_id);
@@ -1566,5 +1566,7 @@ void CGameFramework::FrameAdvance()
 			// 초대 거절 패킷 보내기
 		}
 	}
+
+	LeaveCriticalSection(&cs);
 }
 

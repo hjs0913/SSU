@@ -54,6 +54,8 @@ chrono::system_clock::time_point InvitationCardTimer = chrono::system_clock::now
 int InvitationRoomId;
 int InvitationUser;
 
+CRITICAL_SECTION cs;
+
 struct EXP_OVER {
 	WSAOVERLAPPED m_wsa_over;
 	WSABUF m_wsa_buf;
@@ -566,6 +568,7 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_START_GAIA: {
+		EnterCriticalSection(&cs);
 		PartyUI_On = false;
 		party_info_on = false;
 		PartyInviteUI_ON = false;
@@ -585,6 +588,7 @@ void process_packet(unsigned char* p)
 			party_name[i] = L"";
 			party_name[i].append(temp);
 		}
+		LeaveCriticalSection(&cs);
 		break;
 	}
 	case SC_PACKET_GAIA_PATTERN_ONE: {
