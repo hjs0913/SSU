@@ -51,8 +51,10 @@ bool PartyInviteUI_ON = false;
 bool InvitationCardUI_On = false;
 bool AddAIUI_On = false;
 bool NoticeUI_On = false;
+bool RaidEnterNotice = false;
 wstring Notice_str = L"";
 chrono::system_clock::time_point InvitationCardTimer = chrono::system_clock::now();
+chrono::system_clock::time_point NoticeTimer = chrono::system_clock::now();
 int InvitationRoomId;
 int InvitationUser;
 
@@ -779,8 +781,19 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_NOTICE: {
+		sc_packet_notice* packet = reinterpret_cast<sc_packet_notice*>(p);
 		NoticeUI_On = true;
-		Notice_str = L"5초후에 게임을 시작합니다";
+		if ((int)packet->raid_enter == 0) {
+			RaidEnterNotice = true;
+		}
+		NoticeTimer = chrono::system_clock::now() + 5s;
+
+		wchar_t* temp;
+		int len = 1 + strlen(packet->message);
+		temp = new TCHAR[len];
+		mbstowcs(temp, packet->message, len);
+		Notice_str = L"";
+		Notice_str.append(temp);
 		break;
 	}
 	default:

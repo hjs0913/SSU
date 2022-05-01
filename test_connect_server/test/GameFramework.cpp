@@ -1583,6 +1583,22 @@ void CGameFramework::FrameAdvance()
 		}
 	}
 
+	if (NoticeUI_On) {
+		if (NoticeTimer < chrono::system_clock::now()) {
+			NoticeUI_On = false;
+			RaidEnterNotice = false;
+		}
+		else {
+			if (RaidEnterNotice) {
+				auto t = NoticeTimer - chrono::system_clock::now();
+				if (t >= 4s && t < 5s) Notice_str = L"4초후에 게임을 시작합니다";
+				else if(t >= 3s && t < 4s) Notice_str = L"3초후에 게임을 시작합니다";
+				else if (t >= 2s && t < 3s) Notice_str = L"2초후에 게임을 시작합니다";
+				else if (t >= 1s && t < 2s) Notice_str = L"1초후에 게임을 시작합니다";
+			}
+		}
+	}
+
 	LeaveCriticalSection(&cs);
 }
 

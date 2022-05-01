@@ -60,10 +60,12 @@ extern bool PartyInviteUI_ON;
 // 초대장 관련 변수(초대 받을떄 UI)
 extern bool InvitationCardUI_On;
 extern chrono::system_clock::time_point InvitationCardTimer;
+extern chrono::system_clock::time_point NoticeTimer;
 extern int InvitationRoomId;
 extern int InvitationUser;
 
 extern bool NoticeUI_On;
+extern bool RaidEnterNotice;
 extern wstring Notice_str;
 
 extern CRITICAL_SECTION cs;
