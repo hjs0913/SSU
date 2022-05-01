@@ -345,24 +345,13 @@ void magical_skill_success(int p_id, int target, float skill_factor)
 
 void physical_skill_success(int p_id, int target, float skill_factor)
 {
-
     float give_damage = players[p_id]->get_physical_attack() * skill_factor;
     float defence_damage = (players[target]->get_defence_factor() *
         players[target]->get_physical_defence()) / (1 + (players[target]->get_defence_factor() *
             players[target]->get_physical_defence()));
     float damage = give_damage * (1 - defence_damage);
     int target_hp = players[target]->get_hp() - damage;
-    cout << players[target]->get_defence_factor() << endl;
-    cout << players[target]->get_physical_defence() << endl;
-    cout << "give_damage : " << give_damage << endl;
-    cout << "defence_damage : " << defence_damage << endl;
-    cout << players[target]->get_defence_factor() *
-        players[target]->get_physical_defence() << endl;
-    cout << (1 + (players[target]->get_defence_factor() *
-        players[target]->get_physical_defence())) << endl;
 
-    cout << p_id << "가 " << damage << "을 " << target << "에게 주었다."
-        << target_hp << "남음" << endl;
 
     players[target]->set_hp(target_hp);
     if (target_hp <= 0) {

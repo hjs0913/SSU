@@ -93,6 +93,12 @@ void Gaia::join_player(Player* pl)
 		start_time = ev.start_time;
 		
 		// 5초후 게임을 시작한다는 패킷을 보내주자
+		for (int i = 0; i < GAIA_ROOM; i++) {
+			if (party[i]->get_tribe() != HUMAN) continue;
+			char notice_str[MAX_CHAT_SIZE];
+			strcpy_s(notice_str, "5초후에 게임을 시작합니다");
+			send_notice(party[i], notice_str);
+		}
 	}
 }
 

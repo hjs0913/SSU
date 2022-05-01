@@ -50,6 +50,8 @@ bool alramUI_ON = false;
 bool PartyInviteUI_ON = false;
 bool InvitationCardUI_On = false;
 bool AddAIUI_On = false;
+bool NoticeUI_On = false;
+wstring Notice_str = L"";
 chrono::system_clock::time_point InvitationCardTimer = chrono::system_clock::now();
 int InvitationRoomId;
 int InvitationUser;
@@ -774,6 +776,11 @@ void process_packet(unsigned char* p)
 			int in = find(party_id_index_vector.begin(), party_id_index_vector.end(), (int)reinterpret_cast<sc_packet_party_room_destroy*>(p)->room_id) - party_id_index_vector.begin(); // index 확인
 			party_id_index_vector.erase(party_id_index_vector.begin()+in);
 		}
+		break;
+	}
+	case SC_PACKET_NOTICE: {
+		NoticeUI_On = true;
+		Notice_str = L"5초후에 게임을 시작합니다";
 		break;
 	}
 	default:

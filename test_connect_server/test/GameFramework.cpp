@@ -726,6 +726,11 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			if (InDungeon) break;
 			PartyUI_On = !PartyUI_On;
 			if(PartyUI_On) send_party_room_packet();
+			else {
+				party_id_index_vector.clear();
+				robby_cnt = 0;
+				party_info_on = false;
+			}
 			break;
 		default:
 			break;
@@ -839,6 +844,9 @@ void CGameFramework::BuildObjects()
 		// AI추가 UI
 		m_ppUILayer[18] = new AddAIUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::White);
 
+		// Notice AI
+		m_ppUILayer[19] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::Black);
+
 		m_ppUILayer[0]->setAlpha(0.5, 1.0);
 		m_ppUILayer[1]->setAlpha(0.5, 1.0);
 		m_ppUILayer[2]->setAlpha(0.3, 1.0);
@@ -860,6 +868,7 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[16]->setAlpha(1.0, 1.0);
 		m_ppUILayer[17]->setAlpha(1.0, 1.0);
 		m_ppUILayer[18]->setAlpha(1.0, 1.0);
+		m_ppUILayer[19]->setAlpha(0.8, 1.0);
 
 		m_ppUILayer[0]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_FAR);
@@ -900,6 +909,8 @@ void CGameFramework::BuildObjects()
 		reinterpret_cast<InvitationCardUI*>(m_ppUILayer[17])->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 		m_ppUILayer[18]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[19]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 		// UIBar Setting
@@ -1516,6 +1527,10 @@ void CGameFramework::FrameAdvance()
 			reinterpret_cast<AddAIUI*>(m_ppUILayer[i])->UpdateLabels();
 			break;
 		}
+		case 19:
+			if (!NoticeUI_On) break;
+			m_ppUILayer[i]->UpdateLabels(Notice_str, 0, 0, 640, 50);
+			break;
 	}
 	}
 
@@ -1533,7 +1548,8 @@ void CGameFramework::FrameAdvance()
 		}
 		if (i == 16 && !PartyInviteUI_ON) continue;
 		if (i == 17 && !InvitationCardUI_On) continue;
-		if (i == 18 && !AddAIUI_On) break;
+		if (i == 18 && !AddAIUI_On) continue;
+		if (i == 19 && !NoticeUI_On) continue;
 		m_ppUILayer[i]->Render(m_nSwapChainBufferIndex);
 	}
 

@@ -63,6 +63,9 @@ extern chrono::system_clock::time_point InvitationCardTimer;
 extern int InvitationRoomId;
 extern int InvitationUser;
 
+extern bool NoticeUI_On;
+extern wstring Notice_str;
+
 extern CRITICAL_SECTION cs;
 
 void err_quit(const char* msg);
