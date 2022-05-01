@@ -97,7 +97,7 @@ void Gaia::join_player(Player* pl)
 			if (party[i]->get_tribe() != HUMAN) continue;
 			char notice_str[MAX_CHAT_SIZE];
 			strcpy_s(notice_str, "5초후에 게임을 시작합니다");
-			send_notice(party[i], notice_str);
+			send_notice(party[i], notice_str, 0);
 		}
 	}
 }

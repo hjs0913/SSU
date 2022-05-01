@@ -490,7 +490,7 @@ struct sc_packet_notice {
 	unsigned char size;
 	char type;
 	char message[MAX_CHAT_SIZE];
-	unsigned char raid_enter;	// 0 : 레이드 입장 시간초, 1 : 나머지 공지사항
+	unsigned char raid_enter;	// 0 : 레이드 입장 시간초, 1: 사망 공지사항, 2 : 나머지 공지사항
 };
 
 #pragma pack(pop)

@@ -996,7 +996,6 @@ float get_combat_id_max_hp()
 	return mPlayer[combat_id]->m_max_hp;
 }
 
-
 wchar_t* get_user_name_to_server(int id)
 {
 	WCHAR* temp;

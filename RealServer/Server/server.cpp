@@ -1017,6 +1017,13 @@ void process_packet(int client_id, unsigned char* p)
         float y = packet->y;
         float z = packet->z;       
 
+        pl->state_lock.lock();
+        if (pl->get_state() == ST_DEAD || pl->get_state() == ST_FREE) {
+            pl->state_lock.unlock();
+            break;
+        }
+        pl->state_lock.unlock();
+
         // InDunProcess
         if (pl->get_state() == ST_INDUN) {
             // 유효성 검사
@@ -1195,6 +1202,12 @@ void process_packet(int client_id, unsigned char* p)
         // cs_packet_attack* packet = reinterpret_cast<cs_packet_attack*>(p);
         // 플레이어가 공격하고 반경 1칸 이내에 몬스터가 있다면 전투
 
+        pl->state_lock.lock();
+        if (pl->get_state() == ST_DEAD || pl->get_state() == ST_FREE) {
+            pl->state_lock.unlock();
+            break;
+        }
+        pl->state_lock.unlock();
 
         if (pl->get_attack_active()) break;
         pl->set_attack_active(true);
@@ -1291,6 +1304,13 @@ void process_packet(int client_id, unsigned char* p)
         break;
     }
     case CS_PACKET_SKILL: {
+        pl->state_lock.lock();
+        if (pl->get_state() == ST_DEAD || pl->get_state() == ST_FREE) {
+            pl->state_lock.unlock();
+            break;
+        }
+        pl->state_lock.unlock();
+
         cs_packet_skill* packet = reinterpret_cast<cs_packet_skill*>(p);
         if (pl->get_skill_active(packet->skill_type) == true) return;
         pl->set_skill_active(packet->skill_type, true);     //일반공격 계수는 5
@@ -1746,6 +1766,13 @@ void process_packet(int client_id, unsigned char* p)
         break;
     }
     case CS_PACKET_LOOK: {
+        pl->state_lock.lock();
+        if (pl->get_state() == ST_DEAD || pl->get_state() == ST_FREE) {
+            pl->state_lock.unlock();
+            break;
+        }
+        pl->state_lock.unlock();
+
         cs_packet_look* packet = reinterpret_cast<cs_packet_look*>(p);
         pl->set_look(packet->x, packet->y, packet->z);
         pl->set_right(packet->right_x, packet->right_y, packet->right_z);
@@ -1838,6 +1865,13 @@ void process_packet(int client_id, unsigned char* p)
         break;
     }
     case CS_PACKET_PICKING_SKILL: {
+        pl->state_lock.lock();
+        if (pl->get_state() == ST_DEAD || pl->get_state() == ST_FREE) {
+            pl->state_lock.unlock();
+            break;
+        }
+        pl->state_lock.unlock();
+
         cs_packet_picking_skill* packet = reinterpret_cast<cs_packet_picking_skill*>(p);
         if (pl->get_skill_active(packet->skill_type) == true) return;
         pl->set_skill_active(packet->skill_type, true);   
@@ -2509,7 +2543,6 @@ void worker()
             break;
         }
         case OP_NPC_ATTACK: {
-            cout << "???" << endl;
             // 죽은 상태나 공격하는 상태인지 아닌지 확인
             players[client_id]->state_lock.lock();
             if ((players[client_id]->get_state() != ST_INGAME) || (false == players[client_id]->get_active())) {
@@ -2533,7 +2566,6 @@ void worker()
             lua_pop(L, 1);
             if (m) {
                 // 공격처리
-                cout << "???2" << endl;
                 attack_success(client_id, exp_over->_target, players[client_id]->get_basic_attack_factor());
             }
             else {
@@ -2577,6 +2609,7 @@ void worker()
             break;
         }
         case OP_PLAYER_REVIVE: {
+            cout << "개같이 부활" << endl;
             player_revive(client_id);
             delete exp_over;
             break;
