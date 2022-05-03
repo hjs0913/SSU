@@ -517,6 +517,7 @@ bool CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 				}
 			}
 			else {
+				if (party_enter) break;
 				if (CursorPosInClient.x >= 120 && CursorPosInClient.x <= 300) {
 					if (CursorPosInClient.y >= 60 && CursorPosInClient.y <= 100 && robby_cnt>=1) {
 						send_party_room_info_request(party_id_index_vector[0]);
@@ -729,7 +730,6 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			else {
 				party_id_index_vector.clear();
 				robby_cnt = 0;
-				party_info_on = false;
 			}
 			break;
 		default:

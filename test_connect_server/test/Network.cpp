@@ -524,6 +524,7 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_COMBAT_ID: {
+		EnterCriticalSection(&cs);
 		sc_packet_combat_id* packet = reinterpret_cast<sc_packet_combat_id*>(p);
 		if (combat_id != packet->id) {
 			Combat_On = true;
@@ -552,6 +553,7 @@ void process_packet(unsigned char* p)
 			case E_ICE: my_element_str = Combat_str.append(L"¾óÀ½"); break;
 			}
 		}
+		LeaveCriticalSection(&cs);
 		break;
 	}
 	case SC_PACKET_PLAY_SHOOT: {
@@ -666,14 +668,13 @@ void process_packet(unsigned char* p)
 	case SC_PACKET_PARTY_ROOM: {
 		sc_packet_party_room* packet = reinterpret_cast<sc_packet_party_room*>(p);
 		m_party[(int)packet->room_id]->set_room_name(packet->room_name);
-		if (m_party[(int)packet->room_id]->dst != DUN_ST_ROBBY) {
-			m_party[(int)packet->room_id]->dst = DUN_ST_ROBBY;
-			robby_cnt++;
-			party_id_index_vector.push_back((int)packet->room_id);
-		}
+		m_party[(int)packet->room_id]->dst = DUN_ST_ROBBY;
+		robby_cnt++;
+		party_id_index_vector.push_back((int)packet->room_id);
 		break;
 	}
 	case SC_PACKET_PARTY_ROOM_INFO: {
+		EnterCriticalSection(&cs);
 		sc_packet_party_room_info* packet = reinterpret_cast<sc_packet_party_room_info*>(p);
 		int r_id = (int)packet->room_id;
 
@@ -700,6 +701,7 @@ void process_packet(unsigned char* p)
 		PartyUI_On = true;
 		party_info_on = true;
 		m_party_info = m_party[r_id];
+		LeaveCriticalSection(&cs);
 		break;
 	}
 	case SC_PACKET_PARTY_ROOM_ENTER_OK: {
@@ -736,11 +738,13 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_PARTY_INVITATION: {
+		EnterCriticalSection(&cs);
 		InvitationRoomId = (int)reinterpret_cast<sc_packet_party_invitation*>(p)->room_id;
 		InvitationUser = reinterpret_cast<sc_packet_party_invitation*>(p)->invite_user_id;
 
 		InvitationCardUI_On = true;
 		InvitationCardTimer = chrono::system_clock::now() + 10s;
+		LeaveCriticalSection(&cs);
 		break;
 	}
 	case SC_PACKET_PARTY_INVITATION_FAILED: {
@@ -781,6 +785,7 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_NOTICE: {
+		EnterCriticalSection(&cs);
 		sc_packet_notice* packet = reinterpret_cast<sc_packet_notice*>(p);
 		NoticeUI_On = true;
 		if ((int)packet->raid_enter == 0) {
@@ -794,6 +799,7 @@ void process_packet(unsigned char* p)
 		mbstowcs(temp, packet->message, len);
 		Notice_str = L"";
 		Notice_str.append(temp);
+		LeaveCriticalSection(&cs);
 		break;
 	}
 	default:
