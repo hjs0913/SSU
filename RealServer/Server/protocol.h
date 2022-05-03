@@ -116,6 +116,8 @@ const char SC_PACKET_PARTY_INVITATION = 34;
 const char SC_PACKET_PARTY_INVITATION_FAILED = 35;
 const char SC_PACKET_PARTY_ROOM_DESTROY = 36;
 
+const char SC_PACKET_NOTICE = 37;
+
 //---------------------------------------------------
 #pragma pack (push, 1)
 struct cs_packet_login {
@@ -241,6 +243,7 @@ struct cs_packet_party_add_partner {
 	unsigned char size;
 	char type;
 	unsigned char room_id;
+	unsigned char job;
 };
 
 
@@ -481,6 +484,13 @@ struct sc_packet_party_room_destroy {
 	unsigned char size;
 	char type;
 	unsigned char room_id;
+};
+
+struct sc_packet_notice {
+	unsigned char size;
+	char type;
+	char message[MAX_CHAT_SIZE];
+	unsigned char raid_enter;	// 0 : 레이드 입장 시간초, 1: 사망 공지사항, 2 : 나머지 공지사항
 };
 
 #pragma pack(pop)

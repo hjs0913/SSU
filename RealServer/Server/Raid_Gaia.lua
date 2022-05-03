@@ -16,6 +16,6 @@ my_z = 300;
 
 function set_uid(id)
    my_id = id;
-   return my_element,my_lv, my_name, my_hp, my_physical_attack, my_magical_attck, 
+   return my_element, my_lv, my_name, my_hp, my_physical_attack, my_magical_attck, 
         my_physical_defence, my_magical_defence, my_basic_attack_factor, my_defence_factor;
 end

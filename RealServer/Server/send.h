@@ -54,3 +54,5 @@ void send_party_invitation(Player* pl, int r_id, int user_id);
 void send_party_invitation_failed(Player* pl, int failed_reason, char* invited_user);
 
 void send_party_room_destroy(Player* pl, int r_id);
+
+void send_notice(Player* pl, char* notice_str, int raid_notice);

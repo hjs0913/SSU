@@ -29,6 +29,8 @@ INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
 {
 	setlocale(LC_ALL, "");
+	
+	InitializeCriticalSection(&cs);
 
 	// connect network
 	netInit();
@@ -81,6 +83,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 		}
 	}
 	gGameFramework.OnDestroy();
+
+	DeleteCriticalSection(&cs);
 
 	return((int)msg.wParam);
 }
