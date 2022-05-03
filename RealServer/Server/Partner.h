@@ -14,6 +14,12 @@ class Partner : public Player
 private:
     int     target_id;  //가이아 보스의 아이디로 하자
 
+    pos nearest = { 0,0, };
+    float dis = 0.0;
+    int nearest_num = 0;
+    pos move;
+    bool move_once;
+
 protected:
     char	_name[MAX_NAME_SIZE];
 
@@ -28,29 +34,13 @@ public:
 
     ~Partner();
 
-    void partner_move();
-    void partner_attack();
+    void partner_move(Partner* pa, Gaia* gaia);
+    void partner_attack(Partner* pa, Gaia* gaia);
 
     void physical_skill_success(int p_id, int target, float skill_factor);
 
-    bool check_inside(Coord_P a, Coord_P b, Coord_P c, Coord_P n) {
-        Coord_P A, B, C;
-        A.x = b.x - a.x;
-        A.z = b.z - a.z;
-        B.x = c.x - a.x;
-        B.z = c.z - a.z;
-        C.x = n.x - a.x;
-        C.z = n.z - a.z;
+    bool check_inside(pos a, pos b, pos c, pos n);
+    bool isInsideTriangle(pos a, pos b, pos c, pos n);
 
-        if ((A.x * B.z - A.z * B.x) * (A.x * C.z - A.z * C.x) < 0)
-            return false;
-        return true;
-    }
-    bool isInsideTriangle(Coord_P a, Coord_P b, Coord_P c, Coord_P n)
-    {
-        if (!check_inside(a, b, c, n)) return false;
-        if (!check_inside(b, c, a, n)) return false;
-        if (!check_inside(c, a, b, n)) return false;
-        return true;
-    }
+
 };

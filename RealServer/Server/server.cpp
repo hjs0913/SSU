@@ -345,12 +345,21 @@ void magical_skill_success(int p_id, int target, float skill_factor)
 
 void physical_skill_success(int p_id, int target, float skill_factor)
 {
+
     float give_damage = players[p_id]->get_physical_attack() * skill_factor;
     float defence_damage = (players[target]->get_defence_factor() *
         players[target]->get_physical_defence()) / (1 + (players[target]->get_defence_factor() *
             players[target]->get_physical_defence()));
     float damage = give_damage * (1 - defence_damage);
     int target_hp = players[target]->get_hp() - damage;
+    cout << players[target]->get_defence_factor() << endl;
+    cout << players[target]->get_physical_defence() << endl;
+    cout << "give_damage : " << give_damage << endl;
+    cout << "defence_damage : " << defence_damage << endl;
+    cout << players[target]->get_defence_factor() *
+        players[target]->get_physical_defence() << endl;
+    cout << (1 + (players[target]->get_defence_factor() *
+        players[target]->get_physical_defence())) << endl;
 
 
     players[target]->set_hp(target_hp);
@@ -2050,7 +2059,7 @@ void process_packet(int client_id, unsigned char* p)
                     timer_queue.push(ev);
 
                     ev.obj_id = party_players[i]->get_id();
-                    ev.start_time = chrono::system_clock::now() + 1s;
+                    ev.start_time = chrono::system_clock::now() + 10s;
                     ev.ev = EVENT_PARTNER_ATTACK;
                     ev.target_id = 1;
                     timer_queue.push(ev);
@@ -2745,10 +2754,11 @@ void worker()
             players[client_id]->state_lock.unlock();
 
             Partner* pl = reinterpret_cast<Partner*>(players[client_id]);
-            pl->partner_move();
+            pl->partner_move(pl, dungeons[pl->get_indun_id()]);
             Player** pp = dungeons[pl->get_indun_id()]->get_party_palyer();
             for (int i = 0; i < GAIA_ROOM; i++) {
                 send_move_packet(pp[i], pl);
+                send_look_packet(pp[i], pl);
             }
 
             timer_event ev;
@@ -2767,6 +2777,8 @@ void worker()
                 break;
             }
             players[client_id]->state_lock.unlock();
+            Partner* pl = reinterpret_cast<Partner*>(players[client_id]);
+            pl->partner_attack(pl, dungeons[pl->get_indun_id()]);
             //dungeons[client_id]->partner_attack(1);
             delete exp_over;
             break;

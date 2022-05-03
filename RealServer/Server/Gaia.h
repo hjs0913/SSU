@@ -16,29 +16,38 @@ private:
 	int  player_death_count = 4;
 
 // 패턴 정보
-	bool running_pattern;
+
+
+	
+
+	chrono::system_clock::time_point start_time;
+
+public:	
+	bool running_pattern;  //파트너가 알수있게 퍼블릭으로
+	int pattern_num;   
 	// 1번
 	pos pattern_one_position[4];
 	// 2번
 	pos pattern_two_position[3];
 	int pattern_two_number;
 	int pattern_two_count = 0;
+	pos pattern_two_safe_zone[2];
+
 	// 5번
 	pos pattern_five_position[2];
 	int pattern_five_count = 0;
 	// 특수
 	bool fifteen_pattern;
-	
 
-	chrono::system_clock::time_point start_time;
 
-public:
 	int player_cnt;
 	Npc* boss;
 	mutex state_lock;
 	int player_rander_ok;
 	bool start_game;
 	int partner_cnt;
+
+
 
 public:
 	Gaia(int d_id);
@@ -74,5 +83,8 @@ public:
 
 	void partner_move(int p_id);
 	void partner_attack(int p_id);
+	
+	float get_x();
+	float get_z();
 };
 
