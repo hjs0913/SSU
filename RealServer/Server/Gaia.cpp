@@ -62,6 +62,15 @@ Gaia::~Gaia()
 {
 	delete party;
 }
+float Gaia::get_x()
+{
+	return boss->get_x();
+}
+
+float Gaia::get_z()
+{
+	return boss->get_z();
+}
 
 void Gaia::join_player(Player* pl)
 {
@@ -347,6 +356,7 @@ void Gaia::boss_move()
 		send_move_packet(pt, boss);
 		send_look_packet(pt, boss);
 	}
+
 	
 }
 
@@ -357,7 +367,8 @@ void Gaia::boss_attack()
 	uniform_int_distribution<int> pattern(0, 99);
 	timer_event ev;
 
-	int p = pattern(gen);
+	pattern_num = pattern(gen) % 5;
+
 	if (fifteen_pattern == false) {
 		if (boss->get_hp() < boss->get_maxhp()/2) {
 			fifteen_pattern = true;
@@ -372,8 +383,9 @@ void Gaia::boss_attack()
 		}
 	}
 
-	switch (p%5) {
-	case 0: {
+	switch (pattern_num) {
+	case 0: {  //장판
+		cout << "장판" << endl;
 		running_pattern = true;
 		// 목표지점
 		// 1차 타점
@@ -408,8 +420,10 @@ void Gaia::boss_attack()
 		timer_queue.push(ev);
 		break;
 	}
-	case 1: {
-		pattern_two_number = p % 4;
+	case 1: { //파도3개 
+		cout << "파도" << endl;
+		running_pattern = true;
+		pattern_two_number = pattern_num % 4;
 		switch (pattern_two_number) {
 		case 0: {
 			pattern_two_position[0].first = 2172;
@@ -420,6 +434,11 @@ void Gaia::boss_attack()
 
 			pattern_two_position[2].first = 2372;
 			pattern_two_position[2].second = 2262;
+
+			pattern_two_safe_zone[0].first = 2222;
+			pattern_two_safe_zone[0].second = 2412;
+			pattern_two_safe_zone[1].first = 2322;
+			pattern_two_safe_zone[1].second = 2312;
 			break;
 		}
 		case 1: {
@@ -431,6 +450,11 @@ void Gaia::boss_attack()
 
 			pattern_two_position[2].first = 1888;
 			pattern_two_position[2].second = 2462;
+
+			pattern_two_safe_zone[0].first = 1738;
+			pattern_two_safe_zone[0].second = 2312;
+			pattern_two_safe_zone[1].first = 1838;
+			pattern_two_safe_zone[1].second = 2412;
 			break;
 		}
 		case 2: {
@@ -442,6 +466,11 @@ void Gaia::boss_attack()
 
 			pattern_two_position[2].first = 1688;
 			pattern_two_position[2].second = 1978;
+
+			pattern_two_safe_zone[0].first = 1838;
+			pattern_two_safe_zone[0].second = 1828;
+			pattern_two_safe_zone[1].first = 1738;
+			pattern_two_safe_zone[1].second = 1928;
 			break;
 		}
 		case 3: {
@@ -453,6 +482,11 @@ void Gaia::boss_attack()
 
 			pattern_two_position[2].first = 2172;
 			pattern_two_position[2].second = 1778;
+
+			pattern_two_safe_zone[0].first = 2322;
+			pattern_two_safe_zone[0].second = 1928;
+			pattern_two_safe_zone[1].first = 2222;
+			pattern_two_safe_zone[1].second = 1828;
 			break;
 		}
 		}
@@ -495,7 +529,8 @@ void Gaia::boss_attack()
 		timer_queue.push(ev);
 		break;
 	}
-	case 4: {
+	case 4: {//참격 1개 
+		cout << "참격" << endl;
 		running_pattern = true;
 		pattern_five_position[0] = pos(boss->get_x()+ boss->get_look_x(), boss->get_z() + boss->get_look_z());
 		for (int i = 0; i < GAIA_ROOM; i++) {
@@ -615,7 +650,7 @@ void Gaia::pattern_active(int pattern)
 {
 	switch (pattern) {
 	case 0: {
-		running_pattern = false;
+
 		// 패턴이 발동되었다고 클라에 보내주자
 
 		// 패턴 판정 확인
@@ -634,6 +669,7 @@ void Gaia::pattern_active(int pattern)
 				}
 			}
 			send_gaia_pattern_finish_packet(p, 0);
+			running_pattern = false;
 		}
 
 		break;
@@ -654,6 +690,8 @@ void Gaia::pattern_active(int pattern)
 			for (int i = 0; i < 3; i++) {
 				pattern_two_position[i].first -= movesize;
 				pattern_two_position[i].second -= movesize;
+				pattern_two_safe_zone[i].first -= movesize;
+				pattern_two_safe_zone[i].second -= movesize;
 			}
 			break;
 		}
@@ -661,6 +699,8 @@ void Gaia::pattern_active(int pattern)
 			for (int i = 0; i < 3; i++) {
 				pattern_two_position[i].first += movesize;
 				pattern_two_position[i].second -= movesize;
+				pattern_two_safe_zone[i].first += movesize;
+				pattern_two_safe_zone[i].second -= movesize;
 			}
 			break;
 		}
@@ -668,6 +708,8 @@ void Gaia::pattern_active(int pattern)
 			for (int i = 0; i < 3; i++) {
 				pattern_two_position[i].first += movesize;
 				pattern_two_position[i].second += movesize;
+				pattern_two_safe_zone[i].first += movesize;
+				pattern_two_safe_zone[i].second += movesize;
 			}
 			break;
 		}
@@ -675,7 +717,10 @@ void Gaia::pattern_active(int pattern)
 			for (int i = 0; i < 3; i++) {
 				pattern_two_position[i].first -= movesize;
 				pattern_two_position[i].second += movesize;
+				pattern_two_safe_zone[i].first -= movesize;
+				pattern_two_safe_zone[i].second += movesize;
 			}
+
 			break;
 		}
 		}
@@ -695,6 +740,7 @@ void Gaia::pattern_active(int pattern)
 		else {
 			pattern_two_count = 0;
 			for (int i = 0; i < GAIA_ROOM; i++) send_gaia_pattern_finish_packet(party[i], 1);
+			running_pattern = false;
 		}
 		break;
 	}
@@ -739,8 +785,8 @@ void Gaia::pattern_active(int pattern)
 		}
 		else {
 			pattern_five_count = 0;
-			running_pattern = false;
 			for (int i = 0; i < GAIA_ROOM; i++) send_gaia_pattern_finish_packet(party[i], 4);
+			running_pattern = false;
 		}
 
 		break;
@@ -749,4 +795,6 @@ void Gaia::pattern_active(int pattern)
 		cout << "잘봇된 패턴 활성화" << endl;
 		break;
 	}
+
+
 }

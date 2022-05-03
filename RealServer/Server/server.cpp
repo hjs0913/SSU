@@ -2020,7 +2020,7 @@ void process_packet(int client_id, unsigned char* p)
                     timer_queue.push(ev);
 
                     ev.obj_id = party_players[i]->get_id();
-                    ev.start_time = chrono::system_clock::now() + 1s;
+                    ev.start_time = chrono::system_clock::now() + 10s;
                     ev.ev = EVENT_PARTNER_ATTACK;
                     ev.target_id = 1;
                     timer_queue.push(ev);
@@ -2686,10 +2686,11 @@ void worker()
         }
         case OP_PARTNER_MOVE: {
             Partner* pl = reinterpret_cast<Partner*>(players[client_id]);
-            pl->partner_move();
+            pl->partner_move(pl, dungeons[pl->get_indun_id()]);
             Player** pp = dungeons[pl->get_indun_id()]->get_party_palyer();
             for (int i = 0; i < GAIA_ROOM; i++) {
                 send_move_packet(pp[i], pl);
+                send_look_packet(pp[i], pl);
             }
 
             timer_event ev;
@@ -2702,8 +2703,16 @@ void worker()
             break;
         }
         case OP_PARTNER_ATTACK: {
-            //dungeons[client_id]->partner_attack(1);
-            delete exp_over;
+            Partner* pl = reinterpret_cast<Partner*>(players[client_id]);
+            pl->partner_attack(pl, dungeons[pl->get_indun_id()]);
+
+            /* timer_event ev;
+            ev.obj_id = client_id;
+            ev.start_time = chrono::system_clock::now() + 10s;
+            ev.ev = EVENT_PARTNER_ATTACK;
+            ev.target_id = -1;
+            timer_queue.push(ev);
+            delete exp_over;*/
             break;
         }
         case OP_PARTNER_PATTERN: {
