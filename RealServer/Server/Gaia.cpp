@@ -102,6 +102,12 @@ void Gaia::join_player(Player* pl)
 		start_time = ev.start_time;
 		
 		// 5초후 게임을 시작한다는 패킷을 보내주자
+		for (int i = 0; i < GAIA_ROOM; i++) {
+			if (party[i]->get_tribe() != HUMAN) continue;
+			char notice_str[MAX_CHAT_SIZE];
+			strcpy_s(notice_str, "5초후에 게임을 시작합니다");
+			send_notice(party[i], notice_str, 0);
+		}
 	}
 }
 
@@ -134,6 +140,15 @@ void Gaia::game_start()
 	if (start_time > chrono::system_clock::now()) return;
 	if (player_cnt < GAIA_ROOM) return;
 
+	// AI의 정보를 클라이언트에게 보내주어야한다
+	for (int i = 0; i < GAIA_ROOM; i++) {
+		if (party[i]->get_tribe() == PARTNER) {
+			for (int j = 0; j < GAIA_ROOM; j++) {
+				if(party[j]->get_tribe() == HUMAN) send_put_object_packet(party[j], party[i]);
+			}
+		}
+	}
+
 
 	// 모든 파티 인던 입장 및 게임 시작
 	player_rander_ok = 0;
@@ -159,6 +174,58 @@ void Gaia::game_start()
 	}
 
 	cout << dungeon_id << "번 던전 시작합니다" << endl;
+}
+
+void Gaia::destroy_dungeon()
+{
+	state_lock.lock();
+	set_dun_st(DUN_ST_FREE);
+	state_lock.unlock();
+	
+	player_cnt = 0;
+	partner_cnt = 0;
+
+	fifteen_pattern = false;
+
+	player_rander_ok = 0;
+	target_id = 0;
+	start_game = false;
+	running_pattern = false;
+
+	ZeroMemory(party, sizeof(Player*)*4);
+	ZeroMemory(party_id, sizeof(int) * 4);
+	player_death_count = 4;
+
+	// Boss Npc Intialize	
+	boss->state_lock.lock();
+	boss->set_state(ST_FREE);
+	boss->state_lock.unlock();
+	boss->set_id(101);
+
+	// 루아를 이용한 초기화
+	lua_State* L = boss->L;
+	lua_getglobal(L, "set_uid");
+	lua_pushnumber(L, dungeon_id);
+	int error = lua_pcall(L, 1, 10, 0);
+	boss->set_element(static_cast<ELEMENT>(lua_tointeger(L, -10)));
+	boss->set_lv(lua_tointeger(L, -9));
+
+	boss->set_name(lua_tostring(L, -8));
+
+	boss->set_hp(lua_tointeger(L, -7));
+	boss->set_maxhp(lua_tointeger(L, -7));
+
+	boss->set_physical_attack(lua_tonumber(L, -6));
+	boss->set_magical_attack(lua_tonumber(L, -5));
+	boss->set_physical_defence(lua_tonumber(L, -4));
+	boss->set_magical_defence(lua_tonumber(L, -3));
+	boss->set_basic_attack_factor(lua_tointeger(L, -2));
+	boss->set_defence_factor(lua_tonumber(L, -1));
+
+	lua_pop(L, 11);// eliminate set_uid from stack after call
+
+	boss->set_x(310);
+	boss->set_x(110);
 }
 
 DUNGEON_STATE Gaia::get_dun_st()

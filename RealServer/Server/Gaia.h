@@ -57,6 +57,7 @@ public:
 	void quit_palyer(Player* pl);
 
 	void game_start();
+	void destroy_dungeon();
 
 	DUNGEON_STATE get_dun_st();
 	void set_dun_st(DUNGEON_STATE dst);

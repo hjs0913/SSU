@@ -334,3 +334,13 @@ void send_party_room_destroy(Player* pl, int r_id)
     packet.room_id = r_id;
     pl->do_send(sizeof(packet), &packet);
 }
+
+void send_notice(Player* pl, char* notice_str, int raid_notice)
+{
+    sc_packet_notice packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_NOTICE;
+    strcpy_s(packet.message, notice_str);
+    packet.raid_enter = raid_notice;
+    pl->do_send(sizeof(packet), &packet);
+}

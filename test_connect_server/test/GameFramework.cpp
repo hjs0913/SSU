@@ -473,6 +473,27 @@ bool CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 				break;
 			}
 
+			if (AddAIUI_On) {
+				if (CursorPosInClient.y >= 240 && CursorPosInClient.y <= 260) {
+					if (CursorPosInClient.x >= 205 && CursorPosInClient.x <= 255) {
+						send_party_add_partner(J_DILLER);
+						AddAIUI_On = false;
+					}
+					if (CursorPosInClient.x >= 265 && CursorPosInClient.x <= 315) {
+						send_party_add_partner(J_TANKER);
+						AddAIUI_On = false;
+					}
+					if (CursorPosInClient.x >= 325 && CursorPosInClient.x <= 375) {
+						send_party_add_partner(J_MAGICIAN);
+						AddAIUI_On = false;
+					}
+					if (CursorPosInClient.x >= 385 && CursorPosInClient.x <= 435) {
+						send_party_add_partner(J_SUPPORTER);
+						AddAIUI_On = false;
+					}
+				}
+				break;
+			}
 
 			if (CursorPosInClient.y >= 360 && CursorPosInClient.y <= 400) {
 				if (CursorPosInClient.x >= 140 && CursorPosInClient.x <= 205) {
@@ -491,12 +512,12 @@ bool CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 				}
 				if (CursorPosInClient.x >= 435 && CursorPosInClient.x <= 500) {
 					if (party_enter) {
-						cout << "AI넣기 누름" << endl;
-						send_party_add_partner();
+						AddAIUI_On = true;
 					}
 				}
 			}
 			else {
+				if (party_enter) break;
 				if (CursorPosInClient.x >= 120 && CursorPosInClient.x <= 300) {
 					if (CursorPosInClient.y >= 60 && CursorPosInClient.y <= 100 && robby_cnt>=1) {
 						send_party_room_info_request(party_id_index_vector[0]);
@@ -706,6 +727,10 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			if (InDungeon) break;
 			PartyUI_On = !PartyUI_On;
 			if(PartyUI_On) send_party_room_packet();
+			else {
+				party_id_index_vector.clear();
+				robby_cnt = 0;
+			}
 			break;
 		default:
 			break;
@@ -777,8 +802,6 @@ void CGameFramework::OnDestroy()
 
 void CGameFramework::BuildObjects()
 {
-	
-
 	if (!m_ppUILayer) {
 		m_ppUILayer = new UILayer * [UICOUNT];
 
@@ -803,19 +826,26 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[9] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::White, D2D1::ColorF::Black);
 		m_ppUILayer[10] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
 		m_ppUILayer[11] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
+		m_ppUILayer[12] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
+		m_ppUILayer[13] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
 
 		// Buff UI
-		m_ppUILayer[12] = new BuffUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
+		m_ppUILayer[14] = new BuffUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
 
 		// Party UI
-		m_ppUILayer[13] = new PartyUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::White);
+		m_ppUILayer[15] = new PartyUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::White);
 
 		// 파티초대 UI
-		m_ppUILayer[14] = new PartyInviteUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::Black);
+		m_ppUILayer[16] = new PartyInviteUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::Black);
 
 		// 파티 초대장
-		m_ppUILayer[15] = new InvitationCardUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::DarkGray, D2D1::ColorF::White);
+		m_ppUILayer[17] = new InvitationCardUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::DarkGray, D2D1::ColorF::White);
 
+		// AI추가 UI
+		m_ppUILayer[18] = new AddAIUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::White);
+
+		// Notice AI
+		m_ppUILayer[19] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::Black);
 
 		m_ppUILayer[0]->setAlpha(0.5, 1.0);
 		m_ppUILayer[1]->setAlpha(0.5, 1.0);
@@ -826,13 +856,19 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[6]->setAlpha(0.0, 1.0);
 		m_ppUILayer[7]->setAlpha(0.3, 1.0);
 		m_ppUILayer[8]->setAlpha(0.0, 1.0);
+
 		m_ppUILayer[9]->setAlpha(0.3, 1.0);
 		m_ppUILayer[10]->setAlpha(0.0, 1.0);
 		m_ppUILayer[11]->setAlpha(0.0, 1.0);
 		m_ppUILayer[12]->setAlpha(0.0, 1.0);
-		m_ppUILayer[13]->setAlpha(0.7, 1.0);
-		m_ppUILayer[14]->setAlpha(1.0, 1.0);
-		m_ppUILayer[15]->setAlpha(1.0, 1.0);
+		m_ppUILayer[13]->setAlpha(0.0, 1.0);
+
+		m_ppUILayer[14]->setAlpha(0.0, 1.0);
+		m_ppUILayer[15]->setAlpha(0.7, 1.0);
+		m_ppUILayer[16]->setAlpha(1.0, 1.0);
+		m_ppUILayer[17]->setAlpha(1.0, 1.0);
+		m_ppUILayer[18]->setAlpha(1.0, 1.0);
+		m_ppUILayer[19]->setAlpha(0.8, 1.0);
 
 		m_ppUILayer[0]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_FAR);
@@ -852,6 +888,7 @@ void CGameFramework::BuildObjects()
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 		m_ppUILayer[8]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
 		m_ppUILayer[9]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 		m_ppUILayer[10]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
@@ -861,11 +898,20 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[12]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		m_ppUILayer[13]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+		m_ppUILayer[14]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[15]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-		reinterpret_cast<PartyInviteUI*>(m_ppUILayer[14])->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+		reinterpret_cast<PartyInviteUI*>(m_ppUILayer[16])->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
-		reinterpret_cast<InvitationCardUI*>(m_ppUILayer[15])->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+		reinterpret_cast<InvitationCardUI*>(m_ppUILayer[17])->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+		m_ppUILayer[18]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[19]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 		// UIBar Setting
 		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, 40, 20 + (m_nWndClientWidth / 10) * 3, 60);
@@ -881,6 +927,10 @@ void CGameFramework::BuildObjects()
 		reinterpret_cast<UIBar*>(m_ppUILayer[10])->SetColorBrush(D2D1::ColorF::Red, 1.0, 10, (m_nWndClientHeight / 2) - 60, 140, (m_nWndClientHeight / 2) - 40);
 		reinterpret_cast<UIBar*>(m_ppUILayer[11])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 10, (m_nWndClientHeight / 2) - 30, 140, (m_nWndClientHeight / 2) - 10);
 		reinterpret_cast<UIBar*>(m_ppUILayer[11])->SetColorBrush(D2D1::ColorF::Red, 1.0, 10, (m_nWndClientHeight / 2) - 30, 140, (m_nWndClientHeight / 2) - 10);
+		reinterpret_cast<UIBar*>(m_ppUILayer[12])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 10, (m_nWndClientHeight / 2), 140, (m_nWndClientHeight / 2)  + 20);
+		reinterpret_cast<UIBar*>(m_ppUILayer[12])->SetColorBrush(D2D1::ColorF::Red, 1.0, 10, (m_nWndClientHeight / 2), 140, (m_nWndClientHeight / 2) + 20);
+		reinterpret_cast<UIBar*>(m_ppUILayer[13])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 10, (m_nWndClientHeight / 2) + 30 , 140, (m_nWndClientHeight / 2) + 50);
+		reinterpret_cast<UIBar*>(m_ppUILayer[13])->SetColorBrush(D2D1::ColorF::Red, 1.0, 10, (m_nWndClientHeight / 2) + 30, 140, (m_nWndClientHeight / 2) + 50);
 	}
 
 
@@ -1175,6 +1225,8 @@ void CGameFramework::MoveToNextFrame()
 
 void CGameFramework::FrameAdvance()
 {
+	EnterCriticalSection(&cs);
+
 	m_GameTimer.Tick(0.0f);
 
 	get_basic_information(m_pPlayer, my_id);
@@ -1374,17 +1426,17 @@ void CGameFramework::FrameAdvance()
 			m_ppUILayer[i]->UpdateLabels(ang, (m_nWndClientWidth / 2) - 70, 40, (m_nWndClientWidth / 2) - 70 + (70*5)*bar_percent, (m_nWndClientHeight / 6) - 20);
 			break;
 		}
+
 		case 9: {
 			if (!InDungeon) break;
 			wstring party_info_str = L"파티원정보(DC : ";
 			party_info_str.append(to_wstring(indun_death_count));
 			party_info_str.append(L")");
-			m_ppUILayer[i]->UpdateLabels(party_info_str, 0, (m_nWndClientHeight / 2)-80, 150, (m_nWndClientHeight / 2)+20);
+			m_ppUILayer[i]->UpdateLabels(party_info_str, 0, (m_nWndClientHeight / 2)-80, 150, (m_nWndClientHeight / 2)+60);
 			break; 
 		}
 		case 10: {
 			if (!InDungeon) break;
-			get_hp_to_server(party_id[0]);
 			m_ppUILayer[i]->UpdateLabels(party_name[0], 10, (m_nWndClientHeight / 2) - 60, 10+130*((float)get_hp_to_server(party_id[0])/ get_max_hp_to_server(party_id[0])), (m_nWndClientHeight / 2) - 40);
 			break;
 		}
@@ -1393,7 +1445,18 @@ void CGameFramework::FrameAdvance()
 			m_ppUILayer[i]->UpdateLabels(party_name[1], 10, (m_nWndClientHeight / 2) - 30, 10 + 130 * ((float)get_hp_to_server(party_id[1]) / get_max_hp_to_server(party_id[1])), (m_nWndClientHeight / 2) - 10);
 			break;
 		}
+		case 12: {
+			if (!InDungeon) break;
+			m_ppUILayer[i]->UpdateLabels(party_name[2], 10, (m_nWndClientHeight / 2), 10 + 130 * ((float)get_hp_to_server(party_id[2]) / get_max_hp_to_server(party_id[2])), (m_nWndClientHeight / 2) +20);
+			break;
+		}
 		case 13: {
+			if (!InDungeon) break;
+			m_ppUILayer[i]->UpdateLabels(party_name[3], 10, (m_nWndClientHeight / 2) + 30, 10 + 130 * ((float)get_hp_to_server(party_id[3]) / get_max_hp_to_server(party_id[3])), (m_nWndClientHeight / 2) + 50);
+			break;
+		}
+
+		case 15: {
 			if (!PartyUI_On) break;
 			if (!party_info_on) {
 				reinterpret_cast<PartyUI*>(m_ppUILayer[i])->ResizeTextBlock(robby_cnt + 4);
@@ -1442,12 +1505,12 @@ void CGameFramework::FrameAdvance()
 
 			break;
 		}
-		case 14: {
+		case 16: {
 			if (!PartyInviteUI_ON) break;
 			reinterpret_cast<PartyInviteUI*>(m_ppUILayer[i])->UpdateLabels(Invite_Str);
 			break;
 		}
-		case 15: {
+		case 17: {
 			if (!InvitationCardUI_On) break;
 			wstring temp;
 			wchar_t* temp2 = get_user_name_to_server(InvitationUser);
@@ -1459,6 +1522,15 @@ void CGameFramework::FrameAdvance()
 			delete []temp2;
 			break;
 		}
+		case 18: {
+			if (!AddAIUI_On) break;
+			reinterpret_cast<AddAIUI*>(m_ppUILayer[i])->UpdateLabels();
+			break;
+		}
+		case 19:
+			if (!NoticeUI_On) break;
+			m_ppUILayer[i]->UpdateLabels(Notice_str, 0, 0, 640, 50);
+			break;
 	}
 	}
 
@@ -1466,16 +1538,18 @@ void CGameFramework::FrameAdvance()
 		if ((i == 5 || i == 6)) {
 			if (!Combat_On) continue;
 		}
-		if (i >= 7 && i <= 11) {
+		if (i >= 7 && i <= 13) {
 			if (!InDungeon) continue;
 		}
-		if (i == 13 && !PartyUI_On) {
+		if (i == 15 && !PartyUI_On) {
 			if(PartyUI_On == true)
 				cout << PartyUI_On << endl;
 			continue;
 		}
-		if (i == 14 && !PartyInviteUI_ON) continue;
-		if (i == 15 && !InvitationCardUI_On) continue;
+		if (i == 16 && !PartyInviteUI_ON) continue;
+		if (i == 17 && !InvitationCardUI_On) continue;
+		if (i == 18 && !AddAIUI_On) continue;
+		if (i == 19 && !NoticeUI_On) continue;
 		m_ppUILayer[i]->Render(m_nSwapChainBufferIndex);
 	}
 
@@ -1508,5 +1582,23 @@ void CGameFramework::FrameAdvance()
 			// 초대 거절 패킷 보내기
 		}
 	}
+
+	if (NoticeUI_On) {
+		if (NoticeTimer < chrono::system_clock::now()) {
+			NoticeUI_On = false;
+			RaidEnterNotice = false;
+		}
+		else {
+			if (RaidEnterNotice) {
+				auto t = NoticeTimer - chrono::system_clock::now();
+				if (t >= 4s && t < 5s) Notice_str = L"4초후에 게임을 시작합니다";
+				else if(t >= 3s && t < 4s) Notice_str = L"3초후에 게임을 시작합니다";
+				else if (t >= 2s && t < 3s) Notice_str = L"2초후에 게임을 시작합니다";
+				else if (t >= 1s && t < 2s) Notice_str = L"1초후에 게임을 시작합니다";
+			}
+		}
+	}
+
+	LeaveCriticalSection(&cs);
 }
 

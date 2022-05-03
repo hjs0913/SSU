@@ -107,7 +107,8 @@ void Disconnect(int c_id)
         Gaia* dun = dungeons[pl->get_indun_id()];
         dun->quit_palyer(pl);
 
-        if (dun->player_cnt == 0) {
+        Player** party_players = dun->get_party_palyer();
+        if (dun->player_cnt - dun->partner_cnt == 0) {
             // 아무도 없다는 뜻
             dun->state_lock.lock();
             dun->set_dun_st(DUN_ST_FREE);
@@ -122,9 +123,15 @@ void Disconnect(int c_id)
                 pls->state_lock.unlock();
                 send_party_room_destroy(reinterpret_cast<Player*>(pls), pl->get_indun_id());
             }
+
+            for (int i = 0; i < dun->player_cnt; i++) {
+                int delete_id = party_players[i]->get_id();
+                delete players[delete_id];
+                players[delete_id] = new Player(delete_id);
+            }
+            dun->destroy_dungeon();
         }
         else {
-            Player** party_players = dun->get_party_palyer();
             for (int i = 0; i < dun->player_cnt; i++) {
                 send_party_room_info_packet(party_players[i], dun->get_party_palyer(), dun->player_cnt, dun->get_dungeon_id());
             }
@@ -354,8 +361,6 @@ void physical_skill_success(int p_id, int target, float skill_factor)
     cout << (1 + (players[target]->get_defence_factor() *
         players[target]->get_physical_defence())) << endl;
 
-    cout << p_id << "가 " << damage << "을 " << target << "에게 주었다."
-        << target_hp << "남음" << endl;
 
     players[target]->set_hp(target_hp);
     if (target_hp <= 0) {
@@ -1021,6 +1026,13 @@ void process_packet(int client_id, unsigned char* p)
         float y = packet->y;
         float z = packet->z;       
 
+        pl->state_lock.lock();
+        if (pl->get_state() == ST_DEAD || pl->get_state() == ST_FREE) {
+            pl->state_lock.unlock();
+            break;
+        }
+        pl->state_lock.unlock();
+
         // InDunProcess
         if (pl->get_state() == ST_INDUN) {
             // 유효성 검사
@@ -1199,6 +1211,12 @@ void process_packet(int client_id, unsigned char* p)
         // cs_packet_attack* packet = reinterpret_cast<cs_packet_attack*>(p);
         // 플레이어가 공격하고 반경 1칸 이내에 몬스터가 있다면 전투
 
+        pl->state_lock.lock();
+        if (pl->get_state() == ST_DEAD || pl->get_state() == ST_FREE) {
+            pl->state_lock.unlock();
+            break;
+        }
+        pl->state_lock.unlock();
 
         if (pl->get_attack_active()) break;
         pl->set_attack_active(true);
@@ -1295,6 +1313,13 @@ void process_packet(int client_id, unsigned char* p)
         break;
     }
     case CS_PACKET_SKILL: {
+        pl->state_lock.lock();
+        if (pl->get_state() == ST_DEAD || pl->get_state() == ST_FREE) {
+            pl->state_lock.unlock();
+            break;
+        }
+        pl->state_lock.unlock();
+
         cs_packet_skill* packet = reinterpret_cast<cs_packet_skill*>(p);
         if (pl->get_skill_active(packet->skill_type) == true) return;
         pl->set_skill_active(packet->skill_type, true);     //일반공격 계수는 5
@@ -1750,6 +1775,13 @@ void process_packet(int client_id, unsigned char* p)
         break;
     }
     case CS_PACKET_LOOK: {
+        pl->state_lock.lock();
+        if (pl->get_state() == ST_DEAD || pl->get_state() == ST_FREE) {
+            pl->state_lock.unlock();
+            break;
+        }
+        pl->state_lock.unlock();
+
         cs_packet_look* packet = reinterpret_cast<cs_packet_look*>(p);
         pl->set_look(packet->x, packet->y, packet->z);
         pl->set_right(packet->right_x, packet->right_y, packet->right_z);
@@ -1842,6 +1874,13 @@ void process_packet(int client_id, unsigned char* p)
         break;
     }
     case CS_PACKET_PICKING_SKILL: {
+        pl->state_lock.lock();
+        if (pl->get_state() == ST_DEAD || pl->get_state() == ST_FREE) {
+            pl->state_lock.unlock();
+            break;
+        }
+        pl->state_lock.unlock();
+
         cs_packet_picking_skill* packet = reinterpret_cast<cs_packet_picking_skill*>(p);
         if (pl->get_skill_active(packet->skill_type) == true) return;
         pl->set_skill_active(packet->skill_type, true);   
@@ -2083,15 +2122,12 @@ void process_packet(int client_id, unsigned char* p)
         Gaia* dun = dungeons[r_id];
         dun->quit_palyer(pl);
         // 나갔다는 정보를 player에게 보내준다
-        Player** party_players = dun->get_party_palyer();
         send_party_room_quit_ok_packet(pl);
         pl->join_dungeon_room = false;
 
-        if (dun->player_cnt == 0) {
+        Player** party_players = dun->get_party_palyer();
+        if (dun->player_cnt - dun->partner_cnt == 0) {
             // 아무도 없다는 뜻
-            dun->state_lock.lock();
-            dun->set_dun_st(DUN_ST_FREE);
-            dun->state_lock.unlock();
             for (auto& pls : players) {
                 if (true == is_npc(pls->get_id())) break;
                 pls->state_lock.lock();
@@ -2102,9 +2138,16 @@ void process_packet(int client_id, unsigned char* p)
                 pls->state_lock.unlock();
                 send_party_room_destroy(reinterpret_cast<Player*>(pls), r_id);
             }
+
+            for (int i = 0; i < dun->player_cnt; i++) {
+                int delete_id = party_players[i]->get_id();
+                delete players[delete_id];
+                players[delete_id] = new Player(delete_id);
+            }
+            dun->destroy_dungeon();
+
         }
         else {
-            Player** party_players = dun->get_party_palyer();
             for (int i = 0; i < dun->player_cnt; i++) {
                 send_party_room_info_packet(party_players[i], dun->get_party_palyer(), dun->player_cnt, dun->get_dungeon_id());
             }
@@ -2225,7 +2268,7 @@ void process_packet(int client_id, unsigned char* p)
             partner->set_maxhp(10000);
             partner->set_hp(500);
             partner->set_mp(8000);
-            partner->set_job(J_DILLER);
+            partner->set_job(static_cast<JOB>(packet->job));
             partner->set_lv(25);
             partner->set_element(E_WATER);
             //  여기까지 클라에서 패킷 받으면, 새 player id 생성 후 정보 초기화  
@@ -2509,7 +2552,6 @@ void worker()
             break;
         }
         case OP_NPC_ATTACK: {
-            cout << "???" << endl;
             // 죽은 상태나 공격하는 상태인지 아닌지 확인
             players[client_id]->state_lock.lock();
             if ((players[client_id]->get_state() != ST_INGAME) || (false == players[client_id]->get_active())) {
@@ -2533,7 +2575,6 @@ void worker()
             lua_pop(L, 1);
             if (m) {
                 // 공격처리
-                cout << "???2" << endl;
                 attack_success(client_id, exp_over->_target, players[client_id]->get_basic_attack_factor());
             }
             else {
@@ -2577,6 +2618,7 @@ void worker()
             break;
         }
         case OP_PLAYER_REVIVE: {
+            cout << "개같이 부활" << endl;
             player_revive(client_id);
             delete exp_over;
             break;
@@ -2664,6 +2706,13 @@ void worker()
             break;
         }
         case OP_BOSS_MOVE: {
+            dungeons[client_id]->state_lock.lock();
+            if (dungeons[client_id]->get_dun_st() != DUN_ST_START) {
+                dungeons[client_id]->state_lock.unlock();
+                break;
+            }
+            dungeons[client_id]->state_lock.unlock();
+
             dungeons[client_id]->boss_move();
             timer_event ev;
             ev.obj_id = client_id;
@@ -2675,16 +2724,35 @@ void worker()
             break;
         }
         case OP_BOSS_ATTACK: {
+            dungeons[client_id]->state_lock.lock();
+            if (dungeons[client_id]->get_dun_st() != DUN_ST_START) {
+                dungeons[client_id]->state_lock.unlock();
+                break;
+            }
+            dungeons[client_id]->state_lock.unlock();
             dungeons[client_id]->boss_attack();
             delete exp_over;
             break;
         }
         case OP_GAIA_PATTERN: {
+            dungeons[client_id]->state_lock.lock();
+            if (dungeons[client_id]->get_dun_st() != DUN_ST_START) {
+                dungeons[client_id]->state_lock.unlock();
+                break;
+            }
+            dungeons[client_id]->state_lock.unlock();
             dungeons[client_id]->pattern_active(exp_over->_target);
             delete exp_over;
             break;
         }
         case OP_PARTNER_MOVE: {
+            players[client_id]->state_lock.lock();
+            if (players[client_id]->get_state() != ST_INDUN) {
+                players[client_id]->state_lock.unlock();
+                break;
+            }
+            players[client_id]->state_lock.unlock();
+
             Partner* pl = reinterpret_cast<Partner*>(players[client_id]);
             pl->partner_move(pl, dungeons[pl->get_indun_id()]);
             Player** pp = dungeons[pl->get_indun_id()]->get_party_palyer();
@@ -2703,19 +2771,25 @@ void worker()
             break;
         }
         case OP_PARTNER_ATTACK: {
+            players[client_id]->state_lock.lock();
+            if (players[client_id]->get_state() != ST_INDUN) {
+                players[client_id]->state_lock.unlock();
+                break;
+            }
+            players[client_id]->state_lock.unlock();
             Partner* pl = reinterpret_cast<Partner*>(players[client_id]);
             pl->partner_attack(pl, dungeons[pl->get_indun_id()]);
-
-            /* timer_event ev;
-            ev.obj_id = client_id;
-            ev.start_time = chrono::system_clock::now() + 10s;
-            ev.ev = EVENT_PARTNER_ATTACK;
-            ev.target_id = -1;
-            timer_queue.push(ev);
-            delete exp_over;*/
+            //dungeons[client_id]->partner_attack(1);
+            delete exp_over;
             break;
         }
         case OP_PARTNER_PATTERN: {
+            players[client_id]->state_lock.lock();
+            if (players[client_id]->get_state() != ST_INDUN) {
+                players[client_id]->state_lock.unlock();
+                break;
+            }
+            players[client_id]->state_lock.unlock();
           //  dungeons[client_id]->pattern_active(exp_over->_target);
             delete exp_over;
             break;
@@ -2727,7 +2801,6 @@ void worker()
             dun->state_lock.lock();
             if (dun->get_dun_st() == DUN_ST_START) {
                 dun->state_lock.unlock();
-                dun->game_start();
                 // 게임이 시작 되었으니 시야처리를 해주자
                 Player** vl_pl;
                 vl_pl = dun->get_party_palyer();
