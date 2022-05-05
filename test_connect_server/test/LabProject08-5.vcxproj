@@ -160,9 +160,9 @@
     <ClInclude Include="..\..\RealServer\Server\protocol.h" />
     <ClInclude Include="Bitmap.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CNet.h" />
     <ClInclude Include="DDSTextureLoader12.h" />
     <ClInclude Include="GameFramework.h" />
-    <ClInclude Include="Network.h" />
     <ClInclude Include="PartyUI.h" />
     <ClInclude Include="Pattern.h" />
     <ClInclude Include="test1.h" />
@@ -180,11 +180,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CNet.cpp" />
     <ClCompile Include="DDSTextureLoader12.cpp" />
     <ClCompile Include="GameFramework.cpp" />
-    <ClCompile Include="Network.cpp" />
     <ClCompile Include="PartyUI.cpp" />
     <ClCompile Include="Pattern.cpp" />
+    <ClCompile Include="send.cpp" />
     <ClCompile Include="test1.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Object.cpp" />

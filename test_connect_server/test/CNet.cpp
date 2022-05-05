@@ -1,95 +1,92 @@
 #include "stdafx.h"
-#include "Network.h"
+#include "CNet.h"
 #include "Player.h"
-
-#include "GameFramework.h"
-
-
-int my_id = 0;
-int m_prev_size = 0;
-vector<string> g_msg;
-JOB my_job = J_DILLER;
-ELEMENT my_element = E_NONE;
-
-wstring my_name = L"";
-wstring my_job_str = L"";
-wstring my_element_str = L"";
-wstring Info_str = L"";
-wstring Combat_str = L"";
-bool Combat_On = false;
-atomic_bool InDungeon = false;
-
-// locale variable
-XMFLOAT3 my_position(-1.0f, 5.0f, -1.0f);
-XMFLOAT3 my_camera(0.0f, 0.0f, 0.0f);
-WSADATA wsa;
-SOCKET sock;
-SOCKADDR_IN serveraddr;
-int retval = 0;
-
-SOCKET g_s_socket;
-
-WSABUF mybuf_recv;
-WSABUF mybuf;
-
-int combat_id = -1;
-int party_id[GAIA_ROOM];
-wstring party_name[GAIA_ROOM];
-CPattern m_gaiaPattern;
-int indun_death_count = 4;
-
-array<CPlayer*, MAX_USER+MAX_NPC> mPlayer;
-array<Party*, (MAX_USER / GAIA_ROOM)> m_party;
-vector<int> party_id_index_vector;
-Party* m_party_info;
-bool party_info_on = false;
-int  robby_cnt = 0;
-bool party_enter = false;
-int party_enter_room_id = -1;
-bool alramUI_ON = false;
-bool PartyInviteUI_ON = false;
-bool InvitationCardUI_On = false;
-bool AddAIUI_On = false;
-bool NoticeUI_On = false;
-bool RaidEnterNotice = false;
-wstring Notice_str = L"";
-chrono::system_clock::time_point InvitationCardTimer = chrono::system_clock::now();
-chrono::system_clock::time_point NoticeTimer = chrono::system_clock::now();
-int InvitationRoomId;
-int InvitationUser;
+#include <thread>
 
 CRITICAL_SECTION cs;
-
-struct EXP_OVER {
-	WSAOVERLAPPED m_wsa_over;
-	WSABUF m_wsa_buf;
-	unsigned char m_net_buf[BUFSIZE];
-	COMP_OP m_comp_op;
-};
-
-EXP_OVER _recv_over;
-
-HANDLE g_h_iocp;	// 나중에 iocp바꿀 시 사용
+CPattern	m_gaiaPattern;
+bool InDungeon = false;
+bool PartyInviteUI_On = false;
+bool hit_check = false;
+int effect_x = 0;
+int effect_y = 0;
+int effect_z = 0;
 
 
-bool g_client_shutdown = false;
-
-
-void err_display(int err_no)
+CNet::CNet()
 {
-	WCHAR* lpMsgBuf;
-	FormatMessage(
-		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-		NULL, err_no,
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		(LPTSTR)&lpMsgBuf, 0, 0);
-	wcout << lpMsgBuf << endl;
-
-	//while (true);
-	LocalFree(lpMsgBuf);
+	// network연결
+	netInit();
 }
 
-void err_quit(const char* msg)
+CNet::~CNet()
+{
+
+}
+
+int CNet::netInit()
+{
+	const char* SERVERIP;
+	char tempIP[16];
+	SERVERIP = "127.0.0.1";
+
+	// 윈속 초기화
+	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+		err_quit("Window Socket Initailze failed(Close Program)");
+
+	// socket()
+	sock = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
+	if (sock == INVALID_SOCKET) err_quit("socket()");
+
+	// connect()
+	SOCKADDR_IN server_addr;
+	ZeroMemory(&server_addr, sizeof(server_addr));
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_port = htons(SERVER_PORT);
+	inet_pton(AF_INET, SERVERIP, &server_addr.sin_addr);
+	int ret = connect(sock, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
+	int err_num = WSAGetLastError();
+	if (ret == SOCKET_ERROR) {
+		int err_num = WSAGetLastError();
+		if (WSA_IO_PENDING != err_num) {
+			std::cout << " EROOR : Connect " << std::endl;
+			err_quit("connect()");
+		}
+	}
+	ZeroMemory(&_recv_over, sizeof(_recv_over));
+	_recv_over.m_comp_op = OP_RECV;
+
+	g_h_iocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, NULL, 0);
+	CreateIoCompletionPort(reinterpret_cast<HANDLE>(sock), g_h_iocp, 0, 0);
+
+	for (int i = 0; i < (MAX_USER / GAIA_ROOM); i++) {
+		m_party[i] = new Party(i);
+	}
+
+	char pl_id[MAX_NAME_SIZE];
+	char pl_name[MAX_NAME_SIZE];
+	std::cout << "ID를 입력하세요 : ";
+	std::cin >> pl_id;
+	std::cout << "이름을 입력하세요 : ";
+	std::cin >> pl_name;
+	send_login_packet(pl_id, pl_name);
+
+	do_recv();
+
+	return 0;
+}
+
+int CNet::netclose()
+{
+	// close socket()
+	closesocket(sock);
+
+	// 윈속종료
+	WSACleanup();
+	return 0;
+}
+
+void CNet::err_quit(const char* msg)
 {
 	LPVOID lpMsgBuf;
 
@@ -107,182 +104,21 @@ void err_quit(const char* msg)
 	exit(1);
 }
 
-void send_login_packet(char* id, char* name)
+void CNet::err_display(int err_no)
 {
-	cs_packet_login packet;
-	packet.size = sizeof(packet);
-	packet.type = CS_PACKET_LOGIN;
-	strcpy_s(packet.id, id);
-	strcpy_s(packet.name, name);
-	do_send(sizeof(packet), &packet);
+	WCHAR* lpMsgBuf;
+	FormatMessage(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+		NULL, err_no,
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		(LPTSTR)&lpMsgBuf, 0, 0);
+	std::wcout << lpMsgBuf << std::endl;
+
+	//while (true);
+	LocalFree(lpMsgBuf);
 }
 
-void send_attack_packet(int skill)
-{
-	cs_packet_attack packet;
-	packet.size = sizeof(packet);
-	packet.type = CS_PACKET_ATTACK;
-	//packet.skill = (char)skill;
-	do_send(sizeof(packet), &packet);
-}
-
-void send_move_packet(XMFLOAT3 position)
-{
-	cs_packet_move packet;
-	packet.size = sizeof(packet);
-	packet.type = CS_PACKET_MOVE;
-	//packet.direction = (char)direction;
-	packet.x = position.x;
-	packet.y = position.y;
-	packet.z = position.z;
-	do_send(sizeof(packet), &packet);
-}
-
-void send_look_packet(XMFLOAT3 look, XMFLOAT3 right)
-{
-	cs_packet_look packet;
-	packet.size = sizeof(packet);
-	packet.type = CS_PACKET_LOOK;
-	packet.x = look.x;
-	packet.y = look.y;
-	packet.z = look.z;
-	packet.right_x = right.x;
-	packet.right_y = right.y;
-	packet.right_z = right.z;
-	do_send(sizeof(packet), &packet);
-}
-
-void send_skill_packet(int sk_t, int sk_n)
-{
-	cs_packet_skill packet;
-	packet.size = sizeof(packet);
-	packet.type = CS_PACKET_SKILL;
-
-	packet.skill_type = sk_t;
-	packet.skill_num = sk_n;
-	do_send(sizeof(packet), &packet);
-}
-
-void send_picking_skill_packet(int sk_t, int sk_n, int target)
-{
-	cs_packet_picking_skill packet;
-	packet.size = sizeof(packet);
-	packet.type = CS_PACKET_PICKING_SKILL;
-	packet.target = target;
-	packet.skill_type = sk_t;
-	packet.skill_num = sk_n;
-	do_send(sizeof(packet), &packet);
-
-}
-void send_change_job_packet(JOB my_job)
-{
-	cs_packet_change_job packet;
-	packet.size = sizeof(packet);
-	packet.type = CS_PACKET_CHANGE_JOB;
-	packet.job = my_job;
-	do_send(sizeof(packet), &packet);
-
-}
-void send_change_element_packet(ELEMENT my_element)
-{
-	cs_packet_change_element packet;
-	packet.size = sizeof(packet);
-	packet.type = CS_PACKET_CHANGE_ELEMENT;
-	packet.element = my_element;
-	do_send(sizeof(packet), &packet);
-
-}
-void send_chat_packet(const char* send_str)
-{
-	cs_packet_chat packet;
-	packet.size = sizeof(packet);
-	packet.type = CS_PACKET_CHAT;
-	strcpy_s(packet.message, send_str);
-	do_send(sizeof(packet), &packet);
-}
-
-void send_party_room_packet()
-{
-	cs_packet_party_room packet;
-	packet.size = sizeof(packet);
-	packet.type = CS_PACKET_PARTY_ROOM;
-	do_send(sizeof(packet), &packet);
-}
-
-void send_raid_rander_ok_packet()
-{
-	cs_packet_raid_rander_ok packet;
-	packet.size = sizeof(packet);
-	packet.type = CS_PACKET_RAID_RANDER_OK;
-	do_send(sizeof(packet), &packet);
-}
-
-void send_party_room_make()
-{
-	cs_packet_party_room_make packet;
-	packet.size = sizeof(packet);
-	packet.type = CS_PACKET_PARTY_ROOM_MAKE;
-	do_send(sizeof(packet), &packet);
-}
-
-void send_party_room_info_request(int r_id)
-{
-	cs_packet_party_room_info_request packet;
-	packet.size = sizeof(packet);
-	packet.type = CS_PACKET_PARTY_ROOM_INFO_REQUEST;
-	packet.room_id = m_party[r_id]->get_party_id();
-	do_send(sizeof(packet), &packet);
-}
-
-void send_party_room_enter_request()
-{
-	cs_packet_party_room_enter_request packet;
-	packet.size = sizeof(packet);
-	packet.type = CS_PACKET_PARTY_ROOM_ENTER_REQUEST;
-	packet.room_id = m_party_info->get_party_id();
-	do_send(sizeof(packet), &packet);
-}
-
-void send_party_room_quit_request()
-{
-	cs_packet_party_room_quit_request packet;
-	packet.size = sizeof(packet);
-	packet.type = CS_PACKET_PARTY_ROOM_QUIT_REQUEST;
-	packet.room_id = party_enter_room_id;
-	do_send(sizeof(packet), &packet);
-}
-
-void send_party_invite(char* user)
-{
-	cs_packet_party_invite packet;
-	packet.size = sizeof(packet);
-	packet.type = CS_PACKET_PARTY_INVITE;
-	packet.room_id = party_enter_room_id;
-	strcpy_s(packet.user_name, user);
-	do_send(sizeof(packet), &packet);
-}
-void send_party_add_partner(JOB j)
-{
-	cs_packet_party_add_partner packet;
-	packet.size = sizeof(packet);
-	packet.type = CS_PACKET_PARTY_ADD_PARTNER;
-	packet.room_id = party_enter_room_id;
-	packet.job = j;
-	do_send(sizeof(packet), &packet);
-}
-
-void send_party_invitation_reply(int accept)
-{
-	cs_packet_party_invitation_reply packet;
-	packet.size = sizeof(packet);
-	packet.type = CS_PACKET_PARTY_INVITATION_REPLY;
-	packet.room_id = InvitationRoomId;
-	packet.invite_user_id = InvitationUser;
-	packet.accept = accept;
-	do_send(sizeof(packet), &packet);
-}
-
-void do_send(int num_bytes, void* mess)
+void CNet::do_send(int num_bytes, void* mess)
 {
 	EXP_OVER* ex_over = new EXP_OVER;
 	ex_over->m_comp_op = OP_SEND;
@@ -291,7 +127,7 @@ void do_send(int num_bytes, void* mess)
 	ex_over->m_wsa_buf.len = num_bytes;
 	memcpy(ex_over->m_net_buf, mess, num_bytes);
 
-	int ret = WSASend(g_s_socket, &ex_over->m_wsa_buf, 1, 0, 0, &ex_over->m_wsa_over, NULL);
+	int ret = WSASend(sock, &ex_over->m_wsa_buf, 1, 0, 0, &ex_over->m_wsa_over, NULL);
 	if (SOCKET_ERROR == ret) {
 		int error_num = WSAGetLastError();
 		if (ERROR_IO_PENDING != error_num) {
@@ -301,20 +137,20 @@ void do_send(int num_bytes, void* mess)
 				NULL, error_num,
 				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 				(LPTSTR)&lpMsgBuf, 0, 0);
-			wcout << lpMsgBuf << endl;
+			std::wcout << lpMsgBuf << std::endl;
 			LocalFree(lpMsgBuf);
 		}
 	}
 }
 
-void do_recv()
+void CNet::do_recv()
 {
 	DWORD recv_flag = 0;
 	ZeroMemory(&_recv_over.m_wsa_over, sizeof(_recv_over.m_wsa_over));
 	_recv_over.m_wsa_buf.buf = reinterpret_cast<char*>(_recv_over.m_net_buf + m_prev_size);
 	_recv_over.m_wsa_buf.len = sizeof(_recv_over.m_net_buf) - m_prev_size;
-	int ret = WSARecv(g_s_socket, &_recv_over.m_wsa_buf, 1, 0, &recv_flag, &_recv_over.m_wsa_over, NULL);
-	
+	int ret = WSARecv(sock, &_recv_over.m_wsa_buf, 1, 0, &recv_flag, &_recv_over.m_wsa_over, NULL);
+
 	if (SOCKET_ERROR == ret) {
 		int error_num = WSAGetLastError();
 		if (ERROR_IO_PENDING != error_num) {
@@ -324,42 +160,58 @@ void do_recv()
 				NULL, error_num,
 				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 				(LPTSTR)&lpMsgBuf, 0, 0);
-			wcout << lpMsgBuf << endl;
+			std::wcout << lpMsgBuf << std::endl;
 			//while (true);
 			LocalFree(lpMsgBuf);
 		}
 	}
 }
 
-void process_packet(unsigned char* p) 
+void CNet::GameobjectSynchronize(CGameObject** obj, int m_nobjects)
 {
+	std::cout << "sex" << std::endl;
+	for (int i = 0; i < MAX_USER + MAX_NPC; i++) {
+		m_pPlayer[i] = reinterpret_cast<CPlayer*>(obj[m_nobjects - MAX_NPC - MAX_USER +i]);
+	}
+}
 
+void CNet::MyplayerSynchronize(CPlayer* pl)
+{
+	while (1) {
+		if (my_id != -1) {
+			std::cout << my_id << std::endl;
+			m_pPlayer[my_id] = pl;
+			break;
+		}
+	}
+}
+
+void CNet::process_packet(unsigned char* p)
+{
 	int type = *(p + 1);
 	switch (type) {
 	case SC_PACKET_LOGIN_OK: {
 		// 플레이어의 모든 정보를 보내주자
-		cout << "로그인 성공" << endl;
+		std::cout << "로그인 성공" << std::endl;
 		sc_packet_login_ok* packet = reinterpret_cast<sc_packet_login_ok*>(p);
 		my_id = packet->id;
-		my_position.x = packet->x;
-		my_position.y = packet->y;
-		my_position.z = packet->z;
-		mPlayer[my_id]->m_lv = packet->level;
-		strcpy_s(mPlayer[my_id]->m_name, MAX_NAME_SIZE, packet->name);
-		mPlayer[my_id]->m_hp = packet->hp;
-		mPlayer[my_id]->m_max_hp = packet->maxhp;
-		mPlayer[my_id]->m_mp = packet->mp;
-		mPlayer[my_id]->m_max_mp = packet->maxmp;
-		mPlayer[my_id]->m_exp = packet->exp;
-		mPlayer[my_id]->m_tribe = static_cast<TRIBE>(packet->tribe);
+		m_pPlayer[my_id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
+		m_pPlayer[my_id]->m_lv = packet->level;
+		strcpy_s(m_pPlayer[my_id]->m_name, MAX_NAME_SIZE, packet->name);
+		m_pPlayer[my_id]->m_hp = packet->hp;
+		m_pPlayer[my_id]->m_max_hp = packet->maxhp;
+		m_pPlayer[my_id]->m_mp = packet->mp;
+		m_pPlayer[my_id]->m_max_mp = packet->maxmp;
+		m_pPlayer[my_id]->m_exp = packet->exp;
+		m_pPlayer[my_id]->m_tribe = static_cast<TRIBE>(packet->tribe);
 		my_element = packet->element;
 		my_job = packet->job;
-		
+
 
 		wchar_t* temp;;
-		int len = 1 + strlen(mPlayer[my_id]->m_name);
+		int len = 1 + strlen(m_pPlayer[my_id]->m_name);
 		temp = new TCHAR[len];
-		mbstowcs(temp, mPlayer[my_id]->m_name, len);
+		mbstowcs(temp, m_pPlayer[my_id]->m_name, len);
 		my_name.append(temp);
 		delete temp;
 
@@ -381,7 +233,7 @@ void process_packet(unsigned char* p)
 		}
 
 		Info_str.append(L"Lv : ");
-		Info_str.append(to_wstring(packet->level));
+		Info_str.append(std::to_wstring(packet->level));
 		Info_str.append(L"  이름 : ");
 		Info_str.append(my_name);
 		Info_str.append(L"\n직업 : ");
@@ -393,47 +245,39 @@ void process_packet(unsigned char* p)
 	}
 	case SC_PACKET_MOVE: {
 		sc_packet_move* packet = reinterpret_cast<sc_packet_move*>(p);
-
-		if (packet->id == my_id) {
-			my_position.x = packet->x;
-			my_position.y = packet->y;
-			my_position.z = packet->z;
-		}
-		else {
-			mPlayer[packet->id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
-			//mPlayer[packet->id]->vCenter = XMFLOAT3(packet->x, packet->y, packet->z);
-		}
+		m_pPlayer[packet->id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
 		break;
 	}
 	case SC_PACKET_PUT_OBJECT: {
 		sc_packet_put_object* packet = reinterpret_cast<sc_packet_put_object*> (p);
 		int p_id = packet->id;
+		std::cout << "P_id : " << p_id << std::endl;
 		if (static_cast<TRIBE>(packet->object_type) != OBSTACLE) {
 			/*if (static_cast<TRIBE>(packet->object_type) == BOSS) {
 				p_id += 100;
 			}*/
 
-			mPlayer[p_id]->SetUse(true);
-			mPlayer[p_id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
+			m_pPlayer[p_id]->SetUse(true);
+			m_pPlayer[p_id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
 			//mPlayer[p_id]->vCenter = XMFLOAT3(packet->x, packet->y, packet->z);
-			mPlayer[p_id]->SetLook(XMFLOAT3(packet->look_x, packet->look_y, packet->look_z));
-			mPlayer[p_id]->m_lv = packet->level;
-			mPlayer[p_id]->m_hp = packet->hp;
-			mPlayer[p_id]->m_max_hp = packet->maxhp;
-			mPlayer[p_id]->m_mp = packet->mp;
-			mPlayer[p_id]->m_max_mp = packet->maxmp;
-			mPlayer[p_id]->m_element = packet->element;
+			m_pPlayer[p_id]->SetLook(XMFLOAT3(packet->look_x, packet->look_y, packet->look_z));
+			m_pPlayer[p_id]->m_lv = packet->level;
+			m_pPlayer[p_id]->m_hp = packet->hp;
+			m_pPlayer[p_id]->m_max_hp = packet->maxhp;
+			m_pPlayer[p_id]->m_mp = packet->mp;
+			m_pPlayer[p_id]->m_max_mp = packet->maxmp;
+			m_pPlayer[p_id]->m_element = packet->element;
 
-			mPlayer[p_id]->m_tribe = static_cast<TRIBE>(packet->object_type);
-			strcpy_s(mPlayer[p_id]->m_name, packet->name);
-			mPlayer[p_id]->m_spices = packet->object_class;
+			m_pPlayer[p_id]->m_tribe = static_cast<TRIBE>(packet->object_type);
+			strcpy_s(m_pPlayer[p_id]->m_name, packet->name);
+			m_pPlayer[p_id]->m_spices = packet->object_class;
 		}
 		break;
 	}
 	case SC_PACKET_REMOVE_OBJECT: {
 		sc_packet_remove_object* packet = reinterpret_cast<sc_packet_remove_object*>(p);
 		int p_id = packet->id;
-		if (static_cast<TRIBE>(packet->object_type) != OBSTACLE) mPlayer[p_id]->SetUse(false);
+		if (static_cast<TRIBE>(packet->object_type) != OBSTACLE) m_pPlayer[p_id]->SetUse(false);
 		if (p_id == combat_id) {
 			combat_id = -1;
 			Combat_On = false;
@@ -443,29 +287,29 @@ void process_packet(unsigned char* p)
 	}
 	case SC_PACKET_CHAT: {
 		sc_packet_chat* packet = reinterpret_cast<sc_packet_chat*>(p);
-		string msg = "";
+		std::string msg = "";
 		msg += packet->message;
-		
+
 		if (g_msg.size() >= 5) g_msg.erase(g_msg.begin());
-	
+
 		g_msg.push_back(msg);
 
 		break;
 	}
 	case SC_PACKET_LOGIN_FAIL: {
-		cout << "로그인 실패(3초후 꺼집니다)" << endl;
+		std::cout << "로그인 실패(3초후 꺼집니다)" << std::endl;
 		Sleep(3000);
 		exit(0);
 		break;
 	}
 	case SC_PACKET_STATUS_CHANGE: {
 		sc_packet_status_change* packet = reinterpret_cast<sc_packet_status_change*>(p);
-		mPlayer[packet->id]->m_lv = packet->level;
-		mPlayer[my_id]->m_hp = packet->hp;
-		mPlayer[my_id]->m_mp = packet->mp;
-		mPlayer[my_id]->m_max_hp = packet->maxhp;
-		mPlayer[my_id]->m_max_mp = packet->maxmp;
-		mPlayer[my_id]->m_exp = packet->exp;
+		m_pPlayer[packet->id]->m_lv = packet->level;
+		m_pPlayer[my_id]->m_hp = packet->hp;
+		m_pPlayer[my_id]->m_mp = packet->mp;
+		m_pPlayer[my_id]->m_max_hp = packet->maxhp;
+		m_pPlayer[my_id]->m_max_mp = packet->maxmp;
+		m_pPlayer[my_id]->m_exp = packet->exp;
 		my_element = packet->element;
 		my_job = packet->job;
 
@@ -488,7 +332,7 @@ void process_packet(unsigned char* p)
 		}
 
 		Info_str.append(L"Lv : ");
-		Info_str.append(to_wstring(packet->level));
+		Info_str.append(std::to_wstring(packet->level));
 		Info_str.append(L"  이름 : ");
 		Info_str.append(my_name);
 		Info_str.append(L"\n직업 : ");
@@ -499,14 +343,13 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_DEAD: {
-		
 		sc_packet_dead* packet = reinterpret_cast<sc_packet_dead*> (p);
-		mPlayer[my_id]->SetUse(false);
+		m_pPlayer[my_id]->SetUse(false);
 		combat_id = -1;
 		Combat_On = false;
-		cout << "died" << endl;
+		std::cout << "died" << std::endl;
 		break;
-		
+
 	}
 	case SC_PACKET_REVIVE: {
 		// 아직 미구현
@@ -515,12 +358,12 @@ void process_packet(unsigned char* p)
 	case SC_PACKET_LOOK: {
 		sc_packet_look* packet = reinterpret_cast<sc_packet_look*>(p);
 		XMFLOAT3 xmf3Look(packet->x, packet->y, packet->z);
-		mPlayer[packet->id]->SetLook(xmf3Look);
+		m_pPlayer[packet->id]->SetLook(xmf3Look);
 		break;
 	}
 	case SC_PACKET_CHANGE_HP: {
 		sc_packet_change_hp* packet = reinterpret_cast<sc_packet_change_hp*>(p);
-		mPlayer[packet->id]->m_hp = packet->hp;
+		m_pPlayer[packet->id]->m_hp = packet->hp;
 		break;
 	}
 	case SC_PACKET_COMBAT_ID: {
@@ -532,17 +375,17 @@ void process_packet(unsigned char* p)
 
 			Combat_str = L"";
 			Combat_str.append(L"LV.");
-			Combat_str.append(to_wstring(mPlayer[combat_id]->m_lv));
+			Combat_str.append(std::to_wstring(m_pPlayer[combat_id]->m_lv));
 			Combat_str.append(L"  ");
 			wchar_t* temp;;
-			int len = 1 + strlen(mPlayer[combat_id]->m_name);
+			int len = 1 + strlen(m_pPlayer[combat_id]->m_name);
 			temp = new TCHAR[len];
-			mbstowcs(temp, mPlayer[combat_id]->m_name, len);
+			mbstowcs(temp, m_pPlayer[combat_id]->m_name, len);
 			Combat_str.append(temp);
 			delete temp;
 
 			Combat_str.append(L"\n속성 : ");
-			switch (mPlayer[combat_id]->m_element) {
+			switch (m_pPlayer[combat_id]->m_element) {
 			case E_NONE: my_element_str = Combat_str.append(L"무속성"); break;
 			case E_WATER: my_element_str = Combat_str.append(L"물"); break;
 			case E_FULLMETAL: my_element_str = Combat_str.append(L"강철"); break;
@@ -558,7 +401,7 @@ void process_packet(unsigned char* p)
 	}
 	case SC_PACKET_PLAY_SHOOT: {
 		sc_packet_play_shoot* packet = reinterpret_cast<sc_packet_play_shoot*>(p);
-		shoot = true;	
+		shoot = true;
 		hit_check = false;
 		break;
 	}
@@ -568,29 +411,29 @@ void process_packet(unsigned char* p)
 		effect_x = packet->x;
 		effect_y = packet->y;
 		effect_z = packet->z;
-		cout << effect_x << endl;
-		cout << effect_y << endl;
-		cout << effect_z << endl;
+		std::cout << effect_x << std::endl;
+		std::cout << effect_y << std::endl;
+		std::cout << effect_z << std::endl;
 		break;
 	}
 	case SC_PACKET_START_GAIA: {
 		EnterCriticalSection(&cs);
 		PartyUI_On = false;
 		party_info_on = false;
-		PartyInviteUI_ON = false;
+		PartyInviteUI_On = false;
 		InvitationCardUI_On = false;
 
 		sc_packet_start_gaia* packet = reinterpret_cast<sc_packet_start_gaia*>(p);
-		cout << "인던으로 입장해야됨" << endl;
+		std::cout << "인던으로 입장해야됨" << std::endl;
 		combat_id = 101;
 		InDungeon = true;
 		for (int i = 0; i < GAIA_ROOM; i++) {
 			party_id[i] = packet->party_id[i];
-			cout << party_id[i] << " : " << mPlayer[party_id[i]]->m_name << endl;
+			std::cout << party_id[i] << " : " << m_pPlayer[party_id[i]]->m_name << std::endl;
 			wchar_t* temp;
-			int len = 1 + strlen(mPlayer[party_id[i]]->m_name);
+			int len = 1 + strlen(m_pPlayer[party_id[i]]->m_name);
 			temp = new TCHAR[len];
-			mbstowcs(temp, mPlayer[party_id[i]]->m_name, len);
+			mbstowcs(temp, m_pPlayer[party_id[i]]->m_name, len);
 			party_name[i] = L"";
 			party_name[i].append(temp);
 		}
@@ -632,11 +475,14 @@ void process_packet(unsigned char* p)
 		sc_packet_gaia_pattern_five* packet = reinterpret_cast<sc_packet_gaia_pattern_five*>(p);
 		m_gaiaPattern.pattern_on[4] = true;
 		m_gaiaPattern.pattern_five = XMFLOAT3(packet->point_x, 5, packet->point_z);
-		m_gaiaPattern.pattern_five_look = XMFLOAT3(mPlayer[101]->GetLook());
+		m_gaiaPattern.pattern_five_look = XMFLOAT3(m_pPlayer[101]->GetLook());
 		break;
 	}
 	case SC_PACKET_CHANGE_DEATH_COUNT: {
 		indun_death_count = reinterpret_cast<sc_packet_change_death_count*>(p)->death_count;
+		party_info_str = L"파티원정보(DC : ";
+		party_info_str.append(std::to_wstring(indun_death_count));
+		party_info_str.append(L")");
 		break;
 	}
 	case SC_PACKET_GAIA_JOIN_OK: {
@@ -661,7 +507,7 @@ void process_packet(unsigned char* p)
 		default:
 			break;
 		}
-	
+
 
 		break;
 	}
@@ -711,11 +557,11 @@ void process_packet(unsigned char* p)
 	}
 	case SC_PACKET_PARTY_ROOM_ENTER_FAILED: {
 		int f_reason = (int)reinterpret_cast<sc_packet_party_room_enter_failed*>(p)->failed_reason;
-		string msg = "";
+		std::string msg = "";
 		switch (f_reason)
 		{
 		case 0:
-			msg  = "인원이 꽉차 방에 입장할 수 없습니다";
+			msg = "인원이 꽉차 방에 입장할 수 없습니다";
 			break;
 		case 1:
 			msg = "존재하지 않는 방이므로 입장할 수 없습니다";
@@ -726,7 +572,7 @@ void process_packet(unsigned char* p)
 		default:
 			break;
 		}
-		if (g_msg.size() >= 5 && (f_reason>=0 && f_reason<=2)) g_msg.erase(g_msg.begin());
+		if (g_msg.size() >= 5 && (f_reason >= 0 && f_reason <= 2)) g_msg.erase(g_msg.begin());
 		g_msg.push_back(msg);
 
 		party_enter = false;
@@ -743,13 +589,25 @@ void process_packet(unsigned char* p)
 		InvitationUser = reinterpret_cast<sc_packet_party_invitation*>(p)->invite_user_id;
 
 		InvitationCardUI_On = true;
-		InvitationCardTimer = chrono::system_clock::now() + 10s;
+
+		InvitationCard_str = L"";
+		wchar_t* temp;
+		int len = 1 + strlen(m_pPlayer[InvitationUser]->m_name);
+		temp = new TCHAR[len];
+		mbstowcs(temp, m_pPlayer[InvitationUser]->m_name, len);
+		InvitationCard_str.append(temp);
+		InvitationCard_str.append(L"가 ");
+		InvitationCard_str.append(std::to_wstring(InvitationRoomId));
+		InvitationCard_str.append(L"번 방에 초대하였습니다");
+
+		InvitationCardTimer = std::chrono::system_clock::now() + std::chrono::seconds(10);
+		delete temp;
 		LeaveCriticalSection(&cs);
 		break;
 	}
 	case SC_PACKET_PARTY_INVITATION_FAILED: {
 		int f_reason = (int)reinterpret_cast<sc_packet_party_invitation_failed*>(p)->failed_reason;
-		string msg = "";
+		std::string msg = "";
 		switch (f_reason)
 		{
 		case 0:
@@ -780,7 +638,7 @@ void process_packet(unsigned char* p)
 		if (find(party_id_index_vector.begin(), party_id_index_vector.end(), (int)reinterpret_cast<sc_packet_party_room_destroy*>(p)->room_id)
 			!= party_id_index_vector.end()) {
 			int in = find(party_id_index_vector.begin(), party_id_index_vector.end(), (int)reinterpret_cast<sc_packet_party_room_destroy*>(p)->room_id) - party_id_index_vector.begin(); // index 확인
-			party_id_index_vector.erase(party_id_index_vector.begin()+in);
+			party_id_index_vector.erase(party_id_index_vector.begin() + in);
 		}
 		break;
 	}
@@ -791,7 +649,7 @@ void process_packet(unsigned char* p)
 		if ((int)packet->raid_enter == 0) {
 			RaidEnterNotice = true;
 		}
-		NoticeTimer = chrono::system_clock::now() + 5s;
+		NoticeTimer = std::chrono::system_clock::now() + std::chrono::seconds(5);
 
 		wchar_t* temp;
 		int len = 1 + strlen(packet->message);
@@ -803,13 +661,13 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	default:
-		cout << "잘못된 패킷 type : " << type << endl;
-		cout << "Process packet 오류" << endl;
+		std::cout << "잘못된 패킷 type : " << type << std::endl;
+		std::cout << "Process packet 오류" << std::endl;
 		break;
 	}
 }
 
-void worker()
+void CNet::worker()
 {
 	for (;;) {
 		DWORD num_byte;
@@ -866,147 +724,99 @@ void worker()
 	}
 }
 
-int netInit()
+
+//===============================================================================================
+
+
+void CNet::check_timer()
 {
-	const char* SERVERIP;
-	char tempIP[16];
-	SERVERIP = "127.0.0.1";
-
-	// 윈속 초기화
-	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
-		return 1;
-
-	// socket()
-	g_s_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
-	if (g_s_socket == INVALID_SOCKET) err_quit("socket()");
-
-	// connect()
-	SOCKADDR_IN server_addr;
-	ZeroMemory(&server_addr, sizeof(server_addr));
-	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(SERVER_PORT);
-	inet_pton(AF_INET, SERVERIP, &server_addr.sin_addr);
-	int ret = connect(g_s_socket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
-	int err_num = WSAGetLastError();
-	if (ret == SOCKET_ERROR) {
-		int err_num = WSAGetLastError();
-		if (WSA_IO_PENDING != err_num) {
-			cout << " EROOR : Connect " << endl;
-			err_quit("connect()");
+	if (InvitationCardUI_On) {
+		if (std::chrono::system_clock::now() > InvitationCardTimer) {
+			InvitationCardUI_On = false;
+			// 초대 거절 패킷 보내기
+			send_party_invitation_reply(0);
 		}
 	}
-	ZeroMemory(&_recv_over, sizeof(_recv_over));
-	_recv_over.m_comp_op = OP_RECV;
 
-    g_h_iocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, NULL, 0);
-    CreateIoCompletionPort(reinterpret_cast<HANDLE>(g_s_socket), g_h_iocp, 0, 0);
-
-	for (auto& pl : mPlayer) {
-		pl = new CPlayer();
+	if (NoticeUI_On) {
+		if (NoticeTimer < std::chrono::system_clock::now()) {
+			NoticeUI_On = false;
+			RaidEnterNotice = false;
+		}
+		else {
+			if (RaidEnterNotice) {
+				auto t = NoticeTimer - std::chrono::system_clock::now();
+				if (t >= std::chrono::seconds(4) && t < std::chrono::seconds(5)) Notice_str = L"4초후에 게임을 시작합니다";
+				else if (t >= std::chrono::seconds(3) && t < std::chrono::seconds(4)) Notice_str = L"3초후에 게임을 시작합니다";
+				else if (t >= std::chrono::seconds(2) && t < std::chrono::seconds(3)) Notice_str = L"2초후에 게임을 시작합니다";
+				else if (t >= std::chrono::seconds(1) && t < std::chrono::seconds(2)) Notice_str = L"1초후에 게임을 시작합니다";
+			}
+		}
 	}
-	
-	for (int i = 0; i < (MAX_USER / GAIA_ROOM); i++) {
-		m_party[i] = new Party(i);
-	}
-
-	char pl_id[MAX_NAME_SIZE];
-	char pl_name[MAX_NAME_SIZE];
-	cout << "ID를 입력하세요 : ";
-	cin >> pl_id;
-	cout << "이름을 입력하세요 : ";
-	cin >> pl_name;
-	send_login_packet(pl_id, pl_name);
-
-	do_recv();
 }
 
-int netclose()
+void CNet::StartWorkerThread()
 {
-	// close socket()
-	closesocket(sock);
-
-	// 윈속종료
-	WSACleanup();
-	return 0;
+	std::thread hThread{ &CNet::worker, this };
+	hThread.detach();
 }
 
-XMFLOAT3 return_myPosition() {
-	//cout << "position : " << my_position.x << ", " << my_position.y << ", " << my_position.z << endl;
-	return my_position;
-}
+//----------------------------------------------------------------------------------------------
 
-void get_basic_information(CPlayer* m_otherPlayer, int id)
+
+int CNet::get_my_id()
 {
-	//m_otherPlayer->m_name = ;
-	m_otherPlayer->m_hp = mPlayer[id]->m_hp;
-	m_otherPlayer->m_max_hp = mPlayer[id]->m_max_hp;
-	m_otherPlayer->m_mp = mPlayer[id]->m_mp;
-	m_otherPlayer->m_max_mp = mPlayer[id]->m_max_mp;
-	m_otherPlayer->m_lv = mPlayer[id]->m_lv;
-	m_otherPlayer->m_tribe = mPlayer[id]->m_tribe;
-	m_otherPlayer->m_spices = mPlayer[id]->m_spices;
-	m_otherPlayer->m_element = mPlayer[id]->m_element;
+	return my_id;
 }
 
-void get_player_information(CPlayer* m_otherPlayer, int id)
+JOB CNet::get_my_job()
 {
-	m_otherPlayer->m_mp = mPlayer[id]->m_mp;
-	m_otherPlayer->m_max_mp = mPlayer[id]->m_max_mp;
-	m_otherPlayer->m_physical_attack = mPlayer[id]->m_physical_attack;
-	m_otherPlayer->m_physical_defence = mPlayer[id]->m_physical_defence;
-	m_otherPlayer->m_magical_attack = mPlayer[id]->m_magical_attack;
-	m_otherPlayer->m_magical_defence = mPlayer[id]->m_magical_defence;
-	m_otherPlayer->m_basic_attack_factor = mPlayer[id]->m_basic_attack_factor;
-	m_otherPlayer->m_defence_factor = mPlayer[id]->m_defence_factor;
-	m_otherPlayer->m_move_speed = mPlayer[id]->m_move_speed;
-	m_otherPlayer->m_attack_speed = mPlayer[id]->m_attack_speed;
-	m_otherPlayer->m_exp = mPlayer[id]->m_exp;
+	return my_job;
 }
 
-XMFLOAT3 return_myCamera() {
-	return my_camera;
-}
-
-bool get_use_to_server(int id)
+ELEMENT CNet::get_my_element()
 {
-	return mPlayer[id]->GetUse();
+	return my_element;
 }
 
-XMFLOAT3 get_position_to_server(int id)
+int CNet::get_my_hp()
 {
-	return mPlayer[id]->GetPosition();
+	return m_pPlayer[my_id]->m_hp;
 }
 
-XMFLOAT3 get_look_to_server(int id)
+int CNet::get_my_max_hp()
 {
-	return mPlayer[id]->GetLookVector();
+	return m_pPlayer[my_id]->m_max_hp;
 }
 
-int get_hp_to_server(int id)
+int CNet::get_combat_hp()
 {
-	return mPlayer[id]->m_hp;
+	return m_pPlayer[combat_id]->m_hp;
 }
 
-int get_max_hp_to_server(int id)
+int CNet::get_combat_max_hp()
 {
-	return mPlayer[id]->m_max_hp;
+	return m_pPlayer[combat_id]->m_max_hp;
 }
 
-float get_combat_id_hp()
+Party* CNet::get_party_info()
 {
-	return mPlayer[combat_id]->m_hp;
+	return m_party_info;
 }
 
-float get_combat_id_max_hp()
+int CNet::get_id_hp(int id)
 {
-	return mPlayer[combat_id]->m_max_hp;
+	return m_pPlayer[id]->m_hp;
 }
 
-wchar_t* get_user_name_to_server(int id)
+int CNet::get_id_max_hp(int id)
 {
-	WCHAR* temp;
-	int len = 1 + strlen(mPlayer[id]->m_name);
-	temp = new TCHAR[len];
-	mbstowcs(temp, mPlayer[id]->m_name, len);
-	return temp;
+	return m_pPlayer[id]->m_max_hp;
 }
+
+char* CNet::get_party_name(int id)
+{
+	return m_party[id]->get_room_name();
+}
+
+//===============================================================================================

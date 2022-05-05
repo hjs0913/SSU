@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "Mesh.h"
-#include "Network.h"
+#include "CNet.h"
 #include <fstream>
 
 CMesh::CMesh(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)

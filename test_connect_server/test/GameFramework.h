@@ -7,22 +7,15 @@
 //#include "Timer.h"
 #include "Player.h"
 #include "Scene.h"
-#include "Network.h"
+#include "CNet.h"
 
-extern bool shoot;
 extern  XMFLOAT3 hp_pos;
 extern XMFLOAT3 POS_PLAYER; 
 
-extern wstring Chatting_Str;
-extern wstring Invite_Str;
+extern std::wstring Chatting_Str;
+extern std::wstring Invite_Str;
 extern bool Chatting_On;
 extern bool Mouse_On;
-
-
-extern int effect_x;
-extern int effect_y;
-extern int effect_z;
-extern bool hit_check;
 
 extern int nnn;
 
@@ -94,6 +87,9 @@ public:
 	void Create_OpenWorld_Object();
 	void Create_InDungeon_Object();
 
+	void GameobjectConnectNetwork();
+	void RaidRenderComplete();
+
 private:
 	/////////////////
 	/////////////////
@@ -152,6 +148,8 @@ private:
 
 	UILayer						** m_ppUILayer = NULL;	
 	
+	CNet						network;
+
 };
 
 class cRay :public CGameFramework 
@@ -266,7 +264,7 @@ public:
 		float b = qv2.x + qv2.y + qv2.z;
 		float c = qq2.x + qq2.y + qq2.z;
 
-		cout << a << " " << b << " " << c << endl;
+		std::cout << a << " " << b << " " << c << std::endl;
 		float discriminant = (b * b) - (4 * a * c);
 		if (discriminant < 0.0f)
 			return false;

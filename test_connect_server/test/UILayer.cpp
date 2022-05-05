@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "UILayer.h"
-#include "Network.h"
+#include "CNet.h"
 
 using namespace std;
 

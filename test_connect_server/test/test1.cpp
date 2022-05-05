@@ -33,8 +33,6 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	InitializeCriticalSection(&cs);
 
 	// connect network
-	netInit();
-	thread hThread{ worker };
 
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
@@ -70,12 +68,14 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 				if (change_dungeon) {
 					gGameFramework.Release_OpenWorld_Object();
 					gGameFramework.Create_InDungeon_Object();
-					send_raid_rander_ok_packet();
+					gGameFramework.GameobjectConnectNetwork();
+					gGameFramework.RaidRenderComplete();
 				//	send_partner_rander_ok_packet();
 				}
 				else {
 					gGameFramework.Release_InDungeon_Object();
 					gGameFramework.Create_OpenWorld_Object();
+					gGameFramework.GameobjectConnectNetwork();
 				}
 			}
 
@@ -214,7 +214,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_IME_CHAR:
 	case WM_CHAR: {
-		if (PartyInviteUI_ON) {
+		if (PartyInviteUI_On) {
 			if ((wchar_t)wParam == '\b') {
 				if (Invite_Str.size() > 0) {
 					Invite_Str.pop_back();

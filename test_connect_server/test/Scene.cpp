@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "Scene.h"
 #include "../../RealServer/Server/protocol.h"
-#include "Network.h"
+#include "CNet.h"
 
 CScene::CScene()
 {

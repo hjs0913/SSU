@@ -12,6 +12,7 @@ using namespace std;
 CBillboardObject* pBillboardObject = NULL;
 CMaterial* pMaterials[15];
 CGameObject** m_ppObjects;
+int	m_nObjects = 0;
 XMFLOAT3 hp_pos;
 XMFLOAT3 POS_PLAYER;
 CTexturedRectMesh* pRectMesh;

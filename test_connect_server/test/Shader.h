@@ -18,6 +18,7 @@ extern 	CTexturedRectMesh* newmp[100];
 
 extern CAirplaneMeshDiffused* pOtherPlayerMesh[7];
 extern CGameObject** m_ppObjects;
+extern int	m_nObjects;
 extern float hp_width;
 extern float hp_height;
 extern CCubeMeshDiffused* bullet;
@@ -163,7 +164,7 @@ protected:
 
 
 
-	int								m_nObjects = 0;
+	// int								m_nObjects = 0;
 
 	ID3D12Resource					*m_pd3dcbGameObjects = NULL;
 	CB_GAMEOBJECT_INFO				*m_pcbMappedGameObjects = NULL;

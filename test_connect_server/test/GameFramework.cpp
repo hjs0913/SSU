@@ -17,8 +17,6 @@ using namespace std;
 int bulletidx = 1;
 float tmp[BULLETCNT];
 bool IsFire[BULLETCNT] = {};
-bool shoot = false;
-bool hit_check = false;
 
 wstring Chatting_Str = L"";
 wstring Invite_Str = L"";
@@ -29,10 +27,6 @@ wstring Mp_str = L"";
 bool Chatting_On = false;
 bool Mouse_On = false;
 bool PartyUI_On = false;
-
-int effect_x = 0;
-int effect_y = 0;
-int effect_z = 0;
 
 MOUSEMOVEPOINT m_mouse;
 int m_mouseX = 0;
@@ -99,6 +93,12 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 	CreateDepthStencilView();
 
 	BuildObjects();
+
+	GameobjectConnectNetwork();
+
+	network.StartWorkerThread();
+
+	network.MyplayerSynchronize(m_pPlayer);
 
 	return(true);
 }
@@ -455,41 +455,41 @@ bool CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 		::GetCursorPos(&m_ptOldCursorPos);
 		POINT CursorPosInClient = m_ptOldCursorPos;
 		ScreenToClient(hWnd, &CursorPosInClient);
-		if (InvitationCardUI_On) {
+		if (network.InvitationCardUI_On) {
 			if (CursorPosInClient.y >= 420 && CursorPosInClient.y <= 460) {
 				if (CursorPosInClient.x >= 360 && CursorPosInClient.x <= 460) {
-					send_party_invitation_reply(1);
-					InvitationCardUI_On = false;
+					network.send_party_invitation_reply(1);
+					network.InvitationCardUI_On = false;
 				}
 				if (CursorPosInClient.x >= 520 && CursorPosInClient.x <= 620) {
-					send_party_invitation_reply(0);
-					InvitationCardUI_On = false;
+					network.send_party_invitation_reply(0);
+					network.InvitationCardUI_On = false;
 				}
 			}
 		}
 
 		if (PartyUI_On) {
-			if (PartyInviteUI_ON) {
+			if (PartyInviteUI_On) {
 				break;
 			}
 
-			if (AddAIUI_On) {
+			if (network.AddAIUI_On) {
 				if (CursorPosInClient.y >= 240 && CursorPosInClient.y <= 260) {
 					if (CursorPosInClient.x >= 205 && CursorPosInClient.x <= 255) {
-						send_party_add_partner(J_DILLER);
-						AddAIUI_On = false;
+						network.send_party_add_partner(J_DILLER);
+						network.AddAIUI_On = false;
 					}
 					if (CursorPosInClient.x >= 265 && CursorPosInClient.x <= 315) {
-						send_party_add_partner(J_TANKER);
-						AddAIUI_On = false;
+						network.send_party_add_partner(J_TANKER);
+						network.AddAIUI_On = false;
 					}
 					if (CursorPosInClient.x >= 325 && CursorPosInClient.x <= 375) {
-						send_party_add_partner(J_MAGICIAN);
-						AddAIUI_On = false;
+						network.send_party_add_partner(J_MAGICIAN);
+						network.AddAIUI_On = false;
 					}
 					if (CursorPosInClient.x >= 385 && CursorPosInClient.x <= 435) {
-						send_party_add_partner(J_SUPPORTER);
-						AddAIUI_On = false;
+						network.send_party_add_partner(J_SUPPORTER);
+						network.AddAIUI_On = false;
 					}
 				}
 				break;
@@ -497,42 +497,42 @@ bool CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 
 			if (CursorPosInClient.y >= 360 && CursorPosInClient.y <= 400) {
 				if (CursorPosInClient.x >= 140 && CursorPosInClient.x <= 205) {
-					if(!party_enter)send_party_room_make();
+					if(!network.party_enter)network.send_party_room_make();
 				}
 				if (CursorPosInClient.x >= 215 && CursorPosInClient.x <= 280) {
-					if (!party_info_on) break;
-					if (party_enter == false) send_party_room_enter_request();
-					else send_party_room_quit_request();
+					if (!network.party_info_on) break;
+					if (network.party_enter == false) network.send_party_room_enter_request();
+					else network.send_party_room_quit_request();
 				}
 				if (CursorPosInClient.x >= 360 && CursorPosInClient.x <= 425) {
-					if (party_enter) {
-						PartyInviteUI_ON = true;
+					if (network.party_enter) {
+						PartyInviteUI_On = true;
 						Invite_Str = L"";
 					}
 				}
 				if (CursorPosInClient.x >= 435 && CursorPosInClient.x <= 500) {
-					if (party_enter) {
-						AddAIUI_On = true;
+					if (network.party_enter) {
+						network.AddAIUI_On = true;
 					}
 				}
 			}
 			else {
-				if (party_enter) break;
+				if (network.party_enter) break;
 				if (CursorPosInClient.x >= 120 && CursorPosInClient.x <= 300) {
-					if (CursorPosInClient.y >= 60 && CursorPosInClient.y <= 100 && robby_cnt>=1) {
-						send_party_room_info_request(party_id_index_vector[0]);
+					if (CursorPosInClient.y >= 60 && CursorPosInClient.y <= 100 && network.robby_cnt>=1) {
+						network.send_party_room_info_request(0);
 					}
-					if (CursorPosInClient.y >= 110 && CursorPosInClient.y <= 150 && robby_cnt >= 2) {
-						send_party_room_info_request(party_id_index_vector[1]);
+					if (CursorPosInClient.y >= 110 && CursorPosInClient.y <= 150 && network.robby_cnt >= 2) {
+						network.send_party_room_info_request(1);
 					}
-					if (CursorPosInClient.y >= 160 && CursorPosInClient.y <= 200 && robby_cnt >= 3) {
-						send_party_room_info_request(party_id_index_vector[2]);
+					if (CursorPosInClient.y >= 160 && CursorPosInClient.y <= 200 && network.robby_cnt >= 3) {
+						network.send_party_room_info_request(2);
 					}
-					if (CursorPosInClient.y >= 210 && CursorPosInClient.y <= 250 && robby_cnt >= 4) {
-						send_party_room_info_request(party_id_index_vector[3]);
+					if (CursorPosInClient.y >= 210 && CursorPosInClient.y <= 250 && network.robby_cnt >= 4) {
+						network.send_party_room_info_request(3);
 					}
-					if (CursorPosInClient.y >= 260 && CursorPosInClient.y <= 300 && robby_cnt >= 5) {
-						send_party_room_info_request(party_id_index_vector[4]);
+					if (CursorPosInClient.y >= 260 && CursorPosInClient.y <= 300 && network.robby_cnt >= 5) {
+						network.send_party_room_info_request(4);
 					}
 				}
 			}
@@ -543,7 +543,7 @@ bool CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 		if (f4_picking_possible) {
 			for (int i = 9615; i < 10615; i++) {  //9615  for (int i = 10615; i < 10795; i++) 
 				if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, m_ppObjects[i])) {
-					send_picking_skill_packet(2, 0, i);
+					network.send_picking_skill_packet(2, 0, i);
 					m_ppObjects[i]->SetMesh(0, pOtherPlayerMesh[1]);  //피킹 확인위해 색상변경 
 					f4_picking_possible = false;
 		
@@ -554,7 +554,7 @@ bool CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 		if (f5_picking_possible) {
 			for (int i = 9615; i < 10615; i++) {  //9615  for (int i = 10615; i < 10795; i++) 
 				if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, m_ppObjects[i])) {
-					send_picking_skill_packet(0, 0, i);
+					network.send_picking_skill_packet(0, 0, i);
 					m_ppObjects[i]->SetMesh(0, pOtherPlayerMesh[1]);
 					f5_picking_possible = false;
 			
@@ -565,7 +565,7 @@ bool CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 		if (f6_picking_possible) {
 			for (int i = 9615; i < 10615; i++) {  //9615  for (int i = 10615; i < 10795; i++) 
 				if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, m_ppObjects[i])) {
-					send_picking_skill_packet(1, 0, i);
+					network.send_picking_skill_packet(1, 0, i);
 					m_ppObjects[i]->SetMesh(0, pOtherPlayerMesh[1]);
 					f6_picking_possible = false;
 			
@@ -598,7 +598,7 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 	const wchar_t* temp;
 	int len = 0;
 
-	if (InDungeon) {
+	if (!InDungeon) {
 		if (m_pScene) m_pScene->OnProcessingKeyboardMessage(hWnd, nMessageID, wParam, lParam);
 	}
 	else {
@@ -614,14 +614,14 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			::PostQuitMessage(0);
 			break;
 		case VK_RETURN:
-			if (PartyInviteUI_ON) {
-				PartyInviteUI_ON = false;
+			if (PartyInviteUI_On) {
+				PartyInviteUI_On = false;
 				wcout << Invite_Str << endl;
 				len = 1 + Invite_Str.length();
 				send_str = new char[len * 4];
 				temp = Invite_Str.c_str();
 				wcstombs(send_str, temp, MAX_CHAT_SIZE);
-				send_party_invite(send_str);
+				network.send_party_invite(send_str);
 				delete send_str;
 				break;
 			}
@@ -632,79 +632,79 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 				send_str = new char[len*4];
 				temp = Chatting_Str.c_str();
 				wcstombs(send_str, temp, MAX_CHAT_SIZE);
-				send_chat_packet(send_str);
+				network.send_chat_packet(send_str);
 				Chatting_Str=L"";
 				delete send_str;
 			}
 			break;
 		case VK_F1:
-			switch (my_job)
+			switch (network.my_job)
 			{
 			case J_DILLER:
-				my_job = J_TANKER;
+				network.my_job = J_TANKER;
 				break;
 			case J_TANKER:
-				my_job = J_MAGICIAN;
+				network.my_job = J_MAGICIAN;
 				break;
 			case J_MAGICIAN:
-				my_job = J_SUPPORTER;
+				network.my_job = J_SUPPORTER;
 				break;
 			case J_SUPPORTER:
-				my_job = J_DILLER;
+				network.my_job = J_DILLER;
 				break;
 			default:
 				break;
 			}
-			send_change_job_packet(my_job);
+			network.send_change_job_packet(network.my_job);
 			break;
 		case VK_F2:
-			switch (my_element)
+			switch (network.my_element)
 			{
 			case E_NONE:
-				my_element = E_WATER;
+				network.my_element = E_WATER;
 				for (int i = 1 + BULLETCNT; i < 1 + 2 * BULLETCNT; ++i) 
 					m_ppObjects[i]->SetMaterial(pMaterials[8]);
 				break;
 			case E_WATER:
-				my_element = E_FULLMETAL;
+				network.my_element = E_FULLMETAL;
 				for (int i = 1 + BULLETCNT; i < 1 + 2 * BULLETCNT; ++i)
 					m_ppObjects[i]->SetMaterial(pMaterials[9]);
 	
 				break;
 			case E_FULLMETAL:
-				my_element = E_WIND;
+				network.my_element = E_WIND;
 				for (int i = 1 + BULLETCNT; i < 1 + 2 * BULLETCNT; ++i)
 					m_ppObjects[i]->SetMaterial(pMaterials[10]);
 				break;
 			case E_WIND:
-				my_element = E_FIRE;
+				network.my_element = E_FIRE;
 				for (int i = 1 + BULLETCNT; i < 1 + 2 * BULLETCNT; ++i)
 					m_ppObjects[i]->SetMaterial(pMaterials[11]);
 				break;
 			case E_FIRE:
-				my_element = E_TREE;
+				network.my_element = E_TREE;
 				for (int i = 1 + BULLETCNT; i < 1 + 2 * BULLETCNT; ++i)
 					m_ppObjects[i]->SetMaterial(pMaterials[12]);
 				break;
 			case E_TREE:
-				my_element = E_EARTH;
+				network.my_element = E_EARTH;
 				for (int i = 1 + BULLETCNT; i < 1 + 2 * BULLETCNT; ++i)
 					m_ppObjects[i]->SetMaterial(pMaterials[13]);
 				break;
 			case E_EARTH:
-				my_element = E_ICE;
+				network.my_element = E_ICE;
 				for (int i = 1 + BULLETCNT; i < 1 + 2 * BULLETCNT; ++i)
 					m_ppObjects[i]->SetMaterial(pMaterials[5]);
 				break;
 			case E_ICE:
-				my_element = E_NONE;
+				network.my_element = E_NONE;
 				for (int i = 1 + BULLETCNT; i < 1 + 2 * BULLETCNT; ++i)
 					m_ppObjects[i]->SetMaterial(pMaterials[7]);
 				break;
 			default:
 				break;
 			}
-			send_change_element_packet(my_element);
+			network.send_change_element_packet(network.my_element);
 			break;
 		case VK_F3:
 				m_pCamera = m_pPlayer->ChangeCamera((DWORD)(wParam - VK_F1 + 1), m_GameTimer.GetTimeElapsed());
@@ -726,10 +726,10 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 		case 0x50:	// p key
 			if (InDungeon) break;
 			PartyUI_On = !PartyUI_On;
-			if(PartyUI_On) send_party_room_packet();
+			if(PartyUI_On) network.send_party_room_packet();
 			else {
-				party_id_index_vector.clear();
-				robby_cnt = 0;
+				network.party_id_index_vector.clear();
+				network.robby_cnt = 0;
 			}
 			break;
 		default:
@@ -797,7 +797,7 @@ void CGameFramework::OnDestroy()
 	if (m_pd3dDevice) m_pd3dDevice->Release();
 	if (m_pdxgiFactory) m_pdxgiFactory->Release();
 
-	netclose();
+	network.netclose();
 }
 
 void CGameFramework::BuildObjects()
@@ -935,6 +935,8 @@ void CGameFramework::BuildObjects()
 
 
 	Create_OpenWorld_Object();
+
+
 }
 
 void CGameFramework::Create_OpenWorld_Object()
@@ -1031,7 +1033,7 @@ void CGameFramework::ProcessInput()
 
 		DWORD dwDirection = 0;
 
-		if (!PartyInviteUI_ON&&!Chatting_On && Mouse_On) {
+		if (!PartyInviteUI_On&&!Chatting_On && Mouse_On) {
 			if (pKeysBuffer['W'] & 0xF0) {
 				//send_move_packet(0);
 				dwDirection |= DIR_FORWARD;
@@ -1054,7 +1056,7 @@ void CGameFramework::ProcessInput()
 
 			//��ų---------------------------------
 			if ((pKeysBuffer[VK_NUMPAD1] & 0xF0) || (pKeysBuffer['1'] & 0xF0)) {     //   1 
-				send_skill_packet(0, 0);
+				network.send_skill_packet(0, 0);
 			}
 			//	if ((pKeysBuffer[VK_NUMPAD2] & 0xF0) || (pKeysBuffer['2'] & 0xF0)) {     //   2 
 			//		send_skill_packet(0, 1);
@@ -1064,17 +1066,17 @@ void CGameFramework::ProcessInput()
 			//	}
 
 			if (pKeysBuffer[VK_NUMPAD4] & 0xF0 || (pKeysBuffer['4'] & 0xF0)) {     //   4 
-				send_skill_packet(1, 0);
+				network.send_skill_packet(1, 0);
 			}
 			if (pKeysBuffer[VK_NUMPAD5] & 0xF0 || (pKeysBuffer['5'] & 0xF0)) {     //   5 
-				send_skill_packet(1, 1);
+				network.send_skill_packet(1, 1);
 			
-					if (pushCTRL && my_job == J_MAGICIAN) {
+					if (pushCTRL && network.my_job == J_MAGICIAN) {
 
-						if (shoot) {
+						if (network.shoot) {
 							++bulletidx;
 							pushCTRL = false;
-							shoot = false;
+							network.shoot = false;
 						}
 					}
 					if (bulletidx >= BULLETCNT + 2) {
@@ -1095,7 +1097,7 @@ void CGameFramework::ProcessInput()
 			//	}
 
 			if (pKeysBuffer[VK_NUMPAD7] & 0xF0 || (pKeysBuffer['7'] & 0xF0)) {    // 7 
-				send_skill_packet(2, 0);
+				network.send_skill_packet(2, 0);
 			}
 			//if (pKeysBuffer[VK_NUMPAD8] & 0xF0 || (pKeysBuffer['8'] & 0xF0)) {    // 8 
 			//	send_skill_packet(2, 1);
@@ -1104,7 +1106,7 @@ void CGameFramework::ProcessInput()
 		//		send_skill_packet(2, 2);
 		//	}
 			if (pKeysBuffer[VK_SPACE] & 0xF0) {
-				send_attack_packet(0);
+				network.send_attack_packet(0);
 			}
 			//---------------------------------
 			else {
@@ -1174,13 +1176,13 @@ void CGameFramework::ProcessInput()
 			
 			if (dwDirection) m_pPlayer->Move(dwDirection, 50.0f * m_GameTimer.GetTimeElapsed(), true);
 			
-			send_look_packet(m_pPlayer->GetLookVector(), m_pPlayer->GetRightVector());
+			network.send_look_packet(m_pPlayer->GetLookVector(), m_pPlayer->GetRightVector());
 		}
 	}
 	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
 
 
-	send_move_packet(m_pPlayer->GetPosition());
+	network.send_move_packet(m_pPlayer->GetPosition());
 }
 
 void CGameFramework::AnimateObjects()
@@ -1229,8 +1231,6 @@ void CGameFramework::FrameAdvance()
 
 	m_GameTimer.Tick(0.0f);
 
-	get_basic_information(m_pPlayer, my_id);
-	m_pPlayer->SetPosition(return_myPosition());
 	ProcessInput();
 
 	// receive Player position to server
@@ -1317,14 +1317,14 @@ void CGameFramework::FrameAdvance()
 	Mp_str = L"";
 	string temp_str;
 	wstring* party_name_index;
-	if (robby_cnt > 0) party_name_index = new wstring[robby_cnt];
+	if (network.robby_cnt > 0) party_name_index = new wstring[network.robby_cnt];
 	else party_name_index = nullptr;
 
 	for (int i = 0; i < UICOUNT; i++) {
 		switch (i) {
 		case 0: {
 			
-			for (auto& m : g_msg) {
+			for (auto& m : network.g_msg) {
 				wchar_t* temp;
 				//wstring temp = wstring(m.begin(), m.end());
 				const char* all = m.c_str();
@@ -1343,7 +1343,7 @@ void CGameFramework::FrameAdvance()
 			break;
 
 		case 2:
-			m_ppUILayer[i]->UpdateLabels(Info_str, 0, 0, (m_nWndClientWidth / 10) * 3 + 30, 90);
+			m_ppUILayer[i]->UpdateLabels(network.Info_str, 0, 0, (m_nWndClientWidth / 10) * 3 + 30, 90);
 			break;
 		case 3: {
 			Hp_str.append(L" Hp : ");
@@ -1362,17 +1362,17 @@ void CGameFramework::FrameAdvance()
 			break;
 		}
 		case 5: {
-			if (!Combat_On) break;
-			m_ppUILayer[i]->UpdateLabels(Combat_str, (m_nWndClientWidth / 2) - 80, 0, (m_nWndClientWidth / 2) + 80, (m_nWndClientHeight / 6));
+			if (!network.Combat_On) break;
+			m_ppUILayer[i]->UpdateLabels(network.Combat_str, (m_nWndClientWidth / 2) - 80, 0, (m_nWndClientWidth / 2) + 80, (m_nWndClientHeight / 6));
 			break;
 		}
 		case 6: {
-			if (!Combat_On) break;
+			if (!network.Combat_On) break;
 			wstring ang = L"HP : ";
-			ang.append(to_wstring((int)get_combat_id_hp()));
+			ang.append(to_wstring((int)network.get_combat_hp()));
 			ang.append(L"/");
-			ang.append(to_wstring((int)get_combat_id_max_hp()));
-			m_ppUILayer[i]->UpdateLabels(ang, (m_nWndClientWidth / 2) - 70, 40, 140*((get_combat_id_hp()/get_combat_id_max_hp()))+((m_nWndClientWidth / 2) - 70), (m_nWndClientHeight / 6) - 20);
+			ang.append(to_wstring((int)network.get_combat_max_hp()));
+			m_ppUILayer[i]->UpdateLabels(ang, (m_nWndClientWidth / 2) - 70, 40, 140*((network.get_combat_hp()/network.get_combat_max_hp()))+((m_nWndClientWidth / 2) - 70), (m_nWndClientHeight / 6) - 20);
 			break;
 		}
 		case 7: {
@@ -1383,12 +1383,12 @@ void CGameFramework::FrameAdvance()
 		}
 		case 8: {
 			if (!InDungeon) break;
-			int hp_x = (int)get_combat_id_hp() / 100000;
-			float bar_percent = (((int)get_combat_id_hp() % 100000)+1)/100000.0f;
+			int hp_x = (int)network.get_combat_hp() / 100000;
+			float bar_percent = (((int)network.get_combat_hp() % 100000)+1)/100000.0f;
 			wstring ang = L"HP : ";
-			ang.append(to_wstring((int)get_combat_id_hp()));
+			ang.append(to_wstring((int)network.get_combat_hp()));
 			ang.append(L"/");
-			ang.append(to_wstring((int)get_combat_id_max_hp()));
+			ang.append(to_wstring((int)network.get_combat_max_hp()));
 			ang.append(L"\t\t\t\tX");
 			ang.append(to_wstring(hp_x));
 
@@ -1429,49 +1429,50 @@ void CGameFramework::FrameAdvance()
 
 		case 9: {
 			if (!InDungeon) break;
-			wstring party_info_str = L"파티원정보(DC : ";
-			party_info_str.append(to_wstring(indun_death_count));
-			party_info_str.append(L")");
-			m_ppUILayer[i]->UpdateLabels(party_info_str, 0, (m_nWndClientHeight / 2)-80, 150, (m_nWndClientHeight / 2)+60);
+			m_ppUILayer[i]->UpdateLabels(network.party_info_str, 0, (m_nWndClientHeight / 2)-80, 150, (m_nWndClientHeight / 2)+60);
 			break; 
 		}
 		case 10: {
 			if (!InDungeon) break;
-			m_ppUILayer[i]->UpdateLabels(party_name[0], 10, (m_nWndClientHeight / 2) - 60, 10+130*((float)get_hp_to_server(party_id[0])/ get_max_hp_to_server(party_id[0])), (m_nWndClientHeight / 2) - 40);
+			m_ppUILayer[i]->UpdateLabels(network.party_name[0], 10, (m_nWndClientHeight / 2) - 60, 
+				10+130*((float)network.get_id_hp(network.party_id[0])/ network.get_id_max_hp(network.party_id[0])), (m_nWndClientHeight / 2) - 40);
 			break;
 		}
 		case 11: {
 			if (!InDungeon) break;
-			m_ppUILayer[i]->UpdateLabels(party_name[1], 10, (m_nWndClientHeight / 2) - 30, 10 + 130 * ((float)get_hp_to_server(party_id[1]) / get_max_hp_to_server(party_id[1])), (m_nWndClientHeight / 2) - 10);
+			m_ppUILayer[i]->UpdateLabels(network.party_name[1], 10, (m_nWndClientHeight / 2) - 30, 
+				10 + 130 * ((float)network.get_id_hp(network.party_id[1]) / network.get_id_max_hp(network.party_id[1])), (m_nWndClientHeight / 2) - 10);
 			break;
 		}
 		case 12: {
 			if (!InDungeon) break;
-			m_ppUILayer[i]->UpdateLabels(party_name[2], 10, (m_nWndClientHeight / 2), 10 + 130 * ((float)get_hp_to_server(party_id[2]) / get_max_hp_to_server(party_id[2])), (m_nWndClientHeight / 2) +20);
+			m_ppUILayer[i]->UpdateLabels(network.party_name[2], 10, (m_nWndClientHeight / 2), 
+				10 + 130 * (float)network.get_id_hp(network.party_id[2]) / network.get_id_max_hp(network.party_id[2]), (m_nWndClientHeight / 2) +20);
 			break;
 		}
 		case 13: {
 			if (!InDungeon) break;
-			m_ppUILayer[i]->UpdateLabels(party_name[3], 10, (m_nWndClientHeight / 2) + 30, 10 + 130 * ((float)get_hp_to_server(party_id[3]) / get_max_hp_to_server(party_id[3])), (m_nWndClientHeight / 2) + 50);
+			m_ppUILayer[i]->UpdateLabels(network.party_name[3], 10, (m_nWndClientHeight / 2) + 30, 
+				10 + 130 * ((float)network.get_id_hp(network.party_id[3]) / network.get_id_max_hp(network.party_id[3])), (m_nWndClientHeight / 2) + 50);
 			break;
 		}
 
 		case 15: {
 			if (!PartyUI_On) break;
-			if (!party_info_on) {
-				reinterpret_cast<PartyUI*>(m_ppUILayer[i])->ResizeTextBlock(robby_cnt + 4);
-				if (party_id_index_vector.size() != 0) {
+			if (!network.party_info_on) {
+				reinterpret_cast<PartyUI*>(m_ppUILayer[i])->ResizeTextBlock(network.robby_cnt + 4);
+				if (network.party_id_index_vector.size() != 0) {
 					int tmp = 0;
-					for (auto t : party_id_index_vector) {
+					for (auto t : network.party_id_index_vector) {
 						party_name_index[tmp] = L"NO. ";
-						party_name_index[tmp].append(to_wstring(m_party[t]->get_party_id()));
+						party_name_index[tmp].append(to_wstring(t));
 						party_name_index[tmp].append(L"\n 방제 : ");
 
 						// 방 제목 넣기
 						wchar_t* temp;
-						int len = 1 + strlen(m_party[t]->get_room_name());
+						int len = 1 + strlen(network.get_party_name(t));
 						temp = new TCHAR[len];
-						mbstowcs(temp, m_party[t]->get_room_name(), len);
+						mbstowcs(temp, network.get_party_name(t), len);
 						party_name_index[tmp].append(temp);
 						delete temp;
 						tmp++;
@@ -1480,19 +1481,19 @@ void CGameFramework::FrameAdvance()
 				reinterpret_cast<PartyUI*>(m_ppUILayer[i])->UpdateLabels(party_name_index);
 			}
 			else {
-				reinterpret_cast<PartyUI*>(m_ppUILayer[i])->ResizeTextBlock(robby_cnt + 4 + GAIA_ROOM);
-				if (party_id_index_vector.size() != 0) {
+				reinterpret_cast<PartyUI*>(m_ppUILayer[i])->ResizeTextBlock(network.robby_cnt + 4 + GAIA_ROOM);
+				if (network.party_id_index_vector.size() != 0) {
 					int tmp = 0;
-					for (auto t : party_id_index_vector) {
+					for (auto t : network.party_id_index_vector) {
 						party_name_index[tmp] = L"NO. ";
-						party_name_index[tmp].append(to_wstring(m_party[t]->get_party_id()));
+						party_name_index[tmp].append(to_wstring(t));
 						party_name_index[tmp].append(L"\n 방제 : ");
 
 						// 방 제목 넣기
 						wchar_t* temp;
-						int len = 1 + strlen(m_party[t]->get_room_name());
+						int len = 1 + strlen(network.get_party_name(t));
 						temp = new TCHAR[len];
-						mbstowcs(temp, m_party[t]->get_room_name(), len);
+						mbstowcs(temp, network.get_party_name(t), len);
 						party_name_index[tmp].append(temp);
 						delete []temp;
 						tmp++;
@@ -1500,43 +1501,36 @@ void CGameFramework::FrameAdvance()
 				}
 				
 				// 파티에 대한 정보 출력
-				reinterpret_cast<PartyUI*>(m_ppUILayer[i])->UpdateLabels_PartyInfo(party_name_index, m_party_info, party_enter);
+				reinterpret_cast<PartyUI*>(m_ppUILayer[i])->UpdateLabels_PartyInfo(party_name_index, network.get_party_info(), network.party_enter);
 			}
 
 			break;
 		}
 		case 16: {
-			if (!PartyInviteUI_ON) break;
+			if (!PartyInviteUI_On) break;
 			reinterpret_cast<PartyInviteUI*>(m_ppUILayer[i])->UpdateLabels(Invite_Str);
 			break;
 		}
 		case 17: {
-			if (!InvitationCardUI_On) break;
-			wstring temp;
-			wchar_t* temp2 = get_user_name_to_server(InvitationUser);
-			temp.append(temp2);
-			temp.append(L"가 ");
-			temp.append(std::to_wstring(InvitationRoomId));
-			temp.append(L"번 방에 초대하였습니다");
-			reinterpret_cast<InvitationCardUI*>(m_ppUILayer[i])->UpdateLabels(temp);
-			delete []temp2;
+			if (!network.InvitationCardUI_On) break;
+			reinterpret_cast<InvitationCardUI*>(m_ppUILayer[i])->UpdateLabels(network.InvitationCard_str);
 			break;
 		}
 		case 18: {
-			if (!AddAIUI_On) break;
+			if (!network.AddAIUI_On) break;
 			reinterpret_cast<AddAIUI*>(m_ppUILayer[i])->UpdateLabels();
 			break;
 		}
 		case 19:
-			if (!NoticeUI_On) break;
-			m_ppUILayer[i]->UpdateLabels(Notice_str, 0, 0, 640, 50);
+			if (!network.NoticeUI_On) break;
+			m_ppUILayer[i]->UpdateLabels(network.Notice_str, 0, 0, 640, 50);
 			break;
 	}
 	}
 
 	for (int i = 0; i < UICOUNT; i++) {
 		if ((i == 5 || i == 6)) {
-			if (!Combat_On) continue;
+			if (!network.Combat_On) continue;
 		}
 		if (i >= 7 && i <= 13) {
 			if (!InDungeon) continue;
@@ -1546,10 +1540,10 @@ void CGameFramework::FrameAdvance()
 				cout << PartyUI_On << endl;
 			continue;
 		}
-		if (i == 16 && !PartyInviteUI_ON) continue;
-		if (i == 17 && !InvitationCardUI_On) continue;
-		if (i == 18 && !AddAIUI_On) continue;
-		if (i == 19 && !NoticeUI_On) continue;
+		if (i == 16 && !PartyInviteUI_On) continue;
+		if (i == 17 && !network.InvitationCardUI_On) continue;
+		if (i == 18 && !network.AddAIUI_On) continue;
+		if (i == 19 && !network.NoticeUI_On) continue;
 		m_ppUILayer[i]->Render(m_nSwapChainBufferIndex);
 	}
 
@@ -1575,30 +1569,19 @@ void CGameFramework::FrameAdvance()
 	m_GameTimer.GetFrameRate(m_pszFrameRate + 12, 37);
 	::SetWindowText(m_hWnd, m_pszFrameRate);
 
-	if (robby_cnt > 0) delete []party_name_index;
-	if (InvitationCardUI_On) {
-		if (chrono::system_clock::now() > InvitationCardTimer) {
-			InvitationCardUI_On = false;
-			// 초대 거절 패킷 보내기
-		}
-	}
-
-	if (NoticeUI_On) {
-		if (NoticeTimer < chrono::system_clock::now()) {
-			NoticeUI_On = false;
-			RaidEnterNotice = false;
-		}
-		else {
-			if (RaidEnterNotice) {
-				auto t = NoticeTimer - chrono::system_clock::now();
-				if (t >= 4s && t < 5s) Notice_str = L"4초후에 게임을 시작합니다";
-				else if(t >= 3s && t < 4s) Notice_str = L"3초후에 게임을 시작합니다";
-				else if (t >= 2s && t < 3s) Notice_str = L"2초후에 게임을 시작합니다";
-				else if (t >= 1s && t < 2s) Notice_str = L"1초후에 게임을 시작합니다";
-			}
-		}
-	}
+	if (network.robby_cnt > 0) delete []party_name_index;
+	
+	network.check_timer();
 
 	LeaveCriticalSection(&cs);
 }
 
+void CGameFramework::GameobjectConnectNetwork()
+{
+	network.GameobjectSynchronize(m_ppObjects, m_nObjects);
+}
+
+void CGameFramework::RaidRenderComplete()
+{
+	network.send_raid_rander_ok_packet();
+}

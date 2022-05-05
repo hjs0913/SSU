@@ -166,16 +166,16 @@ HRESULT OnRender()
 
 		// 비트맵 m_pBitmap의 크기를 얻음.
 		D2D1_SIZE_F size = m_pAnotherBitmap->GetSize();
-		cout << size.height << endl;
-		cout << size.width << endl;
-		cout << renderTargetSize.width << endl;
-		cout << renderTargetSize.height << endl;
+		std::cout << size.height << std::endl;
+		std::cout << size.width << std::endl;
+		std::cout << renderTargetSize.width << std::endl;
+		std::cout << renderTargetSize.height << std::endl;
 		// 첫 번째로 비트맵 m_pBitmap을 그리기.
 
 		m_pRenderTarget->DrawBitmap(m_pAnotherBitmap, D2D1::RectF(renderTargetSize.width - size.width, renderTargetSize.height - size.height, renderTargetSize.width, renderTargetSize.height));
 
 		hr = m_pRenderTarget->EndDraw();
-		cout << "엔드 " << endl;
+		std::cout << "엔드 " << std::endl;
 		if (hr == D2DERR_RECREATE_TARGET)
 		{
 			hr = S_OK;

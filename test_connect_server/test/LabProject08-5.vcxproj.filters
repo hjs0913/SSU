@@ -72,9 +72,6 @@
     <ClInclude Include="Bitmap.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Network.h">
-      <Filter>소스 파일\Network</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\RealServer\Server\protocol.h">
       <Filter>소스 파일\Network</Filter>
     </ClInclude>
@@ -83,6 +80,9 @@
     </ClInclude>
     <ClInclude Include="PartyUI.h">
       <Filter>소스 파일\UI/Party</Filter>
+    </ClInclude>
+    <ClInclude Include="CNet.h">
+      <Filter>소스 파일\Network</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -122,14 +122,17 @@
     <ClCompile Include="Pattern.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Network.cpp">
-      <Filter>소스 파일\Network</Filter>
-    </ClCompile>
     <ClCompile Include="UILayer.cpp">
       <Filter>소스 파일\UI/Party</Filter>
     </ClCompile>
     <ClCompile Include="PartyUI.cpp">
       <Filter>소스 파일\UI/Party</Filter>
+    </ClCompile>
+    <ClCompile Include="CNet.cpp">
+      <Filter>소스 파일\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="send.cpp">
+      <Filter>소스 파일\Network</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

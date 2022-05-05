@@ -1019,9 +1019,7 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 		pNpc->SetPosition(XMFLOAT3(0, -100, 0));
 		pNpc->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr);
 		m_ppObjects[i] = pNpc;
-
 	}
-
 }
 
 void CObjectsShader::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pContext, ID3D12RootSignature* pd3dGraphicsRootSignature)
@@ -1409,20 +1407,15 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 	if (InDungeon) {
 		for (int j = 0; j < m_nObjects; j++)
 		{
- 
-
 			if (j >= m_nObjects - server_id) {
 				pPlayer = reinterpret_cast<CAirplanePlayer*>(m_ppObjects[j]);
 				bool tp = pPlayer->GetUse();
-				pPlayer->SetUse(get_use_to_server(j-MAX_WORLD_SHADER));
 				if (pPlayer->GetUse()) {
 
 					if (tp != pPlayer->GetUse()) {
 						// 최초 정보 불러오기 및 종족에 맞게 변환
-						get_basic_information(pPlayer, j - MAX_WORLD_SHADER);
 						if (pPlayer->m_tribe == HUMAN) {
 							pPlayer->SetMesh(0, pOtherPlayerMesh[2]);
-							get_player_information(pPlayer, j - MAX_WORLD_SHADER);
 						}
 						else if (pPlayer->m_tribe == BOSS) {
 							pPlayer->SetMesh(0, pOtherPlayerMesh[0]);
@@ -1462,15 +1455,10 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 						}
 					}
 					// 이때만 렌더링
-				
-					reinterpret_cast<CAirplanePlayer*>(m_ppObjects[j])->m_hp = get_hp_to_server(j - MAX_WORLD_SHADER);
-					m_ppObjects[j]->SetPosition(get_position_to_server(j - MAX_WORLD_SHADER));
 					if (j >= 10615+7 && j < 10795 + 7) {
 						//m_ppObjects[j]->SetPosition(get_position_to_server(j - 9614));
 						m_ppObjects[j]->vCenter = { m_ppObjects[j]->GetPosition().x, m_ppObjects[j]->GetPosition().y + 10, m_ppObjects[j]->GetPosition().z};
 					}
-
-					pPlayer->SetLook(get_look_to_server(j - MAX_WORLD_SHADER));
 					pPlayer->Animate(pTimer, pCamera, m_ppObjects[j]);
 				}
 				else {
@@ -1586,15 +1574,11 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 			if (j >= m_nObjects - server_id) {
 				pPlayer = reinterpret_cast<CAirplanePlayer*>(m_ppObjects[j]);
 				bool tp = pPlayer->GetUse();
-				pPlayer->SetUse(get_use_to_server(j - MAX_WORLD_SHADER));
 				if (pPlayer->GetUse()) {
-
 					if (tp != pPlayer->GetUse()) {
 						// 최초 정보 불러오기 및 종족에 맞게 변환
-						get_basic_information(pPlayer, j - MAX_WORLD_SHADER);
 						if (pPlayer->m_tribe == HUMAN) {
 							pPlayer->SetMesh(0, pOtherPlayerMesh[2]);
-							get_player_information(pPlayer, j - MAX_WORLD_SHADER);
 						}
 						else if (pPlayer->m_tribe == BOSS) {
 							pPlayer->SetMesh(0, pOtherPlayerMesh[0]);
@@ -1635,19 +1619,10 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 					}
 					// 이때만 렌더링
 
-					reinterpret_cast<CAirplanePlayer*>(m_ppObjects[j])->m_hp = get_hp_to_server(j - MAX_WORLD_SHADER);
-					m_ppObjects[j]->SetPosition(get_position_to_server(j - MAX_WORLD_SHADER));
 					if (j >= 10615 && j < 10795) {
 						//m_ppObjects[j]->SetPosition(get_position_to_server(j - 9614));
 						m_ppObjects[j]->vCenter = { m_ppObjects[j]->GetPosition().x, m_ppObjects[j]->GetPosition().y + 10, m_ppObjects[j]->GetPosition().z };
 					}
-
-
-					//cout << j << endl;
-					//cout << m_ppObjects[j]->vCenter.x << m_ppObjects[j]->vCenter.y << m_ppObjects[j]->vCenter.z << endl;
-
-
-					pPlayer->SetLook(get_look_to_server(j - MAX_WORLD_SHADER));
 					pPlayer->Animate(pTimer, pCamera, m_ppObjects[j]);
 
 
