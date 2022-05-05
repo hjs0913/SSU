@@ -8,10 +8,10 @@ test_connect_server/test/Release
 test_connect_server/test/.vs
 test_connect_server/test/x64
 
-SSU_Client/Debug
-SSU_Client/Release
-SSU_Client/.vs
-SSU_Client/x64
+SSUClient/Debug
+SSUClient/Release
+SSUClient/.vs
+SSUClient/x64
 
 샘플프로그램/.vs
 샘플프로그램/Debug
