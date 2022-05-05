@@ -223,7 +223,7 @@ void magical_skill_success(int p_id, int target, float skill_factor)
 
             timer_event ev;
             ev.obj_id = target;
-            ev.start_time = chrono::system_clock::now() + 3s;
+            ev.start_time = chrono::system_clock::now() + 10s;
             ev.ev = EVENT_PLAYER_REVIVE;
             ev.target_id = 0;
             timer_queue.push(ev);
@@ -383,7 +383,7 @@ void physical_skill_success(int p_id, int target, float skill_factor)
 
             timer_event ev;
             ev.obj_id = target;
-            ev.start_time = chrono::system_clock::now() + 3s;
+            ev.start_time = chrono::system_clock::now() + 10s;
             ev.ev = EVENT_PLAYER_REVIVE;
             ev.target_id = 0;
             timer_queue.push(ev);
@@ -623,7 +623,7 @@ void attack_success(int p_id, int target, float atk_factor)
             // 3초후 부활하며 부활과 동시에 위치 좌표를 수정해준다
             timer_event ev;
             ev.obj_id = target;
-            ev.start_time = chrono::system_clock::now() + 3s;
+            ev.start_time = chrono::system_clock::now() + 10s;
             ev.ev = EVENT_PLAYER_REVIVE;
             ev.target_id = 0;
             timer_queue.push(ev);
@@ -2306,11 +2306,12 @@ void player_revive(int client_id)
     }
     pl->set_state(ST_INGAME);
     pl->state_lock.unlock();
+
     // 플레이어 죽은 후 초기화 설정
     pl->set_hp(players[client_id]->get_maxhp());
-    pl->set_x(0);
+    pl->set_x(2100);
     pl->set_y(0);
-    pl->set_z(0);
+    pl->set_z(1940);
     pl->set_exp(pl->get_exp() / 2);
     send_status_change_packet(pl);
 

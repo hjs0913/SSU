@@ -499,7 +499,6 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_DEAD: {
-		
 		sc_packet_dead* packet = reinterpret_cast<sc_packet_dead*> (p);
 		mPlayer[my_id]->SetUse(false);
 		combat_id = -1;
@@ -509,7 +508,13 @@ void process_packet(unsigned char* p)
 		
 	}
 	case SC_PACKET_REVIVE: {
-		// 아직 미구현
+		sc_packet_revive* packet = reinterpret_cast<sc_packet_revive*>(p);
+		mPlayer[my_id]->SetUse(true);
+		mPlayer[my_id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
+		my_position = mPlayer[my_id]->GetPosition();
+		mPlayer[my_id]->m_hp = mPlayer[my_id]->m_max_hp;
+		mPlayer[my_id]->m_mp = mPlayer[my_id]->m_max_mp;
+		mPlayer[my_id]->m_exp = packet->exp;
 		break;
 	}
 	case SC_PACKET_LOOK: {
