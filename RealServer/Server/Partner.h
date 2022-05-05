@@ -19,11 +19,12 @@ private:
     int nearest_num = 0;
     pos move;
     bool move_once;
+    bool running_pattern;
 
 protected:
     char	_name[MAX_NAME_SIZE];
 
-    bool    running_pattern;
+
 
     int     party_id;	//서버(파티)에서의 파티원 id
 public:
