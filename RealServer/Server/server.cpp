@@ -2304,6 +2304,59 @@ void process_packet(int client_id, unsigned char* p)
 void player_revive(int client_id)
 {
     Player* pl = reinterpret_cast<Player*>(players[client_id]);
+    cout << pl->get_name() << "부활" << endl;
+    if (pl->join_dungeon_room == true) {
+        dungeons[pl->indun_id]->state_lock.lock();
+        if (dungeons[pl->indun_id]->get_dun_st() == DUN_ST_START) {
+            cout << "레이드 부활" << endl;
+            dungeons[pl->indun_id]->state_lock.unlock();
+            
+            pl->state_lock.lock();
+            if (pl->get_state() != ST_DEAD) {
+                pl->state_lock.unlock();
+                return;
+            }
+            pl->set_state(ST_INDUN);
+            pl->state_lock.unlock();
+
+            // 초기화
+            pl->set_hp(pl->get_maxhp());
+            pl->set_mp(pl->get_maxmp());
+            send_status_change_packet(pl);
+
+            // 시야처리
+            Player** partys = dungeons[pl->indun_id]->get_party_palyer();
+            for (int i = 0; i < 4; i++) {
+                /*partys[i]->vl.lock();
+                if (pl->get_id() != partys[i]->get_id())
+                    partys[i]->viewlist.insert(pl->get_id());
+                partys[i]->vl.unlock();*/
+
+                if (partys[i]->get_tribe() != HUMAN) continue;
+                send_change_hp_packet(partys[i], pl);
+                send_put_object_packet(partys[i], pl);
+            }
+
+            if (pl->get_tribe() == PARTNER) {
+                timer_event ev;
+                ev.obj_id = pl->get_id();
+                ev.start_time = chrono::system_clock::now() + 10s;
+                ev.ev = EVENT_PARTNER_MOVE;
+                ev.target_id = 1;
+                timer_queue.push(ev);
+
+                ev.obj_id = pl->get_id();
+                ev.start_time = chrono::system_clock::now() + 10s;
+                ev.ev = EVENT_PARTNER_ATTACK;
+                ev.target_id = 1;
+                timer_queue.push(ev);
+            }
+
+            return;
+        }
+        dungeons[pl->indun_id]->state_lock.unlock();
+    }
+    
     pl->state_lock.lock();
     if (pl->get_state() != ST_DEAD) {
         pl->state_lock.unlock();
@@ -2624,7 +2677,6 @@ void worker()
             break;
         }
         case OP_PLAYER_REVIVE: {
-            cout << "개같이 부활" << endl;
             player_revive(client_id);
             delete exp_over;
             break;
