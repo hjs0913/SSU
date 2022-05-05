@@ -16,6 +16,7 @@ Player::Player(int id) : Npc(id)
     superposition = false;
     join_dungeon_room = false;
     indun_id = -1;
+    attack_speed_up = false;
 }
 
 void Player::set_exp(int exp)
