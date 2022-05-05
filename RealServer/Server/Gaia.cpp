@@ -502,10 +502,17 @@ void Gaia::boss_attack()
 			pattern_two_position[2].first = 2372;
 			pattern_two_position[2].second = 2262;
 
-			pattern_two_safe_zone[0].first = 2222;
+			pattern_two_safe_zone[0].first = 2222;  //내부 
 			pattern_two_safe_zone[0].second = 2412;
 			pattern_two_safe_zone[1].first = 2322;
 			pattern_two_safe_zone[1].second = 2312;
+
+			pattern_two_safe_zone[2].first = 2122;  //외부
+			pattern_two_safe_zone[2].second = 2512;
+			pattern_two_safe_zone[3].first = 2422;
+			pattern_two_safe_zone[3].second = 2212;
+
+
 			break;
 		}
 		case 1: {
@@ -522,6 +529,13 @@ void Gaia::boss_attack()
 			pattern_two_safe_zone[0].second = 2312;
 			pattern_two_safe_zone[1].first = 1838;
 			pattern_two_safe_zone[1].second = 2412;
+
+			pattern_two_safe_zone[2].first = 1638;
+			pattern_two_safe_zone[2].second = 2212;
+			pattern_two_safe_zone[3].first = 1938;
+			pattern_two_safe_zone[3].second = 2512;
+
+
 			break;
 		}
 		case 2: {
@@ -538,6 +552,11 @@ void Gaia::boss_attack()
 			pattern_two_safe_zone[0].second = 1828;
 			pattern_two_safe_zone[1].first = 1738;
 			pattern_two_safe_zone[1].second = 1928;
+
+			pattern_two_safe_zone[2].first = 1938;
+			pattern_two_safe_zone[2].second = 1728;
+			pattern_two_safe_zone[3].first = 1638;
+			pattern_two_safe_zone[3].second = 2028;
 			break;
 		}
 		case 3: {
@@ -554,6 +573,11 @@ void Gaia::boss_attack()
 			pattern_two_safe_zone[0].second = 1928;
 			pattern_two_safe_zone[1].first = 2222;
 			pattern_two_safe_zone[1].second = 1828;
+
+			pattern_two_safe_zone[2].first = 2422;
+			pattern_two_safe_zone[2].second = 2028;
+			pattern_two_safe_zone[3].first = 2122;
+			pattern_two_safe_zone[3].second = 1728;
 			break;
 		}
 		}
@@ -757,15 +781,21 @@ void Gaia::pattern_active(int pattern)
 			for (int i = 0; i < 3; i++) {
 				pattern_two_position[i].first -= movesize;
 				pattern_two_position[i].second -= movesize;
+			}
+			for (int i = 0; i < 4; i++) {
 				pattern_two_safe_zone[i].first -= movesize;
 				pattern_two_safe_zone[i].second -= movesize;
 			}
+
 			break;
 		}
 		case 1: {
 			for (int i = 0; i < 3; i++) {
 				pattern_two_position[i].first += movesize;
 				pattern_two_position[i].second -= movesize;
+	
+			}
+			for (int i = 0; i < 4; i++) {
 				pattern_two_safe_zone[i].first += movesize;
 				pattern_two_safe_zone[i].second -= movesize;
 			}
@@ -775,6 +805,8 @@ void Gaia::pattern_active(int pattern)
 			for (int i = 0; i < 3; i++) {
 				pattern_two_position[i].first += movesize;
 				pattern_two_position[i].second += movesize;
+			}
+			for (int i = 0; i < 4; i++) {
 				pattern_two_safe_zone[i].first += movesize;
 				pattern_two_safe_zone[i].second += movesize;
 			}
@@ -784,6 +816,8 @@ void Gaia::pattern_active(int pattern)
 			for (int i = 0; i < 3; i++) {
 				pattern_two_position[i].first -= movesize;
 				pattern_two_position[i].second += movesize;
+			}
+			for (int i = 0; i < 4; i++) {
 				pattern_two_safe_zone[i].first -= movesize;
 				pattern_two_safe_zone[i].second += movesize;
 			}

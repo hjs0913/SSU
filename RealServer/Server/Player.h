@@ -27,7 +27,7 @@ public:
     bool                superposition;
     bool                join_dungeon_room;
     int                 indun_id;
-
+    bool                attack_speed_up;
 public:
     Player(int id);
 
