@@ -9,8 +9,6 @@ private:
 	int dungeon_id;
 	DUNGEON_STATE st;
 	char room_name[MAX_NAME_SIZE];
-
-	int target_id;	// agro_id (이때 id는 파티원에게 부여된 파티내 아이디(0~GAIA_ROOM)
 	Player* party[GAIA_ROOM];	// 파티원 정보
 	int party_id[GAIA_ROOM];	//서버에서의 파티원 id
 	int  player_death_count = 4;
@@ -23,6 +21,7 @@ private:
 	chrono::system_clock::time_point start_time;
 
 public:	
+	int target_id;	// agro_id (이때 id는 파티원에게 부여된 파티내 아이디(0~GAIA_ROOM)
 	bool running_pattern;  //파트너가 알수있게 퍼블릭으로
 	int pattern_num;   
 	// 1번
@@ -31,7 +30,7 @@ public:
 	pos pattern_two_position[3];
 	int pattern_two_number;
 	int pattern_two_count = 0;
-	pos pattern_two_safe_zone[2];
+	pos pattern_two_safe_zone[4];
 
 	// 5번
 	pos pattern_five_position[2];

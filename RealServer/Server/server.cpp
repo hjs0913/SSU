@@ -529,8 +529,6 @@ void attack_success(int p_id, int target, float atk_factor)
     if (players[target]->get_element_cooltime() == false) {
         switch (players[p_id]->get_element())
         {
-
-
         case E_WATER:
             if (players[target]->get_element() == E_FULLMETAL || players[target]->get_element() == E_FIRE
                 || players[target]->get_element() == E_EARTH) {
@@ -1220,13 +1218,21 @@ void process_packet(int client_id, unsigned char* p)
 
         if (pl->get_attack_active()) break;
         pl->set_attack_active(true);
-
         timer_event ev;
-        ev.obj_id = client_id;
-        ev.start_time = chrono::system_clock::now() + 1s;
-        ev.ev = EVENT_PLAYER_ATTACK;
-        ev.target_id = client_id;
-        timer_queue.push(ev);
+        if (pl->attack_speed_up == false) {
+            ev.obj_id = client_id;
+            ev.start_time = chrono::system_clock::now() + 1s;
+            ev.ev = EVENT_PLAYER_ATTACK;
+            ev.target_id = client_id;
+            timer_queue.push(ev);
+        }
+        else {
+            ev.obj_id = client_id;
+            ev.start_time = chrono::system_clock::now() + 50ms;
+            ev.ev = EVENT_PLAYER_ATTACK;
+            ev.target_id = client_id;
+            timer_queue.push(ev);
+        }
         
         if (pl->join_dungeon_room && dungeons[pl->indun_id]->start_game) {
             int indun = pl->indun_id;
@@ -1657,8 +1663,7 @@ void process_packet(int client_id, unsigned char* p)
                         {
                            
                         case 0: // mp흡수 
-                       
-
+                      
                             cout << "마나 드레인!!!" << endl;
                             pl->set_hp(pl->get_hp() - 300);
                             send_status_change_packet(pl);
@@ -2779,7 +2784,6 @@ void worker()
             players[client_id]->state_lock.unlock();
             Partner* pl = reinterpret_cast<Partner*>(players[client_id]);
             pl->partner_attack(pl, dungeons[pl->get_indun_id()]);
-            //dungeons[client_id]->partner_attack(1);
             delete exp_over;
             break;
         }
@@ -2790,7 +2794,6 @@ void worker()
                 break;
             }
             players[client_id]->state_lock.unlock();
-          //  dungeons[client_id]->pattern_active(exp_over->_target);
             delete exp_over;
             break;
         }
@@ -3504,7 +3507,14 @@ void do_timer()
                 }
                 reinterpret_cast<Player*>(players[temp.obj_id])->set_skill_active(temp.target_id, false);
             }
-
+            else if (temp.ev == EVENT_PARTNER_ATTACK) {
+                if (temp.target_id == 10) {
+                    int indun_id = reinterpret_cast<Player*>(players[temp.obj_id])->get_indun_id();
+                    for (int i = 0; i < GAIA_ROOM; ++i) {
+                        dungeons[indun_id]->get_party_palyer()[i]->attack_speed_up = false;
+                    }
+                }
+            }
            
             else {
                 EXP_OVER* ex_over = new EXP_OVER;
@@ -3539,6 +3549,15 @@ void do_timer()
                         ->set_skill_active(ev.target_id, false);
                     continue;
                 }
+                else if (ev.ev == EVENT_PARTNER_ATTACK) {
+                    if (ev.target_id == 10) {
+                        int indun_id = reinterpret_cast<Player*>(players[ev.obj_id])->get_indun_id();
+                        for (int i = 0; i < GAIA_ROOM; ++i) {
+                            dungeons[indun_id]->get_party_palyer()[i]->attack_speed_up = false;
+                        }
+                    }
+                }
+               
                 ex_over->_comp_op = EVtoOP(ev.ev);
                 ex_over->_target = ev.target_id;
                 PostQueuedCompletionStatus(g_h_iocp, 1, ev.obj_id, &ex_over->_wsa_over);   //0은 소켓취급을 받음
