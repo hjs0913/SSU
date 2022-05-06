@@ -309,10 +309,8 @@ void Partner::physical_skill_success(int p_id, int target, float skill_factor)
 }
 
 
-//공격이 초반만 실행되고 잘 안된다. 그리고 데미지도 잘 안들어간다. 
-void Partner::partner_attack(Partner* pa, Gaia* gaia) //일반공격 기본, 스킬을 쿨타임 돌때마다 계속 쓰도록 하자 
+void Partner::partner_attack(Partner* pa, Gaia* gaia) //스킬을 쿨타임 돌때마다 계속 쓰도록 하자     //  서포타가 오류인가?
 {
-	if (running_pattern)return;
 
 	random_device rd;
 	mt19937 gen(rd());
@@ -323,7 +321,6 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //일반공격 기본, 스킬을 쿨
 
 	//일단 직업에 따라서 다시 분류 합시다.
 	//그리고 ai는 피킹이 필요없게 하자 // 직업이랑 hp, mp확인후 제일 필요한 사람에게 버프 주고 버프 ui패킷도 보내자 
-
 	switch (pa->get_job()) // AI의 직업을 보고 움직임을 나누자 
 	{
 	case J_DILLER: {
@@ -344,14 +341,14 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //일반공격 기본, 스킬을 쿨
 					send_change_hp_packet(gaia->get_party_palyer()[i], gaia->boss);
 				}
 			}
-				ev.obj_id = pa->get_id();
-				ev.start_time = chrono::system_clock::now() + 3s;
-				ev.ev = EVENT_PARTNER_ATTACK;
-				ev.target_id = gaia->get_dungeon_id();
-				timer_queue.push(ev);
-				running_pattern = false;
-				break;
-			
+
+			ev.obj_id = pa->get_id();
+			ev.start_time = chrono::system_clock::now() + 3s;
+			ev.ev = EVENT_PARTNER_SKILL;
+			ev.target_id = gaia->get_dungeon_id();
+			timer_queue.push(ev);
+			running_pattern = false;
+			break;
 		}
 		case 1: {
 			running_pattern = true;
@@ -378,7 +375,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //일반공격 기본, 스킬을 쿨
 			}
 			ev.obj_id = pa->get_id();
 			ev.start_time = chrono::system_clock::now() + 3s;  //쿨타임
-			ev.ev = EVENT_PARTNER_ATTACK;
+			ev.ev = EVENT_PARTNER_SKILL;
 			ev.target_id = gaia->get_dungeon_id();
 			timer_queue.push(ev);
 			running_pattern = false;
@@ -395,7 +392,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //일반공격 기본, 스킬을 쿨
 
 			ev.obj_id = pa->get_id();
 			ev.start_time = chrono::system_clock::now() + 3s;  //쿨타임
-			ev.ev = EVENT_PARTNER_ATTACK;
+			ev.ev = EVENT_PARTNER_SKILL;
 			ev.target_id = pa->get_id();;
 			timer_queue.push(ev);
 			running_pattern = false;
@@ -428,7 +425,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //일반공격 기본, 스킬을 쿨
 			}
 			ev.obj_id = pa->get_id();
 			ev.start_time = chrono::system_clock::now() + 3s;  //쿨타임
-			ev.ev = EVENT_PARTNER_ATTACK;
+			ev.ev = EVENT_PARTNER_SKILL;
 			ev.target_id = gaia->get_dungeon_id();
 			timer_queue.push(ev);
 			running_pattern = false;
@@ -444,10 +441,10 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //일반공격 기본, 스킬을 쿨
 				gaia->target_id = pa->get_indun_id();
 				//send_status_change_packet(pl);
 			} 
-			timer_event ev;
+		
 			ev.obj_id = gaia->get_dungeon_id();       // 해제는 나중에 다시 
 			ev.start_time = chrono::system_clock::now() + 7s;
-			ev.ev = EVENT_PARTNER_ATTACK;
+			ev.ev = EVENT_PARTNER_SKILL;
 			ev.target_id = pa->get_id();
 			timer_queue.push(ev);
 			running_pattern = false;
@@ -462,10 +459,10 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //일반공격 기본, 스킬을 쿨
 			pa->set_magical_defence(0.4 * pa->get_lv() * pa->get_lv() + 10 * pa->get_lv());
 			//send_status_change_packet(pl);
 			
-			timer_event ev;            // 해제는 나중에 다시 
+		            // 해제는 나중에 다시 
 			ev.obj_id = pa->get_id();
 			ev.start_time = chrono::system_clock::now() + 10s;  //쿨타임
-			ev.ev = EVENT_PARTNER_ATTACK;
+			ev.ev = EVENT_PARTNER_SKILL;
 			ev.target_id = 2;
 			timer_queue.push(ev);
 			running_pattern = false;
@@ -500,10 +497,10 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //일반공격 기본, 스킬을 쿨
 					send_change_hp_packet(gaia->get_party_palyer()[i], pa);
 				}
 			}
-			timer_event ev;
+		
 			ev.obj_id = pa->get_id();
 			ev.start_time = chrono::system_clock::now() + 5s;
-			ev.ev = EVENT_PARTNER_ATTACK;
+			ev.ev = EVENT_PARTNER_SKILL;
 			ev.target_id = gaia->get_dungeon_id();
 			timer_queue.push(ev);
 			running_pattern = false;
@@ -539,10 +536,10 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //일반공격 기본, 스킬을 쿨
 				for (int i = 0; i < GAIA_ROOM; ++i)
 					send_play_effect_packet(gaia->get_party_palyer()[i], gaia->boss); // 이펙트 터트릴 위치 
 			}
-			timer_event ev;
+		
 			ev.obj_id = pa->get_id();
 			ev.start_time = chrono::system_clock::now() + 10s;
-			ev.ev = EVENT_PARTNER_ATTACK;
+			ev.ev = EVENT_PARTNER_SKILL;
 			ev.target_id = gaia->get_dungeon_id();
 			timer_queue.push(ev);	
 			running_pattern = false;
@@ -555,7 +552,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //일반공격 기본, 스킬을 쿨
 		break;
 	}
 	case J_SUPPORTER: {
-		switch (p)
+		switch (1)
 		{
 		case 0: {  //hp 회복 
 			running_pattern = true;
@@ -581,17 +578,17 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //일반공격 기본, 스킬을 쿨
 			}
 			ev.obj_id = pa->get_id();
 			ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
-			ev.ev = EVENT_PARTNER_ATTACK;
+			ev.ev = EVENT_PARTNER_SKILL;
 			ev.target_id = gaia->get_party_palyer()[target_player]->get_id();
 			timer_queue.push(ev);
 			running_pattern = false;
 			break;
 		}
-		case 1: { //mp 회복 
+		case 1: { //mp 회복   //여기이상 
 			running_pattern = true;
 			int tmp_mp = 0;
 			int target_player = 0;
-			for (int i = 0; i < GAIA_ROOM; ++i) {   // 낮은 체력 플레이어 찾기 
+			for (int i = 0; i < GAIA_ROOM; ++i) {   // 낮은 마나 플레이어 찾기 
 				if (i == 0) {
 					target_player = i;
 					tmp_mp = gaia->get_party_palyer()[i]->get_mp();
@@ -607,11 +604,11 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //일반공격 기본, 스킬을 쿨
 			pa->set_mp(pa->get_mp() - 1000);
 			gaia->get_party_palyer()[target_player]->set_mp(gaia->get_party_palyer()[target_player]->get_mp() + gaia->get_party_palyer()[target_player]->get_maxmp() / 10);
 			for (int i = 0; i < GAIA_ROOM; ++i) {
-			//	send_change_hp_packet(gaia->get_party_palyer()[i], gaia->get_party_palyer()[target_player]);  //여기 mp 변경 함수 만들어서 보내자 
+				send_change_mp_packet(gaia->get_party_palyer()[i], gaia->get_party_palyer()[target_player]); 
 			}
 			ev.obj_id = pa->get_id();
 			ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
-			ev.ev = EVENT_PARTNER_ATTACK;
+			ev.ev = EVENT_PARTNER_SKILL;
 			ev.target_id = gaia->get_party_palyer()[target_player]->get_id();
 			timer_queue.push(ev);
 			running_pattern = false;
@@ -625,7 +622,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //일반공격 기본, 스킬을 쿨
 			}
 			ev.obj_id = pa->get_id();
 			ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
-			ev.ev = EVENT_PARTNER_ATTACK;   // 파트너 (버프) 스킬 이벤트를 따로 만들지 생각해보자 
+			ev.ev = EVENT_PARTNER_SKILL;   // 파트너 (버프) 스킬 이벤트를 따로 만들지 생각해보자 
 			ev.target_id = 10;  // 일단 이걸로 구분 
 			timer_queue.push(ev);
 			running_pattern = false;
@@ -642,4 +639,42 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //일반공격 기본, 스킬을 쿨
 		break;
 	}
 	
+}
+
+void Partner::attack_success(Partner* pa, Gaia* gaia, float atk_factor)
+{
+	float give_damage = pa->get_physical_attack() * atk_factor;
+	float defence_damage = (gaia->boss->get_defence_factor() *
+		gaia->boss->get_physical_defence()) / (1 + (gaia->boss->get_defence_factor() *
+			gaia->boss->get_physical_defence()));
+	float damage = give_damage * (1 - defence_damage);
+	int target_hp = gaia->boss->get_hp() - damage;
+
+	gaia->boss->set_hp(target_hp);
+	for (int i = 0; i < GAIA_ROOM; ++i) {
+		send_change_hp_packet(gaia->get_party_palyer()[i], gaia->boss);
+	}
+	cout << "일반공격!" << endl;
+
+	//hp가 0이되는건 처리 안해놈 
+}
+void Partner::partner_normal_attack(Partner* pa, Gaia* gaia)
+{
+	if (running_pattern)
+		return;
+
+	float partner_x, partner_z;
+	float gaia_x, gaia_z;
+	partner_x = pa->get_x(); partner_z = pa->get_z();
+	gaia_x = gaia->boss->get_x(); gaia_z = gaia->boss->get_z();
+
+	if (gaia_z <= partner_z + 10) {
+		if (partner_z - 10 <= gaia_z) {
+			if (gaia_x <= partner_x + 10) {
+				if (partner_x - 10 <= gaia_x) {
+					attack_success(pa, gaia, pa->get_basic_attack_factor());
+				}
+			}
+		}
+	}
 }

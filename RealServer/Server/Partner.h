@@ -1,7 +1,7 @@
 #pragma once
 #include "SkillBuf.h"
-#include "Player.h"
 #include "Gaia.h"
+#include "stdafx.h"
 
 struct Coord_P
 {
@@ -37,6 +37,8 @@ public:
 
     void partner_move(Partner* pa, Gaia* gaia);
     void partner_attack(Partner* pa, Gaia* gaia);
+    void partner_normal_attack(Partner* pa, Gaia* gaia);
+    void attack_success(Partner* pa, Gaia* gaia, float atk_factor);
 
     void physical_skill_success(int p_id, int target, float skill_factor);
 
