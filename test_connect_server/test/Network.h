@@ -66,6 +66,7 @@ extern int InvitationUser;
 
 extern bool NoticeUI_On;
 extern bool RaidEnterNotice;
+extern bool DeadNotice;
 extern wstring Notice_str;
 
 extern CRITICAL_SECTION cs;

@@ -339,7 +339,7 @@ void Gaia::boss_attack()
 	case 1: { //파도3개 
 		cout << "파도" << endl;
 		running_pattern = true;
-		pattern_two_number = pattern_num % 4;
+		pattern_two_number = pattern(gen) % 4;
 		switch (pattern_two_number) {
 		case 0: {
 			pattern_two_position[0].first = 2172;
@@ -376,6 +376,7 @@ void Gaia::boss_attack()
 
 			pattern_two_safe_zone[0].first = 1738;
 			pattern_two_safe_zone[0].second = 2312;
+
 			pattern_two_safe_zone[1].first = 1838;
 			pattern_two_safe_zone[1].second = 2412;
 
@@ -519,10 +520,15 @@ void Gaia::player_death(Player* p)
 		// 시야처리
 		int tmp_hp = 0;
 		for (int i = 0; i < GAIA_ROOM; i++) {
+			send_change_hp_packet(party[i], p);
 			send_change_death_count_packet(party[i], player_death_count);
-			send_remove_object_packet(party[i], p);
+			if (p->get_id() != party[i]->get_id()) {
+				send_remove_object_packet(party[i], p);
+			}
 			if (party[i]->get_hp() > tmp_hp) target_id = i;
 		}
+
+		send_notice(p, "사망했습니다. 5초 후 부활합니다", 1);
 
 		timer_event ev;
 		ev.obj_id = p->get_id();

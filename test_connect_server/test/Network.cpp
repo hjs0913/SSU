@@ -52,6 +52,7 @@ bool InvitationCardUI_On = false;
 bool AddAIUI_On = false;
 bool NoticeUI_On = false;
 bool RaidEnterNotice = false;
+bool DeadNotice = false;
 wstring Notice_str = L"";
 chrono::system_clock::time_point InvitationCardTimer = chrono::system_clock::now();
 chrono::system_clock::time_point NoticeTimer = chrono::system_clock::now();
@@ -333,7 +334,6 @@ void do_recv()
 
 void process_packet(unsigned char* p) 
 {
-
 	int type = *(p + 1);
 	switch (type) {
 	case SC_PACKET_LOGIN_OK: {
@@ -501,6 +501,7 @@ void process_packet(unsigned char* p)
 	case SC_PACKET_DEAD: {
 		sc_packet_dead* packet = reinterpret_cast<sc_packet_dead*> (p);
 		mPlayer[my_id]->SetUse(false);
+		mPlayer[my_id]->m_hp = 0;
 		combat_id = -1;
 		Combat_On = false;
 		cout << "died" << endl;
@@ -790,21 +791,26 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_NOTICE: {
-		EnterCriticalSection(&cs);
 		sc_packet_notice* packet = reinterpret_cast<sc_packet_notice*>(p);
+		EnterCriticalSection(&cs);
 		NoticeUI_On = true;
+		LeaveCriticalSection(&cs);
+
 		if ((int)packet->raid_enter == 0) {
 			RaidEnterNotice = true;
+			NoticeTimer = chrono::system_clock::now() + 5s;
 		}
-		NoticeTimer = chrono::system_clock::now() + 5s;
-
+		else if ((int)packet->raid_enter == 1) {
+			DeadNotice = true;
+			if(InDungeon) NoticeTimer = chrono::system_clock::now() + 5s;
+			else NoticeTimer = chrono::system_clock::now() + 10s;
+		}
 		wchar_t* temp;
 		int len = 1 + strlen(packet->message);
 		temp = new TCHAR[len];
 		mbstowcs(temp, packet->message, len);
 		Notice_str = L"";
 		Notice_str.append(temp);
-		LeaveCriticalSection(&cs);
 		break;
 	}
 	default:

@@ -1575,6 +1575,8 @@ void CGameFramework::FrameAdvance()
 	m_GameTimer.GetFrameRate(m_pszFrameRate + 12, 37);
 	::SetWindowText(m_hWnd, m_pszFrameRate);
 
+	LeaveCriticalSection(&cs);
+
 	if (robby_cnt > 0) delete []party_name_index;
 	if (InvitationCardUI_On) {
 		if (chrono::system_clock::now() > InvitationCardTimer) {
@@ -1587,10 +1589,17 @@ void CGameFramework::FrameAdvance()
 		if (NoticeTimer < chrono::system_clock::now()) {
 			NoticeUI_On = false;
 			RaidEnterNotice = false;
+			DeadNotice = false;
 		}
 		else {
+			auto t = NoticeTimer - chrono::system_clock::now();
+			if (DeadNotice) {
+				Notice_str = L"사망했습니다. ";
+				Notice_str.append(to_wstring(chrono::duration_cast<chrono::seconds>(t).count()));
+				Notice_str.append(L"초 후 부활합니다");
+			}
+
 			if (RaidEnterNotice) {
-				auto t = NoticeTimer - chrono::system_clock::now();
 				if (t >= 4s && t < 5s) Notice_str = L"4초후에 게임을 시작합니다";
 				else if(t >= 3s && t < 4s) Notice_str = L"3초후에 게임을 시작합니다";
 				else if (t >= 2s && t < 3s) Notice_str = L"2초후에 게임을 시작합니다";
@@ -1598,7 +1607,5 @@ void CGameFramework::FrameAdvance()
 			}
 		}
 	}
-
-	LeaveCriticalSection(&cs);
 }
 

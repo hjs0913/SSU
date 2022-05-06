@@ -220,6 +220,7 @@ void magical_skill_success(int p_id, int target, float skill_factor)
             packet.attacker_id = p_id;
             reinterpret_cast<Player*>(players[target])->do_send(sizeof(packet), &packet);
 
+            send_notice(reinterpret_cast<Player*>(players[target]), "사망했습니다. 10초 후 부활합니다", 1);
 
             timer_event ev;
             ev.obj_id = target;
@@ -380,6 +381,7 @@ void physical_skill_success(int p_id, int target, float skill_factor)
             packet.attacker_id = p_id;
             reinterpret_cast<Player*>(players[target])->do_send(sizeof(packet), &packet);
 
+            send_notice(reinterpret_cast<Player*>(players[target]), "사망했습니다. 10초 후 부활합니다", 1);
 
             timer_event ev;
             ev.obj_id = target;
@@ -618,6 +620,8 @@ void attack_success(int p_id, int target, float atk_factor)
             packet.attacker_id = p_id;
             reinterpret_cast<Player*>(players[target]) ->do_send(sizeof(packet), &packet);
             
+            send_notice(reinterpret_cast<Player*>(players[target]), "사망했습니다. 10초 후 부활합니다", 1);
+
             // 3초후 부활하며 부활과 동시에 위치 좌표를 수정해준다
             timer_event ev;
             ev.obj_id = target;
@@ -2327,14 +2331,12 @@ void player_revive(int client_id)
             // 시야처리
             Player** partys = dungeons[pl->indun_id]->get_party_palyer();
             for (int i = 0; i < 4; i++) {
-                /*partys[i]->vl.lock();
-                if (pl->get_id() != partys[i]->get_id())
-                    partys[i]->viewlist.insert(pl->get_id());
-                partys[i]->vl.unlock();*/
-
                 if (partys[i]->get_tribe() != HUMAN) continue;
                 send_change_hp_packet(partys[i], pl);
-                send_put_object_packet(partys[i], pl);
+
+                if (partys[i]->get_id() != pl->get_id()) {
+                    send_put_object_packet(partys[i], pl);
+                }
             }
 
             if (pl->get_tribe() == PARTNER) {
