@@ -71,7 +71,7 @@ CGameFramework::CGameFramework()
 	m_pScene = NULL;
 	m_pPlayer = NULL;
 
-	_tcscpy_s(m_pszFrameRate, _T("LabProject ("));
+	_tcscpy_s(m_pszFrameRate, _T("SSU ("));
 }
 
 CGameFramework::~CGameFramework()
@@ -614,7 +614,7 @@ void CGameFramework::ProcessInput()
 				else
 					m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
 			}
-			if (dwDirection) m_pPlayer->Move(dwDirection, 12.25f, true);
+			if (dwDirection) m_pPlayer->Move(dwDirection, /*12.25f*/9.0f, true);
 		}
 	}
 	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
@@ -743,7 +743,7 @@ void CGameFramework::FrameAdvance()
 				mbstowcs(temp, all, len);
 				Send_str.append(temp);
 				Send_str += L"\n";
-				delete temp;
+				delete[] temp;
 			}
 			m_ppUILayer[i]->UpdateLabels(Send_str, 0, 340, m_nWndClientWidth / 2, 300 + (m_nWndClientHeight / 3));
 		}
