@@ -79,9 +79,6 @@ public:
 	void judge_pattern_two_leftup(Player* p);
 
 	void player_death(Player* p);
-
-	void partner_move(int p_id);
-	void partner_attack(int p_id);
 	
 	float get_x();
 	float get_z();
