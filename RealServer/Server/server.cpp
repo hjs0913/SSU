@@ -502,22 +502,22 @@ void physical_skill_success(int p_id, int target, float skill_factor)
     }
 }
 
-void attack_success(int p_id, int target, float atk_factor)
+void attack_success(Npc* p, Npc* target, float atk_factor)
 {
     // 현재 물리 공격에 대해서만 생각한다
-    float give_damage = players[p_id]->get_physical_attack() * atk_factor;
-    float defence_damage = (players[target]->get_defence_factor() *
-        players[target]->get_physical_defence()) / (1 + (players[target]->get_defence_factor() *
-            players[target]->get_physical_defence()));
+    float give_damage = p->get_physical_attack() * atk_factor;
+    float defence_damage = (target->get_defence_factor() *
+        target->get_physical_defence()) / (1 + (target->get_defence_factor() *
+            target->get_physical_defence()));
     float damage = give_damage * (1 - defence_damage);
-    int target_hp = players[target]->get_hp() - damage;
+    int target_hp = target->get_hp() - damage;
 
-    cout << players[p_id]->get_name() << "가 " << damage << "의 데미지를 " 
-        << players[target]->get_name() << "에게 입혀"
+    cout << p->get_name() << "가 " << damage << "의 데미지를 " 
+        << target->get_name() << "에게 입혀"
         << target_hp << "의 피가 남음" << endl;
 
 
-    players[target]->set_hp(target_hp);
+    target->set_hp(target_hp);
 
     //timer_event ev;
     //ev.obj_id = p_id;
@@ -526,71 +526,71 @@ void attack_success(int p_id, int target, float atk_factor)
     //ev.target_id = target;
     //timer_queue.push(ev);
 
-    cout << "공격자  속성" << players[p_id]->get_element() << endl;
+    cout << "공격자  속성" << p->get_element() << endl;
 
-    if (players[target]->get_element_cooltime() == false) {
-        switch (players[p_id]->get_element())
+    if (target->get_element_cooltime() == false) {
+        switch (p->get_element())
         {
         case E_WATER:
-            if (players[target]->get_element() == E_FULLMETAL || players[target]->get_element() == E_FIRE
-                || players[target]->get_element() == E_EARTH) {
-                players[target]->set_magical_attack(players[target]->get_magical_attack() / 10 * 9);
-                players[target]->set_element_cooltime(true);
+            if (target->get_element() == E_FULLMETAL || target->get_element() == E_FIRE
+                || target->get_element() == E_EARTH) {
+                target->set_magical_attack(target->get_magical_attack() / 10 * 9);
+                target->set_element_cooltime(true);
             }
-            cout << "타켓의 마공:" << players[target]->get_magical_attack() << endl;
+            cout << "타켓의 마공:" << target->get_magical_attack() << endl;
             break;
         case E_FULLMETAL:
-            if (players[target]->get_element() == E_ICE || players[target]->get_element() == E_TREE
-                || players[target]->get_element() == E_WIND) {
-                reinterpret_cast<Player*>(players[p_id])->set_physical_defence(reinterpret_cast<Player*>(players[p_id])->get_physical_defence() + reinterpret_cast<Player*>(players[p_id])->get_physical_defence() / 10);
-                players[target]->set_element_cooltime(true);
+            if (target->get_element() == E_ICE || target->get_element() == E_TREE
+                || target->get_element() == E_WIND) {
+                reinterpret_cast<Player*>(p)->set_physical_defence(reinterpret_cast<Player*>(p)->get_physical_defence() + reinterpret_cast<Player*>(p)->get_physical_defence() / 10);
+                target->set_element_cooltime(true);
             }
             break;
         case E_WIND:
-            if (players[target]->get_element() == E_WATER || players[target]->get_element() == E_EARTH
-                || players[target]->get_element() == E_FIRE) {
+            if (target->get_element() == E_WATER || target->get_element() == E_EARTH
+                || target->get_element() == E_FIRE) {
 
                 //공속 시전속도 상승 , 쿨타임 감소 
-                players[target]->set_element_cooltime(true);
+                target->set_element_cooltime(true);
             }
             break;
         case E_FIRE:
-            if (players[target]->get_element() == E_ICE || players[target]->get_element() == E_TREE
-                || players[target]->get_element() == E_FULLMETAL) {
+            if (target->get_element() == E_ICE || target->get_element() == E_TREE
+                || target->get_element() == E_FULLMETAL) {
                 //10초 공격력 10프로의 화상 피해 
-                players[target]->set_element_cooltime(true);
+                target->set_element_cooltime(true);
             }
             break;
         case E_TREE:
-            if (players[target]->get_element() == E_EARTH || players[target]->get_element() == E_WATER
-                || players[target]->get_element() == E_WIND) {
-                players[target]->set_physical_attack(players[target]->get_physical_attack() / 10 * 9);
-                players[target]->set_element_cooltime(true);
+            if (target->get_element() == E_EARTH || target->get_element() == E_WATER
+                || target->get_element() == E_WIND) {
+                target->set_physical_attack(target->get_physical_attack() / 10 * 9);
+                target->set_element_cooltime(true);
             }
             break;
         case E_EARTH:
-            if (players[target]->get_element() == E_ICE || players[target]->get_element() == E_FULLMETAL
-                || players[target]->get_element() == E_FIRE) {
-                reinterpret_cast<Player*>(players[p_id])->set_magical_defence(reinterpret_cast<Player*>(players[p_id])->get_magical_defence() + reinterpret_cast<Player*>(players[p_id])->get_magical_defence() / 10);
-                players[target]->set_element_cooltime(true);
+            if (target->get_element() == E_ICE || target->get_element() == E_FULLMETAL
+                || target->get_element() == E_FIRE) {
+                reinterpret_cast<Player*>(p)->set_magical_defence(reinterpret_cast<Player*>(p)->get_magical_defence() + reinterpret_cast<Player*>(p)->get_magical_defence() / 10);
+                target->set_element_cooltime(true);
             }
             break;
         case E_ICE:
-            if (players[target]->get_element() == E_TREE || players[target]->get_element() == E_WATER
-                || players[target]->get_element() == E_WIND) {
+            if (target->get_element() == E_TREE || target->get_element() == E_WATER
+                || target->get_element() == E_WIND) {
                 //동결 and  10초동안 공속, 시전속도, 이동속도 10프로감소 
-                players[target]->set_element_cooltime(true);
+                target->set_element_cooltime(true);
             }
             break;
         default:
             break;
         }
-        if (players[target]->get_element_cooltime() == true) {
+        if (target->get_element_cooltime() == true) {
             timer_event ev;
-            ev.obj_id = p_id;
+            ev.obj_id = p->get_id();
             ev.start_time = chrono::system_clock::now() + 10s;  //쿨타임
             ev.ev = EVENT_ELEMENT_COOLTIME;;
-            ev.target_id = target;
+            ev.target_id = target->get_id();
             timer_queue.push(ev);
         }
     }
@@ -603,147 +603,148 @@ void attack_success(int p_id, int target, float atk_factor)
 
 
     if (target_hp <= 0) {
-        players[target]->state_lock.lock();
-        if(players[target]->get_state()!=ST_INGAME){
-            players[target]->state_lock.unlock();
+        target->state_lock.lock();
+        if(target->get_state()!=ST_INGAME){
+            target->state_lock.unlock();
             return;
         }
-        players[target]->set_state(ST_DEAD);
-        players[target]->state_lock.unlock();
-        if (target < NPC_ID_START) {    // 죽은게 플레이어이다
-            players[p_id]->set_active(false);
+        target->set_state(ST_DEAD);
+        target->state_lock.unlock();
+        if (target->get_id() < NPC_ID_START) {    // 죽은게 플레이어이다
+            if (target->get_tribe() == BOSS) return;    // 보스 죽음
+            p->set_active(false);
             // 죽은것이 플레이어라면 죽었다는 패킷을 보내준다
             sc_packet_dead packet;
             packet.size = sizeof(packet);
             packet.type = SC_PACKET_DEAD;
-            packet.id = target;
-            packet.attacker_id = p_id;
-            reinterpret_cast<Player*>(players[target]) ->do_send(sizeof(packet), &packet);
+            packet.id = target->get_id();
+            packet.attacker_id = p->get_id();
+            reinterpret_cast<Player*>(target) ->do_send(sizeof(packet), &packet);
             
-            send_notice(reinterpret_cast<Player*>(players[target]), "사망했습니다. 10초 후 부활합니다", 1);
+            send_notice(reinterpret_cast<Player*>(target), "사망했습니다. 10초 후 부활합니다", 1);
 
             // 3초후 부활하며 부활과 동시에 위치 좌표를 수정해준다
             timer_event ev;
-            ev.obj_id = target;
+            ev.obj_id = target->get_id();
             ev.start_time = chrono::system_clock::now() + 10s;
             ev.ev = EVENT_PLAYER_REVIVE;
             ev.target_id = 0;
             timer_queue.push(ev);
         }
         else {  // NPC라면 30초 후에 부활할 수 있도록 하자
-            players[target]->set_active(false);
+            target->set_active(false);
             timer_event ev;
-            ev.obj_id = target;
+            ev.obj_id = target->get_id();
             ev.start_time = chrono::system_clock::now() + 30s;
             ev.ev = EVENT_NPC_REVIVE;
             ev.target_id = 0;
             timer_queue.push(ev);
 
             // 플레이어에게 경험치 제공, 그리고 바뀐 경험치와 레벨을 보내주자
-            int get_exp = players[target]->get_lv() * players[target]->get_lv() * 2;
-            if (players[target]->get_tribe() == BOSS)
+            int get_exp = target->get_lv() * target->get_lv() * 2;
+            if (target->get_tribe() == BOSS)
                 get_exp = get_exp * 2;
             char mess[MAX_CHAT_SIZE];
             sprintf_s(mess, MAX_CHAT_SIZE, "%s을 죽였습니다, %d의 경험치를 획득합니다",
-                 players[target]->get_name(), get_exp);
-            send_chat_packet(reinterpret_cast<Player*>(players[p_id]), p_id, mess);
+                 target->get_name(), get_exp);
+            send_chat_packet(reinterpret_cast<Player*>(p), p->get_id(), mess);
 
-            send_status_change_packet(reinterpret_cast<Player*>(players[p_id]));
+            send_status_change_packet(reinterpret_cast<Player*>(p));
 
-            int max_exp = 100 * pow(2, (players[p_id]->get_lv() - 1));
-            if (reinterpret_cast<Player*>(players[p_id])->get_exp() + get_exp >= max_exp) {
-                players[p_id]->set_lv(players[p_id]->get_lv() + 1);
-                reinterpret_cast<Player*>(players[p_id])->
-                    set_exp(reinterpret_cast<Player*>(players[p_id])->get_exp()+ get_exp - max_exp);
+            int max_exp = 100 * pow(2, (p->get_lv() - 1));
+            if (reinterpret_cast<Player*>(p)->get_exp() + get_exp >= max_exp) {
+                p->set_lv(p->get_lv() + 1);
+                reinterpret_cast<Player*>(p)->
+                    set_exp(reinterpret_cast<Player*>(p)->get_exp()+ get_exp - max_exp);
                 sprintf_s(mess, MAX_CHAT_SIZE, "Level up : %d",
-                    players[p_id]->get_lv());
-                send_chat_packet(reinterpret_cast<Player*>(players[p_id]), p_id, mess);
-                send_status_change_packet(reinterpret_cast<Player*>(players[p_id]));
+                    p->get_lv());
+                send_chat_packet(reinterpret_cast<Player*>(p), p->get_id(), mess);
+                send_status_change_packet(reinterpret_cast<Player*>(p));
             }
             else {
-                reinterpret_cast<Player*>(players[p_id])
-                    ->set_exp(reinterpret_cast<Player*>(players[p_id])->get_exp() + get_exp);
+                reinterpret_cast<Player*>(p)
+                    ->set_exp(reinterpret_cast<Player*>(p)->get_exp() + get_exp);
             }
-            send_status_change_packet(reinterpret_cast<Player*>(players[p_id]));
+            send_status_change_packet(reinterpret_cast<Player*>(p));
         }
         // 죽은 target 주위의 플레이어에게 사라지게 해주자
         unordered_set <int> nearlist;
         for (auto& other : players) {
-            if (false == is_near(players[target]->get_id(), other->get_id()))
+            if (false == is_near(target->get_id(), other->get_id()))
                 continue;
             if (ST_INGAME != other->get_state())
                 continue;
             if (other->get_tribe() != HUMAN) break;
             nearlist.insert(other->get_id());
         }
-        nearlist.erase(target);
+        nearlist.erase(target->get_id());
 
         for (auto other : nearlist) {
             Player* other_player = reinterpret_cast<Player*>(players[other]);
             other_player->vl.lock();
-            if (0 != other_player->viewlist.count(target)) {
-                other_player->viewlist.erase(target);
+            if (0 != other_player->viewlist.count(target->get_id())) {
+                other_player->viewlist.erase(target->get_id());
                 other_player->vl.unlock();
-                send_remove_object_packet(other_player, players[target]);
+                send_remove_object_packet(other_player, target);
             }
             else other_player->vl.unlock();
         }
     }
-    else if(p_id >= NPC_ID_START){
+    else if(p->get_id() >= NPC_ID_START){
         // 플레이어가 공격을 당한 것이므로 hp정보가 바뀌었으므로 그것을 보내주자
         // send_status_change_packet(reinterpret_cast<Player*>(players[target]));
         
         // 플레이어의 ViewList에 있는 플레이어들에게 보내주자
-        send_change_hp_packet(reinterpret_cast<Player*>(players[target]), players[target]);
-        reinterpret_cast<Player*>(players[target])->vl.lock();
-        for (auto id : reinterpret_cast<Player*>(players[target])->viewlist) {
+        send_change_hp_packet(reinterpret_cast<Player*>(target), target);
+        reinterpret_cast<Player*>(target)->vl.lock();
+        for (auto id : reinterpret_cast<Player*>(target)->viewlist) {
             if (true == is_npc(id)) continue;
-            send_change_hp_packet(reinterpret_cast<Player*>(players[id]), players[target]);
+            send_change_hp_packet(reinterpret_cast<Player*>(players[id]), target);
         }
-        reinterpret_cast<Player*>(players[target])->vl.unlock();
+        reinterpret_cast<Player*>(target)->vl.unlock();
 
 
         char mess[MAX_CHAT_SIZE];
         //send_chat_packet(reinterpret_cast<Player*>(players[target]), target, mess);
 
         // hp가 깎이였으므로 hp자동회복을 해주도록 하자
-        if (reinterpret_cast<Player*>(players[target])->_auto_hp == false) {
+        if (reinterpret_cast<Player*>(target)->_auto_hp == false) {
             timer_event ev;
-            ev.obj_id = target;
+            ev.obj_id = target->get_id();
             ev.start_time = chrono::system_clock::now() + 5s;
             ev.ev = EVENT_AUTO_PLAYER_HP;
             ev.target_id = 0;
             timer_queue.push(ev);
-            reinterpret_cast<Player*>(players[target])->_auto_hp = true;
+            reinterpret_cast<Player*>(target)->_auto_hp = true;
         }
 
         // npc공격이면 타이머 큐에 다시 넣어주자
         timer_event ev;
-        ev.obj_id = p_id;
+        ev.obj_id = p->get_id();
         ev.start_time = chrono::system_clock::now() + 3s;
         ev.ev = EVENT_NPC_ATTACK;
-        ev.target_id = target;
+        ev.target_id = target->get_id();
         timer_queue.push(ev);
     }
     else {  // 플레이어가 공격을 입힘
         for (auto& obj : players) {
             if (obj->get_state() != ST_INGAME) continue;
             if (true == is_npc(obj->get_id())) break;   // npc가 아닐때
-            if (true == is_near(target, obj->get_id())) {      // 근처에 있을때
-                send_change_hp_packet(reinterpret_cast<Player*>(obj), players[target]);
+            if (true == is_near(target->get_id(), obj->get_id())) {      // 근처에 있을때
+                send_change_hp_packet(reinterpret_cast<Player*>(obj), target);
             }
         }
         
         sc_packet_combat_id packet;
         packet.size = sizeof(packet);
         packet.type = SC_PACKET_COMBAT_ID;
-        packet.id = target;
+        packet.id = target->get_id();
         
-        reinterpret_cast<Player*>(players[p_id])->do_send(sizeof(packet), &packet);
+        reinterpret_cast<Player*>(p)->do_send(sizeof(packet), &packet);
 
         char mess[MAX_CHAT_SIZE];
         sprintf_s(mess, MAX_CHAT_SIZE, "%s -> %s damage : %f",
-            players[p_id]->get_name(), players[target]->get_name(), damage);
+            p->get_name(), target->get_name(), damage);
         //send_chat_packet(reinterpret_cast<Player*>(players[p_id]), p_id, mess);
     }
 }
@@ -1243,11 +1244,11 @@ void process_packet(int client_id, unsigned char* p)
             Npc* bos = dungeons[indun]->boss;
             if (bos->get_x() >= pl->get_x() - 10 && bos->get_x() <= pl->get_x() + 10) {
                 if (bos->get_z() >= pl->get_z() - 10 && bos->get_z() <= pl->get_z() + 10) {
-                   // 일단 고정값으로 제거해 주자
-                    bos->set_hp(bos->get_hp() - 130000);
+                    // 일단 고정값으로 제거해 주자
+                    //bos->set_hp(bos->get_hp() - 130000);
+                    attack_success(pl, bos, pl->get_basic_attack_factor());
 
                     Player** ps = dungeons[indun]->get_party_palyer();
-
                     for (int i = 0; i < GAIA_ROOM; i++) {
                         send_change_hp_packet(ps[i], bos);
                     }
@@ -1265,7 +1266,7 @@ void process_packet(int client_id, unsigned char* p)
             players[i]->state_lock.unlock();
             if (players[i]->get_x() >= pl->get_x() -10 && players[i]->get_x() <= pl->get_x() + 10) {
                 if (players[i]->get_z() >= pl->get_z() - 10 && players[i]->get_z() <= pl->get_z() + 10) {
-                    attack_success(client_id, players[i]->get_id(), pl->get_basic_attack_factor());    // 데미지 계산
+                    attack_success(pl, players[i], pl->get_basic_attack_factor());    // 데미지 계산
                     // 몬스터의 자동공격을 넣어주자
                     players[i]->set_target_id(pl->get_id());
                     if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
@@ -2636,7 +2637,7 @@ void worker()
             lua_pop(L, 1);
             if (m) {
                 // 공격처리
-                attack_success(client_id, exp_over->_target, players[client_id]->get_basic_attack_factor());
+                attack_success(players[client_id], players[exp_over->_target], players[client_id]->get_basic_attack_factor());
             }
             else {
                 if (players[client_id]->get_active()) {
