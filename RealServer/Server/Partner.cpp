@@ -93,16 +93,13 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 								nearest_num = i;
 							}
 						}
-
 					}
 					move = pa->non_a_star(gaia->pattern_two_safe_zone[nearest_num].first, gaia->pattern_two_safe_zone[nearest_num].second, pa->get_x(), pa->get_z());
-
 					pa->set_x(move.first);
 					pa->set_z(move.second);
 				
 				break;
 			case 4:
-			
 				move = pa->non_a_star(gaia->boss->get_look_x() + gaia->boss->get_right_x() * 10, gaia->boss->get_look_z() + gaia->boss->get_right_z() * 10, pa->get_x(), pa->get_z());
 				pa->set_x(move.first);
 				pa->set_z(move.second);
@@ -303,11 +300,6 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 	
 
 }
-void Partner::physical_skill_success(int p_id, int target, float skill_factor)
-{
-
-}
-
 
 void Partner::partner_attack(Partner* pa, Gaia* gaia) //스킬을 쿨타임 돌때마다 계속 쓰도록 하자     //  서포타가 오류인가?
 {
@@ -320,7 +312,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //스킬을 쿨타임 돌때마다 �
 	int p = pattern(gen) % 3;
 
 	//일단 직업에 따라서 다시 분류 합시다.
-	//그리고 ai는 피킹이 필요없게 하자 // 직업이랑 hp, mp확인후 제일 필요한 사람에게 버프 주고 버프 ui패킷도 보내자 
+	//그리고 ai는 피킹이 필요없게 하자 // **직업이랑 hp, mp확인후 제일 필요한 사람에게 버프 주고 버프 ui패킷도 보내자 
 	switch (pa->get_job()) // AI의 직업을 보고 움직임을 나누자 
 	{
 	case J_DILLER: {

@@ -40,8 +40,6 @@ public:
     void partner_normal_attack(Partner* pa, Gaia* gaia);
     void attack_success(Partner* pa, Gaia* gaia, float atk_factor);
 
-    void physical_skill_success(int p_id, int target, float skill_factor);
-
     bool check_inside(pos a, pos b, pos c, pos n);
     bool isInsideTriangle(pos a, pos b, pos c, pos n);
 
