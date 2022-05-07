@@ -650,6 +650,7 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_BUFF_UI: {
+		EnterCriticalSection(&UI_cs);
 		sc_packet_buff_ui* packet = reinterpret_cast<sc_packet_buff_ui*>(p);
 		switch (packet->buff_num)
 		{
@@ -668,6 +669,7 @@ void process_packet(unsigned char* p)
 		default:
 			break;
 		}
+		LeaveCriticalSection(&UI_cs);
 		break;
 	}
 	case SC_PACKET_PARTY_ROOM: {
