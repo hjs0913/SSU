@@ -1921,9 +1921,6 @@ void process_packet(int client_id, unsigned char* p)
                 send_buff_ui_packet(reinterpret_cast<Player*>(players[taget]), 0);
 
                 cout << "아이디 " << taget << "의 이후 mp" << players[taget]->get_mp() << endl;
-
-
-
                 break;
 
             }
@@ -2361,8 +2358,14 @@ void player_revive(int client_id)
                 timer_queue.push(ev);
 
                 ev.obj_id = pl->get_id();
-                ev.start_time = chrono::system_clock::now() + 10s;
-                ev.ev = EVENT_PARTNER_ATTACK;
+                ev.start_time = chrono::system_clock::now() + 1s;
+                ev.ev = EVENT_PARTNER_NORMAL_ATTACK;
+                ev.target_id = 1;
+                timer_queue.push(ev);
+
+                ev.obj_id = pl->get_id();
+                ev.start_time = chrono::system_clock::now() + 3s;
+                ev.ev = EVENT_PARTNER_SKILL;
                 ev.target_id = 1;
                 timer_queue.push(ev);
             }
