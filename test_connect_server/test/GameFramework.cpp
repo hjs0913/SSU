@@ -1225,7 +1225,7 @@ void CGameFramework::MoveToNextFrame()
 
 void CGameFramework::FrameAdvance()
 {
-	EnterCriticalSection(&cs);
+	EnterCriticalSection(&IndunCheck_cs);
 
 	m_GameTimer.Tick(0.0f);
 
@@ -1320,6 +1320,7 @@ void CGameFramework::FrameAdvance()
 	if (robby_cnt > 0) party_name_index = new wstring[robby_cnt];
 	else party_name_index = nullptr;
 
+	EnterCriticalSection(&UI_cs);
 	for (int i = 0; i < UICOUNT; i++) {
 		switch (i) {
 		case 0: {
@@ -1552,6 +1553,7 @@ void CGameFramework::FrameAdvance()
 		if (i == 19 && !NoticeUI_On) continue;
 		m_ppUILayer[i]->Render(m_nSwapChainBufferIndex);
 	}
+	LeaveCriticalSection(&UI_cs);
 
 #ifdef _WITH_PRESENT_PARAMETERS
 	DXGI_PRESENT_PARAMETERS dxgiPresentParameters;
@@ -1561,7 +1563,7 @@ void CGameFramework::FrameAdvance()
 	dxgiPresentParameters.pScrollOffset = NULL;
 	m_pdxgiSwapChain->Present1(1, 0, &dxgiPresentParameters);
 #else
-#ifdef _WITH_SYNCH_SWAPCHAIN
+#ifdef _WITH_SYNCH_SWAPCHAINs
 	m_pdxgiSwapChain->Present(1, 0);
 #else
 	m_pdxgiSwapChain->Present(0, 0);
@@ -1575,7 +1577,6 @@ void CGameFramework::FrameAdvance()
 	m_GameTimer.GetFrameRate(m_pszFrameRate + 12, 37);
 	::SetWindowText(m_hWnd, m_pszFrameRate);
 
-	LeaveCriticalSection(&cs);
 
 	if (robby_cnt > 0) delete []party_name_index;
 	if (InvitationCardUI_On) {
@@ -1607,5 +1608,6 @@ void CGameFramework::FrameAdvance()
 			}
 		}
 	}
+	LeaveCriticalSection(&IndunCheck_cs);
 }
 

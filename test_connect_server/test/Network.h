@@ -69,8 +69,8 @@ extern bool RaidEnterNotice;
 extern bool DeadNotice;
 extern wstring Notice_str;
 
-extern CRITICAL_SECTION cs;
-
+extern CRITICAL_SECTION IndunCheck_cs;
+extern CRITICAL_SECTION UI_cs;
 void err_quit(const char* msg);
 
 void err_display(const char* msg);

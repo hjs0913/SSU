@@ -62,6 +62,7 @@ Gaia::~Gaia()
 {
 	delete party;
 }
+
 float Gaia::get_x()
 {
 	return boss->get_x();
@@ -538,9 +539,32 @@ void Gaia::player_death(Player* p)
 		timer_queue.push(ev);
 	}
 	else {
-		for (auto send_pl : party) {
-			send_remove_object_packet(send_pl, p);
+		p->state_lock.lock();
+		if (p->get_state() != ST_INDUN) {
+			p->state_lock.unlock();
+			return;
 		}
+		p->set_state(ST_DEAD);
+		p->state_lock.unlock();
+
+		int nDeathParty = 0;
+		int tmp_hp = 0;
+		for (int i = 0; i < GAIA_ROOM; i++) {
+			send_change_hp_packet(party[i], p);
+			if (p->get_id() != party[i]->get_id()) {
+				send_remove_object_packet(party[i], p);
+			}
+			if (party[i]->get_hp() > tmp_hp) target_id = i;
+			else if (party[i]->get_hp() == 0) nDeathParty++;
+		}
+		send_notice(p, "사망했습니다.", 2);
+
+		for (int i = 0; i < GAIA_ROOM; i++) {
+			if (nDeathParty == GAIA_ROOM) {
+				send_notice(party[i], "레이드 실패.. 5초후 오픈월드로 되돌아 갑니다", 2);
+			}
+		}
+
 	}
 }
 
