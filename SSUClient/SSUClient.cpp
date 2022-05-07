@@ -6,7 +6,7 @@
 #include "GameFramework.h"
 #include "Bitmap.h"
 #include "UILayer.h" 
-#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console") //콘솔 띄우자 
+//#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console") //콘솔 띄우자 
 
 #define MAX_LOADSTRING 100
 

@@ -132,6 +132,8 @@ public:
 	// player∆Øº∫
 	TRIBE GetTribe();
 	void SetTribe(TRIBE t);
+
+	virtual void Attack(bool isAttack);
 };
 
 class CAirplanePlayer : public CPlayer
@@ -177,5 +179,9 @@ public:
 	virtual void Move(ULONG nDirection, float fDistance, bool bVelocity = false);
 
 	virtual void Update(float fTimeElapsed);
+
+	virtual void Attack(bool isAttack);
+
+	bool m_isAttack = false;
 };
 

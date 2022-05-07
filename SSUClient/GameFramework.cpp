@@ -598,14 +598,16 @@ void CGameFramework::ProcessInput()
 		}
 
 		DWORD dwDirection = 0;
+		DWORD dwAttack = 0;
 		if (pKeysBuffer[VK_UP] & 0xF0) dwDirection |= DIR_FORWARD;
 		if (pKeysBuffer[VK_DOWN] & 0xF0) dwDirection |= DIR_BACKWARD;
 		if (pKeysBuffer[VK_LEFT] & 0xF0) dwDirection |= DIR_LEFT;
 		if (pKeysBuffer[VK_RIGHT] & 0xF0) dwDirection |= DIR_RIGHT;
 		if (pKeysBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
 		if (pKeysBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
+		if (pKeysBuffer[VK_SPACE] & 0xF0) dwAttack |= 0x30;
 
-		if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f))
+		if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f) || (dwAttack != 0))
 		{
 			if (cxDelta || cyDelta)
 			{
@@ -614,7 +616,9 @@ void CGameFramework::ProcessInput()
 				else
 					m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
 			}
-			if (dwDirection) m_pPlayer->Move(dwDirection, /*12.25f*/9.0f, true);
+			if (dwDirection) m_pPlayer->Move(dwDirection, /*12.25f*/4.5f, true);
+			if (dwAttack) m_pPlayer->Attack(true);
+
 		}
 	}
 	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
@@ -659,7 +663,7 @@ void CGameFramework::MoveToNextFrame()
 
 void CGameFramework::FrameAdvance()
 {    
-	m_GameTimer.Tick(30.0f);
+	m_GameTimer.Tick(60.0f);
 	
 	ProcessInput();
 
@@ -763,7 +767,8 @@ void CGameFramework::FrameAdvance()
 			Hp_str.append(L" / ");
 			Hp_str.append(/*to_wstring(m_pPlayer->m_max_hp)*/L"15000");
 	
-			m_ppUILayer[i]->UpdateLabels(Hp_str, 20, 40, 20 + ((float)m_pPlayer->m_hp / m_pPlayer->m_max_hp) * (m_nWndClientWidth / 10) * 3, 60);
+			//m_ppUILayer[i]->UpdateLabels(Hp_str, 20, 40, 20 + ((float)m_pPlayer->m_hp / m_pPlayer->m_max_hp) * (m_nWndClientWidth / 10) * 3, 60);
+			m_ppUILayer[i]->UpdateLabels(Hp_str, 20, 40, 20 + (m_nWndClientWidth / 10) * 3, 60);
 			break;
 		}
 		case 4: {
@@ -771,7 +776,8 @@ void CGameFramework::FrameAdvance()
 			Mp_str.append(/*to_wstring(m_pPlayer->m_mp)*/L"15000");
 			Mp_str.append(L" / ");
 			Mp_str.append(/*to_wstring(m_pPlayer->m_max_mp)*/L"15000");
-			m_ppUILayer[i]->UpdateLabels(Mp_str, 20, 60, 20 + ((float)m_pPlayer->m_mp / m_pPlayer->m_max_mp) * (m_nWndClientWidth / 10) * 3, 80);
+			//m_ppUILayer[i]->UpdateLabels(Mp_str, 20, 60, 20 + ((float)m_pPlayer->m_mp / m_pPlayer->m_max_mp) * (m_nWndClientWidth / 10) * 3, 80);
+			m_ppUILayer[i]->UpdateLabels(Mp_str, 20, 60, 20 + (m_nWndClientWidth / 10) * 3, 80);
 			break;
 		}
 		case 5: {
@@ -962,7 +968,7 @@ void CGameFramework::FrameAdvance()
 
 	MoveToNextFrame();
 
-	m_GameTimer.GetFrameRate(m_pszFrameRate + 12, 37);
+	m_GameTimer.GetFrameRate(m_pszFrameRate + 5/*12*/, 37);
 	size_t nLength = _tcslen(m_pszFrameRate);
 	XMFLOAT3 xmf3Position = m_pPlayer->GetPosition();
 	_stprintf_s(m_pszFrameRate + nLength, 70 - nLength, _T("(%4f, %4f, %4f)"), xmf3Position.x, xmf3Position.y, xmf3Position.z);

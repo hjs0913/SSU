@@ -178,7 +178,6 @@ void CMaterial::LoadTextureFromFile(ID3D12Device *pd3dDevice, ID3D12GraphicsComm
 	bool bDuplicated = false;
 	if (strcmp(pstrTextureName, "null"))
 	{
-		cout << "textureName - " << pstrTextureName << endl;
 		SetMaterialType(nType);
 
 		char pstrFilePath[64] = { '\0' };
@@ -234,7 +233,7 @@ CAnimationSet::CAnimationSet(float fLength, int nFramesPerSecond, int nKeyFrames
 
 	strcpy_s(m_pstrAnimationSetName, 64, pstrName);
 
-	cout << "AnimationSetName : " << m_pstrAnimationSetName << endl;
+	//cout << "AnimationSetName : " << m_pstrAnimationSetName << endl;
 	m_pfKeyFrameTimes = new float[nKeyFrames];
 	m_ppxmf4x4KeyFrameTransforms = new XMFLOAT4X4*[nKeyFrames];
 	for (int i = 0; i < nKeyFrames; i++) m_ppxmf4x4KeyFrameTransforms[i] = new XMFLOAT4X4[nAnimatedBones];
@@ -1004,7 +1003,7 @@ CGameObject *CGameObject::LoadFrameHierarchyFromFile(ID3D12Device *pd3dDevice, I
 
 	CGameObject *pGameObject = new CGameObject();
 
-	cout << "----------LoadFrameHierarchyFromFile 입장----------" << endl;
+	//cout << "----------LoadFrameHierarchyFromFile 입장----------" << endl;
 	for ( ; ; )
 	{
 		::ReadStringFromFile(pInFile, pstrToken);
@@ -1030,7 +1029,7 @@ CGameObject *CGameObject::LoadFrameHierarchyFromFile(ID3D12Device *pd3dDevice, I
 		}
 		else if (!strcmp(pstrToken, "<Mesh>:"))
 		{
-			cout << "Mesh - ";
+			//cout << "Mesh - ";
 			CStandardMesh *pMesh = new CStandardMesh(pd3dDevice, pd3dCommandList);
 			pMesh->LoadMeshFromFile(pd3dDevice, pd3dCommandList, pInFile);
 			pGameObject->SetMesh(pMesh);
@@ -1101,7 +1100,7 @@ void CGameObject::LoadAnimationFromFile(FILE *pInFile, CLoadedModelInfo *pLoaded
 		if (!strcmp(pstrToken, "<AnimationSets>:"))
 		{
 			nAnimationSets = ::ReadIntegerFromFile(pInFile);
-			cout << nAnimationSets << endl;
+			//cout << nAnimationSets << endl;
 			pLoadedModel->m_pAnimationSets = new CAnimationSets(nAnimationSets);
 		}
 		else if (!strcmp(pstrToken, "<FrameNames>:"))
