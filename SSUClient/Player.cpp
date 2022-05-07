@@ -353,26 +353,26 @@ CTerrainPlayer::CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLi
 {
 	m_pCamera = ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
 
-	CLoadedModelInfo *pAngrybotModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Angrybot.bin", NULL);
+	CLoadedModelInfo *pAngrybotModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Bastard_Warrior_FBX_Legacy.bin", NULL);
 	SetChild(pAngrybotModel->m_pModelRootObject, true);
 
-	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, 2, pAngrybotModel);
+	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, 1, pAngrybotModel);
 	m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
-	m_pSkinnedAnimationController->SetTrackAnimationSet(1, 1);
-	m_pSkinnedAnimationController->SetTrackEnable(1, false);
+	//m_pSkinnedAnimationController->SetTrackAnimationSet(1, 1);
+	//m_pSkinnedAnimationController->SetTrackEnable(1, false);
 
-	m_pSkinnedAnimationController->SetCallbackKeys(1, 2);
-#ifdef _WITH_SOUND_RESOURCE
-	m_pSkinnedAnimationController->SetCallbackKey(0, 0.1f, _T("Footstep01"));
-	m_pSkinnedAnimationController->SetCallbackKey(1, 0.5f, _T("Footstep02"));
-	m_pSkinnedAnimationController->SetCallbackKey(2, 0.9f, _T("Footstep03"));
-#else
-	m_pSkinnedAnimationController->SetCallbackKey(1, 0, 0.001f, _T("Sound/Footstep01.wav"));
-	m_pSkinnedAnimationController->SetCallbackKey(1, 1, 0.125f, _T("Sound/Footstep02.wav"));
-//	m_pSkinnedAnimationController->SetCallbackKey(1, 2, 0.39f, _T("Sound/Footstep03.wav"));
-#endif
-	CAnimationCallbackHandler *pAnimationCallbackHandler = new CSoundCallbackHandler();
-	m_pSkinnedAnimationController->SetAnimationCallbackHandler(1, pAnimationCallbackHandler);
+//	m_pSkinnedAnimationController->SetCallbackKeys(1, 2);
+//#ifdef _WITH_SOUND_RESOURCE
+//	m_pSkinnedAnimationController->SetCallbackKey(0, 0.1f, _T("Footstep01"));
+//	m_pSkinnedAnimationController->SetCallbackKey(1, 0.5f, _T("Footstep02"));
+//	m_pSkinnedAnimationController->SetCallbackKey(2, 0.9f, _T("Footstep03"));
+//#else
+//	m_pSkinnedAnimationController->SetCallbackKey(1, 0, 0.001f, _T("Sound/Footstep01.wav"));
+//	m_pSkinnedAnimationController->SetCallbackKey(1, 1, 0.125f, _T("Sound/Footstep02.wav"));
+////	m_pSkinnedAnimationController->SetCallbackKey(1, 2, 0.39f, _T("Sound/Footstep03.wav"));
+//#endif
+//	CAnimationCallbackHandler *pAnimationCallbackHandler = new CSoundCallbackHandler();
+//	m_pSkinnedAnimationController->SetAnimationCallbackHandler(1, pAnimationCallbackHandler);
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 	
@@ -381,6 +381,7 @@ CTerrainPlayer::CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLi
 
 	CHeightMapTerrain *pTerrain = (CHeightMapTerrain *)pContext;
 	SetPosition(XMFLOAT3(310.0f, pTerrain->GetHeight(310.0f, 590.0f), 590.0f));
+	SetScale(XMFLOAT3(10.0f, 10.0f, 10.0f));
 
 	if (pAngrybotModel) delete pAngrybotModel;
 }

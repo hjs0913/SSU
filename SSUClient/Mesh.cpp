@@ -433,7 +433,7 @@ void CStandardMesh::LoadMeshFromFile(ID3D12Device *pd3dDevice, ID3D12GraphicsCom
 	UINT nReads = (UINT)::fread(&m_nVertices, sizeof(int), 1, pInFile);
 
 	::ReadStringFromFile(pInFile, m_pstrMeshName);
-
+	cout << m_pstrMeshName << endl;
 	for ( ; ; )
 	{
 		::ReadStringFromFile(pInFile, pstrToken);
@@ -549,14 +549,18 @@ void CStandardMesh::LoadMeshFromFile(ID3D12Device *pd3dDevice, ID3D12GraphicsCom
 		}
 		else if (!strcmp(pstrToken, "<SubMeshes>:"))
 		{
+			cout << "SubMeshes" << endl;
 			nReads = (UINT)::fread(&(m_nSubMeshes), sizeof(int), 1, pInFile);
 			if (m_nSubMeshes > 0)
 			{
 				m_pnSubSetIndices = new int[m_nSubMeshes];
 				m_ppnSubSetIndices = new UINT*[m_nSubMeshes];
+				ZeroMemory(m_ppnSubSetIndices, m_nSubMeshes * sizeof(UINT));
 
 				m_ppd3dSubSetIndexBuffers = new ID3D12Resource*[m_nSubMeshes];
+				for (int i = 0; i < m_nSubMeshes; ++i) m_ppd3dSubSetIndexBuffers[i] = NULL;
 				m_ppd3dSubSetIndexUploadBuffers = new ID3D12Resource*[m_nSubMeshes];
+				for (int i = 0; i < m_nSubMeshes; ++i) m_ppd3dSubSetIndexUploadBuffers[i] = NULL;
 				m_pd3dSubSetIndexBufferViews = new D3D12_INDEX_BUFFER_VIEW[m_nSubMeshes];
 
 				for (int i = 0; i < m_nSubMeshes; i++)
@@ -564,6 +568,7 @@ void CStandardMesh::LoadMeshFromFile(ID3D12Device *pd3dDevice, ID3D12GraphicsCom
 					::ReadStringFromFile(pInFile, pstrToken);
 					if (!strcmp(pstrToken, "<SubMesh>:"))
 					{
+						cout << "SubMesh" << endl;
 						int nIndex = 0;
 						nReads = (UINT)::fread(&nIndex, sizeof(int), 1, pInFile); //i
 						nReads = (UINT)::fread(&(m_pnSubSetIndices[i]), sizeof(int), 1, pInFile);

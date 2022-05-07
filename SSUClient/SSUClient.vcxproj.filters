@@ -136,4 +136,7 @@
       <Filter>리소스 파일</Filter>
     </ResourceCompile>
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders.hlsl" />
+  </ItemGroup>
 </Project>

@@ -98,7 +98,17 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	XMFLOAT4 xmf4Color(0.0f, 0.3f, 0.0f, 0.0f);
 	m_pTerrain = new CHeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Image/HeightMap.raw"), 512, 512, xmf3Scale, xmf4Color);
 
-	m_nHierarchicalGameObjects = 13;
+
+	m_nHierarchicalGameObjects = 1;
+	m_ppHierarchicalGameObjects = new CGameObject * [m_nHierarchicalGameObjects];
+
+	CLoadedModelInfo* pMonsterModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, /*"Model/Monster.bin"*/"Model/Beast_Wolf.bin", NULL);
+	m_ppHierarchicalGameObjects[0] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMonsterModel, 1);
+	m_ppHierarchicalGameObjects[0]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+	m_ppHierarchicalGameObjects[0]->SetPosition(430.0f, m_pTerrain->GetHeight(430.0f, 700.0f), 700.0f);
+	m_ppHierarchicalGameObjects[0]->SetScale(10.0f, 10.0f, 10.0f);
+
+	/*m_nHierarchicalGameObjects = 13;
 	m_ppHierarchicalGameObjects = new CGameObject*[m_nHierarchicalGameObjects];
 
 	CLoadedModelInfo *pAngrybotModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Angrybot.bin", NULL);
@@ -183,7 +193,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 	m_ppShaders[0] = pEthanObjectsShader;
 
-	if (pEthanModel) delete pEthanModel;
+	if (pEthanModel) delete pEthanModel;*/
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
