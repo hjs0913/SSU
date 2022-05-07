@@ -19,6 +19,8 @@ void send_look_packet(Player* pl, Npc* changer);
 
 void send_change_hp_packet(Player* pl, Npc* victim);
 
+void send_change_mp_packet(Player* pl, Npc* victim);
+
 void send_play_shoot_packet(Player* pl);
 
 void send_play_effect_packet(Player* pl, Npc* npc);
@@ -56,5 +58,3 @@ void send_party_invitation_failed(Player* pl, int failed_reason, char* invited_u
 void send_party_room_destroy(Player* pl, int r_id);
 
 void send_notice(Player* pl, const char* notice_str, int raid_notice);
-
-void send_change_mp_packet(Player* pl, Npc* victim);
