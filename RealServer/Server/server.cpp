@@ -2063,14 +2063,20 @@ void process_packet(int client_id, unsigned char* p)
             for (int i = 0; i < GAIA_ROOM; i++) {
                 if (party_players[i]->get_tribe() == PARTNER) {
                     ev.obj_id = party_players[i]->get_id();
-                    ev.start_time = chrono::system_clock::now() + 10s;
+                    ev.start_time = chrono::system_clock::now() + 1s;
                     ev.ev = EVENT_PARTNER_MOVE;
                     ev.target_id = 1;
                     timer_queue.push(ev);
 
                     ev.obj_id = party_players[i]->get_id();
-                    ev.start_time = chrono::system_clock::now() + 10s;
-                    ev.ev = EVENT_PARTNER_ATTACK;
+                    ev.start_time = chrono::system_clock::now() + 1s;
+                    ev.ev = EVENT_PARTNER_NORMAL_ATTACK;
+                    ev.target_id = 1;
+                    timer_queue.push(ev);
+
+                    ev.obj_id = party_players[i]->get_id();
+                    ev.start_time = chrono::system_clock::now() + 3s;
+                    ev.ev = EVENT_PARTNER_SKILL;
                     ev.target_id = 1;
                     timer_queue.push(ev);
                 }
@@ -2280,6 +2286,12 @@ void process_packet(int client_id, unsigned char* p)
             partner->set_mp(8000);
             partner->set_job(static_cast<JOB>(packet->job));
             partner->set_lv(25);
+            partner->set_physical_attack(0.3 * 25 * 25 + 10 * 25);
+            partner->set_magical_attack(0.1 * 25 * 25 + 5 * 25);
+            partner->set_physical_defence(0.24 * 25 * 25 + 10 * 25);
+            partner->set_magical_defence(0.17 * 25 * 25 + 10 * 25);
+            partner->set_basic_attack_factor(50.0f);
+            partner->set_defence_factor(0.0002);
             partner->set_element(E_WATER);
             //  여기까지 클라에서 패킷 받으면, 새 player id 생성 후 정보 초기화  
 
@@ -2831,7 +2843,8 @@ void worker()
             delete exp_over;
             break;
         }
-        case OP_PARTNER_ATTACK: {
+        case OP_PARTNER_SKILL: {
+            //cout << "파트너 어택 OP"<< endl;
             players[client_id]->state_lock.lock();
             if (players[client_id]->get_state() != ST_INDUN) {
                 players[client_id]->state_lock.unlock();
@@ -2843,13 +2856,22 @@ void worker()
             delete exp_over;
             break;
         }
-        case OP_PARTNER_PATTERN: {
+        case OP_PARTNER_NORMAL_ATTACK: {
             players[client_id]->state_lock.lock();
             if (players[client_id]->get_state() != ST_INDUN) {
                 players[client_id]->state_lock.unlock();
                 break;
             }
             players[client_id]->state_lock.unlock();
+            Partner* pl = reinterpret_cast<Partner*>(players[client_id]);
+            pl->partner_normal_attack(pl, dungeons[pl->get_indun_id()]);
+
+            timer_event ev;
+            ev.obj_id = client_id;
+            ev.start_time = chrono::system_clock::now() + 1s;
+            ev.ev = EVENT_PARTNER_NORMAL_ATTACK;
+            ev.target_id = 1;
+            timer_queue.push(ev);
             delete exp_over;
             break;
         }
@@ -3529,11 +3551,11 @@ COMP_OP EVtoOP(EVENT_TYPE ev) {
     case EVENT_PARTNER_MOVE:
         return OP_PARTNER_MOVE;
         break;
-    case EVENT_PARTNER_ATTACK:
-        return OP_PARTNER_ATTACK;
+    case EVENT_PARTNER_SKILL:
+        return OP_PARTNER_SKILL;
         break;
-    case EVENT_PARTNER_PATTERN:
-        return OP_PARTNER_PATTERN;
+    case EVENT_PARTNER_NORMAL_ATTACK:
+        return OP_PARTNER_NORMAL_ATTACK;
         break;
     case EVENT_GAMESTART_TIMER:
         return OP_GAMESTART_TIMER;
@@ -3563,15 +3585,18 @@ void do_timer()
                 }
                 reinterpret_cast<Player*>(players[temp.obj_id])->set_skill_active(temp.target_id, false);
             }
-            else if (temp.ev == EVENT_PARTNER_ATTACK) {
+            else if (temp.ev == EVENT_PARTNER_SKILL) {
                 if (temp.target_id == 10) {
                     int indun_id = reinterpret_cast<Player*>(players[temp.obj_id])->get_indun_id();
                     for (int i = 0; i < GAIA_ROOM; ++i) {
                         dungeons[indun_id]->get_party_palyer()[i]->attack_speed_up = false;
                     }
                 }
+                EXP_OVER* ex_over = new EXP_OVER;
+                ex_over->_comp_op = EVtoOP(temp.ev);
+                ex_over->_target = temp.target_id;
+                PostQueuedCompletionStatus(g_h_iocp, 1, temp.obj_id, &ex_over->_wsa_over);   //0은 소켓취급을 받음
             }
-           
             else {
                 EXP_OVER* ex_over = new EXP_OVER;
                 ex_over->_comp_op = EVtoOP(temp.ev);
@@ -3605,7 +3630,8 @@ void do_timer()
                         ->set_skill_active(ev.target_id, false);
                     continue;
                 }
-                else if (ev.ev == EVENT_PARTNER_ATTACK) {
+                else if (ev.ev == EVENT_PARTNER_SKILL) {
+                    cout << "몇번들어오냐" << endl;
                     if (ev.target_id == 10) {
                         int indun_id = reinterpret_cast<Player*>(players[ev.obj_id])->get_indun_id();
                         for (int i = 0; i < GAIA_ROOM; ++i) {

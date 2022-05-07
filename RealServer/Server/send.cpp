@@ -135,6 +135,16 @@ void send_change_hp_packet(Player* pl, Npc* victim)
     packet.hp = victim->get_hp();
     pl->do_send(sizeof(packet), &packet);
 }
+void send_change_mp_packet(Player* pl, Npc* victim)
+{
+    sc_packet_change_mp packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_CHANGE_MP;
+    packet.id = victim->get_id();
+    packet.mp = victim->get_mp();
+    pl->do_send(sizeof(packet), &packet);
+}
+
 
 void send_play_shoot_packet(Player* pl)
 {

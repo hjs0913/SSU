@@ -668,8 +668,6 @@ void process_packet(unsigned char* p)
 		default:
 			break;
 		}
-	
-
 		break;
 	}
 	case SC_PACKET_PARTY_ROOM: {
@@ -813,6 +811,11 @@ void process_packet(unsigned char* p)
 		Notice_str = L"";
 		Notice_str.append(temp);
 		LeaveCriticalSection(&UI_cs);
+		break;
+	}
+	case SC_PACKET_CHANGE_MP: {
+		sc_packet_change_mp* packet = reinterpret_cast<sc_packet_change_mp*>(p);
+		mPlayer[packet->id]->m_mp = packet->mp;
 		break;
 	}
 	default:
