@@ -132,6 +132,4 @@ public:
     void accept_initialize();
     void set_socket(SOCKET c_socket);
     void CloseSocketPlayer();
-
- 
 };

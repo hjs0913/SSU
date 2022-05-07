@@ -30,7 +30,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 {
 	setlocale(LC_ALL, "");
 	
-	InitializeCriticalSection(&cs);
+	InitializeCriticalSection(&IndunCheck_cs);
+	InitializeCriticalSection(&UI_cs);
 
 	// connect network
 	netInit();
@@ -84,7 +85,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	}
 	gGameFramework.OnDestroy();
 
-	DeleteCriticalSection(&cs);
+	DeleteCriticalSection(&IndunCheck_cs);
+	DeleteCriticalSection(&UI_cs);
 
 	return((int)msg.wParam);
 }

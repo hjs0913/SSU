@@ -62,6 +62,7 @@ Gaia::~Gaia()
 {
 	delete party;
 }
+
 float Gaia::get_x()
 {
 	return boss->get_x();
@@ -339,7 +340,7 @@ void Gaia::boss_attack()
 	case 1: { //파도3개 
 		cout << "파도" << endl;
 		running_pattern = true;
-		pattern_two_number = pattern_num % 4;
+		pattern_two_number = pattern(gen) % 4;
 		switch (pattern_two_number) {
 		case 0: {
 			pattern_two_position[0].first = 2172;
@@ -376,6 +377,7 @@ void Gaia::boss_attack()
 
 			pattern_two_safe_zone[0].first = 1738;
 			pattern_two_safe_zone[0].second = 2312;
+
 			pattern_two_safe_zone[1].first = 1838;
 			pattern_two_safe_zone[1].second = 2412;
 
@@ -504,18 +506,65 @@ int Gaia::get_dungeon_id()
 
 void Gaia::player_death(Player* p)
 {
+	p->set_hp(0);
+	std::cout << p->get_name() << "사망" << std::endl;
 	if (player_death_count > 0) {
 		player_death_count--;
-		p->set_hp(p->get_maxhp());
-		p->set_mp(p->get_maxmp());
-		for (auto send_pl : party) {
-			send_change_hp_packet(send_pl, p);
-			send_change_death_count_packet(send_pl, player_death_count);
+		p->state_lock.lock();
+		if (p->get_state() != ST_INDUN) {
+			p->state_lock.unlock();
+			return;
 		}
+		p->set_state(ST_DEAD);
+		p->state_lock.unlock();
+
+		// 시야처리
+		int tmp_hp = 0;
+		for (int i = 0; i < GAIA_ROOM; i++) {
+			send_change_hp_packet(party[i], p);
+			send_change_death_count_packet(party[i], player_death_count);
+			if (p->get_id() != party[i]->get_id()) {
+				send_remove_object_packet(party[i], p);
+			}
+			if (party[i]->get_hp() > tmp_hp) target_id = i;
+		}
+
+		send_notice(p, "사망했습니다. 5초 후 부활합니다", 1);
+
+		timer_event ev;
+		ev.obj_id = p->get_id();
+		ev.start_time = chrono::system_clock::now() + 5s;
+		ev.ev = EVENT_PLAYER_REVIVE;
+		ev.target_id = 0;
+		timer_queue.push(ev);
 	}
 	else {
-		p->set_hp(0);
-		// 죽었다고 처리하자
+		p->state_lock.lock();
+		if (p->get_state() != ST_INDUN) {
+			p->state_lock.unlock();
+			return;
+		}
+		p->set_state(ST_DEAD);
+		p->state_lock.unlock();
+
+		int nDeathParty = 0;
+		int tmp_hp = 0;
+		for (int i = 0; i < GAIA_ROOM; i++) {
+			send_change_hp_packet(party[i], p);
+			if (p->get_id() != party[i]->get_id()) {
+				send_remove_object_packet(party[i], p);
+			}
+			if (party[i]->get_hp() > tmp_hp) target_id = i;
+			else if (party[i]->get_hp() == 0) nDeathParty++;
+		}
+		send_notice(p, "사망했습니다.", 2);
+
+		for (int i = 0; i < GAIA_ROOM; i++) {
+			if (nDeathParty == GAIA_ROOM) {
+				send_notice(party[i], "레이드 실패.. 5초후 오픈월드로 되돌아 갑니다", 2);
+			}
+		}
+
 	}
 }
 
@@ -553,6 +602,14 @@ void Gaia::judge_pattern_two_rightup(Player* p)
 		rect[2] = pos(x, z - 70);
 		rect[3] = pos(x + 35, z - 35);
 		pos n = pos(p->get_x(), p->get_z());
+
+		p->state_lock.lock();
+		if (p->get_state() != ST_INDUN) {
+			p->state_lock.unlock();
+			continue;
+		}
+		p->state_lock.unlock();
+
 		if (isInsideTriangle(rect[0], rect[1], rect[2], n) || isInsideTriangle(rect[0], rect[2], rect[3], n)) {
 			// 쳐 맞는 판정
 			p->set_hp(p->get_hp() - 3000);
@@ -575,6 +632,14 @@ void Gaia::judge_pattern_two_leftup(Player* p)
 		rect[2] = pos(x + 70, z);
 		rect[3] = pos(x + 35, z + 35);
 		pos n = pos(p->get_x(), p->get_z());
+
+		p->state_lock.lock();
+		if (p->get_state() != ST_INDUN) {
+			p->state_lock.unlock();
+			continue;
+		}
+		p->state_lock.unlock();
+
 		if (isInsideTriangle(rect[0], rect[1], rect[2], n) || isInsideTriangle(rect[0], rect[2], rect[3], n)) {
 			// 쳐 맞는 판정
 			p->set_hp(p->get_hp() - 3000);
@@ -598,6 +663,13 @@ void Gaia::pattern_active(int pattern)
 			for (int i = 0; i < 4; i++) {
 				int x = pattern_one_position[i].first;
 				int z = pattern_one_position[i].second;
+
+				p->state_lock.lock();
+				if (p->get_state() != ST_INDUN) {
+					p->state_lock.unlock();
+					continue;
+				}
+				p->state_lock.unlock();
 
 				if (sqrt((p->get_x() - x) * (p->get_x() - x) + (p->get_z() - z) * (p->get_z() - z)) < 20) {
 					p->set_hp(p->get_hp() - 2000);
@@ -708,7 +780,16 @@ void Gaia::pattern_active(int pattern)
 		rect[2] = pos(-cos_rect * t_x + sin_rect * t_z, -sin_rect * t_x - cos_rect * t_z);
 		rect[3] = pos(cos_rect * t_x + sin_rect * t_z, -sin_rect * t_x + cos_rect * t_z);
 
+
 		for (auto& p : party) {
+
+			p->state_lock.lock();
+			if (p->get_state() != ST_INDUN) {
+				p->state_lock.unlock();
+				continue;
+			}
+			p->state_lock.unlock();
+
 			if (isInsideTriangle(rect[0], rect[1], rect[2], pos(p->get_x(), p->get_z())) 
 				|| isInsideTriangle(rect[0], rect[2], rect[3], pos(p->get_x(), p->get_z()))) {
 				// 쳐 맞는 판정

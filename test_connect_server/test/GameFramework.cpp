@@ -1225,7 +1225,7 @@ void CGameFramework::MoveToNextFrame()
 
 void CGameFramework::FrameAdvance()
 {
-	EnterCriticalSection(&cs);
+	EnterCriticalSection(&IndunCheck_cs);
 
 	m_GameTimer.Tick(0.0f);
 
@@ -1320,6 +1320,7 @@ void CGameFramework::FrameAdvance()
 	if (robby_cnt > 0) party_name_index = new wstring[robby_cnt];
 	else party_name_index = nullptr;
 
+	EnterCriticalSection(&UI_cs);
 	for (int i = 0; i < UICOUNT; i++) {
 		switch (i) {
 		case 0: {
@@ -1552,6 +1553,7 @@ void CGameFramework::FrameAdvance()
 		if (i == 19 && !NoticeUI_On) continue;
 		m_ppUILayer[i]->Render(m_nSwapChainBufferIndex);
 	}
+	LeaveCriticalSection(&UI_cs);
 
 #ifdef _WITH_PRESENT_PARAMETERS
 	DXGI_PRESENT_PARAMETERS dxgiPresentParameters;
@@ -1561,7 +1563,7 @@ void CGameFramework::FrameAdvance()
 	dxgiPresentParameters.pScrollOffset = NULL;
 	m_pdxgiSwapChain->Present1(1, 0, &dxgiPresentParameters);
 #else
-#ifdef _WITH_SYNCH_SWAPCHAIN
+#ifdef _WITH_SYNCH_SWAPCHAINs
 	m_pdxgiSwapChain->Present(1, 0);
 #else
 	m_pdxgiSwapChain->Present(0, 0);
@@ -1575,6 +1577,7 @@ void CGameFramework::FrameAdvance()
 	m_GameTimer.GetFrameRate(m_pszFrameRate + 12, 37);
 	::SetWindowText(m_hWnd, m_pszFrameRate);
 
+
 	if (robby_cnt > 0) delete []party_name_index;
 	if (InvitationCardUI_On) {
 		if (chrono::system_clock::now() > InvitationCardTimer) {
@@ -1587,10 +1590,17 @@ void CGameFramework::FrameAdvance()
 		if (NoticeTimer < chrono::system_clock::now()) {
 			NoticeUI_On = false;
 			RaidEnterNotice = false;
+			DeadNotice = false;
 		}
 		else {
+			auto t = NoticeTimer - chrono::system_clock::now();
+			if (DeadNotice) {
+				Notice_str = L"사망했습니다. ";
+				Notice_str.append(to_wstring(chrono::duration_cast<chrono::seconds>(t).count()));
+				Notice_str.append(L"초 후 부활합니다");
+			}
+
 			if (RaidEnterNotice) {
-				auto t = NoticeTimer - chrono::system_clock::now();
 				if (t >= 4s && t < 5s) Notice_str = L"4초후에 게임을 시작합니다";
 				else if(t >= 3s && t < 4s) Notice_str = L"3초후에 게임을 시작합니다";
 				else if (t >= 2s && t < 3s) Notice_str = L"2초후에 게임을 시작합니다";
@@ -1598,7 +1608,6 @@ void CGameFramework::FrameAdvance()
 			}
 		}
 	}
-
-	LeaveCriticalSection(&cs);
+	LeaveCriticalSection(&IndunCheck_cs);
 }
 

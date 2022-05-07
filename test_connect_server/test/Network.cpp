@@ -52,13 +52,15 @@ bool InvitationCardUI_On = false;
 bool AddAIUI_On = false;
 bool NoticeUI_On = false;
 bool RaidEnterNotice = false;
+bool DeadNotice = false;
 wstring Notice_str = L"";
 chrono::system_clock::time_point InvitationCardTimer = chrono::system_clock::now();
 chrono::system_clock::time_point NoticeTimer = chrono::system_clock::now();
 int InvitationRoomId;
 int InvitationUser;
 
-CRITICAL_SECTION cs;
+CRITICAL_SECTION IndunCheck_cs;
+CRITICAL_SECTION UI_cs;
 
 struct EXP_OVER {
 	WSAOVERLAPPED m_wsa_over;
@@ -333,7 +335,6 @@ void do_recv()
 
 void process_packet(unsigned char* p) 
 {
-
 	int type = *(p + 1);
 	switch (type) {
 	case SC_PACKET_LOGIN_OK: {
@@ -499,9 +500,9 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_DEAD: {
-		
 		sc_packet_dead* packet = reinterpret_cast<sc_packet_dead*> (p);
 		mPlayer[my_id]->SetUse(false);
+		mPlayer[my_id]->m_hp = 0;
 		combat_id = -1;
 		Combat_On = false;
 		cout << "died" << endl;
@@ -509,7 +510,13 @@ void process_packet(unsigned char* p)
 		
 	}
 	case SC_PACKET_REVIVE: {
-		// 아직 미구현
+		sc_packet_revive* packet = reinterpret_cast<sc_packet_revive*>(p);
+		mPlayer[my_id]->SetUse(true);
+		mPlayer[my_id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
+		my_position = mPlayer[my_id]->GetPosition();
+		mPlayer[my_id]->m_hp = mPlayer[my_id]->m_max_hp;
+		mPlayer[my_id]->m_mp = mPlayer[my_id]->m_max_mp;
+		mPlayer[my_id]->m_exp = packet->exp;
 		break;
 	}
 	case SC_PACKET_LOOK: {
@@ -524,7 +531,7 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_COMBAT_ID: {
-		EnterCriticalSection(&cs);
+		EnterCriticalSection(&UI_cs);
 		sc_packet_combat_id* packet = reinterpret_cast<sc_packet_combat_id*>(p);
 		if (combat_id != packet->id) {
 			Combat_On = true;
@@ -553,7 +560,7 @@ void process_packet(unsigned char* p)
 			case E_ICE: my_element_str = Combat_str.append(L"얼음"); break;
 			}
 		}
-		LeaveCriticalSection(&cs);
+		LeaveCriticalSection(&UI_cs);
 		break;
 	}
 	case SC_PACKET_PLAY_SHOOT: {
@@ -574,7 +581,7 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_START_GAIA: {
-		EnterCriticalSection(&cs);
+		EnterCriticalSection(&IndunCheck_cs);
 		PartyUI_On = false;
 		party_info_on = false;
 		PartyInviteUI_ON = false;
@@ -594,7 +601,7 @@ void process_packet(unsigned char* p)
 			party_name[i] = L"";
 			party_name[i].append(temp);
 		}
-		LeaveCriticalSection(&cs);
+		LeaveCriticalSection(&IndunCheck_cs);
 		break;
 	}
 	case SC_PACKET_GAIA_PATTERN_ONE: {
@@ -672,7 +679,7 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_PARTY_ROOM_INFO: {
-		EnterCriticalSection(&cs);
+		EnterCriticalSection(&UI_cs);
 		sc_packet_party_room_info* packet = reinterpret_cast<sc_packet_party_room_info*>(p);
 		int r_id = (int)packet->room_id;
 
@@ -699,7 +706,7 @@ void process_packet(unsigned char* p)
 		PartyUI_On = true;
 		party_info_on = true;
 		m_party_info = m_party[r_id];
-		LeaveCriticalSection(&cs);
+		LeaveCriticalSection(&UI_cs);
 		break;
 	}
 	case SC_PACKET_PARTY_ROOM_ENTER_OK: {
@@ -736,13 +743,13 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_PARTY_INVITATION: {
-		EnterCriticalSection(&cs);
+		EnterCriticalSection(&UI_cs);
 		InvitationRoomId = (int)reinterpret_cast<sc_packet_party_invitation*>(p)->room_id;
 		InvitationUser = reinterpret_cast<sc_packet_party_invitation*>(p)->invite_user_id;
 
 		InvitationCardUI_On = true;
 		InvitationCardTimer = chrono::system_clock::now() + 10s;
-		LeaveCriticalSection(&cs);
+		LeaveCriticalSection(&UI_cs);
 		break;
 	}
 	case SC_PACKET_PARTY_INVITATION_FAILED: {
@@ -783,21 +790,27 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_NOTICE: {
-		EnterCriticalSection(&cs);
-		sc_packet_notice* packet = reinterpret_cast<sc_packet_notice*>(p);
+		EnterCriticalSection(&UI_cs);
 		NoticeUI_On = true;
+
+		sc_packet_notice* packet = reinterpret_cast<sc_packet_notice*>(p);
 		if ((int)packet->raid_enter == 0) {
 			RaidEnterNotice = true;
+			NoticeTimer = chrono::system_clock::now() + 5s;
 		}
-		NoticeTimer = chrono::system_clock::now() + 5s;
-
+		else if ((int)packet->raid_enter == 1) {
+			DeadNotice = true;
+			if(InDungeon) NoticeTimer = chrono::system_clock::now() + 5s;
+			else NoticeTimer = chrono::system_clock::now() + 10s;
+		}
+		else NoticeTimer = chrono::system_clock::now() + 5s;
 		wchar_t* temp;
 		int len = 1 + strlen(packet->message);
 		temp = new TCHAR[len];
 		mbstowcs(temp, packet->message, len);
 		Notice_str = L"";
 		Notice_str.append(temp);
-		LeaveCriticalSection(&cs);
+		LeaveCriticalSection(&UI_cs);
 		break;
 	}
 	case SC_PACKET_CHANGE_MP: {

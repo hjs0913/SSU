@@ -135,6 +135,7 @@ void send_change_hp_packet(Player* pl, Npc* victim)
     packet.hp = victim->get_hp();
     pl->do_send(sizeof(packet), &packet);
 }
+
 void send_change_mp_packet(Player* pl, Npc* victim)
 {
     sc_packet_change_mp packet;
@@ -144,7 +145,6 @@ void send_change_mp_packet(Player* pl, Npc* victim)
     packet.mp = victim->get_mp();
     pl->do_send(sizeof(packet), &packet);
 }
-
 
 void send_play_shoot_packet(Player* pl)
 {
@@ -345,7 +345,7 @@ void send_party_room_destroy(Player* pl, int r_id)
     pl->do_send(sizeof(packet), &packet);
 }
 
-void send_notice(Player* pl, char* notice_str, int raid_notice)
+void send_notice(Player* pl, const char* notice_str, int raid_notice)
 {
     sc_packet_notice packet;
     packet.size = sizeof(packet);
@@ -353,4 +353,5 @@ void send_notice(Player* pl, char* notice_str, int raid_notice)
     strcpy_s(packet.message, notice_str);
     packet.raid_enter = raid_notice;
     pl->do_send(sizeof(packet), &packet);
+    cout << notice_str << endl;
 }
