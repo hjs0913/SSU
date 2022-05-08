@@ -620,7 +620,7 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 				len = 1 + Invite_Str.length();
 				send_str = new char[len * 4];
 				temp = Invite_Str.c_str();
-				wcstombs(send_str, temp, MAX_CHAT_SIZE);
+				wcstombs(send_str, temp, MAX_NAME_SIZE);
 				send_party_invite(send_str);
 				delete send_str;
 				break;
@@ -725,6 +725,7 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 			break;
 		case 0x50:	// p key
 			if (InDungeon) break;
+			if (PartyInviteUI_ON || Chatting_On) break;
 			PartyUI_On = !PartyUI_On;
 			if(PartyUI_On) send_party_room_packet();
 			else {

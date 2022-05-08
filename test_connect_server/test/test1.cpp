@@ -224,7 +224,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			else if ((wchar_t)wParam == '\r') break;
 			else {
-				if (Invite_Str.size() <= 20)
+				if (Invite_Str.size() < MAX_NAME_SIZE - 1)
 				{
 					Invite_Str.push_back((wchar_t)wParam);
 				}
@@ -238,7 +238,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				}
 			}
 			else {
-				if (Chatting_Str.size() <= 20)
+				if (Chatting_Str.size() < 20)
 				{
 					Chatting_Str.push_back((wchar_t)wParam);
 				}
