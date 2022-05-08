@@ -544,10 +544,23 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 		break;
 	}
 	case J_SUPPORTER: {
-		switch (1)
+		switch (p)
 		{
 		case 0: {  //hp È¸º¹ 
 			running_pattern = true;
+			if (gaia->get_party_palyer()[0]->get_maxhp() == gaia->get_party_palyer()[0]->get_hp() &&
+				gaia->get_party_palyer()[1]->get_maxhp() == gaia->get_party_palyer()[1]->get_hp() &&
+				gaia->get_party_palyer()[2]->get_maxhp() == gaia->get_party_palyer()[2]->get_hp()) {
+				ev.obj_id = pa->get_id();
+				ev.start_time = chrono::system_clock::now() + 5s;  //ÄðÅ¸ÀÓ
+				ev.ev = EVENT_PARTNER_SKILL;
+				ev.target_id = 0;
+				timer_queue.push(ev);
+				running_pattern = false;
+				return;
+			}
+				
+
 			int tmp_hp = 0;
 			int target_player = 0;
 			for (int i = 0; i < GAIA_ROOM; ++i) {   // ³·Àº Ã¼·Â ÇÃ·¹ÀÌ¾î Ã£±â 
@@ -565,6 +578,8 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			cout << "Ãµ»çÀÇ Ä¡À¯!!!" << endl;    //Àû¿ë 
 			pa->set_mp(pa->get_mp() - 1000);
 			gaia->get_party_palyer()[target_player]->set_hp(gaia->get_party_palyer()[target_player]->get_hp() + gaia->get_party_palyer()[target_player]->get_maxhp() / 10);
+			if (gaia->get_party_palyer()[target_player]->get_hp() > gaia->get_party_palyer()[target_player]->get_maxhp())
+				gaia->get_party_palyer()[target_player]->set_hp(gaia->get_party_palyer()[target_player]->get_maxhp());
 			for (int i = 0; i < GAIA_ROOM; ++i) {
 				send_change_hp_packet(gaia->get_party_palyer()[i], gaia->get_party_palyer()[target_player]);
 			}
@@ -578,6 +593,17 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 		}
 		case 1: { //mp È¸º¹   //¿©±âÀÌ»ó 
 			running_pattern = true;
+			if (gaia->get_party_palyer()[0]->get_maxmp() == gaia->get_party_palyer()[0]->get_mp() &&
+				gaia->get_party_palyer()[1]->get_maxmp() == gaia->get_party_palyer()[1]->get_mp() &&
+				gaia->get_party_palyer()[2]->get_maxmp() == gaia->get_party_palyer()[2]->get_mp()) {
+				ev.obj_id = pa->get_id();
+				ev.start_time = chrono::system_clock::now() + 5s;  //ÄðÅ¸ÀÓ
+				ev.ev = EVENT_PARTNER_SKILL;
+				ev.target_id = 0;
+				timer_queue.push(ev);
+				running_pattern = false;
+				return;
+			}
 			int tmp_mp = 0;
 			int target_player = 0;
 			for (int i = 0; i < GAIA_ROOM; ++i) {   // ³·Àº ¸¶³ª ÇÃ·¹ÀÌ¾î Ã£±â 
@@ -595,6 +621,8 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			cout << "¿äÁ¤ÀÇ Ãàº¹!!!" << endl;    //Àû¿ë 
 			pa->set_mp(pa->get_mp() - 1000);
 			gaia->get_party_palyer()[target_player]->set_mp(gaia->get_party_palyer()[target_player]->get_mp() + gaia->get_party_palyer()[target_player]->get_maxmp() / 10);
+			if (gaia->get_party_palyer()[target_player]->get_mp() > gaia->get_party_palyer()[target_player]->get_maxmp())
+				gaia->get_party_palyer()[target_player]->set_mp(gaia->get_party_palyer()[target_player]->get_maxmp());
 			for (int i = 0; i < GAIA_ROOM; ++i) {
 				send_change_mp_packet(gaia->get_party_palyer()[i], gaia->get_party_palyer()[target_player]); 
 			}

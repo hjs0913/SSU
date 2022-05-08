@@ -779,8 +779,6 @@ void process_packet(unsigned char* p)
 	}
 	case SC_PACKET_PARTY_ROOM_DESTROY: {
 		m_party[(int)reinterpret_cast<sc_packet_party_room_destroy*>(p)->room_id]->dst = DUN_ST_FREE;
-		if (robby_cnt <= 0) robby_cnt = 0;
-		else robby_cnt--;
 
 		if (party_id_index_vector.size() == 0) break;
 
@@ -788,6 +786,8 @@ void process_packet(unsigned char* p)
 			!= party_id_index_vector.end()) {
 			int in = find(party_id_index_vector.begin(), party_id_index_vector.end(), (int)reinterpret_cast<sc_packet_party_room_destroy*>(p)->room_id) - party_id_index_vector.begin(); // index »Æ¿Œ
 			party_id_index_vector.erase(party_id_index_vector.begin()+in);
+			robby_cnt--;
+			if (robby_cnt <= 0) robby_cnt = 0;
 		}
 		break;
 	}
