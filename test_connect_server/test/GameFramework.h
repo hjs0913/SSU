@@ -221,9 +221,7 @@ public:
 
 	bool cRay::isPicked(CGameObject* obj)
 	{
-		//cout << obj->GetPosition().x << endl;
-	 //  cout << obj->GetPosition().y << endl;
-	//	cout << obj->GetPosition().z << endl;
+
 		cRay r = (*this);
 		
 
@@ -266,7 +264,7 @@ public:
 		float b = qv2.x + qv2.y + qv2.z;
 		float c = qq2.x + qq2.y + qq2.z;
 
-		cout << a << " " << b << " " << c << endl;
+
 		float discriminant = (b * b) - (4 * a * c);
 		if (discriminant < 0.0f)
 			return false;

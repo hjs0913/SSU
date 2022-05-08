@@ -10,7 +10,7 @@ private:
 	DUNGEON_STATE st;
 	char room_name[MAX_NAME_SIZE];
 	Player* party[GAIA_ROOM];	// 파티원 정보
-	int party_id[GAIA_ROOM];	//서버에서의 파티원 id
+	int party_id[GAIA_ROOM] = { -1, -1, -1, -1 };	//서버에서의 파티원 id
 	int  player_death_count = 4;
 
 // 패턴 정보
@@ -75,8 +75,8 @@ public:
 	bool check_inside(pos a, pos b, pos c, pos n);
 	bool isInsideTriangle(pos a, pos b, pos c, pos n);
 
-	void judge_pattern_two_rightup(Player* p);
-	void judge_pattern_two_leftup(Player* p);
+	void judge_pattern_two_rightup(Player* p, int pattern_number);
+	void judge_pattern_two_leftup(Player* p, int pattern_number);
 
 	void player_death(Player* p);
 	

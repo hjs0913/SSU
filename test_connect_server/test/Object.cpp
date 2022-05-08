@@ -519,7 +519,6 @@ bool CBulletObject::check2() {
 	
 	if (hit_check == true) {
 	
-		cout << "È÷Æ®" << endl;
 		//hit_check = false;
 		return true;
 	}
@@ -580,7 +579,7 @@ void CBillboardObject::Animate(CGameTimer pTimer, CCamera* pCamera, CGameObject*
 //	hp_pos.x = POS_PLAYER.x;
 //	hp_pos.y = POS_PLAYER.y;
 	//hp_pos.z = POS_PLAYER.z;
-	//cout << hp_pos.x << hp_pos.y << hp_pos.z << endl;
+
 	//Sleep(100);
 
 }

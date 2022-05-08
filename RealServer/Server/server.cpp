@@ -77,7 +77,6 @@ bool check_move_alright(int x, int z, bool monster)
 
     for (auto& ob : obstacles) {
         if ((ob.get_x() - size <= x && x <= ob.get_x() + size) && (ob.get_z() - size <= z && z <= ob.get_z()+size )) {
-            cout << "충돌했다" << endl;
             return false;
         }
     }
@@ -189,17 +188,6 @@ void magical_skill_success(int p_id, int target, float skill_factor)
             players[target]->get_magical_defence()));
     float damage = give_damage * (1 - defence_damage);
     int target_hp = players[target]->get_hp() - damage;
-    cout << players[target]->get_defence_factor() << endl;
-    cout << players[target]->get_magical_defence() << endl;
-    cout << "give_damage : " << give_damage << endl;
-    cout << "defence_damage : " << defence_damage << endl;
-    cout << players[target]->get_defence_factor() *
-        players[target]->get_magical_defence() << endl;
-    cout << (1 + (players[target]->get_defence_factor() *
-        players[target]->get_magical_defence())) << endl;
-
-    cout << p_id << "가 " << damage << "을 " << target << "에게 주었다."
-        << target_hp << "남음" << endl;
 
     players[target]->set_hp(target_hp);
     if (target_hp <= 0) {
@@ -353,15 +341,6 @@ void physical_skill_success(int p_id, int target, float skill_factor)
             players[target]->get_physical_defence()));
     float damage = give_damage * (1 - defence_damage);
     int target_hp = players[target]->get_hp() - damage;
-    cout << players[target]->get_defence_factor() << endl;
-    cout << players[target]->get_physical_defence() << endl;
-    cout << "give_damage : " << give_damage << endl;
-    cout << "defence_damage : " << defence_damage << endl;
-    cout << players[target]->get_defence_factor() *
-        players[target]->get_physical_defence() << endl;
-    cout << (1 + (players[target]->get_defence_factor() *
-        players[target]->get_physical_defence())) << endl;
-
 
     players[target]->set_hp(target_hp);
     if (target_hp <= 0) {
@@ -512,9 +491,6 @@ void attack_success(Npc* p, Npc* target, float atk_factor)
     float damage = give_damage * (1 - defence_damage);
     int target_hp = target->get_hp() - damage;
 
-    cout << p->get_name() << "가 " << damage << "의 데미지를 " 
-        << target->get_name() << "에게 입혀"
-        << target_hp << "의 피가 남음" << endl;
 
 
     target->set_hp(target_hp);
@@ -526,7 +502,6 @@ void attack_success(Npc* p, Npc* target, float atk_factor)
     //ev.target_id = target;
     //timer_queue.push(ev);
 
-    cout << "공격자  속성" << p->get_element() << endl;
 
     if (target->get_element_cooltime() == false) {
         switch (p->get_element())
@@ -537,7 +512,7 @@ void attack_success(Npc* p, Npc* target, float atk_factor)
                 target->set_magical_attack(target->get_magical_attack() / 10 * 9);
                 target->set_element_cooltime(true);
             }
-            cout << "타켓의 마공:" << target->get_magical_attack() << endl;
+
             break;
         case E_FULLMETAL:
             if (target->get_element() == E_ICE || target->get_element() == E_TREE
@@ -549,8 +524,8 @@ void attack_success(Npc* p, Npc* target, float atk_factor)
         case E_WIND:
             if (target->get_element() == E_WATER || target->get_element() == E_EARTH
                 || target->get_element() == E_FIRE) {
-
-                //공속 시전속도 상승 , 쿨타임 감소 
+                reinterpret_cast<Player*>(p)->attack_speed_up = true;
+                //공속  상승 , 쿨타임 감소 
                 target->set_element_cooltime(true);
             }
             break;
@@ -892,7 +867,6 @@ void process_packet(int client_id, unsigned char* p)
             break;
         }
         default: {
-            cout << "없는 직업" << endl;
             break;
         }
         }
@@ -1049,13 +1023,13 @@ void process_packet(int client_id, unsigned char* p)
             pl->vl.lock();
             unordered_set <int> my_vl{ pl->viewlist };
             pl->vl.unlock();
-            send_move_packet(pl, pl);
+            send_move_packet(pl, pl, 1);
             for (auto& other : players) {
                 if (other->get_state() != ST_INDUN) continue;
                 if (is_npc(other->get_id())) break;
                 if (reinterpret_cast<Player*>(other)->indun_id == pl->indun_id) {
                     if (other->get_id() == pl->get_id()) continue;
-                    send_move_packet(reinterpret_cast<Player*>(other), pl);
+                    send_move_packet(reinterpret_cast<Player*>(other), pl, 1);
                 }
             }
             break;
@@ -1065,7 +1039,7 @@ void process_packet(int client_id, unsigned char* p)
         // 유효성 검사
         if (check_move_alright(x, z, false) == false) {
             // 올바르지 않을경우 위치를 수정을 해주어야 한다
-            send_move_packet(pl, pl);
+            send_move_packet(pl, pl, 0);
             break;
         }
 
@@ -1098,7 +1072,7 @@ void process_packet(int client_id, unsigned char* p)
         }
         nearlist.erase(client_id);  // 내 아이디는 무조건 들어가니 그것을 지워주자
 
-        send_move_packet(pl, pl); // 내 자신의 움직임을 먼저 보내주자
+        send_move_packet(pl, pl, 1); // 내 자신의 움직임을 먼저 보내주자
 
         pl->vl.lock();
         unordered_set <int> my_vl{ pl->viewlist };
@@ -1126,7 +1100,7 @@ void process_packet(int client_id, unsigned char* p)
                 }
                 else {
                     other_player->vl.unlock();
-                    send_move_packet(other_player, pl);
+                    send_move_packet(other_player, pl, 1);
                 }
             }
             // 계속 시야에 존재하는 플레이어 처리
@@ -1142,7 +1116,7 @@ void process_packet(int client_id, unsigned char* p)
                 }
                 else {
                     other_player->vl.unlock();
-                    send_move_packet(other_player, pl);
+                    send_move_packet(other_player, pl, 1);
                 }
             }
         }
@@ -1289,10 +1263,28 @@ void process_packet(int client_id, unsigned char* p)
         char c_temp[MAX_CHAT_SIZE];
         sprintf_s(c_temp, MAX_CHAT_SIZE, "%s : %s", pl->get_name(), packet->message);
         if (pl->join_dungeon_room) {
-            Player** vl_pl;
-            vl_pl = dungeons[pl->indun_id]->get_party_palyer();
-            for (int i = 0; i < GAIA_ROOM; i++) {
-                send_chat_packet(vl_pl[i], client_id, c_temp);
+            if (dungeons[pl->get_indun_id()]->get_dun_st() == DUN_ST_START) {
+                Player** vl_pl;
+                vl_pl = dungeons[pl->indun_id]->get_party_palyer();
+                for (int i = 0; i < GAIA_ROOM; i++) {
+                    if (vl_pl[i]->get_state() == ST_INGAME || vl_pl[i]->get_state() == ST_INDUN) {
+                        send_chat_packet(vl_pl[i], client_id, c_temp);
+                    }
+                    else break;
+                }
+            }
+            else {
+                for (auto& s_pl : players) {
+                    s_pl->state_lock.lock();
+                    if (s_pl->get_state() != ST_INGAME) {
+                        s_pl->state_lock.unlock();
+                        continue;
+                    }
+                    s_pl->state_lock.unlock();
+                    if (s_pl->get_tribe() == MONSTER) break;
+                    send_chat_packet(reinterpret_cast<Player*>(s_pl), client_id, c_temp);
+
+                }
             }
         }
         else {
@@ -1324,6 +1316,8 @@ void process_packet(int client_id, unsigned char* p)
         break;
     }
     case CS_PACKET_SKILL: {
+        if (pl->get_mp() - 1000 < 0)  //mp없으면 안됨 
+            return;
         pl->state_lock.lock();
         if (pl->get_state() == ST_DEAD || pl->get_state() == ST_FREE) {
             pl->state_lock.unlock();
@@ -1334,7 +1328,6 @@ void process_packet(int client_id, unsigned char* p)
         cs_packet_skill* packet = reinterpret_cast<cs_packet_skill*>(p);
         if (pl->get_skill_active(packet->skill_type) == true) return;
         pl->set_skill_active(packet->skill_type, true);     //일반공격 계수는 5
-        cout << "직업은 " << pl->get_job() << endl;
         switch (pl->get_job())
         {
         case J_DILLER:
@@ -1351,7 +1344,6 @@ void process_packet(int client_id, unsigned char* p)
                     ev.target_id = 0;
                     timer_queue.push(ev);
 
-                    cout << "최후의 일격 !!!" << endl;
                     pl->set_mp(pl->get_mp() - 1000);
 
                     for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
@@ -1395,19 +1387,13 @@ void process_packet(int client_id, unsigned char* p)
                     ev.target_id = 1;
                     timer_queue.push(ev);
 
-                    cout << "look : " << pl->get_look_x() << ", " << pl->get_look_z() << endl;
-                    cout << "right : " << pl->get_right_x() << ", " << pl->get_right_z() << endl;
-
+              
                     Coord a = { pl->get_x(), pl->get_z() };    //플레이어 기준 전방 삼각형 범위 
                     Coord b = { pl->get_x() - pl->get_right_x() * 40 + pl->get_look_x() * 100,
                         pl->get_z() - pl->get_right_z() * 40 + pl->get_look_z() * 100 };  // 왼쪽 위
                     Coord c = { pl->get_x() + pl->get_right_x() * 40 + pl->get_look_x() * 100,
                         pl->get_z() + pl->get_right_z() * 40 + pl->get_look_z() * 100 };  // 오른쪽 위
-                    cout << " 원래 좌표 : " << a.x << ", " << a.z << endl;
-                    cout << " 왼쪽 좌표 : " << b.x << ", " << b.z << endl;
-                    cout << " 오른쪽 좌표 : " << c.x << ", " << c.z << endl;
-
-                    cout << "광야 일격 !!!" << endl;
+           
                     pl->set_mp(pl->get_mp() - 1000);
                     for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
                         players[i]->state_lock.lock();
@@ -1422,10 +1408,9 @@ void process_packet(int client_id, unsigned char* p)
                         float pz = players[i]->get_z();
 
                         if (isInsideTriangle(a, b, c, n)) {
-                            cout << "여기 들어오는가 1 : " << i << endl;
-                            cout << "맞은놈 좌표 : " << n.x << ", " << n.z << endl;
+            
                             pl->set_skill_factor(packet->skill_type, packet->skill_num);
-                            cout << pl->get_skill_factor(packet->skill_type, packet->skill_num) << endl;
+       
                             magical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
                             players[i]->set_target_id(pl->get_id());
                             send_status_change_packet(pl);
@@ -1456,22 +1441,11 @@ void process_packet(int client_id, unsigned char* p)
                     ev.target_id = 2;
                     timer_queue.push(ev);
 
-
-
-                    cout << pl->get_physical_attack() << endl;
-                    cout << pl->get_magical_attack() << endl;
-                    cout << "아레스의 가호 !!!" << endl;
-                    cout << pl->get_mp() << endl;
                     pl->set_mp(pl->get_mp() - 1000);
 
                     pl->set_physical_attack(0.6 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv()); //일단 두배 
                     pl->set_magical_attack(0.2 * pl->get_lv() * pl->get_lv() + 5 * pl->get_lv());
                     send_status_change_packet(pl);
-                    cout << pl->get_physical_attack() << endl;
-                    cout << pl->get_magical_attack() << endl;
-
-                   
-
                     break;
                 }
                 break;
@@ -1492,7 +1466,7 @@ void process_packet(int client_id, unsigned char* p)
                         ev.target_id = 0;
                         timer_queue.push(ev);
 
-                        cout << "밀어내기 !!!" << endl;
+
                         pl->set_mp(pl->get_mp() - 1000);
 
                         for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
@@ -1508,7 +1482,7 @@ void process_packet(int client_id, unsigned char* p)
                                 physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
 
                                 players[i]->set_pos(players[i]->get_x() + pl->get_look_x() * 40, players[i]->get_z() + pl->get_look_z() * 40);
-                                send_move_packet(pl, players[i]);  //나중에 수정필요 
+                                send_move_packet(pl, players[i], 1);  //나중에 수정필요 
                                 send_status_change_packet(pl);
                                 players[i]->set_target_id(pl->get_id());
                                 if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
@@ -1539,10 +1513,6 @@ void process_packet(int client_id, unsigned char* p)
                         ev.target_id = 1;
                         timer_queue.push(ev);
 
-                        cout << "look : " << pl->get_look_x() << ", " << pl->get_look_z() << endl;
-                        cout << "right : " << pl->get_right_x() << ", " << pl->get_right_z() << endl;
-
-                        cout << "어그로 끌기!!!" << endl;
                         pl->set_mp(pl->get_mp() - 1000);
                         for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
                             players[i]->state_lock.lock();
@@ -1590,18 +1560,11 @@ void process_packet(int client_id, unsigned char* p)
                         ev.target_id = 2;
                         timer_queue.push(ev);
 
-                        cout << pl->get_physical_defence() << endl;
-                        cout << pl->get_magical_defence() << endl;
-                        cout << "아테네의 가호 !!!" << endl;
-                        cout << pl->get_mp() << endl;
                         pl->set_mp(pl->get_mp() - 1000);
 
                         pl->set_physical_defence(0.54 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv()); //일단 두배 
                         pl->set_magical_defence(0.4 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv());
                         send_status_change_packet(pl);
-                        cout << pl->get_physical_defence() << endl;
-                        cout << pl->get_magical_defence() << endl;
-
                         break;
                     }
                     break;
@@ -1622,7 +1585,7 @@ void process_packet(int client_id, unsigned char* p)
                             ev.target_id = 3;
                             timer_queue.push(ev);
 
-                            cout << "천사의 치유!!!" << endl;
+                
                             pl->set_mp(pl->get_mp() - 1000);
                             send_status_change_packet(pl);
 
@@ -1634,13 +1597,9 @@ void process_packet(int client_id, unsigned char* p)
                                 }
                                 players[i]->state_lock.unlock();
                                 if ((players[i]->get_x() >= pl->get_x() - 15 && players[i]->get_x() <= pl->get_x() + 15) && (players[i]->get_z() >= pl->get_z() - 15 && players[i]->get_z() <= pl->get_z() + 15)) {
-                                    cout << "아이디 " <<i<<"의 이전 hp" << players[i]->get_hp() << endl;
+                             
                                     players[i]->set_hp(players[i]->get_hp() + players[i]->get_maxhp() / 10);
                                     send_status_change_packet(reinterpret_cast<Player*>(players[i]));
-                                    
-                                    cout << "체력 회복" << endl;
-                                    cout << "아이디 " << i << "의 이후 hp" << players[i]->get_hp() << endl;
-                                 
                                 }
                             }
                             break;
@@ -1668,8 +1627,7 @@ void process_packet(int client_id, unsigned char* p)
                         {
                            
                         case 0: // mp흡수 
-                      
-                            cout << "마나 드레인!!!" << endl;
+              
                             pl->set_hp(pl->get_hp() - 300);
                             send_status_change_packet(pl);
 
@@ -1711,7 +1669,7 @@ void process_packet(int client_id, unsigned char* p)
                             break;
                         case 1:
                      
-                            cout << "에너지 볼!!!" << endl;
+    
                             send_play_shoot_packet(pl); // 쏘라고 보내줘야 쏘자 
 
                             pl->set_mp(pl->get_mp() - 1500);
@@ -1747,8 +1705,6 @@ void process_packet(int client_id, unsigned char* p)
                                 //if (players[i]->get_x() < pl->get_x() + pl->get_look_x() * 20 &&  players[i]->get_z() < pl->get_z()  + pl->get_look_z() * 100) {
                                 if (isInsideTriangle(a,b,c,n) || isInsideTriangle(d, e, f, n)){
 
-                                
-                                        cout << "적중!" << endl;
                                         pl->set_skill_factor(packet->skill_type, packet->skill_num);
                                         players[i]->set_target_id(pl->get_id());
                                         magical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
@@ -1872,14 +1828,12 @@ void process_packet(int client_id, unsigned char* p)
             break;
         }
         }
-        cout << "내 직업은" << packet->job << "번 입니다." << endl;
         send_status_change_packet(pl);
         break;
     }
     case CS_PACKET_CHANGE_ELEMENT: {
         cs_packet_change_element* packet = reinterpret_cast<cs_packet_change_element*>(p);
         pl->set_element(packet->element);
-        cout << "내 속성은" << packet->element << "번 입니다." << endl;
         send_status_change_packet(pl);
         break;
     }
@@ -1908,19 +1862,19 @@ void process_packet(int client_id, unsigned char* p)
                 ev.target_id = 3;
                 timer_queue.push(ev);
 
-                cout << "마나 회복!!!" << endl;
+           
                 pl->set_mp(pl->get_mp() - 1000);
                 send_status_change_packet(pl);
 
                 int taget = packet->target - 9615;
 
-                cout << "아이디 " << taget << "의 이전 mp" << players[taget]->get_mp() << endl;
+          
                 players[taget]->set_mp(players[taget]->get_mp() + players[taget]->get_maxmp() / 10);
                 send_status_change_packet(reinterpret_cast<Player*>(players[taget]));
 
                 send_buff_ui_packet(reinterpret_cast<Player*>(players[taget]), 0);
 
-                cout << "아이디 " << taget << "의 이후 mp" << players[taget]->get_mp() << endl;
+    
                 break;
 
             }
@@ -1936,7 +1890,6 @@ void process_packet(int client_id, unsigned char* p)
                 ev.target_id = 3;
                 timer_queue.push(ev);
 
-                cout << "아테네의 가호!!!" << endl;
                 pl->set_mp(pl->get_mp() - 1000);
                 send_status_change_packet(pl);
 
@@ -1961,18 +1914,15 @@ void process_packet(int client_id, unsigned char* p)
                 ev.target_id = 3;
                 timer_queue.push(ev);
 
-                cout << "천사의 치유!!!" << endl;
                 pl->set_mp(pl->get_mp() - 1000);
                 send_status_change_packet(pl);
 
                 int taget = packet->target - 9615;
 
-                cout << "아이디 " << taget << "의 이전 hp" << players[taget]->get_hp() << endl;
                 players[taget]->set_hp(players[taget]->get_hp() + players[taget]->get_maxhp() / 10);
                 send_status_change_packet(reinterpret_cast<Player*>(players[taget]));
                 send_buff_ui_packet(reinterpret_cast<Player*>(players[taget]), 2);
-                cout << "체력 회복" << endl;
-                cout << "아이디 " << taget << "의 이후 hp" << players[taget]->get_hp() << endl;
+       
 
 
 
@@ -2253,7 +2203,7 @@ void process_packet(int client_id, unsigned char* p)
         Gaia* dun = dungeons[r_id];
 
         if (dun->player_cnt < GAIA_ROOM) {  // 제한 인원수 보다 적을 때만 추가 가능하도록 하자 
-            cout << "넣기 시작!" << endl;
+
             int new_id = get_new_id();
             if (-1 == new_id) {
                 cout << "Maxmum user overflow.Accept aborted.\n";
@@ -2303,14 +2253,11 @@ void process_packet(int client_id, unsigned char* p)
                 if (party_players[i]->get_tribe() == HUMAN)
                     send_party_room_info_packet(party_players[i], dun->get_party_palyer(), dun->player_cnt, dun->get_dungeon_id());
             }
-            cout << "넣기 끝" << endl;
         }
-        else 
-            cout << "가득 차서 불가능!" << endl;
-        break;
+        else
+            break;
     }
     default:
-        cout << "잘못된 패킷 타입 : " << packet_type << endl;
         break;
     }
 }
@@ -2318,11 +2265,9 @@ void process_packet(int client_id, unsigned char* p)
 void player_revive(int client_id)
 {
     Player* pl = reinterpret_cast<Player*>(players[client_id]);
-    cout << pl->get_name() << "부활" << endl;
     if (pl->join_dungeon_room == true) {
         dungeons[pl->indun_id]->state_lock.lock();
         if (dungeons[pl->indun_id]->get_dun_st() == DUN_ST_START) {
-            cout << "레이드 부활" << endl;
             dungeons[pl->indun_id]->state_lock.unlock();
             
             pl->state_lock.lock();
@@ -2543,7 +2488,6 @@ void worker()
             break;
         }
         case OP_ACCEPT: {
-            cout << "Accept Completed.\n";
             SOCKET c_socket = *(reinterpret_cast<SOCKET*>(exp_over->_net_buf));
             int new_id = get_new_id();
             if (-1 == new_id) {
@@ -2645,7 +2589,6 @@ void worker()
             int error = lua_pcall(L, 1, 1, 0);
             if (error != 0) {
                 cout << "LUA ATTACK RANGE ERROR" << endl;
-                cout << lua_tostring(L, -1) << endl;
             }
             bool m = false;
             m = lua_toboolean(L, -1);
@@ -2744,9 +2687,6 @@ void worker()
 
             timer_event ev;
 
-            cout << "여기" << endl;
-            cout << "클라 속성 " << players[ev.obj_id]->get_element() << endl;
-            cout << "타켓 속성 " << players[ev.target_id]->get_element() << endl;
             players[client_id]->state_lock.lock();
             if ((players[client_id]->get_state() != ST_INGAME)) {
                 players[client_id]->state_lock.unlock();
@@ -2833,7 +2773,7 @@ void worker()
             pl->partner_move(pl, dungeons[pl->get_indun_id()]);
             Player** pp = dungeons[pl->get_indun_id()]->get_party_palyer();
             for (int i = 0; i < GAIA_ROOM; i++) {
-                send_move_packet(pp[i], pl);
+                send_move_packet(pp[i], pl, 1);
                 send_look_packet(pp[i], pl);
             }
 
@@ -2847,7 +2787,6 @@ void worker()
             break;
         }
         case OP_PARTNER_SKILL: {
-            //cout << "파트너 어택 OP"<< endl;
             players[client_id]->state_lock.lock();
             if (players[client_id]->get_state() != ST_INDUN) {
                 players[client_id]->state_lock.unlock();
@@ -2881,7 +2820,6 @@ void worker()
         case OP_GAMESTART_TIMER: {
             Gaia* dun = dungeons[exp_over->_target];
             dun->game_start();
-            cout << "찐 게임 시작" << endl;
             dun->state_lock.lock();
             if (dun->get_dun_st() == DUN_ST_START) {
                 dun->state_lock.unlock();
@@ -3364,7 +3302,7 @@ void return_npc_position(int npc_id)
   
         }
         else {
-            send_move_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id]);
+            send_move_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id], 1);
             send_look_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id]);
         }
     }
@@ -3489,7 +3427,7 @@ void do_npc_move(int npc_id, int target)
             send_put_object_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id]);
         }
         else {
-            send_move_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id]);
+            send_move_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id], 1);
             send_look_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id]);
         }
     }
@@ -3634,7 +3572,6 @@ void do_timer()
                     continue;
                 }
                 else if (ev.ev == EVENT_PARTNER_SKILL) {
-                    cout << "몇번들어오냐" << endl;
                     if (ev.target_id == 10) {
                         int indun_id = reinterpret_cast<Player*>(players[ev.obj_id])->get_indun_id();
                         for (int i = 0; i < GAIA_ROOM; ++i) {
@@ -3728,8 +3665,6 @@ int main()
     }
 
     obstacles_read.close();
-
-    cout << "중단점" << endl;
 
     vector <thread> worker_threads;
     thread timer_thread{ do_timer };

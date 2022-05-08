@@ -396,9 +396,11 @@ void process_packet(unsigned char* p)
 		sc_packet_move* packet = reinterpret_cast<sc_packet_move*>(p);
 
 		if (packet->id == my_id) {
-			my_position.x = packet->x;
-			my_position.y = packet->y;
-			my_position.z = packet->z;
+			if ((int)packet->move_right == 0) {
+				my_position.x = packet->x;
+				my_position.y = packet->y;
+				my_position.z = packet->z;
+			}
 		}
 		else {
 			mPlayer[packet->id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
@@ -505,7 +507,6 @@ void process_packet(unsigned char* p)
 		mPlayer[my_id]->m_hp = 0;
 		combat_id = -1;
 		Combat_On = false;
-		cout << "died" << endl;
 		break;
 		
 	}
@@ -575,9 +576,6 @@ void process_packet(unsigned char* p)
 		effect_x = packet->x;
 		effect_y = packet->y;
 		effect_z = packet->z;
-		cout << effect_x << endl;
-		cout << effect_y << endl;
-		cout << effect_z << endl;
 		break;
 	}
 	case SC_PACKET_START_GAIA: {
@@ -588,12 +586,10 @@ void process_packet(unsigned char* p)
 		InvitationCardUI_On = false;
 
 		sc_packet_start_gaia* packet = reinterpret_cast<sc_packet_start_gaia*>(p);
-		cout << "인던으로 입장해야됨" << endl;
 		combat_id = 101;
 		InDungeon = true;
 		for (int i = 0; i < GAIA_ROOM; i++) {
 			party_id[i] = packet->party_id[i];
-			cout << party_id[i] << " : " << mPlayer[party_id[i]]->m_name << endl;
 			wchar_t* temp;
 			int len = 1 + strlen(mPlayer[party_id[i]]->m_name);
 			temp = new TCHAR[len];
@@ -676,8 +672,11 @@ void process_packet(unsigned char* p)
 		sc_packet_party_room* packet = reinterpret_cast<sc_packet_party_room*>(p);
 		m_party[(int)packet->room_id]->set_room_name(packet->room_name);
 		m_party[(int)packet->room_id]->dst = DUN_ST_ROBBY;
-		robby_cnt++;
-		party_id_index_vector.push_back((int)packet->room_id);
+		if (find(party_id_index_vector.begin(), party_id_index_vector.end(), (int)reinterpret_cast<sc_packet_party_room_destroy*>(p)->room_id)
+			== party_id_index_vector.end()) {
+			robby_cnt++;
+			party_id_index_vector.push_back((int)packet->room_id);
+		}
 		break;
 	}
 	case SC_PACKET_PARTY_ROOM_INFO: {
@@ -889,7 +888,7 @@ int netInit()
 	const char* SERVERIP;
 	char tempIP[16];
 	SERVERIP = "127.0.0.1";
-
+	//SERVERIP = "116.47.180.110";
 	// 윈속 초기화
 	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
 		return 1;
@@ -949,7 +948,6 @@ int netclose()
 }
 
 XMFLOAT3 return_myPosition() {
-	//cout << "position : " << my_position.x << ", " << my_position.y << ", " << my_position.z << endl;
 	return my_position;
 }
 
@@ -1027,4 +1025,11 @@ wchar_t* get_user_name_to_server(int id)
 	temp = new TCHAR[len];
 	mbstowcs(temp, mPlayer[id]->m_name, len);
 	return temp;
+}
+
+void set_myPosition(XMFLOAT3 pos)
+{
+	my_position.x = pos.x;
+	my_position.y = pos.y;
+	my_position.z = pos.z;
 }

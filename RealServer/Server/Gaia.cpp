@@ -79,8 +79,6 @@ void Gaia::join_player(Player* pl)
 	party[player_cnt] = pl;
 	party_id[player_cnt] = pl->get_id();
 	player_cnt++;
-	cout << "player_cnt : " << player_cnt << endl;
-	cout << dungeon_id << "번 던전에 입장 중입니다" << endl;
 
 	pl->set_indun_id(dungeon_id);
 	pl->state_lock.lock();
@@ -173,8 +171,6 @@ void Gaia::game_start()
 		// 가장 체력이 높은 플레이어를 일단 타겟으로 잡는다
 		if (party[i]->get_hp() > tmp_hp) target_id = 0;
 	}
-
-	cout << dungeon_id << "번 던전 시작합니다" << endl;
 }
 
 void Gaia::destroy_dungeon()
@@ -227,6 +223,10 @@ void Gaia::destroy_dungeon()
 
 	boss->set_x(310);
 	boss->set_x(110);
+
+	for (int i = 0; i < GAIA_ROOM; i++) {
+		party_id[i] = -1;
+	}
 }
 
 DUNGEON_STATE Gaia::get_dun_st()
@@ -270,7 +270,7 @@ void Gaia::boss_move()
 	boss->set_z(mv.second);
 	for (auto pt : party) {
 		if (pt->get_tribe() != HUMAN) continue;
-		send_move_packet(pt, boss);
+		send_move_packet(pt, boss, 1);
 		send_look_packet(pt, boss);
 	}
 
@@ -289,20 +289,17 @@ void Gaia::boss_attack()
 	if (fifteen_pattern == false) {
 		if (boss->get_hp() < boss->get_maxhp()/2) {
 			fifteen_pattern = true;
-			cout << "특수 패턴을 실행합니다" << endl;
 			return;
 		}
 	}
 	else {
 		if (boss->get_hp() <= 0) {
-			cout << "마지막 발악을 실행합니다" << endl;
 			return;
 		}
 	}
 
 	switch (pattern_num) {
 	case 0: {  //장판
-		cout << "장판" << endl;
 		running_pattern = true;
 		// 목표지점
 		// 1차 타점
@@ -338,7 +335,6 @@ void Gaia::boss_attack()
 		break;
 	}
 	case 1: { //파도3개 
-		cout << "파도" << endl;
 		running_pattern = true;
 		pattern_two_number = pattern(gen) % 4;
 		switch (pattern_two_number) {
@@ -452,8 +448,6 @@ void Gaia::boss_attack()
 		break;
 	}
 	case 2: {
-		cout << "패턴 2(검 꽂기)" << endl;
-		//
 		ev.obj_id = dungeon_id;
 		ev.start_time = chrono::system_clock::now() + 3s;
 		ev.ev = EVENT_BOSS_ATTACK;
@@ -462,8 +456,6 @@ void Gaia::boss_attack()
 		break;
 	}
 	case 3: {
-		cout << "패턴 3(나뭇잎 공격)" << endl;
-		//
 		ev.obj_id = dungeon_id;
 		ev.start_time = chrono::system_clock::now() + 3s;
 		ev.ev = EVENT_BOSS_ATTACK;
@@ -472,7 +464,6 @@ void Gaia::boss_attack()
 		break;
 	}
 	case 4: {//참격 1개 
-		cout << "참격" << endl;
 		running_pattern = true;
 		pattern_five_position[0] = pos(boss->get_x()+ boss->get_look_x(), boss->get_z() + boss->get_look_z());
 		for (int i = 0; i < GAIA_ROOM; i++) {
@@ -494,7 +485,6 @@ void Gaia::boss_attack()
 		break;
 	}
 	default:
-		cout << "패턴 에러" << endl;
 		break;
 	}
 }
@@ -507,7 +497,6 @@ int Gaia::get_dungeon_id()
 void Gaia::player_death(Player* p)
 {
 	p->set_hp(0);
-	std::cout << p->get_name() << "사망" << std::endl;
 	if (player_death_count > 0) {
 		player_death_count--;
 		p->state_lock.lock();
@@ -591,7 +580,7 @@ bool Gaia::isInsideTriangle(pos a, pos b, pos c, pos n)
 
 }
 
-void Gaia::judge_pattern_two_rightup(Player* p)
+void Gaia::judge_pattern_two_rightup(Player* p, int pattern_number)
 {
 	for (int i = 0; i < 3; i++) {
 		int x = pattern_two_position[i].first;
@@ -601,6 +590,15 @@ void Gaia::judge_pattern_two_rightup(Player* p)
 		rect[1] = pos(x - 70, z);
 		rect[2] = pos(x, z - 70);
 		rect[3] = pos(x + 35, z - 35);
+
+		if (pattern_number == 0) {
+			rect[1] = pos(x - 70, z);
+			rect[2] = pos(x, z - 70);
+		}
+		else if (pattern_number == 2) {
+			rect[1] = pos(x, z + 70);
+			rect[2] = pos(x + 70, z);
+		}
 		pos n = pos(p->get_x(), p->get_z());
 
 		p->state_lock.lock();
@@ -621,16 +619,23 @@ void Gaia::judge_pattern_two_rightup(Player* p)
 	}
 }
 
-void Gaia::judge_pattern_two_leftup(Player* p)
+void Gaia::judge_pattern_two_leftup(Player* p, int pattern_number)
 {
 	for (int i = 0; i < 3; i++) {
 		int x = pattern_two_position[i].first;
 		int z = pattern_two_position[i].second;
 		pos rect[4];
 		rect[0] = pos(x - 35, z - 35);
-		rect[1] = pos(x, z - 70);
-		rect[2] = pos(x + 70, z);
 		rect[3] = pos(x + 35, z + 35);
+		if (pattern_number == 1) {
+			rect[1] = pos(x, z - 70);
+			rect[2] = pos(x + 70, z);
+		}
+		else if (pattern_number == 3) {
+			rect[1] = pos(x - 70, z);
+			rect[2] = pos(x, z + 70);
+		}
+		else return;
 		pos n = pos(p->get_x(), p->get_z());
 
 		p->state_lock.lock();
@@ -690,10 +695,10 @@ void Gaia::pattern_active(int pattern)
 		float movesize = 25.0f * (float)(sqrt(2) / 2);
 		for (auto& p : party) {
 			if (pattern_two_number == 0 || pattern_two_number == 2) {
-				judge_pattern_two_rightup(p);
+				judge_pattern_two_rightup(p, pattern_two_number);
 			}
 			else {
-				judge_pattern_two_leftup(p);
+				judge_pattern_two_leftup(p, pattern_two_number);
 			}
 		}
 		// 장판 움직이기
@@ -823,7 +828,6 @@ void Gaia::pattern_active(int pattern)
 		break;
 	}
 	default:
-		cout << "잘봇된 패턴 활성화" << endl;
 		break;
 	}
 

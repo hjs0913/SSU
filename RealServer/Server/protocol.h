@@ -270,6 +270,7 @@ struct sc_packet_move {
 	int		id;
 	float  x, y, z;
 	int		move_time;
+	unsigned char move_right;		// 0 : 위치 수정, 1 : 유효성 올바름
 };
 
 struct sc_packet_put_object {

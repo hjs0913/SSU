@@ -22,7 +22,7 @@ void send_login_ok_packet(Player* pl)
     pl->do_send(sizeof(packet), &packet);
 }
 
-void send_move_packet(Player* pl, Npc* mover)
+void send_move_packet(Player* pl, Npc* mover, int right)
 {
     sc_packet_move packet;
     packet.id = mover->get_id();
@@ -32,6 +32,7 @@ void send_move_packet(Player* pl, Npc* mover)
     packet.y = mover->get_y();
     packet.z = mover->get_z();
     packet.move_time =  pl->last_move_time;
+    packet.move_right = right;
     pl->do_send(sizeof(packet), &packet);
 }
 
@@ -78,8 +79,6 @@ void send_remove_object_packet(Player* pl, Npc* victim)
 
 void send_chat_packet(Player* pl, int my_id, char* mess)
 {
-    cout << pl->get_name() << endl;
-    cout << mess << endl;
     sc_packet_chat packet;
     packet.id = my_id;
     packet.size = sizeof(packet);
@@ -353,5 +352,4 @@ void send_notice(Player* pl, const char* notice_str, int raid_notice)
     strcpy_s(packet.message, notice_str);
     packet.raid_enter = raid_notice;
     pl->do_send(sizeof(packet), &packet);
-    cout << notice_str << endl;
 }
