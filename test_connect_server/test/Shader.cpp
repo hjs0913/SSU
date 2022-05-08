@@ -1186,6 +1186,7 @@ void CObjectsShader::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 		pBillboardObject->SetPosition(0, -100, 0);
 		pBillboardObject->SetCbvGPUDescriptorHandlePtr(m_d3dCbvGPUDescriptorStartHandle.ptr + (::gnCbvSrvDescriptorIncrementSize * i));
 		m_ppObjects[i] = pBillboardObject;
+
 	}
 
 	std::default_random_engine dre;
@@ -1712,7 +1713,7 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 				m_ppObjects[j]->Animate2(j, pTimer, pCamera, pPlayer);
 			}
 			else {
-				m_ppObjects[j]->Animate(pTimer, pCamera, player);
+					m_ppObjects[j]->Animate(pTimer, pCamera, player);
 			}
 
 
