@@ -549,8 +549,8 @@ void attack_success(Npc* p, Npc* target, float atk_factor)
         case E_WIND:
             if (target->get_element() == E_WATER || target->get_element() == E_EARTH
                 || target->get_element() == E_FIRE) {
-
-                //공속 시전속도 상승 , 쿨타임 감소 
+                reinterpret_cast<Player*>(p)->attack_speed_up = true;
+                //공속  상승 , 쿨타임 감소 
                 target->set_element_cooltime(true);
             }
             break;
