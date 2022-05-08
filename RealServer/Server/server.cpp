@@ -2172,6 +2172,7 @@ void process_packet(int client_id, unsigned char* p)
 
             for (int i = 0; i < dun->player_cnt; i++) {
                 int delete_id = party_players[i]->get_id();
+                cout << "delete_id : " << delete_id << endl;
                 delete players[delete_id];
                 players[delete_id] = new Player(delete_id);
             }
