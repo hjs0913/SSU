@@ -122,7 +122,9 @@ void Gaia::quit_palyer(Player* pl)
 	// 앞으로 다 땡겨오기
 	for (int i = tmp; i < GAIA_ROOM; i++) {
 		if (i == GAIA_ROOM - 1) continue;
+		cout << party_id[i] << endl;
 		party[i] = party[i + 1];
+		cout << party_id[i] << endl;
 		party_id[i] = party_id[i + 1];
 	}
 
@@ -227,6 +229,10 @@ void Gaia::destroy_dungeon()
 
 	boss->set_x(310);
 	boss->set_x(110);
+
+	for (int i = 0; i < GAIA_ROOM; i++) {
+		party_id[i] = -1;
+	}
 }
 
 DUNGEON_STATE Gaia::get_dun_st()
@@ -591,7 +597,7 @@ bool Gaia::isInsideTriangle(pos a, pos b, pos c, pos n)
 
 }
 
-void Gaia::judge_pattern_two_rightup(Player* p)
+void Gaia::judge_pattern_two_rightup(Player* p, int pattern_number)
 {
 	for (int i = 0; i < 3; i++) {
 		int x = pattern_two_position[i].first;
@@ -601,6 +607,15 @@ void Gaia::judge_pattern_two_rightup(Player* p)
 		rect[1] = pos(x - 70, z);
 		rect[2] = pos(x, z - 70);
 		rect[3] = pos(x + 35, z - 35);
+
+		if (pattern_number == 0) {
+			rect[1] = pos(x - 70, z);
+			rect[2] = pos(x, z - 70);
+		}
+		else if (pattern_number == 2) {
+			rect[1] = pos(x, z + 70);
+			rect[2] = pos(x + 70, z);
+		}
 		pos n = pos(p->get_x(), p->get_z());
 
 		p->state_lock.lock();
@@ -621,16 +636,23 @@ void Gaia::judge_pattern_two_rightup(Player* p)
 	}
 }
 
-void Gaia::judge_pattern_two_leftup(Player* p)
+void Gaia::judge_pattern_two_leftup(Player* p, int pattern_number)
 {
 	for (int i = 0; i < 3; i++) {
 		int x = pattern_two_position[i].first;
 		int z = pattern_two_position[i].second;
 		pos rect[4];
 		rect[0] = pos(x - 35, z - 35);
-		rect[1] = pos(x, z - 70);
-		rect[2] = pos(x + 70, z);
 		rect[3] = pos(x + 35, z + 35);
+		if (pattern_number == 1) {
+			rect[1] = pos(x, z - 70);
+			rect[2] = pos(x + 70, z);
+		}
+		else if (pattern_number == 3) {
+			rect[1] = pos(x - 70, z);
+			rect[2] = pos(x, z + 70);
+		}
+		else return;
 		pos n = pos(p->get_x(), p->get_z());
 
 		p->state_lock.lock();
@@ -690,10 +712,10 @@ void Gaia::pattern_active(int pattern)
 		float movesize = 25.0f * (float)(sqrt(2) / 2);
 		for (auto& p : party) {
 			if (pattern_two_number == 0 || pattern_two_number == 2) {
-				judge_pattern_two_rightup(p);
+				judge_pattern_two_rightup(p, pattern_two_number);
 			}
 			else {
-				judge_pattern_two_leftup(p);
+				judge_pattern_two_leftup(p, pattern_two_number);
 			}
 		}
 		// 장판 움직이기

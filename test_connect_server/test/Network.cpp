@@ -676,8 +676,11 @@ void process_packet(unsigned char* p)
 		sc_packet_party_room* packet = reinterpret_cast<sc_packet_party_room*>(p);
 		m_party[(int)packet->room_id]->set_room_name(packet->room_name);
 		m_party[(int)packet->room_id]->dst = DUN_ST_ROBBY;
-		robby_cnt++;
-		party_id_index_vector.push_back((int)packet->room_id);
+		if (find(party_id_index_vector.begin(), party_id_index_vector.end(), (int)reinterpret_cast<sc_packet_party_room_destroy*>(p)->room_id)
+			== party_id_index_vector.end()) {
+			robby_cnt++;
+			party_id_index_vector.push_back((int)packet->room_id);
+		}
 		break;
 	}
 	case SC_PACKET_PARTY_ROOM_INFO: {
