@@ -1342,6 +1342,8 @@ void process_packet(int client_id, unsigned char* p)
         break;
     }
     case CS_PACKET_SKILL: {
+        if (pl->get_mp() - 1000 < 0)  //mp¾øÀ¸¸é ¾ÈµÊ 
+            return;
         pl->state_lock.lock();
         if (pl->get_state() == ST_DEAD || pl->get_state() == ST_FREE) {
             pl->state_lock.unlock();
