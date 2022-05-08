@@ -505,7 +505,6 @@ void process_packet(unsigned char* p)
 		mPlayer[my_id]->m_hp = 0;
 		combat_id = -1;
 		Combat_On = false;
-		cout << "died" << endl;
 		break;
 		
 	}
@@ -575,9 +574,6 @@ void process_packet(unsigned char* p)
 		effect_x = packet->x;
 		effect_y = packet->y;
 		effect_z = packet->z;
-		cout << effect_x << endl;
-		cout << effect_y << endl;
-		cout << effect_z << endl;
 		break;
 	}
 	case SC_PACKET_START_GAIA: {
@@ -588,12 +584,10 @@ void process_packet(unsigned char* p)
 		InvitationCardUI_On = false;
 
 		sc_packet_start_gaia* packet = reinterpret_cast<sc_packet_start_gaia*>(p);
-		cout << "인던으로 입장해야됨" << endl;
 		combat_id = 101;
 		InDungeon = true;
 		for (int i = 0; i < GAIA_ROOM; i++) {
 			party_id[i] = packet->party_id[i];
-			cout << party_id[i] << " : " << mPlayer[party_id[i]]->m_name << endl;
 			wchar_t* temp;
 			int len = 1 + strlen(mPlayer[party_id[i]]->m_name);
 			temp = new TCHAR[len];
@@ -952,7 +946,6 @@ int netclose()
 }
 
 XMFLOAT3 return_myPosition() {
-	//cout << "position : " << my_position.x << ", " << my_position.y << ", " << my_position.z << endl;
 	return my_position;
 }
 

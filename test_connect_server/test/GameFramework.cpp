@@ -423,8 +423,7 @@ bool CGameFramework::TestIntersection(int mouseX, int mouseY, CGameObject* obj)
 	//m_pPlayer
 	if (RaySphereIntersect(rayOrigin, rayDirection, 40.0f) == true)
 	{
-		cout << obj->GetPosition().x << "  " <<obj->GetPosition().y  << "  " << obj->GetPosition().z <<  endl;
-		cout << "픽킹";
+
 		return true;
 		// 교차하는 경우 화면에 표시되는 텍스트 문자열에서 교차로를 "yes"로 설정합니다.
 	//	m_Text->SetIntersection(true, m_D3D->GetDeviceContext());
@@ -616,7 +615,6 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 		case VK_RETURN:
 			if (PartyInviteUI_ON) {
 				PartyInviteUI_ON = false;
-				wcout << Invite_Str << endl;
 				len = 1 + Invite_Str.length();
 				send_str = new char[len * 4];
 				temp = Invite_Str.c_str();
@@ -1077,18 +1075,19 @@ void CGameFramework::ProcessInput()
 							pushCTRL = false;
 							shoot = false;
 						}
-					}
-					if (bulletidx >= BULLETCNT + 2) {
-						bulletidx = 2;
-						for (int i = 0; i < BULLETCNT; ++i) {
-							if (IsFire[i]) {
-								if(!InDungeon) m_pScene->Rotate(2 + i, 0, tmp[i], 0.0f);
-								else m_pRaid_Scene->Rotate(2 + i, 0, tmp[i], 0.0f);
+						if (bulletidx >= BULLETCNT + 2) {
+							bulletidx = 2;
+							for (int i = 0; i < BULLETCNT; ++i) {
+								if (IsFire[i]) {
+									if (!InDungeon) m_pScene->Rotate(2 + i, 0, tmp[i], 0.0f);
+									else m_pRaid_Scene->Rotate(2 + i, 0, tmp[i], 0.0f);
+								}
+								IsFire[i] = false;
 							}
-							IsFire[i] = false;
 						}
+						IsFire[bulletidx - 2] = true;
 					}
-					IsFire[bulletidx - 2] = true;
+				
 				
 			}
 			//	if (pKeysBuffer[VK_NUMPAD6] & 0xF0 || (pKeysBuffer['6'] & 0xF0)) {     //   6
@@ -1544,8 +1543,6 @@ void CGameFramework::FrameAdvance()
 			if (!InDungeon) continue;
 		}
 		if (i == 15 && !PartyUI_On) {
-			if(PartyUI_On == true)
-				cout << PartyUI_On << endl;
 			continue;
 		}
 		if (i == 16 && !PartyInviteUI_ON) continue;
