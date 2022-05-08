@@ -604,6 +604,9 @@ void CStandardMesh::OnPreRender(ID3D12GraphicsCommandList *pd3dCommandList, void
 //
 CSkinnedMesh::CSkinnedMesh(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList) : CStandardMesh(pd3dDevice, pd3dCommandList)
 {
+	m_d3dBoneIndexBufferView.BufferLocation = NULL;
+	m_d3dBoneIndexBufferView.StrideInBytes = NULL;
+	m_d3dBoneIndexBufferView.SizeInBytes = NULL;
 }
 
 CSkinnedMesh::~CSkinnedMesh()

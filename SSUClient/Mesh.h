@@ -49,6 +49,7 @@ protected:
 	XMFLOAT3						m_xmf3AABBExtents = XMFLOAT3(0.0f, 0.0f, 0.0f);
 
 	D3D12_PRIMITIVE_TOPOLOGY		m_d3dPrimitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+	
 	UINT							m_nSlot = 0;
 	UINT							m_nOffset = 0;
 
