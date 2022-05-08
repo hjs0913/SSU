@@ -326,7 +326,6 @@ bool Npc::check_move_alright(int x, int z, bool monster, array<Obstacle, MAX_OBS
 
 	for (auto& ob : obs) {
 		if ((ob.get_x() - size <= x && x <= ob.get_x() + size) && (ob.get_z() - size <= z && z <= ob.get_z() + size)) {
-			cout << "충돌했다" << endl;
 			return false;
 		}
 	}
@@ -339,7 +338,6 @@ int Npc::huristic(int t_x, int t_z, int x, int z)
 	int s_x = abs(t_x - x);
 	int s_z = abs(t_z - z);
 	int score = sqrt(pow(s_x, 2) + pow(s_z, 2));
-	//cout << "huristic : " << score << endl;
 	return score;
 }
 

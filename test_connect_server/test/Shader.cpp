@@ -447,7 +447,6 @@ void CObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 	for (int i = 0; i < 609; i++) {
 		float x, y, z;
 		obstacles_read >> x >> y >> z;
-	//	cout << x << "," << y << "," << z << endl;
 		obstacles[i]._id = i;
 		obstacles[i]._x = x +2500;
 		obstacles[i]._y = y + 200;
@@ -599,11 +598,9 @@ void CObjectsShader::BuildObjects(ID3D12Device* pd3dDevice, ID3D12GraphicsComman
 				float xPosition = obstacles[x  + z]._x;
 				float zPosition = obstacles[x  + z ]._z;
 				float fHeight = pTerrain->GetHeight(xPosition, zPosition);
-				//cout << xPosition << " " << fHeight << " " << zPosition << endl;
 			//	if (xPosition <= fTerrainWidth / 2 - 200 || xPosition >= fTerrainWidth / 2 + 200 ||   //나무 위치     
 				//	zPosition <= fTerrainLength / 2 - 200 || zPosition >= fTerrainLength / 2 + 200) {
 				pBillboardObject->SetPosition(xPosition, 35, zPosition);         //1028 168 1028
-				//cout << hp_pos.x << hp_pos.y << hp_pos.z << endl;
 
 		//	}
 			//if (x == 1)
@@ -698,7 +695,6 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 	for (int i = 0; i < 609; i++) {
 		float x, y, z;
 		obstacles_read >> x >> y >> z;
-		//	cout << x << "," << y << "," << z << endl;
 		obstacles[i]._id = i;
 		obstacles[i]._x = x;
 		obstacles[i]._y = y;
@@ -918,7 +914,7 @@ void CObjectsShader::BuildObjects2(ID3D12Device* pd3dDevice, ID3D12GraphicsComma
 				}
 
 				float fHeight = pTerrain->GetHeight(xPosition, zPosition);
-				//cout << xPosition << " " << fHeight << " " << zPosition << endl;
+
 			//	if (xPosition <= fTerrainWidth / 2 - 200 || xPosition >= fTerrainWidth / 2 + 200 ||   //나무 위치     
 				//	zPosition <= fTerrainLength / 2 - 200 || zPosition >= fTerrainLength / 2 + 200) {
 				pBillboardObject->SetPosition(xPosition, fHeight+23, zPosition);         //1028 168 1028
@@ -1250,7 +1246,6 @@ void CObjectsShader::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsC
 				}
 
 				float fHeight = pTerrain->GetHeight(xPosition, zPosition);
-				//cout << xPosition << " " << fHeight << " " << zPosition << endl;
 			//	if (xPosition <= fTerrainWidth / 2 - 200 || xPosition >= fTerrainWidth / 2 + 200 ||   //나무 위치     
 				//	zPosition <= fTerrainLength / 2 - 200 || zPosition >= fTerrainLength / 2 + 200) {
 				pBillboardObject->SetPosition(xPosition, fHeight + 23, zPosition);         //1028 168 1028
@@ -1545,7 +1540,7 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 
 						}
 						else {
-							cout << "우아2" << endl;
+			
 							//m_ppObjects[j + BULLETCNT - 30]->SetPosition(effect_x - 10, effect_y + 10, effect_z);
 							//m_ppObjects[j + BULLETCNT - 31]->SetPosition(effect_x, effect_y , effect_z);
 							//m_ppObjects[j + BULLETCNT - 32]->SetPosition(effect_x - 10, effect_y + 10, effect_z);
@@ -1643,13 +1638,8 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 					}
 
 
-					//cout << j << endl;
-					//cout << m_ppObjects[j]->vCenter.x << m_ppObjects[j]->vCenter.y << m_ppObjects[j]->vCenter.z << endl;
-
-
 					pPlayer->SetLook(get_look_to_server(j - MAX_WORLD_SHADER));
 					pPlayer->Animate(pTimer, pCamera, m_ppObjects[j]);
-
 
 
 					// hp bar 렌더링
@@ -1694,7 +1684,6 @@ void CObjectsShader::AnimateObjects(CGameTimer pTimer, CCamera* pCamera, CGameOb
 
 					}
 					else {
-						cout << "우아2" << endl;
 						//m_ppObjects[j + BULLETCNT - 30]->SetPosition(effect_x - 10, effect_y + 10, effect_z);
 						//m_ppObjects[j + BULLETCNT - 31]->SetPosition(effect_x, effect_y , effect_z);
 						//m_ppObjects[j + BULLETCNT - 32]->SetPosition(effect_x - 10, effect_y + 10, effect_z);
