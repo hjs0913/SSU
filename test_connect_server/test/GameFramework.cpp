@@ -1230,7 +1230,7 @@ void CGameFramework::FrameAdvance()
 	m_GameTimer.Tick(0.0f);
 
 	get_basic_information(m_pPlayer, my_id);
-	m_pPlayer->SetPosition(return_myPosition());
+	// m_pPlayer->SetPosition(return_myPosition());
 	ProcessInput();
 
 	// receive Player position to server
