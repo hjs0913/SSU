@@ -1289,10 +1289,28 @@ void process_packet(int client_id, unsigned char* p)
         char c_temp[MAX_CHAT_SIZE];
         sprintf_s(c_temp, MAX_CHAT_SIZE, "%s : %s", pl->get_name(), packet->message);
         if (pl->join_dungeon_room) {
-            Player** vl_pl;
-            vl_pl = dungeons[pl->indun_id]->get_party_palyer();
-            for (int i = 0; i < GAIA_ROOM; i++) {
-                send_chat_packet(vl_pl[i], client_id, c_temp);
+            if (dungeons[pl->get_indun_id()]->get_dun_st() == DUN_ST_START) {
+                Player** vl_pl;
+                vl_pl = dungeons[pl->indun_id]->get_party_palyer();
+                for (int i = 0; i < GAIA_ROOM; i++) {
+                    if (vl_pl[i]->get_state() == ST_INGAME || vl_pl[i]->get_state() == ST_INDUN) {
+                        send_chat_packet(vl_pl[i], client_id, c_temp);
+                    }
+                    else break;
+                }
+            }
+            else {
+                for (auto& s_pl : players) {
+                    s_pl->state_lock.lock();
+                    if (s_pl->get_state() != ST_INGAME) {
+                        s_pl->state_lock.unlock();
+                        continue;
+                    }
+                    s_pl->state_lock.unlock();
+                    if (s_pl->get_tribe() == MONSTER) break;
+                    send_chat_packet(reinterpret_cast<Player*>(s_pl), client_id, c_temp);
+
+                }
             }
         }
         else {
