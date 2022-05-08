@@ -397,7 +397,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //스킬을 쿨타임 돌때마다 �
 				gaia->boss->set_pos(gaia->boss->get_x() + pa->get_look_x() * 40, gaia->boss->get_z() + pa->get_look_z() * 40);
 				gaia->boss->set_hp(gaia->boss->get_hp() - give_damage);
 				for (int i = 0; i < GAIA_ROOM; ++i) {
-					send_move_packet(gaia->get_party_palyer()[i], gaia->boss);
+					send_move_packet(gaia->get_party_palyer()[i], gaia->boss, 1);
 					send_change_hp_packet(gaia->get_party_palyer()[i], gaia->boss);
 				}
 			}
@@ -469,7 +469,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //스킬을 쿨타임 돌때마다 �
 				gaia->boss->set_hp(gaia->boss->get_hp() - give_damage);
 
 				for (int i = 0; i < GAIA_ROOM; ++i) {
-					send_move_packet(gaia->get_party_palyer()[i], gaia->boss);
+					send_move_packet(gaia->get_party_palyer()[i], gaia->boss, 1);
 					send_change_hp_packet(gaia->get_party_palyer()[i], gaia->boss);
 					send_change_hp_packet(gaia->get_party_palyer()[i], pa);
 				}

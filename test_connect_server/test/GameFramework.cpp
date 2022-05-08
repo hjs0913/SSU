@@ -1172,14 +1172,16 @@ void CGameFramework::ProcessInput()
 				}
 			}
 			
-			if (dwDirection) m_pPlayer->Move(dwDirection, 50.0f * m_GameTimer.GetTimeElapsed(), true);
-			
+			if (dwDirection) {
+				m_pPlayer->Move(dwDirection, 50.0f * m_GameTimer.GetTimeElapsed(), true);
+			}
 			send_look_packet(m_pPlayer->GetLookVector(), m_pPlayer->GetRightVector());
 		}
 	}
 	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
 
 
+	set_myPosition(m_pPlayer->GetPosition());
 	send_move_packet(m_pPlayer->GetPosition());
 }
 
@@ -1230,7 +1232,7 @@ void CGameFramework::FrameAdvance()
 	m_GameTimer.Tick(0.0f);
 
 	get_basic_information(m_pPlayer, my_id);
-	// m_pPlayer->SetPosition(return_myPosition());
+	m_pPlayer->SetPosition(return_myPosition());
 	ProcessInput();
 
 	// receive Player position to server

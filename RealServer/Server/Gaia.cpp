@@ -270,7 +270,7 @@ void Gaia::boss_move()
 	boss->set_z(mv.second);
 	for (auto pt : party) {
 		if (pt->get_tribe() != HUMAN) continue;
-		send_move_packet(pt, boss);
+		send_move_packet(pt, boss, 1);
 		send_look_packet(pt, boss);
 	}
 
