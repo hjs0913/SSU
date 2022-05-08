@@ -1023,13 +1023,13 @@ void process_packet(int client_id, unsigned char* p)
             pl->vl.lock();
             unordered_set <int> my_vl{ pl->viewlist };
             pl->vl.unlock();
-            send_move_packet(pl, pl);
+            send_move_packet(pl, pl, 1);
             for (auto& other : players) {
                 if (other->get_state() != ST_INDUN) continue;
                 if (is_npc(other->get_id())) break;
                 if (reinterpret_cast<Player*>(other)->indun_id == pl->indun_id) {
                     if (other->get_id() == pl->get_id()) continue;
-                    send_move_packet(reinterpret_cast<Player*>(other), pl);
+                    send_move_packet(reinterpret_cast<Player*>(other), pl, 1);
                 }
             }
             break;
@@ -1039,7 +1039,7 @@ void process_packet(int client_id, unsigned char* p)
         // 유효성 검사
         if (check_move_alright(x, z, false) == false) {
             // 올바르지 않을경우 위치를 수정을 해주어야 한다
-            send_move_packet(pl, pl);
+            send_move_packet(pl, pl, 0);
             break;
         }
 
@@ -1072,7 +1072,7 @@ void process_packet(int client_id, unsigned char* p)
         }
         nearlist.erase(client_id);  // 내 아이디는 무조건 들어가니 그것을 지워주자
 
-        send_move_packet(pl, pl); // 내 자신의 움직임을 먼저 보내주자
+        send_move_packet(pl, pl, 1); // 내 자신의 움직임을 먼저 보내주자
 
         pl->vl.lock();
         unordered_set <int> my_vl{ pl->viewlist };
@@ -1100,7 +1100,7 @@ void process_packet(int client_id, unsigned char* p)
                 }
                 else {
                     other_player->vl.unlock();
-                    send_move_packet(other_player, pl);
+                    send_move_packet(other_player, pl, 1);
                 }
             }
             // 계속 시야에 존재하는 플레이어 처리
@@ -1116,7 +1116,7 @@ void process_packet(int client_id, unsigned char* p)
                 }
                 else {
                     other_player->vl.unlock();
-                    send_move_packet(other_player, pl);
+                    send_move_packet(other_player, pl, 1);
                 }
             }
         }
@@ -1482,7 +1482,7 @@ void process_packet(int client_id, unsigned char* p)
                                 physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
 
                                 players[i]->set_pos(players[i]->get_x() + pl->get_look_x() * 40, players[i]->get_z() + pl->get_look_z() * 40);
-                                send_move_packet(pl, players[i]);  //나중에 수정필요 
+                                send_move_packet(pl, players[i], 1);  //나중에 수정필요 
                                 send_status_change_packet(pl);
                                 players[i]->set_target_id(pl->get_id());
                                 if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
@@ -2773,7 +2773,7 @@ void worker()
             pl->partner_move(pl, dungeons[pl->get_indun_id()]);
             Player** pp = dungeons[pl->get_indun_id()]->get_party_palyer();
             for (int i = 0; i < GAIA_ROOM; i++) {
-                send_move_packet(pp[i], pl);
+                send_move_packet(pp[i], pl, 1);
                 send_look_packet(pp[i], pl);
             }
 
@@ -3302,7 +3302,7 @@ void return_npc_position(int npc_id)
   
         }
         else {
-            send_move_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id]);
+            send_move_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id], 1);
             send_look_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id]);
         }
     }
@@ -3427,7 +3427,7 @@ void do_npc_move(int npc_id, int target)
             send_put_object_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id]);
         }
         else {
-            send_move_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id]);
+            send_move_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id], 1);
             send_look_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id]);
         }
     }

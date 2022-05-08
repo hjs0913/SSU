@@ -22,7 +22,7 @@ void send_login_ok_packet(Player* pl)
     pl->do_send(sizeof(packet), &packet);
 }
 
-void send_move_packet(Player* pl, Npc* mover)
+void send_move_packet(Player* pl, Npc* mover, int right)
 {
     sc_packet_move packet;
     packet.id = mover->get_id();
@@ -32,6 +32,7 @@ void send_move_packet(Player* pl, Npc* mover)
     packet.y = mover->get_y();
     packet.z = mover->get_z();
     packet.move_time =  pl->last_move_time;
+    packet.move_right = right;
     pl->do_send(sizeof(packet), &packet);
 }
 

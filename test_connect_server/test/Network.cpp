@@ -396,9 +396,11 @@ void process_packet(unsigned char* p)
 		sc_packet_move* packet = reinterpret_cast<sc_packet_move*>(p);
 
 		if (packet->id == my_id) {
-			my_position.x = packet->x;
-			my_position.y = packet->y;
-			my_position.z = packet->z;
+			if ((int)packet->move_right == 0) {
+				my_position.x = packet->x;
+				my_position.y = packet->y;
+				my_position.z = packet->z;
+			}
 		}
 		else {
 			mPlayer[packet->id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
@@ -1023,4 +1025,11 @@ wchar_t* get_user_name_to_server(int id)
 	temp = new TCHAR[len];
 	mbstowcs(temp, mPlayer[id]->m_name, len);
 	return temp;
+}
+
+void set_myPosition(XMFLOAT3 pos)
+{
+	my_position.x = pos.x;
+	my_position.y = pos.y;
+	my_position.z = pos.z;
 }

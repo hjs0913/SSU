@@ -3,7 +3,7 @@
 #include "stdafx.h"
 void send_login_ok_packet(Player* pl);
 
-void send_move_packet(Player* pl, Npc* mover);
+void send_move_packet(Player* pl, Npc* mover, int right);
 
 void send_put_object_packet(Player* pl, Npc* target);
 

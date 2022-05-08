@@ -150,3 +150,5 @@ float get_combat_id_max_hp();
 
 wchar_t* get_user_name_to_server(int id);
 
+void set_myPosition(XMFLOAT3 pos);
+
