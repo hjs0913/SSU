@@ -437,6 +437,7 @@ void BuffUI::Render(UINT nFrame)
     end_buff_2 = clock();
     end_buff_3 = clock();
     end_buff_4 = clock();
+
     if ((end_buff_0 - start_buff_0) / CLOCKS_PER_SEC >= 3)
         buff_ui_num[0] = -1;
     if ((end_buff_1 - start_buff_1) / CLOCKS_PER_SEC >= 10)

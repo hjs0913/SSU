@@ -1858,7 +1858,7 @@ void process_packet(int client_id, unsigned char* p)
                 ev.obj_id = client_id;
                 ev.start_time = chrono::system_clock::now() + 5s;  //ÄğÅ¸ÀÓ
                 ev.ev = EVENT_SKILL_COOLTIME;
-                ev.target_id = 3;
+                ev.target_id = packet->target;
                 timer_queue.push(ev);
 
            
@@ -1886,7 +1886,7 @@ void process_packet(int client_id, unsigned char* p)
                 ev.obj_id = client_id;
                 ev.start_time = chrono::system_clock::now() + 5s;  //ÄğÅ¸ÀÓ
                 ev.ev = EVENT_SKILL_COOLTIME;
-                ev.target_id = 3;
+                ev.target_id = packet->target;
                 timer_queue.push(ev);
 
                 pl->set_mp(pl->get_mp() - 1000);
@@ -1910,7 +1910,7 @@ void process_packet(int client_id, unsigned char* p)
                 ev.obj_id = client_id;
                 ev.start_time = chrono::system_clock::now() + 5s;  //ÄğÅ¸ÀÓ
                 ev.ev = EVENT_SKILL_COOLTIME;
-                ev.target_id = 3;
+                ev.target_id = packet->target;
                 timer_queue.push(ev);
 
                 pl->set_mp(pl->get_mp() - 1000);

@@ -379,6 +379,7 @@ bool CGameFramework::TestIntersection(int mouseX, int mouseY, CGameObject* obj)
 	pointX = pointX / projectionMatrix4._11;
 	pointY = pointY / projectionMatrix4._22;
 
+
 	// 뷰 행렬의 역함수를 구합니다.
 	F_viewMatrix = m_pCamera->GetViewMatrix();
 	viewMatrix = XMLoadFloat4x4(&F_viewMatrix);
@@ -398,9 +399,15 @@ bool CGameFramework::TestIntersection(int mouseX, int mouseY, CGameObject* obj)
 	origin = m_pCamera->GetPosition();
 
 	// 세계 행렬을 가져와 구의 위치로 변환합니다.  //.여기 다시 보자 
-	F3_worldMatrix = m_pCamera->GetLookAtPosition();
-	//worldMatrix = XMLoadFloat3(&F3_worldMatrix);
-	worldMatrix = XMMatrixIdentity();
+	F3_worldMatrix = m_pCamera->GetLookAtPosition();  
+	
+	///m_xmf3LookAtWorld이걸 써서 수정한 부분 
+	XMFLOAT4X4 worldllook;
+	worldllook._11 = m_pCamera->GetWorld().x; worldllook._12 = 0.0f; worldllook._13 = 0.0f; worldllook._14 = 0.0f;
+	worldllook._21 = 0.0f; worldllook._22 = m_pCamera->GetWorld().y; worldllook._23 = 0.0f; worldllook._24 = 0.0f;
+	worldllook._31 = 0.0f; worldllook._32 = 0.0f; worldllook._33 = m_pCamera->GetWorld().z; worldllook._34 = 0.0f;
+	worldllook._41 = 0.0f; worldllook._42 = 0.0f; worldllook._43 = 0.0f; worldllook._44 = 0.0f;
+	worldMatrix = XMLoadFloat4x4(&worldllook);//XMMatrixIdentity();
 
 	//translateMatrix = XMMatrixTranslation(obj->vCenter.x, obj->vCenter.y, obj->vCenter.z);
 	translateMatrix = XMMatrixTranslation(obj->GetPosition().x, obj->GetPosition().y, obj->GetPosition().z);
@@ -416,11 +423,8 @@ bool CGameFramework::TestIntersection(int mouseX, int mouseY, CGameObject* obj)
 	// 광선 방향을 표준화합니다.
 	XMStoreFloat3(&rayDirection, XMVector3Normalize(XMVectorSet(direction.x, direction.y, direction.z, 0.0f)));
 
-
-
-
 	// 이제 광선 구 교차 테스트를 수행하십시오.
-	if (RaySphereIntersect(rayOrigin, rayDirection, 15.0f) == true)  //피킹 성공
+	if (RaySphereIntersect(rayOrigin, rayDirection, 20.0f) == true)  //피킹 성공
 		return true;
 	else
 		return false;
