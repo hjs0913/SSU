@@ -1009,7 +1009,6 @@ void process_packet(int client_id, unsigned char* p)
             break;
         }
         pl->state_lock.unlock();
-
         // InDunProcess
         if (pl->get_state() == ST_INDUN) {
             // 유효성 검사
@@ -1442,7 +1441,7 @@ void process_packet(int client_id, unsigned char* p)
                     timer_queue.push(ev);
 
                     pl->set_mp(pl->get_mp() - 1000);
-
+                    send_buff_ui_packet(pl, 3); //ui
                     pl->set_physical_attack(0.6 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv()); //일단 두배 
                     pl->set_magical_attack(0.2 * pl->get_lv() * pl->get_lv() + 5 * pl->get_lv());
                     send_status_change_packet(pl);
@@ -1561,7 +1560,7 @@ void process_packet(int client_id, unsigned char* p)
                         timer_queue.push(ev);
 
                         pl->set_mp(pl->get_mp() - 1000);
-
+                        send_buff_ui_packet(pl, 1);
                         pl->set_physical_defence(0.54 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv()); //일단 두배 
                         pl->set_magical_defence(0.4 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv());
                         send_status_change_packet(pl);
@@ -1859,7 +1858,7 @@ void process_packet(int client_id, unsigned char* p)
                 ev.obj_id = client_id;
                 ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
                 ev.ev = EVENT_SKILL_COOLTIME;
-                ev.target_id = 3;
+                ev.target_id = packet->target;
                 timer_queue.push(ev);
 
            
@@ -1887,7 +1886,7 @@ void process_packet(int client_id, unsigned char* p)
                 ev.obj_id = client_id;
                 ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
                 ev.ev = EVENT_SKILL_COOLTIME;
-                ev.target_id = 3;
+                ev.target_id = packet->target;
                 timer_queue.push(ev);
 
                 pl->set_mp(pl->get_mp() - 1000);
@@ -1911,7 +1910,7 @@ void process_packet(int client_id, unsigned char* p)
                 ev.obj_id = client_id;
                 ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
                 ev.ev = EVENT_SKILL_COOLTIME;
-                ev.target_id = 3;
+                ev.target_id = packet->target;
                 timer_queue.push(ev);
 
                 pl->set_mp(pl->get_mp() - 1000);

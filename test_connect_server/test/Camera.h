@@ -92,7 +92,7 @@ public:
 
 	XMFLOAT4X4 GetViewMatrix() { return(m_xmf4x4View); }
 	XMFLOAT4X4 GetProjectionMatrix() { return(m_xmf4x4Projection); }
-
+	XMFLOAT3 GetWorld() { return(m_xmf3LookAtWorld); }
 
 
 

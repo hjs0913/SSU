@@ -662,6 +662,14 @@ void process_packet(unsigned char* p)
 			buff_ui_num[2] = packet->buff_num;
 			start_buff_2 = clock();
 			break;
+		case 3:
+			buff_ui_num[3] = packet->buff_num;
+			start_buff_3 = clock();
+			break;
+		case 4:
+			buff_ui_num[4] = packet->buff_num;
+			start_buff_4 = clock();
+			break;
 		default:
 			break;
 		}

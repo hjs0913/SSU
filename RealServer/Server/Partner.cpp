@@ -432,7 +432,6 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			running_pattern = true;
 
 			pa->set_mp(pa->get_mp() - 1000);
-
 			pa->set_physical_defence(0.54 * pa->get_lv() * pa->get_lv() + 10 * pa->get_lv()); //ÀÏ´Ü µÎ¹è 
 			pa->set_magical_defence(0.4 * pa->get_lv() * pa->get_lv() + 10 * pa->get_lv());
 			//send_status_change_packet(pl);
@@ -558,9 +557,12 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 				}
 			}
 			pa->set_mp(pa->get_mp() - 1000);
+			send_buff_ui_packet(gaia->get_party_palyer()[target_player], 2); //ui
+
 			gaia->get_party_palyer()[target_player]->set_hp(gaia->get_party_palyer()[target_player]->get_hp() + gaia->get_party_palyer()[target_player]->get_maxhp() / 10);
-			if (gaia->get_party_palyer()[target_player]->get_hp() > gaia->get_party_palyer()[target_player]->get_maxhp())
+			if (gaia->get_party_palyer()[target_player]->get_hp() > gaia->get_party_palyer()[target_player]->get_maxhp()) 
 				gaia->get_party_palyer()[target_player]->set_hp(gaia->get_party_palyer()[target_player]->get_maxhp());
+			
 			for (int i = 0; i < GAIA_ROOM; ++i) {
 				send_change_hp_packet(gaia->get_party_palyer()[i], gaia->get_party_palyer()[target_player]);
 			}
@@ -600,6 +602,8 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 				}
 			}
 			pa->set_mp(pa->get_mp() - 1000);
+			send_buff_ui_packet(gaia->get_party_palyer()[target_player], 0); //ui
+
 			gaia->get_party_palyer()[target_player]->set_mp(gaia->get_party_palyer()[target_player]->get_mp() + gaia->get_party_palyer()[target_player]->get_maxmp() / 10);
 			if (gaia->get_party_palyer()[target_player]->get_mp() > gaia->get_party_palyer()[target_player]->get_maxmp())
 				gaia->get_party_palyer()[target_player]->set_mp(gaia->get_party_palyer()[target_player]->get_maxmp());
@@ -618,7 +622,9 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			running_pattern = true;
 			for (int i = 0; i < GAIA_ROOM; ++i) {
 				gaia->get_party_palyer()[i]->attack_speed_up = true;
+				send_buff_ui_packet(gaia->get_party_palyer()[i], 4); 
 			}
+
 			ev.obj_id = pa->get_id();
 			ev.start_time = chrono::system_clock::now() + 5s;  //ÄðÅ¸ÀÓ
 			ev.ev = EVENT_PARTNER_SKILL;   // ÆÄÆ®³Ê (¹öÇÁ) ½ºÅ³ ÀÌº¥Æ®¸¦ µû·Î ¸¸µéÁö »ý°¢ÇØº¸ÀÚ 
