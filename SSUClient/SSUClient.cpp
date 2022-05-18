@@ -28,8 +28,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	setlocale(LC_ALL, "");
 
 	// connect network
-	//netInit();
-	//thread hThread{ worker };
+	netInit();
+	thread hThread{ worker };
 	
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);

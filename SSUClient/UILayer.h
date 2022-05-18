@@ -10,14 +10,20 @@ using namespace D2D1;
 
 
 #define SafeRelease(p) { if(p) { (p)->Release(); (p)=NULL; } }
-extern int buff_ui_num[3];
+
+extern int buff_ui_num[5];
+
 extern clock_t start_buff_0;
 extern clock_t start_buff_1;
 extern clock_t start_buff_2;
+extern clock_t start_buff_3;
+extern clock_t start_buff_4;
 
 extern clock_t end_buff_0;
 extern clock_t end_buff_1;
 extern clock_t end_buff_2;
+extern clock_t end_buff_3;
+extern clock_t end_buff_4;
 
 struct TextBlock
 {

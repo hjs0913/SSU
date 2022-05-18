@@ -4,6 +4,7 @@
 
 #include "GameFramework.h"
 
+
 int my_id = 0;
 int m_prev_size = 0;
 vector<string> g_msg;
@@ -48,9 +49,18 @@ int party_enter_room_id = -1;
 bool alramUI_ON = false;
 bool PartyInviteUI_ON = false;
 bool InvitationCardUI_On = false;
+bool AddAIUI_On = false;
+bool NoticeUI_On = false;
+bool RaidEnterNotice = false;
+bool DeadNotice = false;
+wstring Notice_str = L"";
 chrono::system_clock::time_point InvitationCardTimer = chrono::system_clock::now();
+chrono::system_clock::time_point NoticeTimer = chrono::system_clock::now();
 int InvitationRoomId;
 int InvitationUser;
+
+CRITICAL_SECTION IndunCheck_cs;
+CRITICAL_SECTION UI_cs;
 
 struct EXP_OVER {
 	WSAOVERLAPPED m_wsa_over;
@@ -253,12 +263,13 @@ void send_party_invite(char* user)
 	strcpy_s(packet.user_name, user);
 	do_send(sizeof(packet), &packet);
 }
-void send_party_add_partner()
+void send_party_add_partner(JOB j)
 {
 	cs_packet_party_add_partner packet;
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET_PARTY_ADD_PARTNER;
 	packet.room_id = party_enter_room_id;
+	packet.job = j;
 	do_send(sizeof(packet), &packet);
 }
 
@@ -337,7 +348,6 @@ void process_packet(unsigned char* p)
 		mPlayer[my_id]->m_lv = packet->level;
 		strcpy_s(mPlayer[my_id]->m_name, MAX_NAME_SIZE, packet->name);
 		mPlayer[my_id]->m_hp = packet->hp;
-		cout << "로그인 - " << mPlayer[my_id]->m_hp << endl;
 		mPlayer[my_id]->m_max_hp = packet->maxhp;
 		mPlayer[my_id]->m_mp = packet->mp;
 		mPlayer[my_id]->m_max_mp = packet->maxmp;
@@ -386,9 +396,11 @@ void process_packet(unsigned char* p)
 		sc_packet_move* packet = reinterpret_cast<sc_packet_move*>(p);
 
 		if (packet->id == my_id) {
-			my_position.x = packet->x;
-			my_position.y = packet->y;
-			my_position.z = packet->z;
+			if ((int)packet->move_right == 0) {
+				my_position.x = packet->x;
+				my_position.y = packet->y;
+				my_position.z = packet->z;
+			}
 		}
 		else {
 			mPlayer[packet->id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
@@ -490,17 +502,22 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_DEAD: {
-		
 		sc_packet_dead* packet = reinterpret_cast<sc_packet_dead*> (p);
 		mPlayer[my_id]->SetUse(false);
+		mPlayer[my_id]->m_hp = 0;
 		combat_id = -1;
 		Combat_On = false;
-		cout << "died" << endl;
 		break;
 		
 	}
 	case SC_PACKET_REVIVE: {
-		// 아직 미구현
+		sc_packet_revive* packet = reinterpret_cast<sc_packet_revive*>(p);
+		mPlayer[my_id]->SetUse(true);
+		mPlayer[my_id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
+		my_position = mPlayer[my_id]->GetPosition();
+		mPlayer[my_id]->m_hp = mPlayer[my_id]->m_max_hp;
+		mPlayer[my_id]->m_mp = mPlayer[my_id]->m_max_mp;
+		mPlayer[my_id]->m_exp = packet->exp;
 		break;
 	}
 	case SC_PACKET_LOOK: {
@@ -515,6 +532,7 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_COMBAT_ID: {
+		EnterCriticalSection(&UI_cs);
 		sc_packet_combat_id* packet = reinterpret_cast<sc_packet_combat_id*>(p);
 		if (combat_id != packet->id) {
 			Combat_On = true;
@@ -543,6 +561,7 @@ void process_packet(unsigned char* p)
 			case E_ICE: my_element_str = Combat_str.append(L"얼음"); break;
 			}
 		}
+		LeaveCriticalSection(&UI_cs);
 		break;
 	}
 	case SC_PACKET_PLAY_SHOOT: {
@@ -557,24 +576,20 @@ void process_packet(unsigned char* p)
 		effect_x = packet->x;
 		effect_y = packet->y;
 		effect_z = packet->z;
-		cout << effect_x << endl;
-		cout << effect_y << endl;
-		cout << effect_z << endl;
 		break;
 	}
 	case SC_PACKET_START_GAIA: {
+		EnterCriticalSection(&IndunCheck_cs);
 		PartyUI_On = false;
 		party_info_on = false;
 		PartyInviteUI_ON = false;
 		InvitationCardUI_On = false;
 
 		sc_packet_start_gaia* packet = reinterpret_cast<sc_packet_start_gaia*>(p);
-		cout << "인던으로 입장해야됨" << endl;
 		combat_id = 101;
 		InDungeon = true;
 		for (int i = 0; i < GAIA_ROOM; i++) {
 			party_id[i] = packet->party_id[i];
-
 			wchar_t* temp;
 			int len = 1 + strlen(mPlayer[party_id[i]]->m_name);
 			temp = new TCHAR[len];
@@ -582,6 +597,7 @@ void process_packet(unsigned char* p)
 			party_name[i] = L"";
 			party_name[i].append(temp);
 		}
+		LeaveCriticalSection(&IndunCheck_cs);
 		break;
 	}
 	case SC_PACKET_GAIA_PATTERN_ONE: {
@@ -630,6 +646,7 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_BUFF_UI: {
+		EnterCriticalSection(&UI_cs);
 		sc_packet_buff_ui* packet = reinterpret_cast<sc_packet_buff_ui*>(p);
 		switch (packet->buff_num)
 		{
@@ -645,24 +662,33 @@ void process_packet(unsigned char* p)
 			buff_ui_num[2] = packet->buff_num;
 			start_buff_2 = clock();
 			break;
+		case 3:
+			buff_ui_num[3] = packet->buff_num;
+			start_buff_3 = clock();
+			break;
+		case 4:
+			buff_ui_num[4] = packet->buff_num;
+			start_buff_4 = clock();
+			break;
 		default:
 			break;
 		}
-	
-
+		LeaveCriticalSection(&UI_cs);
 		break;
 	}
 	case SC_PACKET_PARTY_ROOM: {
 		sc_packet_party_room* packet = reinterpret_cast<sc_packet_party_room*>(p);
 		m_party[(int)packet->room_id]->set_room_name(packet->room_name);
-		if (m_party[(int)packet->room_id]->dst != DUN_ST_ROBBY) {
-			m_party[(int)packet->room_id]->dst = DUN_ST_ROBBY;
+		m_party[(int)packet->room_id]->dst = DUN_ST_ROBBY;
+		if (find(party_id_index_vector.begin(), party_id_index_vector.end(), (int)reinterpret_cast<sc_packet_party_room_destroy*>(p)->room_id)
+			== party_id_index_vector.end()) {
 			robby_cnt++;
 			party_id_index_vector.push_back((int)packet->room_id);
 		}
 		break;
 	}
 	case SC_PACKET_PARTY_ROOM_INFO: {
+		EnterCriticalSection(&UI_cs);
 		sc_packet_party_room_info* packet = reinterpret_cast<sc_packet_party_room_info*>(p);
 		int r_id = (int)packet->room_id;
 
@@ -689,6 +715,7 @@ void process_packet(unsigned char* p)
 		PartyUI_On = true;
 		party_info_on = true;
 		m_party_info = m_party[r_id];
+		LeaveCriticalSection(&UI_cs);
 		break;
 	}
 	case SC_PACKET_PARTY_ROOM_ENTER_OK: {
@@ -725,11 +752,13 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_PARTY_INVITATION: {
+		EnterCriticalSection(&UI_cs);
 		InvitationRoomId = (int)reinterpret_cast<sc_packet_party_invitation*>(p)->room_id;
 		InvitationUser = reinterpret_cast<sc_packet_party_invitation*>(p)->invite_user_id;
 
 		InvitationCardUI_On = true;
 		InvitationCardTimer = chrono::system_clock::now() + 10s;
+		LeaveCriticalSection(&UI_cs);
 		break;
 	}
 	case SC_PACKET_PARTY_INVITATION_FAILED: {
@@ -757,8 +786,6 @@ void process_packet(unsigned char* p)
 	}
 	case SC_PACKET_PARTY_ROOM_DESTROY: {
 		m_party[(int)reinterpret_cast<sc_packet_party_room_destroy*>(p)->room_id]->dst = DUN_ST_FREE;
-		if (robby_cnt <= 0) robby_cnt = 0;
-		else robby_cnt--;
 
 		if (party_id_index_vector.size() == 0) break;
 
@@ -766,7 +793,44 @@ void process_packet(unsigned char* p)
 			!= party_id_index_vector.end()) {
 			int in = find(party_id_index_vector.begin(), party_id_index_vector.end(), (int)reinterpret_cast<sc_packet_party_room_destroy*>(p)->room_id) - party_id_index_vector.begin(); // index 확인
 			party_id_index_vector.erase(party_id_index_vector.begin()+in);
+			robby_cnt--;
+			if (robby_cnt <= 0) robby_cnt = 0;
 		}
+		break;
+	}
+	case SC_PACKET_NOTICE: {
+		EnterCriticalSection(&UI_cs);
+		NoticeUI_On = true;
+
+		sc_packet_notice* packet = reinterpret_cast<sc_packet_notice*>(p);
+		if ((int)packet->raid_enter == 0) {
+			RaidEnterNotice = true;
+			NoticeTimer = chrono::system_clock::now() + 5s;
+		}
+		else if ((int)packet->raid_enter == 1) {
+			DeadNotice = true;
+			if(InDungeon) NoticeTimer = chrono::system_clock::now() + 5s;
+			else NoticeTimer = chrono::system_clock::now() + 10s;
+		}
+		else NoticeTimer = chrono::system_clock::now() + 5s;
+		wchar_t* temp;
+		int len = 1 + strlen(packet->message);
+		temp = new TCHAR[len];
+		mbstowcs(temp, packet->message, len);
+		Notice_str = L"";
+		Notice_str.append(temp);
+		LeaveCriticalSection(&UI_cs);
+		break;
+	}
+	case SC_PACKET_CHANGE_MP: {
+		sc_packet_change_mp* packet = reinterpret_cast<sc_packet_change_mp*>(p);
+		mPlayer[packet->id]->m_mp = packet->mp;
+		break;
+	}
+	case SC_PACKET_ANIMATION_ATTACK: {
+		sc_packet_animation_attack* packet = reinterpret_cast<sc_packet_animation_attack*>(p);
+		mPlayer[packet->id]->Attack(true);
+		cout << packet->id << "번 공격 애니메이션" << endl;
 		break;
 	}
 	default:
@@ -838,7 +902,7 @@ int netInit()
 	const char* SERVERIP;
 	char tempIP[16];
 	SERVERIP = "127.0.0.1";
-
+	//SERVERIP = "116.47.180.110";
 	// 윈속 초기화
 	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
 		return 1;
@@ -898,7 +962,6 @@ int netclose()
 }
 
 XMFLOAT3 return_myPosition() {
-	//cout << "position : " << my_position.x << ", " << my_position.y << ", " << my_position.z << endl;
 	return my_position;
 }
 
@@ -969,7 +1032,6 @@ float get_combat_id_max_hp()
 	return mPlayer[combat_id]->m_max_hp;
 }
 
-
 wchar_t* get_user_name_to_server(int id)
 {
 	WCHAR* temp;
@@ -977,4 +1039,11 @@ wchar_t* get_user_name_to_server(int id)
 	temp = new TCHAR[len];
 	mbstowcs(temp, mPlayer[id]->m_name, len);
 	return temp;
+}
+
+void set_myPosition(XMFLOAT3 pos)
+{
+	my_position.x = pos.x;
+	my_position.y = pos.y;
+	my_position.z = pos.z;
 }

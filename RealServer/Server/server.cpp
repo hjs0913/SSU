@@ -1195,7 +1195,21 @@ void process_packet(int client_id, unsigned char* p)
         pl->state_lock.unlock();
 
         if (pl->get_attack_active()) break;
+        
         pl->set_attack_active(true);
+        send_animation_attack(pl, pl->get_id());
+        pl->vl.lock();
+        unordered_set <int> my_vl{ pl->viewlist };
+        pl->vl.unlock();
+        cout << pl->get_id() << "ÀÇ viewlist "; 
+        for (auto vl_id : my_vl) {
+            if (players[vl_id]->get_tribe() == HUMAN) {
+                send_animation_attack(reinterpret_cast<Player*>(players[vl_id]), pl->get_id());
+                cout << vl_id << ", ";
+            }
+        }
+        cout << endl;
+
         timer_event ev;
         if (pl->attack_speed_up == false) {
             ev.obj_id = client_id;

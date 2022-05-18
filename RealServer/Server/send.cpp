@@ -353,3 +353,12 @@ void send_notice(Player* pl, const char* notice_str, int raid_notice)
     packet.raid_enter = raid_notice;
     pl->do_send(sizeof(packet), &packet);
 }
+
+void send_animation_attack(Player* pl, int id)
+{
+    sc_packet_animation_attack packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_ANIMATION_ATTACK;
+    packet.id = id;
+    pl->do_send(sizeof(packet), &packet);
+}

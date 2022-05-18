@@ -4,13 +4,17 @@
 
 using namespace std;
 
-int buff_ui_num[3] = {-1};
+int buff_ui_num[5] = { -1 };
 clock_t start_buff_0;
 clock_t start_buff_1;
 clock_t start_buff_2;
+clock_t start_buff_3;
+clock_t start_buff_4;
 clock_t end_buff_0;
 clock_t end_buff_1;
 clock_t end_buff_2;
+clock_t end_buff_3;
+clock_t end_buff_4;
 
 UILayer::UILayer(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor)
 {
