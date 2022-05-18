@@ -3529,6 +3529,9 @@ void do_timer()
             else if (temp.ev == EVENT_PARTNER_SKILL) {
                 if (temp.target_id == 10) {
                     int indun_id = reinterpret_cast<Player*>(players[temp.obj_id])->get_indun_id();
+
+                    if (indun_id < 0) continue;
+
                     for (int i = 0; i < GAIA_ROOM; ++i) {
                         dungeons[indun_id]->get_party_palyer()[i]->attack_speed_up = false;
                     }
@@ -3574,6 +3577,9 @@ void do_timer()
                 else if (ev.ev == EVENT_PARTNER_SKILL) {
                     if (ev.target_id == 10) {
                         int indun_id = reinterpret_cast<Player*>(players[ev.obj_id])->get_indun_id();
+
+                        if (indun_id < 0) continue;
+
                         for (int i = 0; i < GAIA_ROOM; ++i) {
                             dungeons[indun_id]->get_party_palyer()[i]->attack_speed_up = false;
                         }
