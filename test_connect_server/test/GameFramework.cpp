@@ -420,20 +420,10 @@ bool CGameFramework::TestIntersection(int mouseX, int mouseY, CGameObject* obj)
 
 
 	// 이제 광선 구 교차 테스트를 수행하십시오.
-	//m_pPlayer
-	if (RaySphereIntersect(rayOrigin, rayDirection, 40.0f) == true)
-	{
-
+	if (RaySphereIntersect(rayOrigin, rayDirection, 15.0f) == true)  //피킹 성공
 		return true;
-		// 교차하는 경우 화면에 표시되는 텍스트 문자열에서 교차로를 "yes"로 설정합니다.
-	//	m_Text->SetIntersection(true, m_D3D->GetDeviceContext());
-	}
 	else
-	{
 		return false;
-		// 그렇지 않으면 "No"로 교차를 설정하십시오.
-	//	m_Text->SetIntersection(false, m_D3D->GetDeviceContext());
-	}
 }
 
 
