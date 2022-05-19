@@ -346,6 +346,10 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 
 void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 {
+	char* send_str;
+	const wchar_t* temp;
+	int len = 0;
+
 	if (m_pScene) m_pScene->OnProcessingKeyboardMessage(hWnd, nMessageID, wParam, lParam);
 	switch (nMessageID)
 	{
@@ -356,6 +360,16 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 					::PostQuitMessage(0);
 					break;
 				case VK_RETURN:
+					Chatting_On = !Chatting_On;
+					if (Chatting_On == false) {
+						len = 1 + Chatting_Str.length();
+						send_str = new char[len * 4];
+						temp = Chatting_Str.c_str();
+						wcstombs(send_str, temp, MAX_CHAT_SIZE);
+						send_chat_packet(send_str);
+						Chatting_Str = L"";
+						delete send_str;
+					}
 					break;
 				case VK_F1:
 				case VK_F2:
@@ -599,10 +613,26 @@ void CGameFramework::ProcessInput()
 
 		DWORD dwDirection = 0;
 		DWORD dwAttack = 0;
-		if (pKeysBuffer[VK_UP] & 0xF0) dwDirection |= DIR_FORWARD;
-		if (pKeysBuffer[VK_DOWN] & 0xF0) dwDirection |= DIR_BACKWARD;
-		if (pKeysBuffer[VK_LEFT] & 0xF0) dwDirection |= DIR_LEFT;
-		if (pKeysBuffer[VK_RIGHT] & 0xF0) dwDirection |= DIR_RIGHT;
+
+		if (!Chatting_On) {
+			if (pKeysBuffer['W'] & 0xF0) {
+				dwDirection |= DIR_FORWARD;
+			}
+			if (pKeysBuffer['S'] & 0xF0) {
+				dwDirection |= DIR_BACKWARD;
+			}
+			if (pKeysBuffer['A'] & 0xF0) {
+				dwDirection |= DIR_LEFT;
+			}
+			if (pKeysBuffer['D'] & 0xF0) {
+				dwDirection |= DIR_RIGHT;
+			}
+		}
+
+		//if (pKeysBuffer[VK_UP] & 0xF0) dwDirection |= DIR_FORWARD;
+		//if (pKeysBuffer[VK_DOWN] & 0xF0) dwDirection |= DIR_BACKWARD;
+		//if (pKeysBuffer[VK_LEFT] & 0xF0) dwDirection |= DIR_LEFT;
+		//if (pKeysBuffer[VK_RIGHT] & 0xF0) dwDirection |= DIR_RIGHT;
 		if (pKeysBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
 		if (pKeysBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
 		if (pKeysBuffer[VK_SPACE] & 0xF0) dwAttack |= 0x30;
@@ -624,6 +654,9 @@ void CGameFramework::ProcessInput()
 		}
 	}
 	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
+
+	set_myPosition(m_pPlayer->GetPosition());
+	send_move_packet(m_pPlayer->GetPosition());
 }
 
 void CGameFramework::AnimateObjects()
@@ -667,6 +700,9 @@ void CGameFramework::FrameAdvance()
 {    
 	m_GameTimer.Tick(60.0f);
 	
+	get_basic_information(m_pPlayer, my_id);
+	m_pPlayer->SetPosition(return_myPosition());
+
 	ProcessInput();
 
     AnimateObjects();

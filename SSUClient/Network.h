@@ -130,6 +130,9 @@ XMFLOAT3 return_myCamera();
 
 #include "Camera.h"
 #include "Object.h"
+
+void get_object_information(CGameObject* m_otherPlayer, int id);
+
 void get_basic_information(CPlayer* m_otherPlayer, int id);
 
 int get_hp_to_server(int id);

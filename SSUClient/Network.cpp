@@ -829,8 +829,7 @@ void process_packet(unsigned char* p)
 	}
 	case SC_PACKET_ANIMATION_ATTACK: {
 		sc_packet_animation_attack* packet = reinterpret_cast<sc_packet_animation_attack*>(p);
-		mPlayer[packet->id]->Attack(true);
-		cout << packet->id << "번 공격 애니메이션" << endl;
+		mPlayer[packet->id]->m_net_attack = true;
 		break;
 	}
 	default:
@@ -965,9 +964,20 @@ XMFLOAT3 return_myPosition() {
 	return my_position;
 }
 
+void get_object_information(CGameObject* m_otherPlayer, int id) 
+{
+	if (mPlayer[id]->GetUse() == false) return;
+
+	m_otherPlayer->SetPosition(get_position_to_server(id));
+	//m_otherPlayer->SetLook(get_look_to_server(id));
+	if (mPlayer[id]->m_net_attack == true) {
+		mPlayer[id]->m_net_attack == false;
+		m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 2);
+	}
+}
+
 void get_basic_information(CPlayer* m_otherPlayer, int id)
 {
-	//m_otherPlayer->m_name = ;
 	m_otherPlayer->m_hp = mPlayer[id]->m_hp;
 	m_otherPlayer->m_max_hp = mPlayer[id]->m_max_hp;
 	m_otherPlayer->m_mp = mPlayer[id]->m_mp;
@@ -976,6 +986,10 @@ void get_basic_information(CPlayer* m_otherPlayer, int id)
 	m_otherPlayer->m_tribe = mPlayer[id]->m_tribe;
 	m_otherPlayer->m_spices = mPlayer[id]->m_spices;
 	m_otherPlayer->m_element = mPlayer[id]->m_element;
+	if (mPlayer[id]->m_net_attack == true) {
+		mPlayer[id]->m_net_attack == false;
+		m_otherPlayer->Attack(true);
+	}
 }
 
 void get_player_information(CPlayer* m_otherPlayer, int id)

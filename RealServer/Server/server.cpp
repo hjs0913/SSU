@@ -926,6 +926,7 @@ void process_packet(int client_id, unsigned char* p)
             other_player->do_send(sizeof(packet), &packet);*/
         }
         // 새로 접속한 플레이어에게 기존 정보를 보내중
+        pl->viewlist.clear();
         for (auto& other : players) {
             if (other->get_id() == client_id) continue;
             other->state_lock.lock();
@@ -955,7 +956,6 @@ void process_packet(int client_id, unsigned char* p)
             }
 
             pl->vl.lock();
-            pl->viewlist.clear();
             pl->viewlist.insert(other->get_id());
             pl->vl.unlock();
 

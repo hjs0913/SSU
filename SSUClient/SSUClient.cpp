@@ -124,7 +124,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_KEYUP:
 		gGameFramework.OnProcessingWindowMessage(hWnd, message, wParam, lParam);
 		break;
-	case WM_COMMAND:
+	case WM_COMMAND: {
 		wmId = LOWORD(wParam);
 		wmEvent = HIWORD(wParam);
 		switch (wmId)
@@ -139,13 +139,32 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			return(::DefWindowProc(hWnd, message, wParam, lParam));
 		}
 		break;
-	case WM_PAINT:
+	}
+	case WM_PAINT: {
 		hdc = ::BeginPaint(hWnd, &ps);
 		EndPaint(hWnd, &ps);
 		break;
-	case WM_DESTROY:
+	}
+	case WM_DESTROY: {
 		::PostQuitMessage(0);
 		break;
+	}
+	case WM_CHAR: {
+		if (Chatting_On) {
+			if ((wchar_t)wParam == '\b') {
+				if (Chatting_Str.size() > 0) {
+					Chatting_Str.pop_back();
+				}
+			}
+			else {
+				if (Chatting_Str.size() < 20)
+				{
+					Chatting_Str.push_back((wchar_t)wParam);
+				}
+			}
+		}
+		break;
+	}
 	default:
 		return(::DefWindowProc(hWnd, message, wParam, lParam));
 	}
