@@ -794,9 +794,9 @@ XMFLOAT3 CGameObject::GetRight()
 
 void CGameObject::SetLook(XMFLOAT3 xmf3Look)
 {
-	XMFLOAT3 m_xmf3Look = xmf3Look;
-	XMFLOAT3 m_xmf3Right = Vector3::CrossProduct(GetUp(), GetLook(), true);
-	XMFLOAT3 m_xmf3Up = Vector3::CrossProduct(GetLook(), GetRight(), true);
+	m_xmf3Look = Vector3::Normalize(xmf3Look);
+	m_xmf3Right = Vector3::CrossProduct(GetUp(), GetLook(), true);
+	m_xmf3Up = Vector3::CrossProduct(GetLook(), GetRight(), true);
 
 	m_xmf4x4ToParent._11 = m_xmf3Right.x; m_xmf4x4ToParent._12 = m_xmf3Right.y; m_xmf4x4ToParent._13 = m_xmf3Right.z;
 	m_xmf4x4ToParent._21 = m_xmf3Up.x; m_xmf4x4ToParent._22 = m_xmf3Up.y; m_xmf4x4ToParent._23 = m_xmf3Up.z;

@@ -361,3 +361,52 @@ void InvitationCardUI::Render(UINT nFrame)
     m_pd3d11DeviceContext->Flush();
 }
 
+//--------------------------------------------
+AddAIUI::AddAIUI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor)
+    : UILayer(nFrame, pd3dDevice, pd3dCommandQueue, LayoutColor, TextColor)
+{
+    m_vTextBlocks.resize(4);
+    BG_Rect = D2D1::RectF(195, 210, 445, 270);
+
+    m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::DarkBlue), (ID2D1SolidColorBrush**)&m_pButtonBrush);
+    m_pButtonBrush->SetColor(D2D1::ColorF(D2D1::ColorF::DarkBlue));
+    m_pButtonBrush->SetOpacity(1.0f);
+}
+
+AddAIUI::~AddAIUI()
+{
+
+}
+
+void AddAIUI::UpdateLabels()
+{
+    m_vTextBlocks[0] = { L"µô·¯", D2D1::RectF(205, 240, 255, 260), m_pdwTextFormat };
+    m_vTextBlocks[1] = { L"ÅÊÄ¿", D2D1::RectF(265, 240, 315, 260), m_pdwTextFormat };
+    m_vTextBlocks[2] = { L"¸¶¹ý»ç", D2D1::RectF(325, 240, 375, 260), m_pdwTextFormat };
+    m_vTextBlocks[3] = { L"¼­Æ÷ÅÍ", D2D1::RectF(385, 240, 435, 260), m_pdwTextFormat };
+}
+
+void AddAIUI::Render(UINT nFrame)
+{
+    ID3D11Resource* ppResources[] = { m_vWrappedRenderTargets[nFrame] };
+
+    m_pd2dDeviceContext->SetTarget(m_vd2dRenderTargets[nFrame]);
+
+    m_pd3d11On12Device->AcquireWrappedResources(ppResources, _countof(ppResources));
+    //--------
+    m_pd2dDeviceContext->BeginDraw();
+    m_pd2dDeviceContext->FillRectangle(BG_Rect, m_pBrush);
+    m_pd2dDeviceContext->DrawRectangle(BG_Rect, m_pBrush);
+    for (int i = 0; i < 4; i++)
+    {
+        m_pd2dDeviceContext->FillRectangle(m_vTextBlocks[i].d2dLayoutRect, m_pButtonBrush);
+        m_pd2dDeviceContext->DrawRectangle(m_vTextBlocks[i].d2dLayoutRect, m_pButtonBrush);
+        m_pd2dDeviceContext->DrawText(m_vTextBlocks[i].strText.c_str(), static_cast<UINT>(m_vTextBlocks[i].strText.length()),
+            m_vTextBlocks[i].pdwFormat, m_vTextBlocks[i].d2dLayoutRect, m_pd2dTextBrush);
+        
+    }
+    m_pd2dDeviceContext->EndDraw();
+
+    m_pd3d11On12Device->ReleaseWrappedResources(ppResources, _countof(ppResources));
+    m_pd3d11DeviceContext->Flush();
+}

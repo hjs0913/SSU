@@ -81,3 +81,16 @@ public:
 	virtual void Resize(ID3D12Resource** ppd3dRenderTargets, UINT width, UINT height, UINT TextAlignment, UINT ParagraphAlignment);
 	virtual void Render(UINT nFrame);
 };
+
+class AddAIUI : public UILayer
+{
+private:
+	D2D1_RECT_F                 BG_Rect;
+	ID2D1SolidColorBrush* m_pButtonBrush;
+public:
+	AddAIUI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor);
+	~AddAIUI();
+
+	virtual void UpdateLabels();
+	virtual void Render(UINT nFrame);
+};

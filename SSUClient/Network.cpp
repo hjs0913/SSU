@@ -968,14 +968,20 @@ void get_object_information(CGameObject* m_otherPlayer, int id)
 {
 	if (mPlayer[id]->GetUse() == false) return;
 
-	if (mPlayer[id]->GetPosition().x != m_otherPlayer->GetPosition().x && mPlayer[id]->GetPosition().z != m_otherPlayer->GetPosition().z) {
+	if (mPlayer[id]->GetPosition().x != m_otherPlayer->GetPosition().x || mPlayer[id]->GetPosition().z != m_otherPlayer->GetPosition().z) {
 		m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 1);
 		m_otherPlayer->SetPosition(get_position_to_server(id));
 	}
 	else m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 
-	//m_otherPlayer->SetLook(mPlayer[id]->GetLook());
-	m_otherPlayer->SetLook(get_look_to_server(id));
+	if (mPlayer[id]->GetLook().x != m_otherPlayer->GetLook().x ||
+		mPlayer[id]->GetLook().y != m_otherPlayer->GetLook().y ||
+		mPlayer[id]->GetLook().z != m_otherPlayer->GetLook().z
+		) {
+		m_otherPlayer->SetLook(mPlayer[id]->GetLook());
+		//m_otherPlayer->SetLook(get_look_to_server(id));
+	}
+
 	if (mPlayer[id]->m_net_attack == true) {
 		mPlayer[id]->m_net_attack == false;
 		m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 2);
