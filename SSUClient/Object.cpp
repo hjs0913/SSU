@@ -768,7 +768,7 @@ void CGameObject::SetScale(float x, float y, float z)
 {
 	XMMATRIX mtxScale = XMMatrixScaling(x, y, z);
 	m_xmf4x4ToParent = Matrix4x4::Multiply(mtxScale, m_xmf4x4ToParent);
-
+	m_xmf3Scale = XMFLOAT3(x, y, z);
 	UpdateTransform(NULL);
 }
 
@@ -790,6 +790,18 @@ XMFLOAT3 CGameObject::GetUp()
 XMFLOAT3 CGameObject::GetRight()
 {
 	return(Vector3::Normalize(XMFLOAT3(m_xmf4x4World._11, m_xmf4x4World._12, m_xmf4x4World._13)));
+}
+
+void CGameObject::SetLook(XMFLOAT3 xmf3Look)
+{
+	XMFLOAT3 m_xmf3Look = xmf3Look;
+	XMFLOAT3 m_xmf3Right = Vector3::CrossProduct(GetUp(), GetLook(), true);
+	XMFLOAT3 m_xmf3Up = Vector3::CrossProduct(GetLook(), GetRight(), true);
+
+	m_xmf4x4ToParent._11 = m_xmf3Right.x; m_xmf4x4ToParent._12 = m_xmf3Right.y; m_xmf4x4ToParent._13 = m_xmf3Right.z;
+	m_xmf4x4ToParent._21 = m_xmf3Up.x; m_xmf4x4ToParent._22 = m_xmf3Up.y; m_xmf4x4ToParent._23 = m_xmf3Up.z;
+	m_xmf4x4ToParent._31 = m_xmf3Look.x; m_xmf4x4ToParent._32 = m_xmf3Look.y; m_xmf4x4ToParent._33 = m_xmf3Look.z;
+	m_xmf4x4ToParent = Matrix4x4::Multiply(XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z), m_xmf4x4ToParent);
 }
 
 void CGameObject::MoveStrafe(float fDistance)

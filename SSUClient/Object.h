@@ -317,6 +317,9 @@ class CGameObject
 private:
 	int								m_nReferences = 0;
 
+protected:
+	XMFLOAT3						m_xmf3Scale = XMFLOAT3(1.0f, 1.0f, 1.0f);
+
 public:
 	void AddRef();
 	void Release();
@@ -373,6 +376,7 @@ public:
 	void SetPosition(float x, float y, float z);
 	void SetPosition(XMFLOAT3 xmf3Position);
 	void SetScale(float x, float y, float z);
+	void SetLook(XMFLOAT3 xmf3Look);
 
 	void MoveStrafe(float fDistance = 1.0f);
 	void MoveUp(float fDistance = 1.0f);

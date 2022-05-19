@@ -651,6 +651,7 @@ void CGameFramework::ProcessInput()
 				// m_pPlayer->Attack(true);
 				send_attack_packet(0);
 			}
+			send_look_packet(m_pPlayer->GetLookVector(), m_pPlayer->GetRightVector());
 		}
 	}
 	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
