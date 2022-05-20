@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "Scene.h"
-#include "protocol.h"
+#include "../RealServer/Server/protocol.h"
 #include "Network.h"
 ID3D12DescriptorHeap *CScene::m_pd3dCbvSrvDescriptorHeap = NULL;
 
@@ -105,12 +105,12 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 	CLoadedModelInfo* pCharacterModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Bastard_Warrior_Idle_Run_Attack_Once.bin", NULL);
 	m_ppHierarchicalGameObjects[0] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pCharacterModel, 1);
-	m_ppHierarchicalGameObjects[0]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 2);
+	m_ppHierarchicalGameObjects[0]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 	m_ppHierarchicalGameObjects[0]->SetPosition(3550.0f, m_pTerrain->GetHeight(3550.0f, 650.0f), 650.0f);
 	m_ppHierarchicalGameObjects[0]->SetScale(10.0f, 10.0f, 10.0f);
 
 	m_ppHierarchicalGameObjects[6] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pCharacterModel, 1);
-	m_ppHierarchicalGameObjects[6]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 1);
+	m_ppHierarchicalGameObjects[6]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 	m_ppHierarchicalGameObjects[6]->SetPosition(3600.0f, m_pTerrain->GetHeight(3600.0f, 650.0f), 650.0f);
 	m_ppHierarchicalGameObjects[6]->SetScale(10.0f, 10.0f, 10.0f);
 
@@ -648,6 +648,15 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	{
 		if (m_ppHierarchicalGameObjects[i])
 		{
+
+			// 임시방편 데스요
+			if (i == 0 && my_id != 0) {
+				get_object_information(m_ppHierarchicalGameObjects[0], 0);
+			}
+			if (i == 1 && my_id != 1) {
+				get_object_information(m_ppHierarchicalGameObjects[6], 1);
+			}
+
 			m_ppHierarchicalGameObjects[i]->Animate(m_fElapsedTime);
 			if (!m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController) m_ppHierarchicalGameObjects[i]->UpdateTransform(NULL);
 			m_ppHierarchicalGameObjects[i]->Render(pd3dCommandList, pCamera);

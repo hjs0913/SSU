@@ -119,6 +119,11 @@ const char SC_PACKET_PARTY_ROOM_DESTROY = 36;
 const char SC_PACKET_NOTICE = 37;
 const char SC_PACKET_CHANGE_MP = 38;
 
+const char SC_PACKET_ANIMATION_ATTACK = 101;
+const char SC_PACKET_ANIMATION_MOVE = 102;
+const char SC_PACKET_ANIMATION_DEAD = 103;
+// const char SC_PACKET_ANIMATION_IDLE = 101;
+
 //---------------------------------------------------
 #pragma pack (push, 1)
 struct cs_packet_login {
@@ -500,6 +505,12 @@ struct sc_packet_notice {
 	char type;
 	char message[MAX_CHAT_SIZE];
 	unsigned char raid_enter;	// 0 : 레이드 입장 시간초, 1: 사망 공지사항, 2 : 나머지 공지사항
+};
+
+struct sc_packet_animation_attack {
+	unsigned char size;
+	char type;
+	int id;
 };
 
 #pragma pack(pop)

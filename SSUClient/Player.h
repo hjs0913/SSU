@@ -11,7 +11,7 @@
 #include "Camera.h"
 #include "UILayer.h"
 #include "PartyUI.h"
-#include "protocol.h"
+#include "../RealServer/Server/protocol.h"
 
 struct CB_PLAYER_INFO
 {
@@ -22,11 +22,6 @@ class CPlayer : public CGameObject
 {
 protected:
 	XMFLOAT3					m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	XMFLOAT3					m_xmf3Right = XMFLOAT3(1.0f, 0.0f, 0.0f);
-	XMFLOAT3					m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
-	XMFLOAT3					m_xmf3Look = XMFLOAT3(0.0f, 0.0f, 1.0f);
-
-	XMFLOAT3					m_xmf3Scale = XMFLOAT3(1.0f, 1.0f, 1.0f);
 
 	float           			m_fPitch = 0.0f;
 	float           			m_fYaw = 0.0f;
@@ -65,7 +60,7 @@ public:
 	int							m_exp;
 	TRIBE						m_tribe = HUMAN;
 	int							m_spices;
-
+	bool						m_net_attack;
 public:
 	CPlayer();
 	virtual ~CPlayer();

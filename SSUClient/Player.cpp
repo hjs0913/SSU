@@ -508,6 +508,8 @@ void CTerrainPlayer::Update(float fTimeElapsed)
 		float fLength = sqrtf(m_xmf3Velocity.x * m_xmf3Velocity.x + m_xmf3Velocity.z * m_xmf3Velocity.z);
 		if (::IsZero(fLength))
 		{
+			// 공격 애니메이션 시간초를 설정해서 애니메이션 시간이 지나면 멈추도록 설정하자
+
 			if (!m_pSkinnedAnimationController->m_pAnimationTracks[2].m_bEnable) {
 				m_pSkinnedAnimationController->SetTrackEnable(0, true);
 				m_pSkinnedAnimationController->SetTrackEnable(1, false);
@@ -519,7 +521,6 @@ void CTerrainPlayer::Update(float fTimeElapsed)
 				m_pSkinnedAnimationController->SetTrackEnable(1, false);
 				m_pSkinnedAnimationController->SetTrackPosition(1, 0.0f);
 			}
-
 
 			/*if (m_pSkinnedAnimationController->m_pAnimationTracks[2].m_fPosition == 20.0f) {
 				m_pSkinnedAnimationController->SetTrackEnable(2, false);
