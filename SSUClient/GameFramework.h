@@ -68,6 +68,9 @@ public:
 	void Create_OpenWorld_Object();
 	void Create_InDungeon_Object();
 
+	bool RaySphereIntersect(XMFLOAT3 rayOrigin, XMFLOAT3 rayDirection, float radius);
+	bool TestIntersection(int mouseX, int mouseY, CPlayer* obj);
+
 private:
 	HINSTANCE					m_hInstance;
 	HWND						m_hWnd; 

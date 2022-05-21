@@ -29,9 +29,10 @@ protected:
 
 	DWORD							m_nMode;
 
-	XMFLOAT3						m_xmf3LookAtWorld;
+
 	XMFLOAT3						m_xmf3Offset;
 	float           				m_fTimeLag;
+
 
 	XMFLOAT4X4						m_xmf4x4View;
 	XMFLOAT4X4						m_xmf4x4Projection;
@@ -41,8 +42,8 @@ protected:
 	CPlayer							*m_pPlayer;
 
 public:
-
-
+	XMFLOAT3						m_xmf3LookAtWorld;
+	XMFLOAT4X4						m_xmf4x4World;
 	CCamera();
 	CCamera(CCamera *pCamera);
 	virtual ~CCamera();
@@ -92,7 +93,7 @@ public:
 
 	XMFLOAT4X4 GetViewMatrix() { return(m_xmf4x4View); }
 	XMFLOAT4X4 GetProjectionMatrix() { return(m_xmf4x4Projection); }
-	XMFLOAT3 GetWorld() { return(m_xmf3LookAtWorld); }
+	XMFLOAT4X4 GetWorld() { return(m_xmf4x4World); }
 
 
 
