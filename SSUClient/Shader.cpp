@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Shader.h"
 
+extern CGameObject** m_ppObjects = 0;
 CShader::CShader()
 {
 }

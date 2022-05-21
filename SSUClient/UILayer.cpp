@@ -349,6 +349,26 @@ bool BuffUI::Setup()
         if (FAILED(D2DLoadBitmap(L"\Image/천사.png", m_pd2dDeviceContext, imagingFactory[2], &bitmap[2])))
             return false;
     }
+    if (buff_ui_num[3] == 3) {
+
+        if (FAILED(WICInit(&imagingFactory[3])))
+        {
+            MessageBox(0, L"Imaging  Factory", 0, 0);
+            return false;
+        }
+        if (FAILED(D2DLoadBitmap(L"\Image/공격력.png", m_pd2dDeviceContext, imagingFactory[3], &bitmap[3])))
+            return false;
+    }
+    if (buff_ui_num[4] == 4) {
+
+        if (FAILED(WICInit(&imagingFactory[4])))
+        {
+            MessageBox(0, L"Imaging  Factory", 0, 0);
+            return false;
+        }
+        if (FAILED(D2DLoadBitmap(L"\Image/전광석화.png", m_pd2dDeviceContext, imagingFactory[4], &bitmap[4])))
+            return false;
+    }
     return true;
 }
 
@@ -386,7 +406,6 @@ void BuffUI::Render(UINT nFrame)
     m_pd2dDeviceContext->BeginDraw();
     if (buff_ui_num[0] == 0) {
         m_pd2dDeviceContext->DrawBitmap(bitmap[0], buff_space0);
-
     }
     if (buff_ui_num[1] == 1) {
         m_pd2dDeviceContext->DrawBitmap(bitmap[1], buff_space1);
@@ -394,7 +413,12 @@ void BuffUI::Render(UINT nFrame)
     if (buff_ui_num[2] == 2) {
         m_pd2dDeviceContext->DrawBitmap(bitmap[2], buff_space2);
     }
-
+    if (buff_ui_num[3] == 3) {
+        m_pd2dDeviceContext->DrawBitmap(bitmap[3], buff_space3);
+    }
+    if (buff_ui_num[4] == 4) {
+        m_pd2dDeviceContext->DrawBitmap(bitmap[4], buff_space4);
+    }
     /*for (auto textBlock : m_vTextBlocks)
     {
         m_pd2dDeviceContext->FillRectangle(textBlock.d2dLayoutRect, m_pBrush);
@@ -410,10 +434,17 @@ void BuffUI::Render(UINT nFrame)
     end_buff_0 = clock();
     end_buff_1 = clock();
     end_buff_2 = clock();
+    end_buff_3 = clock();
+    end_buff_4 = clock();
+
     if ((end_buff_0 - start_buff_0) / CLOCKS_PER_SEC >= 3)
         buff_ui_num[0] = -1;
     if ((end_buff_1 - start_buff_1) / CLOCKS_PER_SEC >= 10)
         buff_ui_num[1] = -1;
     if ((end_buff_2 - start_buff_2) / CLOCKS_PER_SEC >= 3)
         buff_ui_num[2] = -1;
+    if ((end_buff_3 - start_buff_3) / CLOCKS_PER_SEC >= 10)  //공격력 
+        buff_ui_num[3] = -1;
+    if ((end_buff_4 - start_buff_4) / CLOCKS_PER_SEC >= 5)  //공속 
+        buff_ui_num[4] = -1;
 }

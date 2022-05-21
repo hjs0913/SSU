@@ -9,7 +9,7 @@
 #include <array>
 #include <queue>
 #include <string>
-
+#include "Player.h"
 #include "../RealServer/Server/protocol.h"
 #include "stdafx.h"
 #include "Pattern.h"
@@ -23,7 +23,7 @@
 
 using namespace std;
 
-
+extern array<CPlayer*, MAX_USER + MAX_NPC> mPlayer;
 extern int my_id;
 extern int m_prev_recv;
 extern vector<string> g_msg;

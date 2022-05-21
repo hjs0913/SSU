@@ -78,6 +78,99 @@ CGameFramework::~CGameFramework()
 {
 }
 
+bool CGameFramework::RaySphereIntersect(XMFLOAT3 rayOrigin, XMFLOAT3 rayDirection, float radius)
+{
+	// a, b 및 c 계수를 계산합니다.
+	float a = (rayDirection.x * rayDirection.x) + (rayDirection.y * rayDirection.y) + (rayDirection.z * rayDirection.z);
+	float b = ((rayDirection.x * rayOrigin.x) + (rayDirection.y * rayOrigin.y) + (rayDirection.z * rayOrigin.z)) * 2.0f;
+	float c = ((rayOrigin.x * rayOrigin.x) + (rayOrigin.y * rayOrigin.y) + (rayOrigin.z * rayOrigin.z)) - (radius * radius);
+
+	// 결과값을 얻는다
+	float discriminant = (b * b) - (4 * a * c);
+
+	// 결과값이 음수이면 피킹 선이 구를 벗어난 것입니다. 그렇지 않으면 구를 선택합니다.
+	if (discriminant < 0.0f)
+	{
+		return false;
+	}
+
+	return true;
+};
+
+bool CGameFramework::TestIntersection(int mouseX, int mouseY, CPlayer* obj)
+{
+
+
+	XMMATRIX projectionMatrix, viewMatrix, inverseViewMatrix, worldMatrix, translateMatrix, inverseWorldMatrix;
+	XMFLOAT4X4 F_projectionMatrix, F_viewMatrix, F_inverseViewMatrix, F_worldMatrix, F_translateMatrix, F_inverseWorldMatrix;
+	XMFLOAT3 direction, origin, rayOrigin, rayDirection;
+	XMFLOAT3 F3_worldMatrix;
+	XMVECTOR V_worldMatrix;
+
+	// 마우스 커서 좌표를 -1에서 +1 범위로 이동합니다
+	float pointX = ((2.0f * (float)mouseX) / (float)m_nWndClientWidth) - 1.0f;      //FRAME_BUFFER_WIDTH
+	float pointY = (((2.0f * (float)mouseY) / (float)m_nWndClientHeight) - 1.0f) * -1.0f;  //FRAME_BUFFER_HEIGHT
+
+	// 뷰포트의 종횡비를 고려하여 투영 행렬을 사용하여 점을 조정합니다
+	F_projectionMatrix = m_pCamera->GetProjectionMatrix();
+	projectionMatrix = XMLoadFloat4x4(&F_projectionMatrix);
+
+	XMFLOAT3X3 projectionMatrix4;
+	XMStoreFloat3x3(&projectionMatrix4, projectionMatrix);
+
+	pointX = pointX / projectionMatrix4._11;
+	pointY = pointY / projectionMatrix4._22;
+
+	// 뷰 행렬의 역함수를 구합니다.
+	F_viewMatrix = m_pCamera->GetViewMatrix();
+	viewMatrix = XMLoadFloat4x4(&F_viewMatrix);
+	inverseViewMatrix = XMMatrixInverse(nullptr, viewMatrix);
+
+	XMFLOAT3X3 inverseViewMatrix4;
+	XMStoreFloat3x3(&inverseViewMatrix4, inverseViewMatrix);
+
+
+
+	// 뷰 공간에서 피킹 레이의 방향을 계산합니다.
+	direction.x = (pointX * inverseViewMatrix4._11) + (pointY * inverseViewMatrix4._21) + inverseViewMatrix4._31;
+	direction.y = (pointX * inverseViewMatrix4._12) + (pointY * inverseViewMatrix4._22) + inverseViewMatrix4._32;
+	direction.z = (pointX * inverseViewMatrix4._13) + (pointY * inverseViewMatrix4._23) + inverseViewMatrix4._33;
+
+	// 카메라의 위치 인 picking ray의 원점을 가져옵니다.
+	origin = m_pPlayer ->GetPosition();
+	
+	// 세계 행렬을 가져와 구의 위치로 변환합니다.  //.여기 다시 보자 
+	F3_worldMatrix = m_pCamera->GetLookAtPosition();
+
+	///m_xmf3LookAtWorld이걸 써서 수정한 부분 
+	//XMFLOAT4X4 worldllook;
+//	worldllook._11 = m_pCamera->GetWorld().x; worldllook._12 = 0.0f; worldllook._13 = 0.0f; worldllook._14 = 0.0f;
+//	worldllook._21 = 0.0f; worldllook._22 = m_pCamera->GetWorld().y; worldllook._23 = 0.0f; worldllook._24 = 0.0f;
+//	worldllook._31 = 0.0f;
+// worldllook._32 = 0.0f; worldllook._33 = m_pCamera->GetWorld().z; worldllook._34 = 0.0f;
+//	worldllook._41 = 0.0f; worldllook._42 = 0.0f; worldllook._43 = 0.0f; worldllook._44 = 0.0f;
+//	worldMatrix = XMLoadFloat4x4(&worldllook);//XMMatrixIdentity();
+	worldMatrix = XMMatrixIdentity();
+	//translateMatrix = XMMatrixTranslation(obj->vCenter.x, obj->vCenter.y, obj->vCenter.z);
+	translateMatrix = XMMatrixTranslation(obj->GetPosition().x, obj->GetPosition().y, obj->GetPosition().z);
+	worldMatrix = XMMatrixMultiply(worldMatrix, translateMatrix);
+
+	// 이제 번역 된 행렬의 역함수를 구하십시오.
+	inverseWorldMatrix = XMMatrixInverse(nullptr, worldMatrix);
+
+	// 이제 광선 원점과 광선 방향을 뷰 공간에서 월드 공간으로 변환합니다.
+	XMStoreFloat3(&rayOrigin, XMVector3TransformCoord(XMVectorSet(origin.x, origin.y, origin.z, 0.0f), inverseWorldMatrix));
+	XMStoreFloat3(&direction, XMVector3TransformNormal(XMVectorSet(direction.x, direction.y, direction.z, 0.0f), inverseWorldMatrix));
+
+	// 광선 방향을 표준화합니다.
+	XMStoreFloat3(&rayDirection, XMVector3Normalize(XMVectorSet(direction.x, direction.y, direction.z, 0.0f)));
+
+	// 이제 광선 구 교차 테스트를 수행하십시오.
+	if (RaySphereIntersect(rayOrigin, rayDirection, 20.0f) == true)  //피킹 성공
+		return true;
+	else
+		return false;
+}
 bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 {
 	m_hInstance = hInstance;
@@ -416,6 +509,43 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 				}
 				break;
 			}
+
+			if (f4_picking_possible) {
+				//cRay r; 
+				//r.RayAtWorldSpace(LOWORD(lParam), HIWORD(lParam));
+				for (int i = 0; i < MAX_USER; ++i) {  //9615  for (int i = 10615; i < 10795; i++) 
+					//if(r.isPicked(m_ppObjects[i])){
+					if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, mPlayer[i])) {
+						send_picking_skill_packet(2, 0, i);
+					//	m_ppObjects[i]->SetMesh(0, pOtherPlayerMesh[1]);  //피킹 확인위해 색상변경 
+						f4_picking_possible = false;
+
+					}
+				}
+			}
+
+			if (f5_picking_possible) {
+				for (int i = 0; i < MAX_USER; ++i) { 
+					if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, mPlayer[i])) {
+						send_picking_skill_packet(0, 0, i);
+						f5_picking_possible = false;
+
+					}
+				}
+			}
+
+			if (f6_picking_possible) {
+				for (int i = 0; i < MAX_USER; ++i) { 
+					if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, mPlayer[i])) {
+						send_picking_skill_packet(1, 0, i);
+						f6_picking_possible = false;
+
+					}
+				}
+			}
+
+
+
 		}
 		case WM_RBUTTONDOWN:
 			::SetCapture(hWnd);
@@ -497,6 +627,15 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 				}
 				case VK_F3:
 					m_pCamera = m_pPlayer->ChangeCamera((DWORD)(wParam - VK_F1 + 1), m_GameTimer.GetTimeElapsed());
+					break;
+				case VK_F4:
+					f4_picking_possible = true;
+					break;
+				case VK_F5:
+					f5_picking_possible = true;
+					break;
+				case VK_F6:
+					f6_picking_possible = true;
 					break;
 				case VK_F9:
 					ChangeSwapChainState();

@@ -1879,15 +1879,13 @@ void process_packet(int client_id, unsigned char* p)
                 pl->set_mp(pl->get_mp() - 1000);
                 send_status_change_packet(pl);
 
-                int taget = packet->target - 9615;
+                int taget = packet->target;// -9615;
 
           
                 players[taget]->set_mp(players[taget]->get_mp() + players[taget]->get_maxmp() / 10);
                 send_status_change_packet(reinterpret_cast<Player*>(players[taget]));
 
                 send_buff_ui_packet(reinterpret_cast<Player*>(players[taget]), 0);
-
-    
                 break;
 
             }
@@ -1906,7 +1904,7 @@ void process_packet(int client_id, unsigned char* p)
                 pl->set_mp(pl->get_mp() - 1000);
                 send_status_change_packet(pl);
 
-                int taget = packet->target - 9615;
+                int taget = packet->target; //  -9615;
 
                 players[taget]->set_physical_defence(players[taget]->get_physical_defence()  * 11 / 10);
                 players[taget]->set_magical_defence(players[taget]->get_magical_defence() * 11 / 10);
@@ -1930,14 +1928,11 @@ void process_packet(int client_id, unsigned char* p)
                 pl->set_mp(pl->get_mp() - 1000);
                 send_status_change_packet(pl);
 
-                int taget = packet->target - 9615;
+                int taget = packet->target;// - 9615;
 
                 players[taget]->set_hp(players[taget]->get_hp() + players[taget]->get_maxhp() / 10);
                 send_status_change_packet(reinterpret_cast<Player*>(players[taget]));
                 send_buff_ui_packet(reinterpret_cast<Player*>(players[taget]), 2);
-       
-
-
 
                 break;
 

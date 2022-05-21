@@ -366,19 +366,17 @@ bool CGameFramework::TestIntersection(int mouseX, int mouseY, CGameObject* obj)
 	XMVECTOR V_worldMatrix;
 
 	// 마우스 커서 좌표를 -1에서 +1 범위로 이동합니다
-	float pointX = ((2.0f * (float)mouseX) / (float)m_nWndClientWidth) - 1.0f;      //FRAME_BUFFER_WIDTH
-	float pointY = (((2.0f * (float)mouseY) / (float)m_nWndClientHeight) - 1.0f) * -1.0f;  //FRAME_BUFFER_HEIGHT
+	float pointX = ((2.0f * (float)mouseX) / (float)FRAME_BUFFER_WIDTH) - 1.0f;      //FRAME_BUFFER_WIDTH
+	float pointY = (((2.0f * (float)mouseY) / (float)FRAME_BUFFER_HEIGHT) - 1.0f) * -1.0f;  //FRAME_BUFFER_HEIGHT
 
 	// 뷰포트의 종횡비를 고려하여 투영 행렬을 사용하여 점을 조정합니다
 	F_projectionMatrix = m_pCamera->GetProjectionMatrix();
 	projectionMatrix = XMLoadFloat4x4(&F_projectionMatrix);
-
 	XMFLOAT3X3 projectionMatrix4;
 	XMStoreFloat3x3(&projectionMatrix4, projectionMatrix);
 
-	pointX = pointX / projectionMatrix4._11;
-	pointY = pointY / projectionMatrix4._22;
-
+	pointX = (pointX)/ projectionMatrix4._11;
+	pointY = (pointY) / projectionMatrix4._22;
 
 	// 뷰 행렬의 역함수를 구합니다.
 	F_viewMatrix = m_pCamera->GetViewMatrix();
@@ -398,18 +396,23 @@ bool CGameFramework::TestIntersection(int mouseX, int mouseY, CGameObject* obj)
 	// 카메라의 위치 인 picking ray의 원점을 가져옵니다.
 	origin = m_pCamera->GetPosition();
 
-	// 세계 행렬을 가져와 구의 위치로 변환합니다.  //.여기 다시 보자 
-	F3_worldMatrix = m_pCamera->GetLookAtPosition();  
+	// 세계 행렬을 가져와 구의 위치로 변환합니다.  //.여기 다시 보자  
 	
 	///m_xmf3LookAtWorld이걸 써서 수정한 부분 
-	XMFLOAT4X4 worldllook;
-	worldllook._11 = m_pCamera->GetWorld().x; worldllook._12 = 0.0f; worldllook._13 = 0.0f; worldllook._14 = 0.0f;
-	worldllook._21 = 0.0f; worldllook._22 = m_pCamera->GetWorld().y; worldllook._23 = 0.0f; worldllook._24 = 0.0f;
-	worldllook._31 = 0.0f; worldllook._32 = 0.0f; worldllook._33 = m_pCamera->GetWorld().z; worldllook._34 = 0.0f;
-	worldllook._41 = 0.0f; worldllook._42 = 0.0f; worldllook._43 = 0.0f; worldllook._44 = 0.0f;
-	worldMatrix = XMLoadFloat4x4(&worldllook);//XMMatrixIdentity();
+	//XMFLOAT4X4 worldllook = XMMatrixIdentity(); //m_pCamera->GetWorld();//= m_pPlayer->m_xmf4x4World;
 
-	//translateMatrix = XMMatrixTranslation(obj->vCenter.x, obj->vCenter.y, obj->vCenter.z);
+	//worldllook._11 = m_pCamera->GetRightVector().x; worldllook._12 = m_pCamera->GetRightVector().y; worldllook._13 = m_pCamera->GetRightVector().z; worldllook._14 = 1.0f;
+	//worldllook._21 = m_pCamera->GetUpVector().x;   worldllook._22 = m_pCamera->GetUpVector().y; worldllook._23 = m_pCamera->GetUpVector().z; worldllook._24 = 1.0f;
+	//worldllook._31 = m_pCamera->GetLookVector().x; worldllook._32 = m_pCamera->GetLookVector().y;  worldllook._33 = m_pCamera->GetLookVector().z;  worldllook._34 = 1.0f;
+	//worldllook._41 = m_pCamera->GetPosition().x; worldllook._42 = m_pCamera->GetPosition().y;  worldllook._43 = m_pCamera->GetPosition().z; worldllook._44 = 1.0f;
+	F_worldMatrix = m_pCamera->GetWorld();
+
+
+	worldMatrix = XMMatrixIdentity();
+
+		
+//	worldMatrix = XMMatrixIdentity();
+
 	translateMatrix = XMMatrixTranslation(obj->GetPosition().x, obj->GetPosition().y, obj->GetPosition().z);
 	worldMatrix = XMMatrixMultiply(worldMatrix, translateMatrix);
 
@@ -531,10 +534,13 @@ bool CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 			}
 			break;
 		}
-
+		
 	
 		if (f4_picking_possible) {
+			//cRay r; 
+			//r.RayAtWorldSpace(LOWORD(lParam), HIWORD(lParam));
 			for (int i = 9615; i < 10615; i++) {  //9615  for (int i = 10615; i < 10795; i++) 
+				//if(r.isPicked(m_ppObjects[i])){
 				if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, m_ppObjects[i])) {
 					send_picking_skill_packet(2, 0, i);
 					m_ppObjects[i]->SetMesh(0, pOtherPlayerMesh[1]);  //피킹 확인위해 색상변경 
