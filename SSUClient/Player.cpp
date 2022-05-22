@@ -5,6 +5,9 @@
 #include "stdafx.h"
 #include "Player.h"
 #include "Shader.h"
+#include "Timer.h"
+
+#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console") //콘솔 띄우자 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CPlayer
@@ -237,6 +240,7 @@ void CPlayer::Attack(bool isAttack)
 
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 
 CAirplanePlayer::CAirplanePlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, ID3D12RootSignature *pd3dGraphicsRootSignature, void *pContext)
@@ -358,17 +362,26 @@ CTerrainPlayer::CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLi
 {
 	m_pCamera = ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
 
-	CLoadedModelInfo *pAngrybotModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Bastard_Warrior_Idle_Run_Attack_once.bin", NULL);
+	CLoadedModelInfo *pAngrybotModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Bastard_Warrior.bin", NULL);
 	SetChild(pAngrybotModel->m_pModelRootObject, true);
+	anim_cnt = pAngrybotModel->m_pAnimationSets->m_nAnimationSets;
 
-	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, 3, pAngrybotModel, true);
-	m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
-	m_pSkinnedAnimationController->SetTrackAnimationSet(1, 1);
-	m_pSkinnedAnimationController->SetTrackAnimationSet(2, 2);
+	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, anim_cnt, pAngrybotModel, true);
+	m_pSkinnedAnimationController->m_pAnimationSets = pAngrybotModel->m_pAnimationSets;
 
-	m_pSkinnedAnimationController->SetTrackEnable(1, false);
-	m_pSkinnedAnimationController->SetTrackEnable(2, false);
-	
+	for (int i = 0; i < anim_cnt; ++i) {
+		cout << i + 1 << ", ";
+		m_pSkinnedAnimationController->SetTrackAnimationSet(i, i);
+		m_pSkinnedAnimationController->SetTrackEnable(i, false);
+	}
+	cout << " 완료!" << endl;
+	m_pSkinnedAnimationController->SetTrackEnable(1, true);
+
+	// 5번 부터 ANIMATION_TYPE_ONCE
+	for (int i = 5; i < anim_cnt; ++i) {
+		m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[i]->m_nType = ANIMATION_TYPE_ONCE;
+	}
+
 //	m_pSkinnedAnimationController->SetCallbackKeys(2, 2);
 //#ifdef _WITH_SOUND_RESOURCE
 //	m_pSkinnedAnimationController->SetCallbackKey(0, 0.1f, _T("Footstep01"));
@@ -388,7 +401,7 @@ CTerrainPlayer::CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLi
 	SetCameraUpdatedContext(pContext);
 
 	CHeightMapTerrain *pTerrain = (CHeightMapTerrain *)pContext;
-	SetPosition(XMFLOAT3(3500.0f, pTerrain->GetHeight(310.0f, 590.0f), 590.0f));
+	SetPosition(XMFLOAT3(3500.0f, pTerrain->GetHeight(3500.0f, 590.0f), 590.0f));
 	SetScale(XMFLOAT3(10.0f, 10.0f, 10.0f));
 
 	if (pAngrybotModel) delete pAngrybotModel;
@@ -491,9 +504,11 @@ void CTerrainPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVeloci
 {
 	if (dwDirection)
 	{
+		cout << "이동" << endl;
 		m_pSkinnedAnimationController->SetTrackEnable(0, false);
+		m_pSkinnedAnimationController->SetTrackEnable(5, false);
 		m_pSkinnedAnimationController->SetTrackEnable(1, true);
-		m_pSkinnedAnimationController->SetTrackEnable(2, false);
+		m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[5]->m_fPosition = 0.0f;
 	}
 
 	CPlayer::Move(dwDirection, fDistance, bUpdateVelocity);
@@ -506,38 +521,46 @@ void CTerrainPlayer::Update(float fTimeElapsed)
 	if (m_pSkinnedAnimationController)
 	{
 		float fLength = sqrtf(m_xmf3Velocity.x * m_xmf3Velocity.x + m_xmf3Velocity.z * m_xmf3Velocity.z);
-		if (::IsZero(fLength))
+		if (::IsZero(fLength))	// 가만히 서있을 때
 		{
-			if (!m_pSkinnedAnimationController->m_pAnimationTracks[2].m_bEnable) {
+			if (!m_pSkinnedAnimationController->m_pAnimationTracks[5].m_bEnable) {	// 공격하는 게 아니면 IDLE
 				m_pSkinnedAnimationController->SetTrackEnable(0, true);
 				m_pSkinnedAnimationController->SetTrackEnable(1, false);
-				m_pSkinnedAnimationController->SetTrackPosition(1, 0.0f);
+				m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[5]->m_fPosition = 0.0f;
 			}
+		}
+		float playTime = m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[5]->m_fLength - m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[5]->m_fPosition;
 
-			else {
-				m_pSkinnedAnimationController->SetTrackEnable(2, true);
-				m_pSkinnedAnimationController->SetTrackEnable(1, false);
-				m_pSkinnedAnimationController->SetTrackPosition(1, 0.0f);
-			}
-
-
-			/*if (m_pSkinnedAnimationController->m_pAnimationTracks[2].m_fPosition == 20.0f) {
-				m_pSkinnedAnimationController->SetTrackEnable(2, false);
-				m_pSkinnedAnimationController->SetTrackPosition(2, 0.0f);
-			}*/
+		if (playTime <= 0) {
+			m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[5]->m_fPosition = 0.0f;
+			m_pSkinnedAnimationController->SetTrackEnable(0, true);
+			m_pSkinnedAnimationController->SetTrackEnable(1, false);
+			m_pSkinnedAnimationController->SetTrackEnable(5, false);
 		}
 	}
 }
 
 void CTerrainPlayer::Attack(bool isAttack)
 {
+	m_isAttack = isAttack;
 	CPlayer::Attack(isAttack);
-	
+
 	if (isAttack) {
+		cout << "Attack!" << endl;
 		m_pSkinnedAnimationController->SetTrackEnable(0, false);
 		m_pSkinnedAnimationController->SetTrackEnable(1, false);
-		m_pSkinnedAnimationController->SetTrackEnable(2, true);
+		m_pSkinnedAnimationController->SetTrackEnable(5, true);
 	}
+}
 
-
+void CTerrainPlayer::ChangeAnimationState(Player_Animation animState)
+{
+	m_animState = animState;
+	for (int i = 0; i < anim_cnt; ++i) {
+		if (i == m_animState) {
+			m_pSkinnedAnimationController->SetTrackEnable(i, true);
+			continue;
+		}
+		m_pSkinnedAnimationController->SetTrackEnable(i, false);
+	}
 }

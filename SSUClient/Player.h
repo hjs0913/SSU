@@ -12,10 +12,16 @@
 #include "UILayer.h"
 #include "PartyUI.h"
 #include "protocol.h"
+#include "Timer.h"
 
 struct CB_PLAYER_INFO
 {
 	XMFLOAT4X4					m_xmf4x4World;
+};
+
+enum Player_Animation
+{
+	IDLE, MOVE_FORWARD, MOVE_BACK, MOVE_LEFT, MOVE_RIGHT, ATTACK_1, ATTACK_2, ATTACK_3, SKILL_1, SKILL_2, SKILL_3, HIT, CRITICAL_HIT, DIE
 };
 
 class CPlayer : public CGameObject
@@ -182,6 +188,10 @@ public:
 
 	virtual void Attack(bool isAttack);
 
+	void ChangeAnimationState(Player_Animation animState);
+
+	Player_Animation m_animState = IDLE;
 	bool m_isAttack = false;
+	int anim_cnt = 0;
 };
 

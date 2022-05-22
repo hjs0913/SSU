@@ -380,10 +380,8 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 	{
 		case WM_ACTIVATE:
 		{
-			if (LOWORD(wParam) == WA_INACTIVE)
-				m_GameTimer.Stop();
-			else
-				m_GameTimer.Start();
+			if (LOWORD(wParam) == WA_INACTIVE) m_GameTimer.Stop();
+			else m_GameTimer.Start();
 			break;
 		}
 		case WM_SIZE:
@@ -621,6 +619,7 @@ void CGameFramework::ProcessInput()
 
 		}
 	}
+
 	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
 }
 
@@ -664,7 +663,7 @@ void CGameFramework::MoveToNextFrame()
 void CGameFramework::FrameAdvance()
 {    
 	m_GameTimer.Tick(60.0f);
-	
+
 	ProcessInput();
 
     AnimateObjects();
@@ -974,4 +973,3 @@ void CGameFramework::FrameAdvance()
 	_stprintf_s(m_pszFrameRate + nLength, 70 - nLength, _T("(%4f, %4f, %4f)"), xmf3Position.x, xmf3Position.y, xmf3Position.z);
 	::SetWindowText(m_hWnd, m_pszFrameRate);
 }
-

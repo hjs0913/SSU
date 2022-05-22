@@ -5,6 +5,8 @@
 #include "Object.h"
 #include "Shader.h"
 #include "Scene.h"
+
+#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console") //콘솔 띄우자 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 CTexture::CTexture(int nTextures, UINT nTextureType, int nSamplers)
@@ -232,7 +234,6 @@ CAnimationSet::CAnimationSet(float fLength, int nFramesPerSecond, int nKeyFrames
 
 	strcpy_s(m_pstrAnimationSetName, 64, pstrName);
 
-	//cout << "AnimationSetName : " << m_pstrAnimationSetName << endl;
 	m_pfKeyFrameTimes = new float[nKeyFrames];
 	m_ppxmf4x4KeyFrameTransforms = new XMFLOAT4X4*[nKeyFrames];
 	for (int i = 0; i < nKeyFrames; i++) m_ppxmf4x4KeyFrameTransforms[i] = new XMFLOAT4X4[nAnimatedBones];
@@ -276,8 +277,10 @@ void CAnimationSet::SetPosition(float fElapsedPosition)
 //			m_fPosition = fTrackPosition - int(fTrackPosition / m_fLength) * m_fLength;
 			break;
 		}
-		case ANIMATION_TYPE_ONCE:
+		case ANIMATION_TYPE_ONCE: {
+			if (m_fPosition <= m_fLength) m_fPosition += fElapsedPosition;
 			break;
+		}
 		case ANIMATION_TYPE_PINGPONG:
 			break;
 	}
@@ -484,7 +487,6 @@ void CAnimationController::UpdateShaderVariables(ID3D12GraphicsCommandList *pd3d
 
 void CAnimationController::AdvanceTime(float fTimeElapsed, CGameObject *pRootGameObject) 
 {
-	m_fTime += fTimeElapsed; 
 	if (m_pAnimationTracks)
 	{
 //		for (int k = 0; k < m_nAnimationTracks; k++) m_pAnimationTracks[k].m_fPosition += (fTimeElapsed * m_pAnimationTracks[k].m_fSpeed);
@@ -509,7 +511,9 @@ void CAnimationController::AdvanceTime(float fTimeElapsed, CGameObject *pRootGam
 
 		for (int k = 0; k < m_nAnimationTracks; k++)
 		{
-			if (m_pAnimationTracks[k].m_bEnable) m_pAnimationSets->m_pAnimationSets[m_pAnimationTracks[k].m_nAnimationSet]->HandleCallback();
+			if (m_pAnimationTracks[k].m_bEnable) {
+				m_pAnimationSets->m_pAnimationSets[m_pAnimationTracks[k].m_nAnimationSet]->HandleCallback();
+			}
 		}
 	}
 } 
@@ -1005,7 +1009,6 @@ CGameObject *CGameObject::LoadFrameHierarchyFromFile(ID3D12Device *pd3dDevice, I
 
 	CGameObject *pGameObject = new CGameObject();
 
-	//cout << "----------LoadFrameHierarchyFromFile 입장----------" << endl;
 	for ( ; ; )
 	{
 		::ReadStringFromFile(pInFile, pstrToken);
@@ -1031,7 +1034,6 @@ CGameObject *CGameObject::LoadFrameHierarchyFromFile(ID3D12Device *pd3dDevice, I
 		}
 		else if (!strcmp(pstrToken, "<Mesh>:"))
 		{
-			//cout << "Mesh - ";
 			CStandardMesh *pMesh = new CStandardMesh(pd3dDevice, pd3dCommandList);
 			pMesh->LoadMeshFromFile(pd3dDevice, pd3dCommandList, pInFile);
 			pGameObject->SetMesh(pMesh);
@@ -1102,7 +1104,6 @@ void CGameObject::LoadAnimationFromFile(FILE *pInFile, CLoadedModelInfo *pLoaded
 		if (!strcmp(pstrToken, "<AnimationSets>:"))
 		{
 			nAnimationSets = ::ReadIntegerFromFile(pInFile);
-			//cout << nAnimationSets << endl;
 			pLoadedModel->m_pAnimationSets = new CAnimationSets(nAnimationSets);
 		}
 		else if (!strcmp(pstrToken, "<FrameNames>:"))

@@ -98,51 +98,55 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	XMFLOAT4 xmf4Color(0.0f, 0.3f, 0.0f, 0.0f);
 	m_pTerrain = new CHeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Image/HeightMap.raw"), 512, 512, xmf3Scale, xmf4Color);
 
-
-	m_nHierarchicalGameObjects = 7;
+	m_nHierarchicalGameObjects = 11;
 	m_ppHierarchicalGameObjects = new CGameObject * [m_nHierarchicalGameObjects];
 	//for (int i = 0; i < m_nHierarchicalGameObjects; ++i) m_ppHierarchicalGameObjects[i] = NULL;
 
-	CLoadedModelInfo* pCharacterModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Bastard_Warrior_Idle_Run_Attack_Once.bin", NULL);
-	m_ppHierarchicalGameObjects[0] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pCharacterModel, 1);
-	m_ppHierarchicalGameObjects[0]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 2);
-	m_ppHierarchicalGameObjects[0]->SetPosition(3550.0f, m_pTerrain->GetHeight(3550.0f, 650.0f), 650.0f);
-	m_ppHierarchicalGameObjects[0]->SetScale(10.0f, 10.0f, 10.0f);
-
-	m_ppHierarchicalGameObjects[6] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pCharacterModel, 1);
-	m_ppHierarchicalGameObjects[6]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 1);
-	m_ppHierarchicalGameObjects[6]->SetPosition(3600.0f, m_pTerrain->GetHeight(3600.0f, 650.0f), 650.0f);
-	m_ppHierarchicalGameObjects[6]->SetScale(10.0f, 10.0f, 10.0f);
-
 	CLoadedModelInfo* pMonsterModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Beast_Wolf.bin", NULL);
-	m_ppHierarchicalGameObjects[1] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMonsterModel, 1);
-	m_ppHierarchicalGameObjects[1]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
-	m_ppHierarchicalGameObjects[1]->SetPosition(3500.0f, m_pTerrain->GetHeight(3500.0f, 650.0f), 650.0f);
-	m_ppHierarchicalGameObjects[1]->SetScale(10.0f, 10.0f, 10.0f);
-	m_ppHierarchicalGameObjects[2] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMonsterModel, 1);
-	m_ppHierarchicalGameObjects[2]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
-	m_ppHierarchicalGameObjects[2]->SetPosition(3450.0f, m_pTerrain->GetHeight(3450.0f, 650.0f), 650.0f);
-	m_ppHierarchicalGameObjects[2]->SetScale(10.0f, 10.0f, 10.0f);
+	for (int i = 0; i < 6; ++i) {
+		m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMonsterModel, 1);
+		m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, i);
+		m_ppHierarchicalGameObjects[i]->SetPosition((3450.0f + 50.0f * i), m_pTerrain->GetHeight((3450.0f + 50.0f * i), 650.0f), 650.0f);
+		m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
+	}
 
+	m_ppHierarchicalGameObjects[9] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMonsterModel, 6);
+	for (int i = 0; i < 6; ++i) {
+		m_ppHierarchicalGameObjects[9]->m_pSkinnedAnimationController->SetTrackAnimationSet(i, i);
+		if (i == 4)
+			m_ppHierarchicalGameObjects[9]->m_pSkinnedAnimationController->SetTrackEnable(i, true);
+		else
+			m_ppHierarchicalGameObjects[9]->m_pSkinnedAnimationController->SetTrackEnable(i, false);
+	}
+
+	m_ppHierarchicalGameObjects[9]->SetPosition(3500.0f, m_pTerrain->GetHeight(3500.0f, 600.0f), 600.0f);
+	m_ppHierarchicalGameObjects[9]->SetScale(10.0f, 10.0f, 10.0f);
 
 	CLoadedModelInfo* pCastleModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Castle_Wall.bin", NULL);
-	m_ppHierarchicalGameObjects[3] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pCastleModel, 0);
-	m_ppHierarchicalGameObjects[3]->SetPosition(3200.0f, m_pTerrain->GetHeight(3200.0f, 1000.0f) - 30.0f, 1000.0f);
-	m_ppHierarchicalGameObjects[3]->SetScale(35.0f, 20.0f, 15.0f);
+	m_ppHierarchicalGameObjects[6] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pCastleModel, 0);
+	m_ppHierarchicalGameObjects[6]->SetPosition(3200.0f, m_pTerrain->GetHeight(3200.0f, 1000.0f) - 30.0f, 1000.0f);
+	m_ppHierarchicalGameObjects[6]->SetScale(35.0f, 20.0f, 15.0f);
 	if (pCastleModel) delete pCastleModel;
 
 	CLoadedModelInfo* pHouseModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/House.bin", NULL);
-	m_ppHierarchicalGameObjects[4] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pHouseModel, 0);
-	m_ppHierarchicalGameObjects[4]->SetPosition(3200.0f, m_pTerrain->GetHeight(3200.0f, 700.0f), 700.0f);
-	m_ppHierarchicalGameObjects[4]->SetScale(4.0f, 4.0f, 4.0f);
+	m_ppHierarchicalGameObjects[7] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pHouseModel, 0);
+	m_ppHierarchicalGameObjects[7]->SetPosition(3200.0f, m_pTerrain->GetHeight(3200.0f, 700.0f), 700.0f);
+	m_ppHierarchicalGameObjects[7]->SetScale(4.0f, 4.0f, 4.0f);
 
 	CLoadedModelInfo* pHouseModell = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/House.bin", NULL);
-	m_ppHierarchicalGameObjects[5] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pHouseModell, 0);
-	m_ppHierarchicalGameObjects[5]->SetPosition(3200.0f, m_pTerrain->GetHeight(3200.0f, 500.0f) - 20.0f, 500.0f);
-	m_ppHierarchicalGameObjects[5]->SetScale(4.0f, 4.0f, 4.0f);
+	m_ppHierarchicalGameObjects[8] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pHouseModell, 0);
+	m_ppHierarchicalGameObjects[8]->SetPosition(3200.0f, m_pTerrain->GetHeight(3200.0f, 500.0f) - 20.0f, 500.0f);
+	m_ppHierarchicalGameObjects[8]->SetScale(4.0f, 4.0f, 4.0f);
 	if (pHouseModel) delete pHouseModel;
 	if (pHouseModell) delete pHouseModell;
 
+
+	CLoadedModelInfo* pGaiaModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Gaia.bin", NULL);
+	m_ppHierarchicalGameObjects[10] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pGaiaModel, 1);
+	m_ppHierarchicalGameObjects[10]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+	m_ppHierarchicalGameObjects[10]->SetPosition(3600.0f, m_pTerrain->GetHeight(3600.0f, 600.0f), 600.0f);
+	m_ppHierarchicalGameObjects[10]->SetScale(20.0f, 20.0f, 20.0f);
+	if (pGaiaModel) delete pGaiaModel;
 
 	/*m_nHierarchicalGameObjects = 13;
 	m_ppHierarchicalGameObjects = new CGameObject*[m_nHierarchicalGameObjects];
