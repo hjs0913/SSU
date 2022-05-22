@@ -33,7 +33,7 @@ WSABUF mybuf_recv;
 WSABUF mybuf;
 
 int combat_id = -1;
-int party_id[GAIA_ROOM];
+
 wstring party_name[GAIA_ROOM];
 CPattern m_gaiaPattern;
 int indun_death_count = 4;
@@ -589,11 +589,12 @@ void process_packet(unsigned char* p)
 		combat_id = 101;
 		InDungeon = true;
 		for (int i = 0; i < GAIA_ROOM; i++) {
-			party_id[i] = packet->party_id[i];
+			m_party_info->player_id[i] = packet->party_id[i];
+			if (packet->party_id[i] == my_id) m_party_info->myId_in_partyIndex = i;
 			wchar_t* temp;
-			int len = 1 + strlen(mPlayer[party_id[i]]->m_name);
+			int len = 1 + strlen(mPlayer[m_party_info->player_id[i]]->m_name);
 			temp = new TCHAR[len];
-			mbstowcs(temp, mPlayer[party_id[i]]->m_name, len);
+			mbstowcs(temp, mPlayer[m_party_info->player_id[i]]->m_name, len);
 			party_name[i] = L"";
 			party_name[i].append(temp);
 		}
@@ -962,6 +963,33 @@ int netclose()
 
 XMFLOAT3 return_myPosition() {
 	return my_position;
+}
+
+void get_raid_information(CGameObject* m_otherPlayer, int id)
+{
+	int tmp_id = 0;
+	if (id >= m_party_info->myId_in_partyIndex) tmp_id = id + 1;
+	else tmp_id = id;
+
+	if (mPlayer[m_party_info->player_id[tmp_id]]->GetPosition().x != m_otherPlayer->GetPosition().x
+		|| mPlayer[m_party_info->player_id[tmp_id]]->GetPosition().z != m_otherPlayer->GetPosition().z) {
+		m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 1);
+		m_otherPlayer->SetPosition(get_position_to_server(m_party_info->player_id[tmp_id]));
+	}
+	else m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+
+	if (mPlayer[m_party_info->player_id[tmp_id]]->GetLook().x != m_otherPlayer->GetLook().x ||
+		mPlayer[m_party_info->player_id[tmp_id]]->GetLook().y != m_otherPlayer->GetLook().y ||
+		mPlayer[m_party_info->player_id[tmp_id]]->GetLook().z != m_otherPlayer->GetLook().z
+		) {
+		m_otherPlayer->SetLook(mPlayer[m_party_info->player_id[tmp_id]]->GetLook());
+		//m_otherPlayer->SetLook(get_look_to_server(id));
+	}
+
+	if (mPlayer[m_party_info->player_id[tmp_id]]->m_net_attack == true) {
+		mPlayer[m_party_info->player_id[tmp_id]]->m_net_attack == false;
+		m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 2);
+	}
 }
 
 void get_object_information(CGameObject* m_otherPlayer, int id) 

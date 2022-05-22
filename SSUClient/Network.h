@@ -38,7 +38,7 @@ extern wstring Combat_str;
 extern bool Combat_On;
 
 extern atomic_bool InDungeon;
-extern int party_id[GAIA_ROOM];
+
 extern wstring party_name[GAIA_ROOM];
 extern CPattern m_gaiaPattern;
 extern int indun_death_count;
@@ -130,6 +130,8 @@ XMFLOAT3 return_myCamera();
 
 #include "Camera.h"
 #include "Object.h"
+
+void get_raid_information(CGameObject* m_otherPlayer, int id);
 
 void get_object_information(CGameObject* m_otherPlayer, int id);
 
