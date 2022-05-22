@@ -516,10 +516,10 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 				for (int i = 0; i < MAX_USER; ++i) {  //9615  for (int i = 10615; i < 10795; i++) 
 					//if(r.isPicked(m_ppObjects[i])){
 					if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, mPlayer[i])) {
-						send_picking_skill_packet(2, 0, i);
+						send_picking_skill_packet(0, 0, i);
 					//	m_ppObjects[i]->SetMesh(0, pOtherPlayerMesh[1]);  //피킹 확인위해 색상변경 
 						f4_picking_possible = false;
-
+						cout << "f4 보내기" << endl;
 					}
 				}
 			}
@@ -527,9 +527,9 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 			if (f5_picking_possible) {
 				for (int i = 0; i < MAX_USER; ++i) { 
 					if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, mPlayer[i])) {
-						send_picking_skill_packet(0, 0, i);
+						send_picking_skill_packet(1, 0, i);
 						f5_picking_possible = false;
-
+						cout << "f5 보내기" << endl;
 					}
 				}
 			}
@@ -537,9 +537,9 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 			if (f6_picking_possible) {
 				for (int i = 0; i < MAX_USER; ++i) { 
 					if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, mPlayer[i])) {
-						send_picking_skill_packet(1, 0, i);
+						send_picking_skill_packet(2, 0, i);
 						f6_picking_possible = false;
-
+						cout << "f6 보내기" << endl;
 					}
 				}
 			}
@@ -629,13 +629,16 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 					m_pCamera = m_pPlayer->ChangeCamera((DWORD)(wParam - VK_F1 + 1), m_GameTimer.GetTimeElapsed());
 					break;
 				case VK_F4:
-					f4_picking_possible = true;
+					if(m_pPlayer->m_mp >= 1000)
+						f4_picking_possible = true;
 					break;
 				case VK_F5:
-					f5_picking_possible = true;
+					if (m_pPlayer->m_mp >= 1000)
+						f5_picking_possible = true;
 					break;
 				case VK_F6:
-					f6_picking_possible = true;
+					if (m_pPlayer->m_mp >= 1000)
+						f6_picking_possible = true;
 					break;
 				case VK_F9:
 					ChangeSwapChainState();

@@ -1872,7 +1872,7 @@ void process_packet(int client_id, unsigned char* p)
                 ev.obj_id = client_id;
                 ev.start_time = chrono::system_clock::now() + 5s;  //ÄğÅ¸ÀÓ
                 ev.ev = EVENT_SKILL_COOLTIME;
-                ev.target_id = packet->target;
+                ev.target_id = 0; // packet->target;
                 timer_queue.push(ev);
 
            
@@ -1898,7 +1898,7 @@ void process_packet(int client_id, unsigned char* p)
                 ev.obj_id = client_id;
                 ev.start_time = chrono::system_clock::now() + 5s;  //ÄğÅ¸ÀÓ
                 ev.ev = EVENT_SKILL_COOLTIME;
-                ev.target_id = packet->target;
+                ev.target_id = 1; //packet->target;
                 timer_queue.push(ev);
 
                 pl->set_mp(pl->get_mp() - 1000);
@@ -1922,9 +1922,9 @@ void process_packet(int client_id, unsigned char* p)
                 ev.obj_id = client_id;
                 ev.start_time = chrono::system_clock::now() + 5s;  //ÄğÅ¸ÀÓ
                 ev.ev = EVENT_SKILL_COOLTIME;
-                ev.target_id = packet->target;
+                ev.target_id = 2;// packet->target;
                 timer_queue.push(ev);
-
+                 
                 pl->set_mp(pl->get_mp() - 1000);
                 send_status_change_packet(pl);
 
@@ -1933,7 +1933,6 @@ void process_packet(int client_id, unsigned char* p)
                 players[taget]->set_hp(players[taget]->get_hp() + players[taget]->get_maxhp() / 10);
                 send_status_change_packet(reinterpret_cast<Player*>(players[taget]));
                 send_buff_ui_packet(reinterpret_cast<Player*>(players[taget]), 2);
-
                 break;
 
             }
@@ -3578,8 +3577,7 @@ void do_timer()
                         //send_status_change_packet(reinterpret_cast<Player*>(players[ev.obj_id]));
                     }
             
-                    reinterpret_cast<Player*>(players[ev.obj_id])
-                        ->set_skill_active(ev.target_id, false);
+                    reinterpret_cast<Player*>(players[ev.obj_id])->set_skill_active(ev.target_id, false);
                     continue;
                 }
                 else if (ev.ev == EVENT_PARTNER_SKILL) {
