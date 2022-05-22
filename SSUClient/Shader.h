@@ -7,7 +7,6 @@
 #include "Object.h"
 #include "Camera.h"
 
-extern CGameObject** m_ppObjects;
 class CShader
 {
 public:
@@ -108,7 +107,6 @@ public:
 class CStandardObjectsShader : public CStandardShader
 {
 public:
-	//CGameObject** m_ppObjects = 0;
 	CStandardObjectsShader();
 	virtual ~CStandardObjectsShader();
 
@@ -121,7 +119,7 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 
 protected:
-	
+	CGameObject						**m_ppObjects = 0;
 	int								m_nObjects = 0;
 };
 
@@ -153,7 +151,6 @@ public:
 class CSkinnedAnimationObjectsShader : public CSkinnedAnimationStandardShader
 {
 public:
-	//CGameObject** m_ppObjects = 0;
 	CSkinnedAnimationObjectsShader();
 	virtual ~CSkinnedAnimationObjectsShader();
 
@@ -166,7 +163,7 @@ public:
 	virtual void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera);
 
 protected:
-
+	CGameObject						**m_ppObjects = 0;
 	int								m_nObjects = 0;
 };
 
