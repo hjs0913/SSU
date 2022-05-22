@@ -240,6 +240,10 @@ void CPlayer::Attack(bool isAttack)
 
 }
 
+void CPlayer::Skill(int n)
+{
+
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 
@@ -370,17 +374,14 @@ CTerrainPlayer::CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLi
 	m_pSkinnedAnimationController->m_pAnimationSets = pAngrybotModel->m_pAnimationSets;
 
 	for (int i = 0; i < anim_cnt; ++i) {
-		cout << i + 1 << ", ";
 		m_pSkinnedAnimationController->SetTrackAnimationSet(i, i);
-		m_pSkinnedAnimationController->SetTrackEnable(i, false);
 	}
-	cout << " 완료!" << endl;
-	m_pSkinnedAnimationController->SetTrackEnable(1, true);
 
 	// 5번 부터 ANIMATION_TYPE_ONCE
 	for (int i = 5; i < anim_cnt; ++i) {
 		m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[i]->m_nType = ANIMATION_TYPE_ONCE;
 	}
+
 
 //	m_pSkinnedAnimationController->SetCallbackKeys(2, 2);
 //#ifdef _WITH_SOUND_RESOURCE
@@ -502,14 +503,50 @@ void CTerrainPlayer::OnCameraUpdateCallback(float fTimeElapsed)
 
 void CTerrainPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVelocity)
 {
-	if (dwDirection)
-	{
-		cout << "이동" << endl;
-		m_pSkinnedAnimationController->SetTrackEnable(0, false);
-		m_pSkinnedAnimationController->SetTrackEnable(5, false);
+	m_pSkinnedAnimationController->SetTrackEnable(0, false);
+	m_pSkinnedAnimationController->SetTrackEnable(5, false);
+	m_pSkinnedAnimationController->SetTrackEnable(9, false);
+	m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[5]->m_fPosition = 0.0f;
+	m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[9]->m_fPosition = 0.0f;
+
+	switch (dwDirection) {
+	case DIR_FORWARD:
 		m_pSkinnedAnimationController->SetTrackEnable(1, true);
-		m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[5]->m_fPosition = 0.0f;
+		m_pSkinnedAnimationController->SetTrackEnable(2, false);
+		m_pSkinnedAnimationController->SetTrackEnable(3, false);
+		m_pSkinnedAnimationController->SetTrackEnable(4, false);
+		break;
+	case DIR_BACKWARD:
+		m_pSkinnedAnimationController->SetTrackEnable(1, false);
+		m_pSkinnedAnimationController->SetTrackEnable(2, true);
+		m_pSkinnedAnimationController->SetTrackEnable(3, false);
+		m_pSkinnedAnimationController->SetTrackEnable(4, false);
+		break;
+	case DIR_RIGHT:
+		m_pSkinnedAnimationController->SetTrackEnable(1, false);
+		m_pSkinnedAnimationController->SetTrackEnable(2, false);
+		m_pSkinnedAnimationController->SetTrackEnable(3, true);
+		m_pSkinnedAnimationController->SetTrackEnable(4, false);
+		break;
+	case DIR_LEFT:
+		m_pSkinnedAnimationController->SetTrackEnable(1, false);
+		m_pSkinnedAnimationController->SetTrackEnable(2, false);
+		m_pSkinnedAnimationController->SetTrackEnable(3, false);
+		m_pSkinnedAnimationController->SetTrackEnable(4, true);
+		break;
+	default:
+		break;
 	}
+
+	//if (dwDirection)
+	//{
+	//	m_pSkinnedAnimationController->SetTrackEnable(0, false);
+	//	m_pSkinnedAnimationController->SetTrackEnable(5, false);
+	//	m_pSkinnedAnimationController->SetTrackEnable(9, false);
+	//	m_pSkinnedAnimationController->SetTrackEnable(1, true);
+	//	m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[5]->m_fPosition = 0.0f;
+	//	m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[9]->m_fPosition = 0.0f;
+	//}
 
 	CPlayer::Move(dwDirection, fDistance, bUpdateVelocity);
 }
@@ -523,19 +560,53 @@ void CTerrainPlayer::Update(float fTimeElapsed)
 		float fLength = sqrtf(m_xmf3Velocity.x * m_xmf3Velocity.x + m_xmf3Velocity.z * m_xmf3Velocity.z);
 		if (::IsZero(fLength))	// 가만히 서있을 때
 		{
-			if (!m_pSkinnedAnimationController->m_pAnimationTracks[5].m_bEnable) {	// 공격하는 게 아니면 IDLE
-				m_pSkinnedAnimationController->SetTrackEnable(0, true);
-				m_pSkinnedAnimationController->SetTrackEnable(1, false);
-				m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[5]->m_fPosition = 0.0f;
-			}
-		}
-		float playTime = m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[5]->m_fLength - m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[5]->m_fPosition;
-
-		if (playTime <= 0) {
-			m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[5]->m_fPosition = 0.0f;
 			m_pSkinnedAnimationController->SetTrackEnable(0, true);
 			m_pSkinnedAnimationController->SetTrackEnable(1, false);
-			m_pSkinnedAnimationController->SetTrackEnable(5, false);
+			m_pSkinnedAnimationController->SetTrackEnable(2, false);
+			m_pSkinnedAnimationController->SetTrackEnable(3, false);
+			m_pSkinnedAnimationController->SetTrackEnable(4, false);
+
+			if (m_pSkinnedAnimationController->m_pAnimationTracks[5].m_bEnable) {	// 일반 공격 시
+				m_pSkinnedAnimationController->SetTrackEnable(0, false);
+				m_pSkinnedAnimationController->SetTrackEnable(5, true);
+				m_pSkinnedAnimationController->SetTrackEnable(9, false);
+				//m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[5]->m_fPosition = 0.0f;
+				m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[9]->m_fPosition = 0.0f;
+			}
+
+			if (m_pSkinnedAnimationController->m_pAnimationTracks[9].m_bEnable) {	// 주변 공격 시
+				m_pSkinnedAnimationController->SetTrackEnable(0, false);
+				m_pSkinnedAnimationController->SetTrackEnable(5, false);
+				m_pSkinnedAnimationController->SetTrackEnable(9, true);
+				m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[5]->m_fPosition = 0.0f;
+			}
+
+			if (m_pSkinnedAnimationController->m_pAnimationTracks[0].m_bEnable) {
+				for (int i = 5; i < anim_cnt; ++i) {
+					m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[i]->m_fPosition = 0.0f;
+				}
+			}
+		}
+
+		if (m_pSkinnedAnimationController->m_pAnimationTracks[5].m_bEnable) {
+			float playTime = m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[5]->m_fLength - m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[5]->m_fPosition;
+
+			if (playTime <= 0) {
+				m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[5]->m_fPosition = 0.0f;
+				m_pSkinnedAnimationController->SetTrackEnable(0, true);
+				m_pSkinnedAnimationController->SetTrackEnable(1, false);
+				m_pSkinnedAnimationController->SetTrackEnable(5, false);
+			}
+		}
+
+		if (m_pSkinnedAnimationController->m_pAnimationTracks[9].m_bEnable) {
+			float playTime = m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[9]->m_fLength - m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[9]->m_fPosition;
+
+			if (playTime <= 0) {
+				m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[9]->m_fPosition = 0.0f;
+				m_pSkinnedAnimationController->SetTrackEnable(0, true);
+				m_pSkinnedAnimationController->SetTrackEnable(9, false);
+			}
 		}
 	}
 }
@@ -546,11 +617,26 @@ void CTerrainPlayer::Attack(bool isAttack)
 	CPlayer::Attack(isAttack);
 
 	if (isAttack) {
-		cout << "Attack!" << endl;
 		m_pSkinnedAnimationController->SetTrackEnable(0, false);
 		m_pSkinnedAnimationController->SetTrackEnable(1, false);
+		m_pSkinnedAnimationController->SetTrackEnable(2, false);
+		m_pSkinnedAnimationController->SetTrackEnable(3, false);
+		m_pSkinnedAnimationController->SetTrackEnable(4, false);
 		m_pSkinnedAnimationController->SetTrackEnable(5, true);
+		m_pSkinnedAnimationController->SetTrackEnable(9, false);
 	}
+}
+
+void CTerrainPlayer::Skill(int n)
+{
+	CPlayer::Skill(n);
+	m_pSkinnedAnimationController->SetTrackEnable(0, false);
+	m_pSkinnedAnimationController->SetTrackEnable(1, false);
+	m_pSkinnedAnimationController->SetTrackEnable(2, false);
+	m_pSkinnedAnimationController->SetTrackEnable(3, false);
+	m_pSkinnedAnimationController->SetTrackEnable(4, false);
+	m_pSkinnedAnimationController->SetTrackEnable(5, false);
+	m_pSkinnedAnimationController->SetTrackEnable(9, true);
 }
 
 void CTerrainPlayer::ChangeAnimationState(Player_Animation animState)

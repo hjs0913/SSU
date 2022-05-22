@@ -106,6 +106,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	for (int i = 0; i < 6; ++i) {
 		m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMonsterModel, 1);
 		m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, i);
+		m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
 		m_ppHierarchicalGameObjects[i]->SetPosition((3450.0f + 50.0f * i), m_pTerrain->GetHeight((3450.0f + 50.0f * i), 650.0f), 650.0f);
 		m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
 	}
@@ -121,6 +122,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 	m_ppHierarchicalGameObjects[9]->SetPosition(3500.0f, m_pTerrain->GetHeight(3500.0f, 600.0f), 600.0f);
 	m_ppHierarchicalGameObjects[9]->SetScale(10.0f, 10.0f, 10.0f);
+
 
 	CLoadedModelInfo* pCastleModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Castle_Wall.bin", NULL);
 	m_ppHierarchicalGameObjects[6] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pCastleModel, 0);
@@ -144,6 +146,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	CLoadedModelInfo* pGaiaModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Gaia.bin", NULL);
 	m_ppHierarchicalGameObjects[10] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pGaiaModel, 1);
 	m_ppHierarchicalGameObjects[10]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+	m_ppHierarchicalGameObjects[10]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
 	m_ppHierarchicalGameObjects[10]->SetPosition(3600.0f, m_pTerrain->GetHeight(3600.0f, 600.0f), 600.0f);
 	m_ppHierarchicalGameObjects[10]->SetScale(20.0f, 20.0f, 20.0f);
 	if (pGaiaModel) delete pGaiaModel;

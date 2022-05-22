@@ -243,7 +243,7 @@ public:
 	~CAnimationTrack() { }
 
 public:
-    BOOL 							m_bEnable = true;
+    BOOL 							m_bEnable = false;
     float 							m_fSpeed = 1.0f;
     float 							m_fPosition = 0.0f;
     float 							m_fWeight = 1.0f;

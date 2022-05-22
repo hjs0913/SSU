@@ -597,6 +597,7 @@ void CGameFramework::ProcessInput()
 
 		DWORD dwDirection = 0;
 		DWORD dwAttack = 0;
+		DWORD dwSkill = 0;
 		if (pKeysBuffer[VK_UP] & 0xF0) dwDirection |= DIR_FORWARD;
 		if (pKeysBuffer[VK_DOWN] & 0xF0) dwDirection |= DIR_BACKWARD;
 		if (pKeysBuffer[VK_LEFT] & 0xF0) dwDirection |= DIR_LEFT;
@@ -604,8 +605,9 @@ void CGameFramework::ProcessInput()
 		if (pKeysBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
 		if (pKeysBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
 		if (pKeysBuffer[VK_SPACE] & 0xF0) dwAttack |= 0x30;
+		if ((pKeysBuffer[VK_NUMPAD1] & 0xF0) || (pKeysBuffer['1'] & 0xF0)) dwSkill |= 0x31;
 
-		if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f) || (dwAttack != 0))
+		if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f) || (dwAttack != 0) || (dwSkill != 0))
 		{
 			if (cxDelta || cyDelta)
 			{
@@ -616,7 +618,7 @@ void CGameFramework::ProcessInput()
 			}
 			if (dwDirection) m_pPlayer->Move(dwDirection, /*12.25f*/4.5f, true);
 			if (dwAttack) m_pPlayer->Attack(true);
-
+			if (dwSkill) m_pPlayer->Skill(1);
 		}
 	}
 

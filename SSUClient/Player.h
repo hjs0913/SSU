@@ -140,6 +140,7 @@ public:
 	void SetTribe(TRIBE t);
 
 	virtual void Attack(bool isAttack);
+	virtual void Skill(int i);
 };
 
 class CAirplanePlayer : public CPlayer
@@ -187,7 +188,7 @@ public:
 	virtual void Update(float fTimeElapsed);
 
 	virtual void Attack(bool isAttack);
-
+	virtual void Skill(int i);
 	void ChangeAnimationState(Player_Animation animState);
 
 	Player_Animation m_animState = IDLE;
