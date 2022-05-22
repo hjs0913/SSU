@@ -1007,13 +1007,14 @@ void CGameFramework::ProcessInput()
 					m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
 				else
 					m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
+				
+				send_look_packet(m_pPlayer->GetLookVector(), m_pPlayer->GetRightVector());
 			}
 			if (dwDirection) m_pPlayer->Move(dwDirection, /*12.25f*/4.5f, true);
 			if (dwAttack) {
 				// m_pPlayer->Attack(true);
 				send_attack_packet(0);
 			}
-			send_look_packet(m_pPlayer->GetLookVector(), m_pPlayer->GetRightVector());
 		}
 	}
 	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());

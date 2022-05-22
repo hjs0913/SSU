@@ -131,6 +131,8 @@ XMFLOAT3 return_myCamera();
 #include "Camera.h"
 #include "Object.h"
 
+void get_raid_initialize_position(CGameObject* m_otherPlayer, int id);
+
 void get_raid_information(CGameObject* m_otherPlayer, int id);
 
 void get_object_information(CGameObject* m_otherPlayer, int id);

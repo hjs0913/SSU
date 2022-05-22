@@ -278,6 +278,8 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	m_ppHierarchicalGameObjects[3]->SetPosition(3500.0f, m_pTerrain->GetHeight(3500.0f, 650.0f), 650.0f);
 	m_ppHierarchicalGameObjects[3]->SetScale(10.0f, 10.0f, 10.0f);
 
+	for (int i = 0; i < 3; i++) get_raid_initialize_position(m_ppHierarchicalGameObjects[i], i);
+
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
 
