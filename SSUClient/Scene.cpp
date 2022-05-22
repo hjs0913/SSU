@@ -698,7 +698,15 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 		if (m_ppHierarchicalGameObjects[i])
 		{
 			if (InDungeon) {	// 레이드 상황
-				if(i < 3) get_raid_information(m_ppHierarchicalGameObjects[i], i);
+				if (i < 3) {
+					get_raid_information(m_ppHierarchicalGameObjects[i], i);
+					m_ppHierarchicalGameObjects[i]->SetPosition(
+						XMFLOAT3(m_ppHierarchicalGameObjects[i]->GetPosition().x,
+							m_pTerrain->GetHeight(m_ppHierarchicalGameObjects[i]->GetPosition().x, m_ppHierarchicalGameObjects[i]->GetPosition().z),
+							m_ppHierarchicalGameObjects[i]->GetPosition().z
+						)
+					);
+				}
 
 				m_ppHierarchicalGameObjects[i]->Animate(m_fElapsedTime);
 				if (!m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController) m_ppHierarchicalGameObjects[i]->UpdateTransform(NULL);
@@ -709,9 +717,21 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 				// 임시방편 데스요
 				if (i == 0 && my_id != 0) {
 					get_object_information(m_ppHierarchicalGameObjects[0], 0);
+					m_ppHierarchicalGameObjects[i]->SetPosition(
+						XMFLOAT3(m_ppHierarchicalGameObjects[i]->GetPosition().x,
+							m_pTerrain->GetHeight(m_ppHierarchicalGameObjects[i]->GetPosition().x, m_ppHierarchicalGameObjects[i]->GetPosition().z),
+							m_ppHierarchicalGameObjects[i]->GetPosition().z
+						)
+					);
 				}
 				if (i == 1 && my_id != 1) {
 					get_object_information(m_ppHierarchicalGameObjects[6], 1);
+					m_ppHierarchicalGameObjects[i]->SetPosition(
+						XMFLOAT3(m_ppHierarchicalGameObjects[i]->GetPosition().x,
+							m_pTerrain->GetHeight(m_ppHierarchicalGameObjects[i]->GetPosition().x, m_ppHierarchicalGameObjects[i]->GetPosition().z),
+							m_ppHierarchicalGameObjects[i]->GetPosition().z
+						)
+					);
 				}
 
 				m_ppHierarchicalGameObjects[i]->Animate(m_fElapsedTime);
