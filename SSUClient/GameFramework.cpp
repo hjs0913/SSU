@@ -897,11 +897,11 @@ void CGameFramework::Create_InDungeon_Object()
 {
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
 
-	m_pScene = new CScene();
-	if (m_pScene) m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
+	m_pRaid_Scene = new CScene();
+	if (m_pRaid_Scene) m_pRaid_Scene->BuildObjects_Raid(m_pd3dDevice, m_pd3dCommandList);
 
 #ifdef _WITH_TERRAIN_PLAYER
-	CTerrainPlayer* pPlayer = new CTerrainPlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->m_pTerrain);
+	CTerrainPlayer* pPlayer = new CTerrainPlayer(m_pd3dDevice, m_pd3dCommandList, m_pRaid_Scene->GetGraphicsRootSignature(), m_pRaid_Scene->m_pTerrain);
 	//get_basic_information(pPlayer, 0);
 
 #else
@@ -909,7 +909,7 @@ void CGameFramework::Create_InDungeon_Object()
 	pPlayer->SetPosition(XMFLOAT3(425.0f, 240.0f, 640.0f));
 #endif
 
-	m_pScene->m_pPlayer = m_pPlayer = pPlayer;
+	m_pRaid_Scene->m_pPlayer = m_pPlayer = pPlayer;
 	m_pCamera = m_pPlayer->GetCamera();
 	m_pPlayer->SetUse(true);
 
@@ -919,7 +919,7 @@ void CGameFramework::Create_InDungeon_Object()
 
 	WaitForGpuComplete();
 
-	if (m_pScene) m_pScene->ReleaseUploadBuffers();
+	if (m_pRaid_Scene) m_pRaid_Scene->ReleaseUploadBuffers();
 	if (m_pPlayer) m_pPlayer->ReleaseUploadBuffers();
 
 	m_GameTimer.Reset();
@@ -1010,13 +1010,14 @@ void CGameFramework::ProcessInput()
 					m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
 				else
 					m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
+				
+				send_look_packet(m_pPlayer->GetLookVector(), m_pPlayer->GetRightVector());
 			}
 			if (dwDirection) m_pPlayer->Move(dwDirection, /*12.25f*/4.5f, true);
 			if (dwAttack) {
 				// m_pPlayer->Attack(true);
 				send_attack_packet(0);
 			}
-			send_look_packet(m_pPlayer->GetLookVector(), m_pPlayer->GetRightVector());
 		}
 	}
 	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
@@ -1029,7 +1030,13 @@ void CGameFramework::AnimateObjects()
 {
 	float fTimeElapsed = m_GameTimer.GetTimeElapsed();
 
-	if (m_pScene) m_pScene->AnimateObjects(fTimeElapsed);
+	if (InDungeon == false) {
+		if (m_pScene) m_pScene->AnimateObjects(fTimeElapsed);
+	}
+	else {
+		if (m_pRaid_Scene) m_pRaid_Scene->AnimateObjects(fTimeElapsed);
+	}
+
 
 	m_pPlayer->Animate(fTimeElapsed);
 }
@@ -1099,7 +1106,12 @@ void CGameFramework::FrameAdvance()
 
 	m_pd3dCommandList->OMSetRenderTargets(1, &d3dRtvCPUDescriptorHandle, TRUE, &d3dDsvCPUDescriptorHandle);
 
-	if (m_pScene) m_pScene->Render(m_pd3dCommandList, m_pCamera);
+	if (!InDungeon) {
+		if (m_pScene) m_pScene->Render(m_pd3dCommandList, m_pCamera);
+	}
+	else {
+		if (m_pRaid_Scene) m_pRaid_Scene->Render(m_pd3dCommandList, m_pCamera);
+	}
 
 #ifdef _WITH_PLAYER_TOP
 	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
@@ -1259,22 +1271,26 @@ void CGameFramework::FrameAdvance()
 		}
 		case 10: {
 			if (!InDungeon) break;
-			m_ppUILayer[i]->UpdateLabels(party_name[0], 10, (m_nWndClientHeight / 2) - 60, 10 + 130 * ((float)get_hp_to_server(party_id[0]) / get_max_hp_to_server(party_id[0])), (m_nWndClientHeight / 2) - 40);
+			m_ppUILayer[i]->UpdateLabels(party_name[0], 10, (m_nWndClientHeight / 2) - 60, 
+				10 + 130 * ((float)get_hp_to_server(m_party_info->player_id[0]) / get_max_hp_to_server(m_party_info->player_id[0])), (m_nWndClientHeight / 2) - 40);
 			break;
 		}
 		case 11: {
 			if (!InDungeon) break;
-			m_ppUILayer[i]->UpdateLabels(party_name[1], 10, (m_nWndClientHeight / 2) - 30, 10 + 130 * ((float)get_hp_to_server(party_id[1]) / get_max_hp_to_server(party_id[1])), (m_nWndClientHeight / 2) - 10);
+			m_ppUILayer[i]->UpdateLabels(party_name[1], 10, (m_nWndClientHeight / 2) - 30, 
+				10 + 130 * ((float)get_hp_to_server(m_party_info->player_id[1]) / get_max_hp_to_server(m_party_info->player_id[1])), (m_nWndClientHeight / 2) - 10);
 			break;
 		}
 		case 12: {
 			if (!InDungeon) break;
-			m_ppUILayer[i]->UpdateLabels(party_name[2], 10, (m_nWndClientHeight / 2), 10 + 130 * ((float)get_hp_to_server(party_id[2]) / get_max_hp_to_server(party_id[2])), (m_nWndClientHeight / 2) + 20);
+			m_ppUILayer[i]->UpdateLabels(party_name[2], 10, (m_nWndClientHeight / 2), 
+				10 + 130 * ((float)get_hp_to_server(m_party_info->player_id[2]) / get_max_hp_to_server(m_party_info->player_id[2])), (m_nWndClientHeight / 2) + 20);
 			break;
 		}
 		case 13: {
 			if (!InDungeon) break;
-			m_ppUILayer[i]->UpdateLabels(party_name[3], 10, (m_nWndClientHeight / 2) + 30, 10 + 130 * ((float)get_hp_to_server(party_id[3]) / get_max_hp_to_server(party_id[3])), (m_nWndClientHeight / 2) + 50);
+			m_ppUILayer[i]->UpdateLabels(party_name[3], 10, (m_nWndClientHeight / 2) + 30, 
+				10 + 130 * ((float)get_hp_to_server(m_party_info->player_id[3]) / get_max_hp_to_server(m_party_info->player_id[3])), (m_nWndClientHeight / 2) + 50);
 			break;
 		}
 

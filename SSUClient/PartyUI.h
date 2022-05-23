@@ -8,15 +8,15 @@ class Party
 private:
 	int		party_id;
 	char	room_name[MAX_NAME_SIZE];
-
-
 	bool	player_use[4];
+
 public:
 	char*	player_name[GAIA_ROOM];
 	int		player_id[GAIA_ROOM];
 	int		player_lv[GAIA_ROOM];
 	JOB		player_job[GAIA_ROOM];
 	int		player_cnt;
+	int		myId_in_partyIndex;
 	DUNGEON_STATE dst;
 public:
 	Party();
