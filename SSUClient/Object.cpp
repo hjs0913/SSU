@@ -5,6 +5,7 @@
 #include "Object.h"
 #include "Shader.h"
 #include "Scene.h"
+#include "Network.h"
 
 #pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console") //ÄÜ¼Ö ¶ç¿ìÀÚ 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1254,10 +1255,16 @@ CHeightMapTerrain::CHeightMapTerrain(ID3D12Device *pd3dDevice, ID3D12GraphicsCom
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
 	CTexture *pTerrainBaseTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
-	pTerrainBaseTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/Base_Texture.dds", 0);
+	if(!InDungeon)
+		pTerrainBaseTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/Base_Texture.dds", 0);
+	else
+		pTerrainBaseTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/indun_base.dds", 0);
 
 	CTexture *pTerrainDetailTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
-	pTerrainDetailTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Terrain/Detail_Texture_Ground.dds", 0);
+	if (!InDungeon)
+		pTerrainDetailTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Terrain/Detail_Texture_Ground.dds", 0);
+	else
+		pTerrainDetailTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/indun_detail.dds", 0);
 
 	CTerrainShader *pTerrainShader = new CTerrainShader();
 	pTerrainShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
@@ -1289,7 +1296,11 @@ CSkyBox::CSkyBox(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dComman
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
 	CTexture *pSkyBoxTexture = new CTexture(1, RESOURCE_TEXTURE_CUBE, 0);
-	pSkyBoxTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"SkyBox/SkyBox_0.dds", 0);
+
+	if(!InDungeon)
+		pSkyBoxTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"SkyBox/SkyBox_0.dds", 0);
+	else
+		pSkyBoxTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"SkyBox/indun.dds", 0);
 
 	CSkyBoxShader *pSkyBoxShader = new CSkyBoxShader();
 	pSkyBoxShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
