@@ -1037,8 +1037,6 @@ void CGameFramework::AnimateObjects()
 	else {
 		if (m_pRaid_Scene) m_pRaid_Scene->AnimateObjects(fTimeElapsed);
 	}
-
-
 	m_pPlayer->Animate(fTimeElapsed);
 }
 

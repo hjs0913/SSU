@@ -38,7 +38,7 @@ wstring party_name[GAIA_ROOM];
 CPattern m_gaiaPattern;
 int indun_death_count = 4;
 
-array<CPlayer*, MAX_USER+MAX_NPC> mPlayer;
+array<CPlayer*, MAX_USER+MAX_NPC+1> mPlayer;
 array<Party*, (MAX_USER / GAIA_ROOM)> m_party;
 vector<int> party_id_index_vector;
 Party* m_party_info;
@@ -412,10 +412,6 @@ void process_packet(unsigned char* p)
 		sc_packet_put_object* packet = reinterpret_cast<sc_packet_put_object*> (p);
 		int p_id = packet->id;
 		if (static_cast<TRIBE>(packet->object_type) != OBSTACLE) {
-			/*if (static_cast<TRIBE>(packet->object_type) == BOSS) {
-				p_id += 100;
-			}*/
-
 			mPlayer[p_id]->SetUse(true);
 			mPlayer[p_id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
 			//mPlayer[p_id]->vCenter = XMFLOAT3(packet->x, packet->y, packet->z);
@@ -586,7 +582,7 @@ void process_packet(unsigned char* p)
 		InvitationCardUI_On = false;
 
 		sc_packet_start_gaia* packet = reinterpret_cast<sc_packet_start_gaia*>(p);
-		combat_id = 101;
+		combat_id = GAIA_ID;
 		InDungeon = true;
 		for (int i = 0; i < GAIA_ROOM; i++) {
 			m_party_info->player_id[i] = packet->party_id[i];
@@ -967,12 +963,18 @@ XMFLOAT3 return_myPosition() {
 
 void get_raid_initialize_position(CGameObject* m_otherPlayer, int id)
 {
-	int tmp_id = 0;
-	if (id >= m_party_info->myId_in_partyIndex) tmp_id = id + 1;
-	else tmp_id = id;
+	if (id == 3) {
+		m_otherPlayer->SetPosition(get_position_to_server(GAIA_ID));
+		m_otherPlayer->SetLook(mPlayer[GAIA_ID]->GetLook());
+	}
+	else {
+		int tmp_id = 0;
+		if (id >= m_party_info->myId_in_partyIndex) tmp_id = id + 1;
+		else tmp_id = id;
 
-	m_otherPlayer->SetPosition(get_position_to_server(m_party_info->player_id[tmp_id]));
-	m_otherPlayer->SetLook(mPlayer[m_party_info->player_id[tmp_id]]->GetLook());
+		m_otherPlayer->SetPosition(get_position_to_server(m_party_info->player_id[tmp_id]));
+		m_otherPlayer->SetLook(mPlayer[m_party_info->player_id[tmp_id]]->GetLook());
+	}
 }
 
 void get_raid_information(CGameObject* m_otherPlayer, int id)
@@ -1014,8 +1016,40 @@ void get_raid_information(CGameObject* m_otherPlayer, int id)
 
 	if (mPlayer[m_party_info->player_id[tmp_id]]->m_net_attack == true) {
 		mPlayer[m_party_info->player_id[tmp_id]]->m_net_attack == false;
-		m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 2);
+		m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 5);
 	}
+}
+
+void get_gaia_information(CGameObject* m_otherPlayer)
+{
+	if (mPlayer[GAIA_ID]->GetLook().x != m_otherPlayer->GetLook().x ||
+		mPlayer[GAIA_ID]->GetLook().y != m_otherPlayer->GetLook().y ||
+		mPlayer[GAIA_ID]->GetLook().z != m_otherPlayer->GetLook().z
+		) {
+		m_otherPlayer->SetLook(mPlayer[GAIA_ID]->GetLook());
+	}
+
+	if (mPlayer[GAIA_ID]->GetPosition().x != m_otherPlayer->GetPosition().x
+		|| mPlayer[GAIA_ID]->GetPosition().z != m_otherPlayer->GetPosition().z) {
+		if (abs(m_otherPlayer->GetPosition().x - mPlayer[GAIA_ID]->GetPosition().x) >= 100 ||
+			abs(m_otherPlayer->GetPosition().z - mPlayer[GAIA_ID]->GetPosition().z) >= 100) {
+			m_otherPlayer->SetPosition(get_position_to_server(GAIA_ID));
+		}
+		else {
+			if (sqrt(pow(m_otherPlayer->GetPosition().x - mPlayer[GAIA_ID]->GetPosition().x, 2) +
+				pow(m_otherPlayer->GetPosition().z - mPlayer[GAIA_ID]->GetPosition().z, 2)) < 1.0) {
+				m_otherPlayer->SetPosition(get_position_to_server(GAIA_ID));
+			}
+			else {
+				XMFLOAT3 shiftDirection = Vector3::Normalize(XMFLOAT3(
+					mPlayer[GAIA_ID]->GetPosition().x - m_otherPlayer->GetPosition().x,
+					0,
+					mPlayer[GAIA_ID]->GetPosition().z - m_otherPlayer->GetPosition().z));
+				m_otherPlayer->Move(shiftDirection, false);
+			}
+		}
+	}
+	else m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 }
 
 void get_object_information(CGameObject* m_otherPlayer, int id) 

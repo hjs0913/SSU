@@ -281,15 +281,15 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	m_ppHierarchicalGameObjects[2]->SetPosition(3600.0f, m_pTerrain->GetHeight(3600.0f, 650.0f), 650.0f);
 	m_ppHierarchicalGameObjects[2]->SetScale(10.0f, 10.0f, 10.0f);
 
-	// 나중에 가이아 모델로 바꿔준다
-	CLoadedModelInfo* pMonsterModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Beast_Wolf.bin", NULL);
-	m_ppHierarchicalGameObjects[3] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMonsterModel, 1);
+	CLoadedModelInfo* pGaiaModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Gaia.bin", NULL);
+	m_ppHierarchicalGameObjects[3] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pGaiaModel, 1);
 	m_ppHierarchicalGameObjects[3]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 	m_ppHierarchicalGameObjects[3]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
-	m_ppHierarchicalGameObjects[3]->SetPosition(3500.0f, m_pTerrain->GetHeight(3500.0f, 650.0f), 650.0f);
-	m_ppHierarchicalGameObjects[3]->SetScale(10.0f, 10.0f, 10.0f);
+	m_ppHierarchicalGameObjects[3]->SetPosition(3600.0f, m_pTerrain->GetHeight(3600.0f, 600.0f), 600.0f);
+	m_ppHierarchicalGameObjects[3]->SetScale(20.0f, 20.0f, 20.0f);
+	if (pGaiaModel) delete pGaiaModel;
 
-	for (int i = 0; i < 3; i++) get_raid_initialize_position(m_ppHierarchicalGameObjects[i], i);
+	for (int i = 0; i < m_nHierarchicalGameObjects; i++) get_raid_initialize_position(m_ppHierarchicalGameObjects[i], i);
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
@@ -718,7 +718,15 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 						)
 					);
 				}
-
+				else if (i == 3) {
+					get_gaia_information(m_ppHierarchicalGameObjects[i]);
+					m_ppHierarchicalGameObjects[i]->SetPosition(
+						XMFLOAT3(m_ppHierarchicalGameObjects[i]->GetPosition().x,
+							m_pTerrain->GetHeight(m_ppHierarchicalGameObjects[i]->GetPosition().x, m_ppHierarchicalGameObjects[i]->GetPosition().z),
+							m_ppHierarchicalGameObjects[i]->GetPosition().z
+						)
+					);
+				}
 				m_ppHierarchicalGameObjects[i]->Animate(m_fElapsedTime);
 				if (!m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController) m_ppHierarchicalGameObjects[i]->UpdateTransform(NULL);
 				m_ppHierarchicalGameObjects[i]->Render(pd3dCommandList, pCamera);
