@@ -173,6 +173,9 @@ public:
 
 	int								m_nKeyFrames = 0;
 	float							*m_pfKeyFrameTimes = NULL;
+	//5.21
+	float							*m_pfSaveKeyFrameTimesData = NULL;
+
 	XMFLOAT4X4						**m_ppxmf4x4KeyFrameTransforms = NULL;
 
 #ifdef _WITH_ANIMATION_SRT
@@ -240,7 +243,7 @@ public:
 	~CAnimationTrack() { }
 
 public:
-    BOOL 							m_bEnable = true;
+    BOOL 							m_bEnable = false;
     float 							m_fSpeed = 1.0f;
     float 							m_fPosition = 0.0f;
     float 							m_fWeight = 1.0f;
@@ -281,6 +284,9 @@ public:
 
 public:
     float 							m_fTime = 0.0f;
+	float m_fPlayTime = 0.0f;
+	float m_fStartTime = 0.0f;
+	bool m_bIsStartAnim = false;
 
     int 							m_nAnimationTracks = 0;
     CAnimationTrack 				*m_pAnimationTracks = NULL;
@@ -292,6 +298,8 @@ public:
 
 	ID3D12Resource					**m_ppd3dcbSkinningBoneTransforms = NULL; //[SkinnedMeshes]
 	XMFLOAT4X4						**m_ppcbxmf4x4MappedSkinningBoneTransforms = NULL; //[SkinnedMeshes]
+
+
 
 public:
 	void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);

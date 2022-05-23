@@ -669,10 +669,8 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 	{
 		case WM_ACTIVATE:
 		{
-			if (LOWORD(wParam) == WA_INACTIVE)
-				m_GameTimer.Stop();
-			else
-				m_GameTimer.Start();
+			if (LOWORD(wParam) == WA_INACTIVE) m_GameTimer.Stop();
+			else m_GameTimer.Start();
 			break;
 		}
 		case WM_SIZE:
@@ -1001,8 +999,9 @@ void CGameFramework::ProcessInput()
 		if (pKeysBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
 		if (pKeysBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
 		if (pKeysBuffer[VK_SPACE] & 0xF0) dwAttack |= 0x30;
+		if ((pKeysBuffer[VK_NUMPAD1] & 0xF0) || (pKeysBuffer['1'] & 0xF0)) dwSkill |= 0x31;
 
-		if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f) || (dwAttack != 0))
+		if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f) || (dwAttack != 0) || (dwSkill != 0))
 		{
 			if (cxDelta || cyDelta)
 			{
@@ -1018,8 +1017,10 @@ void CGameFramework::ProcessInput()
 				// m_pPlayer->Attack(true);
 				send_attack_packet(0);
 			}
+			if (dwSkill) m_pPlayer->Skill(1);
 		}
 	}
+
 	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
 
 	set_myPosition(m_pPlayer->GetPosition());
@@ -1446,4 +1447,3 @@ void CGameFramework::FrameAdvance()
 
 	LeaveCriticalSection(&IndunCheck_cs);
 }
-

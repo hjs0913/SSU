@@ -12,10 +12,16 @@
 #include "UILayer.h"
 #include "PartyUI.h"
 #include "../RealServer/Server/protocol.h"
+#include "Timer.h"
 
 struct CB_PLAYER_INFO
 {
 	XMFLOAT4X4					m_xmf4x4World;
+};
+
+enum Player_Animation
+{
+	IDLE, MOVE_FORWARD, MOVE_BACK, MOVE_LEFT, MOVE_RIGHT, ATTACK_1, ATTACK_2, ATTACK_3, SKILL_1, SKILL_2, SKILL_3, HIT, CRITICAL_HIT, DIE
 };
 
 class CPlayer : public CGameObject
@@ -129,6 +135,7 @@ public:
 	void SetTribe(TRIBE t);
 
 	virtual void Attack(bool isAttack);
+	virtual void Skill(int i);
 };
 
 class CAirplanePlayer : public CPlayer
@@ -176,7 +183,11 @@ public:
 	virtual void Update(float fTimeElapsed);
 
 	virtual void Attack(bool isAttack);
+	virtual void Skill(int i);
+	void ChangeAnimationState(Player_Animation animState);
 
+	Player_Animation m_animState = IDLE;
 	bool m_isAttack = false;
+	int anim_cnt = 0;
 };
 

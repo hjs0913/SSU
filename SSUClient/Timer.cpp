@@ -85,6 +85,11 @@ float CGameTimer::GetTimeElapsed()
     return(m_fTimeElapsed);
 }
 
+float CGameTimer::GetFPSTimeElapsed()
+{
+	return(m_fFPSTimeElapsed);
+}
+
 float CGameTimer::GetTotalTime()
 {
 	if (m_bStopped) return(float(((m_nStopPerformanceCounter - m_nPausedPerformanceCounter) - m_nBasePerformanceCounter) * m_fTimeScale));
