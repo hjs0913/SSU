@@ -422,7 +422,8 @@ void process_packet(unsigned char* p)
 			mPlayer[p_id]->m_mp = packet->mp;
 			mPlayer[p_id]->m_max_mp = packet->maxmp;
 			mPlayer[p_id]->m_element = packet->element;
-
+			mPlayer[p_id]->m_net_attack = false;
+			mPlayer[p_id]->m_net_dead = false;
 			mPlayer[p_id]->m_tribe = static_cast<TRIBE>(packet->object_type);
 			strcpy_s(mPlayer[p_id]->m_name, packet->name);
 			mPlayer[p_id]->m_spices = packet->object_class;
@@ -499,21 +500,34 @@ void process_packet(unsigned char* p)
 	}
 	case SC_PACKET_DEAD: {
 		sc_packet_dead* packet = reinterpret_cast<sc_packet_dead*> (p);
-		mPlayer[my_id]->SetUse(false);
-		mPlayer[my_id]->m_hp = 0;
-		combat_id = -1;
-		Combat_On = false;
+		if (packet->id == my_id) {
+			mPlayer[my_id]->SetUse(false);
+			mPlayer[my_id]->m_hp = 0;
+			combat_id = -1;
+			Combat_On = false;
+		}
+		else {
+			mPlayer[packet->id]->m_net_dead = true;
+		}
 		break;
 		
 	}
 	case SC_PACKET_REVIVE: {
 		sc_packet_revive* packet = reinterpret_cast<sc_packet_revive*>(p);
-		mPlayer[my_id]->SetUse(true);
-		mPlayer[my_id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
-		my_position = mPlayer[my_id]->GetPosition();
-		mPlayer[my_id]->m_hp = mPlayer[my_id]->m_max_hp;
-		mPlayer[my_id]->m_mp = mPlayer[my_id]->m_max_mp;
-		mPlayer[my_id]->m_exp = packet->exp;
+		if (packet->id == my_id) {
+			mPlayer[my_id]->SetUse(true);
+			mPlayer[my_id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
+			my_position = mPlayer[my_id]->GetPosition();
+			mPlayer[my_id]->m_hp = mPlayer[my_id]->m_max_hp;
+			mPlayer[my_id]->m_mp = mPlayer[my_id]->m_max_mp;
+			mPlayer[my_id]->m_exp = packet->exp;
+		}
+		else {
+			mPlayer[packet->id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
+			mPlayer[packet->id]->m_hp = packet->hp;
+			mPlayer[packet->id]->m_mp = mPlayer[my_id]->m_max_mp;
+			mPlayer[packet->id]->m_net_dead = false;
+		}
 		break;
 	}
 	case SC_PACKET_LOOK: {
@@ -677,7 +691,8 @@ void process_packet(unsigned char* p)
 		sc_packet_party_room* packet = reinterpret_cast<sc_packet_party_room*>(p);
 		m_party[(int)packet->room_id]->set_room_name(packet->room_name);
 		m_party[(int)packet->room_id]->dst = DUN_ST_ROBBY;
-		if (find(party_id_index_vector.begin(), party_id_index_vector.end(), (int)reinterpret_cast<sc_packet_party_room_destroy*>(p)->room_id)
+		cout << (int)packet->room_id << endl;
+		if (find(party_id_index_vector.begin(), party_id_index_vector.end(), packet->room_id)
 			== party_id_index_vector.end()) {
 			robby_cnt++;
 			party_id_index_vector.push_back((int)packet->room_id);
@@ -983,6 +998,35 @@ void get_raid_information(CGameObject* m_otherPlayer, int id)
 	if (id >= m_party_info->myId_in_partyIndex) tmp_id = id + 1;
 	else tmp_id = id;
 
+
+	if (mPlayer[m_party_info->player_id[tmp_id]]->m_net_dead == true) {	// 사망 애니메이션 출력
+		if (!m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[13].m_bEnable) {
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(13, 13);
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(13, true);
+		}
+		return;
+	}
+	else {
+		if (m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[13].m_bEnable) {	// 부활
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(0, true);
+		}
+	}
+
+	if (m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[5].m_bEnable) {
+		float playTime = m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[5]->m_fLength -
+			m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[5]->m_fPosition;
+		if (playTime < 0.1) {
+			m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[5]->m_fPosition = 0.0f;
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(0, true);
+		}
+		else return;
+	}
+
 	if (mPlayer[m_party_info->player_id[tmp_id]]->GetLook().x != m_otherPlayer->GetLook().x ||
 		mPlayer[m_party_info->player_id[tmp_id]]->GetLook().y != m_otherPlayer->GetLook().y ||
 		mPlayer[m_party_info->player_id[tmp_id]]->GetLook().z != m_otherPlayer->GetLook().z
@@ -999,11 +1043,19 @@ void get_raid_information(CGameObject* m_otherPlayer, int id)
 		else {
 			if (sqrt(pow(m_otherPlayer->GetPosition().x - mPlayer[m_party_info->player_id[tmp_id]]->GetPosition().x, 2) +
 				pow(m_otherPlayer->GetPosition().z - mPlayer[m_party_info->player_id[tmp_id]]->GetPosition().z, 2)) < 1.0) {
-				m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 1);
+				if (!m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[1].m_bEnable) {
+					m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
+					m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(1, 1);
+					m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(1, true);
+				}
 				m_otherPlayer->SetPosition(get_position_to_server(m_party_info->player_id[tmp_id]));
 			}
 			else {
-				m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 1);
+				if (!m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[1].m_bEnable) {
+					m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
+					m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(1, 1);
+					m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(1, true);
+				}
 				XMFLOAT3 shiftDirection = Vector3::Normalize(XMFLOAT3(
 					mPlayer[m_party_info->player_id[tmp_id]]->GetPosition().x - m_otherPlayer->GetPosition().x,
 					0,
@@ -1012,12 +1064,24 @@ void get_raid_information(CGameObject* m_otherPlayer, int id)
 			}
 		}
 	}
-	else m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+	else {
+		if (!m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[0].m_bEnable) {
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(0, true);
+		}
+	}
 
 	if (mPlayer[m_party_info->player_id[tmp_id]]->m_net_attack == true) {
-		mPlayer[m_party_info->player_id[tmp_id]]->m_net_attack == false;
-		m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 5);
+		mPlayer[m_party_info->player_id[tmp_id]]->m_net_attack = false;
+		if (!m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[5].m_bEnable) {
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(5, 5);
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(5, true);
+		}
 	}
+
+
 }
 
 void get_gaia_information(CGameObject* m_otherPlayer)
@@ -1088,7 +1152,7 @@ void get_object_information(CGameObject* m_otherPlayer, int id)
 	else m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 
 	if (mPlayer[id]->m_net_attack == true) {
-		mPlayer[id]->m_net_attack == false;
+		mPlayer[id]->m_net_attack = false;
 		m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 2);
 	}
 }
@@ -1104,8 +1168,8 @@ void get_basic_information(CPlayer* m_otherPlayer, int id)
 	m_otherPlayer->m_spices = mPlayer[id]->m_spices;
 	m_otherPlayer->m_element = mPlayer[id]->m_element;
 	if (mPlayer[id]->m_net_attack == true) {
-		mPlayer[id]->m_net_attack == false;
-		m_otherPlayer->Attack(true);
+		mPlayer[id]->m_net_attack = false;
+		reinterpret_cast<CTerrainPlayer*>(m_otherPlayer)->Attack(true);
 	}
 }
 

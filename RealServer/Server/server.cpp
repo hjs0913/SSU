@@ -795,9 +795,9 @@ void process_packet(int client_id, unsigned char* p)
 
         }
         // 원래는 DB에서 받아와야 하는 정보를 기본 정보로 대체
-        pl->set_x(2100);
+        pl->set_x(3210);
         pl->set_y(0);
-        pl->set_z(1940);
+        pl->set_z(940);
         pl->set_job(J_TANKER);
         pl->set_lv(25);
         pl->set_element(E_WATER);
@@ -2297,7 +2297,8 @@ void player_revive(int client_id)
                 send_change_hp_packet(partys[i], pl);
 
                 if (partys[i]->get_id() != pl->get_id()) {
-                    send_put_object_packet(partys[i], pl);
+                    //send_put_object_packet(partys[i], pl);
+                    send_revive_packet(partys[i], pl);
                 }
             }
 
@@ -2337,9 +2338,9 @@ void player_revive(int client_id)
 
     // 플레이어 죽은 후 초기화 설정
     pl->set_hp(players[client_id]->get_maxhp());
-    pl->set_x(2100);
+    pl->set_x(3210);
     pl->set_y(0);
-    pl->set_z(1940);
+    pl->set_z(940);
     pl->set_exp(pl->get_exp() / 2);
     send_status_change_packet(pl);
 
@@ -3661,6 +3662,7 @@ int main()
     initialise_NPC();
     initialise_DUNGEON();
 
+    // 장애물
     ifstream obstacles_read("tree_position.txt");
     if (!obstacles_read.is_open()) {
         cout << "파일을 읽을 수 없습니다" << endl;
@@ -3671,9 +3673,9 @@ int main()
         float x, y, z;
         obstacles_read >> x >> y >> z;
         obstacles[i].set_id(i);
-        obstacles[i].set_x(x+100);
-        obstacles[i].set_y(y);
-        obstacles[i].set_z(z+300);
+        obstacles[i].set_x(0);
+        obstacles[i].set_y(0);
+        obstacles[i].set_z(0);
     }
 
     obstacles_read.close();

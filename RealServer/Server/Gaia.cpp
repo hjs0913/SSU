@@ -518,7 +518,8 @@ void Gaia::player_death(Player* p)
 			send_change_hp_packet(party[i], p);
 			send_change_death_count_packet(party[i], player_death_count);
 			if (p->get_id() != party[i]->get_id()) {
-				send_remove_object_packet(party[i], p);
+				// send_remove_object_packet(party[i], p);
+				send_dead_packet(party[i], boss, p);
 			}
 			if (party[i]->get_hp() > tmp_hp) target_id = i;
 		}
