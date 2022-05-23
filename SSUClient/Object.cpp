@@ -9,6 +9,7 @@
 #pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console") //ÄÜ¼Ö ¶ç¿ìÀÚ 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
+
 CTexture::CTexture(int nTextures, UINT nTextureType, int nSamplers)
 {
 	m_nTextureType = nTextureType;
@@ -772,7 +773,7 @@ void CGameObject::SetScale(float x, float y, float z)
 {
 	XMMATRIX mtxScale = XMMatrixScaling(x, y, z);
 	m_xmf4x4ToParent = Matrix4x4::Multiply(mtxScale, m_xmf4x4ToParent);
-
+	m_xmf3Scale = XMFLOAT3(x, y, z);
 	UpdateTransform(NULL);
 }
 
@@ -796,6 +797,28 @@ XMFLOAT3 CGameObject::GetRight()
 	return(Vector3::Normalize(XMFLOAT3(m_xmf4x4World._11, m_xmf4x4World._12, m_xmf4x4World._13)));
 }
 
+void CGameObject::SetLook(XMFLOAT3 xmf3Look)
+{
+	m_xmf3Look = Vector3::Normalize(xmf3Look);
+	m_xmf3Right = Vector3::CrossProduct(m_xmf3Up, m_xmf3Look, true);
+	m_xmf3Up = Vector3::CrossProduct(m_xmf3Look, m_xmf3Right, true);
+
+	m_xmf4x4ToParent._11 = m_xmf3Scale.x * m_xmf3Right.x; 
+	m_xmf4x4ToParent._12 = m_xmf3Scale.y * m_xmf3Right.y; 
+	m_xmf4x4ToParent._13 = m_xmf3Scale.z * m_xmf3Right.z;
+
+	m_xmf4x4ToParent._21 = m_xmf3Scale.x * m_xmf3Up.x; 
+	m_xmf4x4ToParent._22 = m_xmf3Scale.y * m_xmf3Up.y; 
+	m_xmf4x4ToParent._23 = m_xmf3Scale.z * m_xmf3Up.z;
+
+	m_xmf4x4ToParent._31 = m_xmf3Scale.x * m_xmf3Look.x; 
+	m_xmf4x4ToParent._32 = m_xmf3Scale.y * m_xmf3Look.y;
+	m_xmf4x4ToParent._33 = m_xmf3Scale.z * m_xmf3Look.z;
+	// m_xmf4x4ToParent = Matrix4x4::Multiply(XMMatrixScaling(m_xmf3Scale.x, m_xmf3Scale.y, m_xmf3Scale.z), m_xmf4x4ToParent);
+
+	UpdateTransform(NULL);
+}
+
 void CGameObject::MoveStrafe(float fDistance)
 {
 	XMFLOAT3 xmf3Position = GetPosition();
@@ -817,6 +840,13 @@ void CGameObject::MoveForward(float fDistance)
 	XMFLOAT3 xmf3Position = GetPosition();
 	XMFLOAT3 xmf3Look = GetLook();
 	xmf3Position = Vector3::Add(xmf3Position, xmf3Look, fDistance);
+	CGameObject::SetPosition(xmf3Position);
+}
+
+void CGameObject::Move(const XMFLOAT3& xmf3Shift, bool bVelocity)
+{
+	XMFLOAT3 xmf3Position = GetPosition();
+	xmf3Position = Vector3::Add(xmf3Position, xmf3Shift);
 	CGameObject::SetPosition(xmf3Position);
 }
 

@@ -156,7 +156,7 @@ HRESULT OnRender()
 	{
 		// ·»´õÅ¸°ÙÀÇ Å©±â¸¦ ¾òÀ½.
 		D2D1_SIZE_F renderTargetSize = m_pRenderTarget->GetSize();
-
+		
 		m_pRenderTarget->BeginDraw();
 		m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
 		m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::Black));

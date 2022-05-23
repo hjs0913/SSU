@@ -4,6 +4,7 @@
 
 CCamera::CCamera()
 {
+	m_xmf4x4World = Matrix4x4::Identity();
 	m_xmf4x4View = Matrix4x4::Identity();
 	m_xmf4x4Projection = Matrix4x4::Identity();
 	m_d3dViewport = { 0, 0, FRAME_BUFFER_WIDTH , FRAME_BUFFER_HEIGHT, 0.0f, 1.0f };
@@ -30,6 +31,7 @@ CCamera::CCamera(CCamera *pCamera)
 	}
 	else
 	{
+		m_xmf4x4World = Matrix4x4::Identity();
 		m_xmf4x4View = Matrix4x4::Identity();
 		m_xmf4x4Projection = Matrix4x4::Identity();
 		m_d3dViewport = { 0, 0, FRAME_BUFFER_WIDTH , FRAME_BUFFER_HEIGHT, 0.0f, 1.0f };
@@ -185,6 +187,11 @@ void CSpaceShipCamera::Rotate(float x, float y, float z)
 		m_xmf3Position = Vector3::TransformCoord(m_xmf3Position, xmmtxRotate);
 		m_xmf3Position = Vector3::Add(m_xmf3Position, m_pPlayer->GetPosition());
 	}
+	m_xmf4x4World._11 = m_xmf3Right.x; 	m_xmf4x4World._12 = m_xmf3Right.y; 	m_xmf4x4World._13 = m_xmf3Right.z;
+	m_xmf4x4World._21 = m_xmf3Up.x; 	m_xmf4x4World._22 = m_xmf3Up.y; 	m_xmf4x4World._23 = m_xmf3Up.z;
+	m_xmf4x4World._31 = m_xmf3Look.x; 	m_xmf4x4World._32 = m_xmf3Look.y; 	m_xmf4x4World._33 = m_xmf3Look.z;
+	m_xmf4x4World._41 = m_xmf3Position.x; 	m_xmf4x4World._42 = m_xmf3Position.y; 	m_xmf4x4World._43 = m_xmf3Position.z;
+
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -203,6 +210,10 @@ CFirstPersonCamera::CFirstPersonCamera(CCamera *pCamera) : CCamera(pCamera)
 			m_xmf3Right = Vector3::Normalize(m_xmf3Right);
 			m_xmf3Look = Vector3::Normalize(m_xmf3Look);
 		}
+		m_xmf4x4World._11 = m_xmf3Right.x; 	m_xmf4x4World._12 = m_xmf3Right.y; 	m_xmf4x4World._13 = m_xmf3Right.z;
+		m_xmf4x4World._21 = m_xmf3Up.x; 	m_xmf4x4World._22 = m_xmf3Up.y; 	m_xmf4x4World._23 = m_xmf3Up.z;
+		m_xmf4x4World._31 = m_xmf3Look.x; 	m_xmf4x4World._32 = m_xmf3Look.y; 	m_xmf4x4World._33 = m_xmf3Look.z;
+		m_xmf4x4World._41 = m_xmf3Position.x; 	m_xmf4x4World._42 = m_xmf3Position.y; 	m_xmf4x4World._43 = m_xmf3Position.z;
 	}
 }
 
@@ -234,6 +245,10 @@ void CFirstPersonCamera::Rotate(float x, float y, float z)
 		m_xmf3Up = Vector3::TransformNormal(m_xmf3Up, xmmtxRotate);
 		m_xmf3Right = Vector3::TransformNormal(m_xmf3Right, xmmtxRotate);
 	}
+	m_xmf4x4World._11 = m_xmf3Right.x; 	m_xmf4x4World._12 = m_xmf3Right.y; 	m_xmf4x4World._13 = m_xmf3Right.z;
+	m_xmf4x4World._21 = m_xmf3Up.x; 	m_xmf4x4World._22 = m_xmf3Up.y; 	m_xmf4x4World._23 = m_xmf3Up.z;
+	m_xmf4x4World._31 = m_xmf3Look.x; 	m_xmf4x4World._32 = m_xmf3Look.y; 	m_xmf4x4World._33 = m_xmf3Look.z;
+	m_xmf4x4World._41 = m_xmf3Position.x; 	m_xmf4x4World._42 = m_xmf3Position.y; 	m_xmf4x4World._43 = m_xmf3Position.z;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -252,6 +267,10 @@ CThirdPersonCamera::CThirdPersonCamera(CCamera *pCamera) : CCamera(pCamera)
 			m_xmf3Right = Vector3::Normalize(m_xmf3Right);
 			m_xmf3Look = Vector3::Normalize(m_xmf3Look);
 		}
+		m_xmf4x4World._11 = m_xmf3Right.x; 	m_xmf4x4World._12 = m_xmf3Right.y; 	m_xmf4x4World._13 = m_xmf3Right.z;
+		m_xmf4x4World._21 = m_xmf3Up.x; 	m_xmf4x4World._22 = m_xmf3Up.y; 	m_xmf4x4World._23 = m_xmf3Up.z;
+		m_xmf4x4World._31 = m_xmf3Look.x; 	m_xmf4x4World._32 = m_xmf3Look.y; 	m_xmf4x4World._33 = m_xmf3Look.z;
+		m_xmf4x4World._41 = m_xmf3Position.x; 	m_xmf4x4World._42 = m_xmf3Position.y; 	m_xmf4x4World._43 = m_xmf3Position.z;
 	}
 }
 
@@ -281,6 +300,10 @@ void CThirdPersonCamera::Update(XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 			m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3Direction, fDistance);
 			SetLookAt(xmf3LookAt);
 		}
+		m_xmf4x4World._11 = m_xmf3Right.x; 	m_xmf4x4World._12 = m_xmf3Right.y; 	m_xmf4x4World._13 = m_xmf3Right.z;
+		m_xmf4x4World._21 = m_xmf3Up.x; 	m_xmf4x4World._22 = m_xmf3Up.y; 	m_xmf4x4World._23 = m_xmf3Up.z;
+		m_xmf4x4World._31 = m_xmf3Look.x; 	m_xmf4x4World._32 = m_xmf3Look.y; 	m_xmf4x4World._33 = m_xmf3Look.z;
+		m_xmf4x4World._41 = m_xmf3Position.x; 	m_xmf4x4World._42 = m_xmf3Position.y; 	m_xmf4x4World._43 = m_xmf3Position.z;
 	}
 }
 
@@ -290,4 +313,9 @@ void CThirdPersonCamera::SetLookAt(XMFLOAT3& xmf3LookAt)
 	m_xmf3Right = XMFLOAT3(mtxLookAt._11, mtxLookAt._21, mtxLookAt._31);
 	m_xmf3Up = XMFLOAT3(mtxLookAt._12, mtxLookAt._22, mtxLookAt._32);
 	m_xmf3Look = XMFLOAT3(mtxLookAt._13, mtxLookAt._23, mtxLookAt._33);
+
+	m_xmf4x4World._11 = m_xmf3Right.x; 	m_xmf4x4World._12 = m_xmf3Right.y; 	m_xmf4x4World._13 = m_xmf3Right.z;
+	m_xmf4x4World._21 = m_xmf3Up.x; 	m_xmf4x4World._22 = m_xmf3Up.y; 	m_xmf4x4World._23 = m_xmf3Up.z;
+	m_xmf4x4World._31 = m_xmf3Look.x; 	m_xmf4x4World._32 = m_xmf3Look.y; 	m_xmf4x4World._33 = m_xmf3Look.z;
+	m_xmf4x4World._41 = m_xmf3Position.x; 	m_xmf4x4World._42 = m_xmf3Position.y; 	m_xmf4x4World._43 = m_xmf3Position.z;
 }

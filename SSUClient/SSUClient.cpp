@@ -28,8 +28,11 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	setlocale(LC_ALL, "");
 
 	// connect network
-	//netInit();
-	//thread hThread{ worker };
+	InitializeCriticalSection(&IndunCheck_cs);
+	InitializeCriticalSection(&UI_cs);
+	
+	netInit();
+	thread hThread{ worker };
 	
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
@@ -45,6 +48,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 
 	hAccelTable = ::LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_SSU_CLIENT));
 
+
+	bool change_dungeon = false;
 	while (1)
 	{
 		if (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
@@ -58,10 +63,27 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 		}
 		else
 		{
+			if (change_dungeon != InDungeon) {
+				change_dungeon = InDungeon;
+				if (change_dungeon) {
+					gGameFramework.Release_OpenWorld_Object();
+					gGameFramework.Create_InDungeon_Object();
+					send_raid_rander_ok_packet();
+					//	send_partner_rander_ok_packet();
+				}
+				else {
+					gGameFramework.Release_InDungeon_Object();
+					gGameFramework.Create_OpenWorld_Object();
+				}
+			}
+
 			gGameFramework.FrameAdvance();
 		}
 	}
 	gGameFramework.OnDestroy();
+
+	DeleteCriticalSection(&IndunCheck_cs);
+	DeleteCriticalSection(&UI_cs);
 
 	return((int)msg.wParam);
 }
@@ -124,7 +146,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_KEYUP:
 		gGameFramework.OnProcessingWindowMessage(hWnd, message, wParam, lParam);
 		break;
-	case WM_COMMAND:
+	case WM_COMMAND: {
 		wmId = LOWORD(wParam);
 		wmEvent = HIWORD(wParam);
 		switch (wmId)
@@ -139,13 +161,47 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			return(::DefWindowProc(hWnd, message, wParam, lParam));
 		}
 		break;
-	case WM_PAINT:
+	}
+	case WM_PAINT: {
 		hdc = ::BeginPaint(hWnd, &ps);
 		EndPaint(hWnd, &ps);
 		break;
-	case WM_DESTROY:
+	}
+	case WM_DESTROY: {
 		::PostQuitMessage(0);
 		break;
+	}
+	case WM_CHAR: {
+		if (PartyInviteUI_ON) {
+			if ((wchar_t)wParam == '\b') {
+				if (Invite_Str.size() > 0) {
+					Invite_Str.pop_back();
+				}
+			}
+			else if ((wchar_t)wParam == '\r') break;
+			else {
+				if (Invite_Str.size() < MAX_NAME_SIZE - 1)
+				{
+					Invite_Str.push_back((wchar_t)wParam);
+				}
+			}
+		}
+
+		if (Chatting_On) {
+			if ((wchar_t)wParam == '\b') {
+				if (Chatting_Str.size() > 0) {
+					Chatting_Str.pop_back();
+				}
+			}
+			else {
+				if (Chatting_Str.size() < 20)
+				{
+					Chatting_Str.push_back((wchar_t)wParam);
+				}
+			}
+		}
+		break;
+	}
 	default:
 		return(::DefWindowProc(hWnd, message, wParam, lParam));
 	}

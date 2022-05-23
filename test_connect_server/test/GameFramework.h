@@ -185,7 +185,7 @@ public:
 		cRay r;
 		r.m_vDirection.x = ((2.0f * nScreenX) / viewport.Width - 1.0f) / MatProjection._11;
 		r.m_vDirection.y = ((-2.0f * nScreenY) / viewport.Height + 1.0f) / MatProjection._22;
-		r.m_vDirection.z = -1.0f;
+		r.m_vDirection.z = 1.0f;
 		r.m_eRaySpace = E_VIEW;
 		return r;
 	};
@@ -201,7 +201,7 @@ public:
 		XMMATRIX matView, matInvView;
 		XMVECTOR DE;
 	
-		f_matView = m_pCamera->GetProjectionMatrix(); //이거도문제 
+		f_matView = m_pCamera->GetViewMatrix(); //이거도문제 
 		matView = XMLoadFloat4x4(&f_matView);
 
 		DE = XMMatrixDeterminant(matView);
@@ -212,10 +212,6 @@ public:
 		XMStoreFloat3(&r.m_vDirection, XMVector3Normalize(XMVectorSet(r.m_vDirection.x, r.m_vDirection.y, r.m_vDirection.z, 0.0f)));
 
 		r.m_eRaySpace = E_WORLD;
-
-
-
-
 		return r;
 	};
 
@@ -254,7 +250,7 @@ public:
 		XMVECTOR vv = XMVector3Dot(f_dir, f_dir);
 		XMVECTOR qv = XMVector3Dot(f_ori, f_dir);
 		XMVECTOR qq = XMVector3Dot(f_ori, f_ori);
-		float rr = 2500;
+		float rr = 150;
 
 		XMFLOAT3 vv2;  XMStoreFloat3(&vv2, vv);
 		XMFLOAT3 qv2;  XMStoreFloat3(&qv2, qv);
@@ -264,15 +260,17 @@ public:
 		float b = qv2.x + qv2.y + qv2.z;
 		float c = qq2.x + qq2.y + qq2.z;
 
-
+	
 		float discriminant = (b * b) - (4 * a * c);
-		if (discriminant < 0.0f)
-			return false;
-		return true;
-		//if (b * b - a * (c - rr) >= 0)
-		//	return true;
-		//else
+	//	if (discriminant < 0.0f)
 		//	return false;
+	//	else
+		//	return true;
+	
+		if (b * b - a * (c - rr) >= 0)
+			return true;
+		else
+			return false;
 	}
 
 protected:
@@ -283,3 +281,4 @@ protected:
 
 
 };
+

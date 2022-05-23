@@ -2,7 +2,7 @@
 
 #define FRAME_BUFFER_WIDTH		640
 #define FRAME_BUFFER_HEIGHT		480
-#define UICOUNT 16
+#define UICOUNT 20
 
 #include "Timer.h"
 #include "Player.h"
@@ -62,7 +62,14 @@ public:
 	void OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	LRESULT CALLBACK OnProcessingWindowMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 
-	CGameTimer GetGameTimer() { return m_GameTimer; }
+	void Release_OpenWorld_Object();
+	void Release_InDungeon_Object();
+
+	void Create_OpenWorld_Object();
+	void Create_InDungeon_Object();
+
+	bool RaySphereIntersect(XMFLOAT3 rayOrigin, XMFLOAT3 rayDirection, float radius);
+	bool TestIntersection(int mouseX, int mouseY, CPlayer* obj);
 
 private:
 	HINSTANCE					m_hInstance;
@@ -102,6 +109,8 @@ private:
 	CGameTimer					m_GameTimer;
 
 	CScene						*m_pScene = NULL;
+	CScene						*m_pRaid_Scene = NULL;
+
 	CPlayer						*m_pPlayer = NULL;
 	CCamera						*m_pCamera = NULL;
 

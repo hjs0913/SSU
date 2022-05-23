@@ -926,6 +926,7 @@ void process_packet(int client_id, unsigned char* p)
             other_player->do_send(sizeof(packet), &packet);*/
         }
         // 새로 접속한 플레이어에게 기존 정보를 보내중
+        pl->viewlist.clear();
         for (auto& other : players) {
             if (other->get_id() == client_id) continue;
             other->state_lock.lock();
@@ -955,7 +956,6 @@ void process_packet(int client_id, unsigned char* p)
             }
 
             pl->vl.lock();
-            pl->viewlist.clear();
             pl->viewlist.insert(other->get_id());
             pl->vl.unlock();
 
@@ -1009,7 +1009,6 @@ void process_packet(int client_id, unsigned char* p)
             break;
         }
         pl->state_lock.unlock();
-
         // InDunProcess
         if (pl->get_state() == ST_INDUN) {
             // 유효성 검사
@@ -1196,7 +1195,21 @@ void process_packet(int client_id, unsigned char* p)
         pl->state_lock.unlock();
 
         if (pl->get_attack_active()) break;
+        
         pl->set_attack_active(true);
+        send_animation_attack(pl, pl->get_id());
+        pl->vl.lock();
+        unordered_set <int> my_vl{ pl->viewlist };
+        pl->vl.unlock();
+        cout << pl->get_id() << "의 viewlist "; 
+        for (auto vl_id : my_vl) {
+            if (players[vl_id]->get_tribe() == HUMAN) {
+                send_animation_attack(reinterpret_cast<Player*>(players[vl_id]), pl->get_id());
+                cout << vl_id << ", ";
+            }
+        }
+        cout << endl;
+
         timer_event ev;
         if (pl->attack_speed_up == false) {
             ev.obj_id = client_id;
@@ -1442,7 +1455,7 @@ void process_packet(int client_id, unsigned char* p)
                     timer_queue.push(ev);
 
                     pl->set_mp(pl->get_mp() - 1000);
-
+                    send_buff_ui_packet(pl, 3); //ui
                     pl->set_physical_attack(0.6 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv()); //일단 두배 
                     pl->set_magical_attack(0.2 * pl->get_lv() * pl->get_lv() + 5 * pl->get_lv());
                     send_status_change_packet(pl);
@@ -1561,7 +1574,7 @@ void process_packet(int client_id, unsigned char* p)
                         timer_queue.push(ev);
 
                         pl->set_mp(pl->get_mp() - 1000);
-
+                        send_buff_ui_packet(pl, 1);
                         pl->set_physical_defence(0.54 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv()); //일단 두배 
                         pl->set_magical_defence(0.4 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv());
                         send_status_change_packet(pl);
@@ -1859,22 +1872,20 @@ void process_packet(int client_id, unsigned char* p)
                 ev.obj_id = client_id;
                 ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
                 ev.ev = EVENT_SKILL_COOLTIME;
-                ev.target_id = 3;
+                ev.target_id = 0; // packet->target;
                 timer_queue.push(ev);
 
            
                 pl->set_mp(pl->get_mp() - 1000);
                 send_status_change_packet(pl);
 
-                int taget = packet->target - 9615;
+                int taget = packet->target;// -9615;
 
           
                 players[taget]->set_mp(players[taget]->get_mp() + players[taget]->get_maxmp() / 10);
                 send_status_change_packet(reinterpret_cast<Player*>(players[taget]));
 
                 send_buff_ui_packet(reinterpret_cast<Player*>(players[taget]), 0);
-
-    
                 break;
 
             }
@@ -1887,13 +1898,13 @@ void process_packet(int client_id, unsigned char* p)
                 ev.obj_id = client_id;
                 ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
                 ev.ev = EVENT_SKILL_COOLTIME;
-                ev.target_id = 3;
+                ev.target_id = 1; //packet->target;
                 timer_queue.push(ev);
 
                 pl->set_mp(pl->get_mp() - 1000);
                 send_status_change_packet(pl);
 
-                int taget = packet->target - 9615;
+                int taget = packet->target; //  -9615;
 
                 players[taget]->set_physical_defence(players[taget]->get_physical_defence()  * 11 / 10);
                 players[taget]->set_magical_defence(players[taget]->get_magical_defence() * 11 / 10);
@@ -1911,21 +1922,17 @@ void process_packet(int client_id, unsigned char* p)
                 ev.obj_id = client_id;
                 ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
                 ev.ev = EVENT_SKILL_COOLTIME;
-                ev.target_id = 3;
+                ev.target_id = 2;// packet->target;
                 timer_queue.push(ev);
-
+                 
                 pl->set_mp(pl->get_mp() - 1000);
                 send_status_change_packet(pl);
 
-                int taget = packet->target - 9615;
+                int taget = packet->target;// - 9615;
 
                 players[taget]->set_hp(players[taget]->get_hp() + players[taget]->get_maxhp() / 10);
                 send_status_change_packet(reinterpret_cast<Player*>(players[taget]));
                 send_buff_ui_packet(reinterpret_cast<Player*>(players[taget]), 2);
-       
-
-
-
                 break;
 
             }
@@ -3529,6 +3536,9 @@ void do_timer()
             else if (temp.ev == EVENT_PARTNER_SKILL) {
                 if (temp.target_id == 10) {
                     int indun_id = reinterpret_cast<Player*>(players[temp.obj_id])->get_indun_id();
+
+                    if (indun_id < 0) continue;
+
                     for (int i = 0; i < GAIA_ROOM; ++i) {
                         dungeons[indun_id]->get_party_palyer()[i]->attack_speed_up = false;
                     }
@@ -3567,13 +3577,15 @@ void do_timer()
                         //send_status_change_packet(reinterpret_cast<Player*>(players[ev.obj_id]));
                     }
             
-                    reinterpret_cast<Player*>(players[ev.obj_id])
-                        ->set_skill_active(ev.target_id, false);
+                    reinterpret_cast<Player*>(players[ev.obj_id])->set_skill_active(ev.target_id, false);
                     continue;
                 }
                 else if (ev.ev == EVENT_PARTNER_SKILL) {
                     if (ev.target_id == 10) {
                         int indun_id = reinterpret_cast<Player*>(players[ev.obj_id])->get_indun_id();
+
+                        if (indun_id < 0) continue;
+
                         for (int i = 0; i < GAIA_ROOM; ++i) {
                             dungeons[indun_id]->get_party_palyer()[i]->attack_speed_up = false;
                         }

@@ -9,21 +9,21 @@
 #include <array>
 #include <queue>
 #include <string>
-
-#include "protocol.h"
+#include "Player.h"
+#include "../RealServer/Server/protocol.h"
 #include "stdafx.h"
 #include "Pattern.h"
 #include "PartyUI.h"
 
-//#ifdef UNICODE
-//#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
-//#else
-//#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
-//#endif
+#ifdef UNICODE
+#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
+#else
+#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
+#endif
 
 using namespace std;
 
-
+extern array<CPlayer*, MAX_USER + MAX_NPC> mPlayer;
 extern int my_id;
 extern int m_prev_recv;
 extern vector<string> g_msg;
@@ -38,7 +38,7 @@ extern wstring Combat_str;
 extern bool Combat_On;
 
 extern atomic_bool InDungeon;
-extern int party_id[GAIA_ROOM];
+
 extern wstring party_name[GAIA_ROOM];
 extern CPattern m_gaiaPattern;
 extern int indun_death_count;
@@ -47,6 +47,7 @@ extern array<Party*, (MAX_USER / GAIA_ROOM)> m_party;
 extern Party* m_party_info;
 extern bool PartyUI_On;
 extern bool party_info_on;
+extern bool AddAIUI_On;
 extern int  robby_cnt;
 extern vector<int> party_id_index_vector;
 
@@ -59,9 +60,17 @@ extern bool PartyInviteUI_ON;
 // 초대장 관련 변수(초대 받을떄 UI)
 extern bool InvitationCardUI_On;
 extern chrono::system_clock::time_point InvitationCardTimer;
+extern chrono::system_clock::time_point NoticeTimer;
 extern int InvitationRoomId;
 extern int InvitationUser;
 
+extern bool NoticeUI_On;
+extern bool RaidEnterNotice;
+extern bool DeadNotice;
+extern wstring Notice_str;
+
+extern CRITICAL_SECTION IndunCheck_cs;
+extern CRITICAL_SECTION UI_cs;
 void err_quit(const char* msg);
 
 void err_display(const char* msg);
@@ -98,7 +107,7 @@ void send_party_room_quit_request();
 
 void send_party_invite(char* user); 
 
-void send_party_add_partner();
+void send_party_add_partner(JOB j);
 
 void send_party_invitation_reply(int accept);
 
@@ -121,6 +130,13 @@ XMFLOAT3 return_myCamera();
 
 #include "Camera.h"
 #include "Object.h"
+
+void get_raid_initialize_position(CGameObject* m_otherPlayer, int id);
+
+void get_raid_information(CGameObject* m_otherPlayer, int id);
+
+void get_object_information(CGameObject* m_otherPlayer, int id);
+
 void get_basic_information(CPlayer* m_otherPlayer, int id);
 
 int get_hp_to_server(int id);
@@ -140,4 +156,6 @@ float get_combat_id_hp();
 float get_combat_id_max_hp();
 
 wchar_t* get_user_name_to_server(int id);
+
+void set_myPosition(XMFLOAT3 pos);
 

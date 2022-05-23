@@ -1,22 +1,22 @@
 #pragma once
 #include "UILayer.h"
 #include "stdafx.h"
-#include "protocol.h"
+#include "../RealServer/Server/protocol.h"
 
 class Party
 {
 private:
 	int		party_id;
 	char	room_name[MAX_NAME_SIZE];
-
-
 	bool	player_use[4];
+
 public:
 	char*	player_name[GAIA_ROOM];
 	int		player_id[GAIA_ROOM];
 	int		player_lv[GAIA_ROOM];
 	JOB		player_job[GAIA_ROOM];
 	int		player_cnt;
+	int		myId_in_partyIndex;
 	DUNGEON_STATE dst;
 public:
 	Party();
@@ -79,5 +79,18 @@ public:
 	~InvitationCardUI();
 	virtual void UpdateLabels(const std::wstring& strUIText);
 	virtual void Resize(ID3D12Resource** ppd3dRenderTargets, UINT width, UINT height, UINT TextAlignment, UINT ParagraphAlignment);
+	virtual void Render(UINT nFrame);
+};
+
+class AddAIUI : public UILayer
+{
+private:
+	D2D1_RECT_F                 BG_Rect;
+	ID2D1SolidColorBrush* m_pButtonBrush;
+public:
+	AddAIUI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor);
+	~AddAIUI();
+
+	virtual void UpdateLabels();
 	virtual void Render(UINT nFrame);
 };
