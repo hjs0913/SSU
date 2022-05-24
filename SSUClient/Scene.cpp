@@ -125,7 +125,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMonsterModel, 6);
 		for (int j = 0; j < 6; ++j) {
 			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
-			if (j== 1)
+			if (j== 5)
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(j, true);
 			else
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(j, false);
@@ -623,7 +623,11 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 						)
 					);
 				}
-				m_ppHierarchicalGameObjects[i]->Animate(m_fElapsedTime);
+				// 사망 애니메이션 느리게 작동하기 위해
+				if (m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[13].m_bEnable) {
+					m_ppHierarchicalGameObjects[i]->Animate(0.005);
+				}
+				else m_ppHierarchicalGameObjects[i]->Animate(m_fElapsedTime);
 				if (!m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController) m_ppHierarchicalGameObjects[i]->UpdateTransform(NULL);
 				m_ppHierarchicalGameObjects[i]->Render(pd3dCommandList, pCamera);
 

@@ -158,8 +158,8 @@ void Gaia::game_start()
 	st = DUN_ST_START;
 	state_lock.unlock();
 
-	boss->set_x(party[0]->get_x() + 20);
-	boss->set_z(party[0]->get_z() + 20);
+	boss->set_x(2037);
+	boss->set_z(2130);
 
 	for (int i = 0; i < GAIA_ROOM; i++) {
 		party[i]->set_x(party[0]->get_x()+10*i);
@@ -547,7 +547,8 @@ void Gaia::player_death(Player* p)
 		for (int i = 0; i < GAIA_ROOM; i++) {
 			send_change_hp_packet(party[i], p);
 			if (p->get_id() != party[i]->get_id()) {
-				send_remove_object_packet(party[i], p);
+				send_dead_packet(party[i], boss, p);
+				//send_remove_object_packet(party[i], p);
 			}
 			if (party[i]->get_hp() > tmp_hp) target_id = i;
 			else if (party[i]->get_hp() == 0) nDeathParty++;
