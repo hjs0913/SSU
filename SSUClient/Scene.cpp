@@ -122,10 +122,10 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 	CLoadedModelInfo* pMonsterModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Beast_Wolf.bin", NULL);
 	for (int i = 3; i < 33; ++i) {
-		m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMonsterModel, 6);
-		for (int j = 0; j < 6; ++j) {
+		m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMonsterModel, 5);
+		for (int j = 0; j < 5; ++j) {
 			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
-			if (j== 1)
+			if (j== 0)
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(j, true);
 			else
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(j, false);
@@ -192,7 +192,7 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	m_ppHierarchicalGameObjects[3]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 	m_ppHierarchicalGameObjects[3]->m_pSkinnedAnimationController->SetTrackEnable(0,true);
 	m_ppHierarchicalGameObjects[3]->SetPosition(3500.0f, m_pTerrain->GetHeight(3500.0f, 650.0f), 650.0f);
-	m_ppHierarchicalGameObjects[3]->SetScale(10.0f, 10.0f, 10.0f);
+	m_ppHierarchicalGameObjects[3]->SetScale(20.0f, 20.0f, 20.0f);
 
 	for (int i = 0; i < m_nHierarchicalGameObjects; i++) get_raid_initialize_position(m_ppHierarchicalGameObjects[i], i);
 
