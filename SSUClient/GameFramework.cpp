@@ -1029,7 +1029,7 @@ void CGameFramework::ProcessInput()
 				
 				send_look_packet(m_pPlayer->GetLookVector(), m_pPlayer->GetRightVector());
 			}
-			if (dwDirection) m_pPlayer->Move(dwDirection, /*12.25f*/4.5f, true);
+			if (dwDirection) m_pPlayer->Move(dwDirection, /*12.25f*/6.5f, true);
 			if (dwAttack) {
 				// m_pPlayer->Attack(true);
 				send_attack_packet(0);
