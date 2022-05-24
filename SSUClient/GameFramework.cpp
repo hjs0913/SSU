@@ -994,19 +994,23 @@ void CGameFramework::ProcessInput()
 		DWORD dwDirection = 0;
 		DWORD dwAttack = 0;
 		DWORD dwSkill = 0;
+
 		if (!PartyInviteUI_ON && !Chatting_On) {
-			if (pKeysBuffer['W'] & 0xF0) {
-				dwDirection |= DIR_FORWARD;
-			}
 			if (pKeysBuffer['S'] & 0xF0) {
-				dwDirection |= DIR_BACKWARD;
+				dwDirection = DIR_BACKWARD;
 			}
 			if (pKeysBuffer['A'] & 0xF0) {
-				dwDirection |= DIR_LEFT;
+				dwDirection = DIR_LEFT;
 			}
 			if (pKeysBuffer['D'] & 0xF0) {
-				dwDirection |= DIR_RIGHT;
+				dwDirection = DIR_RIGHT;
 			}
+			if (pKeysBuffer['W'] & 0xF0) {
+				dwDirection = DIR_FORWARD;
+			}
+
+			if (pKeysBuffer[VK_SPACE] & 0xF0) dwAttack |= 0x30;
+			if ((pKeysBuffer[VK_NUMPAD1] & 0xF0) || (pKeysBuffer['1'] & 0xF0)) dwSkill |= 0x31;
 		}
 
 		//if (pKeysBuffer[VK_UP] & 0xF0) dwDirection |= DIR_FORWARD;
@@ -1015,8 +1019,6 @@ void CGameFramework::ProcessInput()
 		//if (pKeysBuffer[VK_RIGHT] & 0xF0) dwDirection |= DIR_RIGHT;
 		if (pKeysBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
 		if (pKeysBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
-		if (pKeysBuffer[VK_SPACE] & 0xF0) dwAttack |= 0x30;
-		if ((pKeysBuffer[VK_NUMPAD1] & 0xF0) || (pKeysBuffer['1'] & 0xF0)) dwSkill |= 0x31;
 
 		if ((dwDirection != 0) || (cxDelta != 0.0f) || (cyDelta != 0.0f) || (dwAttack != 0) || (dwSkill != 0))
 		{
@@ -1029,7 +1031,7 @@ void CGameFramework::ProcessInput()
 				
 				send_look_packet(m_pPlayer->GetLookVector(), m_pPlayer->GetRightVector());
 			}
-			if (dwDirection) m_pPlayer->Move(dwDirection, /*12.25f*/6.5f, true);
+			if (dwDirection) m_pPlayer->Move(dwDirection, /*12.25f*/10.5f, true);
 			if (dwAttack) {
 				// m_pPlayer->Attack(true);
 				send_attack_packet(0);
@@ -1054,6 +1056,7 @@ void CGameFramework::AnimateObjects()
 	else {
 		if (m_pRaid_Scene) m_pRaid_Scene->AnimateObjects(fTimeElapsed);
 	}
+
 	m_pPlayer->Animate(fTimeElapsed);
 }
 

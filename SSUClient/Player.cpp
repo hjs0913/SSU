@@ -68,7 +68,7 @@ void CPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVelocity)
 		if (dwDirection & DIR_UP) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Up, fDistance);
 		if (dwDirection & DIR_DOWN) xmf3Shift = Vector3::Add(xmf3Shift, m_xmf3Up, -fDistance);
 
-		Move(xmf3Shift, bUpdateVelocity);
+		Move(xmf3Shift, dwDirection, bUpdateVelocity);
 	}
 }
 
@@ -76,6 +76,32 @@ void CPlayer::Move(const XMFLOAT3& xmf3Shift, bool bUpdateVelocity)
 {
 	if (bUpdateVelocity)
 	{
+		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, xmf3Shift);
+	}
+	else
+	{
+		m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3Shift);
+		//m_pCamera->Move(xmf3Shift);
+	}
+}
+
+void CPlayer::Move(const XMFLOAT3& xmf3Shift, int dir, bool bUpdateVelocity)
+{
+	if (bUpdateVelocity)
+	{
+		switch (dir) {
+		case DIR_FORWARD:
+			SetMaxVelocityXZ(45.0f);
+			break;
+		case DIR_BACKWARD:
+		case DIR_RIGHT:
+		case DIR_LEFT:
+			SetMaxVelocityXZ(30.0f);
+			break;
+		default:
+			break;
+		}
+
 		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, xmf3Shift);
 	}
 	else
@@ -169,12 +195,10 @@ void CPlayer::Update(float fTimeElapsed)
 	if (nCurrentCameraMode == THIRD_PERSON_CAMERA) m_pCamera->SetLookAt(m_xmf3Position);
 	m_pCamera->RegenerateViewMatrix();
 	
-	cout << "이전 : " << m_xmf3Velocity.x << ", " << m_xmf3Velocity.z << endl;
 	fLength = Vector3::Length(m_xmf3Velocity);
 	float fDeceleration = (m_fFriction * fTimeElapsed);
 	if (fDeceleration > fLength) fDeceleration = fLength;
 	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, Vector3::ScalarProduct(m_xmf3Velocity, -fDeceleration, true));
-	cout << "이후 : " << m_xmf3Velocity.x << ", " << m_xmf3Velocity.z << endl;
 }
 
 CCamera *CPlayer::OnChangeCamera(DWORD nNewCameraMode, DWORD nCurrentCameraMode)
@@ -378,6 +402,7 @@ CTerrainPlayer::CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLi
 	for (int i = 0; i < anim_cnt; ++i) {
 		m_pSkinnedAnimationController->SetTrackAnimationSet(i, i);
 	}
+	m_pSkinnedAnimationController->SetTrackEnable(0, true);
 
 	// 5번 부터 ANIMATION_TYPE_ONCE
 	for (int i = 5; i < anim_cnt; ++i) {
@@ -505,7 +530,7 @@ void CTerrainPlayer::OnCameraUpdateCallback(float fTimeElapsed)
 
 void CTerrainPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVelocity)
 {
-	if (m_pSkinnedAnimationController->m_pAnimationTracks[5].m_bEnable) return;
+	if (m_pSkinnedAnimationController->m_pAnimationTracks[5].m_bEnable || m_pSkinnedAnimationController->m_pAnimationTracks[9].m_bEnable) return;
 	m_pSkinnedAnimationController->SetTrackEnable(0, false);
 	m_pSkinnedAnimationController->SetTrackEnable(5, false);
 	m_pSkinnedAnimationController->SetTrackEnable(9, false);
@@ -540,16 +565,6 @@ void CTerrainPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVeloci
 	default:
 		break;
 	}
-
-	//if (dwDirection)
-	//{
-	//	m_pSkinnedAnimationController->SetTrackEnable(0, false);
-	//	m_pSkinnedAnimationController->SetTrackEnable(5, false);
-	//	m_pSkinnedAnimationController->SetTrackEnable(9, false);
-	//	m_pSkinnedAnimationController->SetTrackEnable(1, true);
-	//	m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[5]->m_fPosition = 0.0f;
-	//	m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[9]->m_fPosition = 0.0f;
-	//}
 
 	CPlayer::Move(dwDirection, fDistance, bUpdateVelocity);
 }
