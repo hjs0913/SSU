@@ -1999,6 +1999,19 @@ void process_packet(int client_id, unsigned char* p)
         if (dungeons[pl->indun_id]->player_rander_ok == GAIA_ROOM - dungeons[pl->indun_id]->partner_cnt) {
             dungeons[pl->indun_id]->start_game = true;
 
+            // Ai움직이기 시작
+            Player** party_players = dungeons[pl->indun_id]->get_party_palyer();
+
+            // 레이드 위치 수정
+            for (int i = 0; i < GAIA_ROOM; i++) {
+                party_players[i]->set_x(2025 + 10 * i);
+                party_players[i]->set_z(2110);
+                for (int j = 0; j < GAIA_ROOM; j++) {
+                    send_move_packet(party_players[j], party_players[i], 0);
+                }
+            }
+
+
             // BOSS NPC Timer Start
             timer_event ev;
             ev.obj_id = dungeons[pl->indun_id]->get_dungeon_id();
@@ -2013,9 +2026,6 @@ void process_packet(int client_id, unsigned char* p)
             ev.ev = EVENT_BOSS_ATTACK;
             ev.target_id = -1;
             timer_queue.push(ev);
-
-            // Ai움직이기 시작
-            Player** party_players = dungeons[pl->indun_id]->get_party_palyer();
 
             for (int i = 0; i < GAIA_ROOM; i++) {
                 if (party_players[i]->get_tribe() == PARTNER) {
@@ -2606,7 +2616,7 @@ void worker()
             lua_pop(L, 1);
             if (m) {
                 // 공격처리
-                // send_animation_attack(, client_id);
+                send_animation_attack(reinterpret_cast<Player*>( players[exp_over->_target]), client_id);
                 attack_success(players[client_id], players[exp_over->_target], players[client_id]->get_basic_attack_factor());
             }
             else {

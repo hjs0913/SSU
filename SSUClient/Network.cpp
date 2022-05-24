@@ -691,7 +691,6 @@ void process_packet(unsigned char* p)
 		sc_packet_party_room* packet = reinterpret_cast<sc_packet_party_room*>(p);
 		m_party[(int)packet->room_id]->set_room_name(packet->room_name);
 		m_party[(int)packet->room_id]->dst = DUN_ST_ROBBY;
-		cout << (int)packet->room_id << endl;
 		if (find(party_id_index_vector.begin(), party_id_index_vector.end(), packet->room_id)
 			== party_id_index_vector.end()) {
 			robby_cnt++;
@@ -1002,24 +1001,26 @@ void get_raid_information(CGameObject* m_otherPlayer, int id)
 	if (mPlayer[m_party_info->player_id[tmp_id]]->m_net_dead == true) {	// 사망 애니메이션 출력
 		if (!m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[13].m_bEnable) {
 			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
+			m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[13]->m_fPosition = 0.0f;
 			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(13, 13);
 			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(13, true);
 		}
 		else {
 			float playTime = m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[13]->m_fLength -
 				m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[13]->m_fPosition;
-			if (playTime < 0.1) {
-				m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[13]->m_fPosition = 0.99f;
+			if (playTime < 0.1f) {
+				//m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[13]->m_fPosition = 0.0f;
+				m_otherPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
+				//m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[13]->m_fPosition = 0.994f;
 			}
 		}
 		return;
 	}
-	else {
-		if (m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[13].m_bEnable) {	// 부활
-			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
-			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
-			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(0, true);
-		}
+	
+	if (m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[13].m_bEnable) {	// 부활
+		m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
+		m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+		m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(0, true);
 	}
 
 	if (m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[5].m_bEnable) {
