@@ -23,7 +23,7 @@ Gaia::Gaia(int d_id)
 	boss->state_lock.lock();
 	boss->set_state(ST_FREE);
 	boss->state_lock.unlock();
-	boss->set_id(101);
+	boss->set_id(1180);
 
 	lua_State* L = boss->L = luaL_newstate();
 	luaL_openlibs(L);
@@ -158,8 +158,13 @@ void Gaia::game_start()
 	st = DUN_ST_START;
 	state_lock.unlock();
 
-	boss->set_x(party[0]->get_x() + 10);
-	boss->set_z(party[0]->get_z() + 10);
+	boss->set_x(party[0]->get_x() + 20);
+	boss->set_z(party[0]->get_z() + 20);
+
+	for (int i = 0; i < GAIA_ROOM; i++) {
+		party[i]->set_x(party[0]->get_x()+10*i);
+		party[i]->set_z(party[0]->get_z());
+	}
 
 	for (int i = 0; i < GAIA_ROOM; i++) {
 		party[i]->state_lock.lock();
@@ -197,7 +202,7 @@ void Gaia::destroy_dungeon()
 	boss->state_lock.lock();
 	boss->set_state(ST_FREE);
 	boss->state_lock.unlock();
-	boss->set_id(101);
+	boss->set_id(GAIA_ID);
 
 	// 루아를 이용한 초기화
 	lua_State* L = boss->L;
@@ -513,7 +518,8 @@ void Gaia::player_death(Player* p)
 			send_change_hp_packet(party[i], p);
 			send_change_death_count_packet(party[i], player_death_count);
 			if (p->get_id() != party[i]->get_id()) {
-				send_remove_object_packet(party[i], p);
+				// send_remove_object_packet(party[i], p);
+				send_dead_packet(party[i], boss, p);
 			}
 			if (party[i]->get_hp() > tmp_hp) target_id = i;
 		}

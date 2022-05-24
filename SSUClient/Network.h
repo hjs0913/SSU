@@ -23,7 +23,7 @@
 
 using namespace std;
 
-extern array<CPlayer*, MAX_USER + MAX_NPC> mPlayer;
+extern array<CPlayer*, MAX_USER + MAX_NPC+1> mPlayer;
 extern int my_id;
 extern int m_prev_recv;
 extern vector<string> g_msg;
@@ -134,6 +134,8 @@ XMFLOAT3 return_myCamera();
 void get_raid_initialize_position(CGameObject* m_otherPlayer, int id);
 
 void get_raid_information(CGameObject* m_otherPlayer, int id);
+
+void get_gaia_information(CGameObject* m_otherPlayer);
 
 void get_object_information(CGameObject* m_otherPlayer, int id);
 

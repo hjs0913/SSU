@@ -113,6 +113,29 @@ void send_status_change_packet(Player* pl)
     pl->do_send(sizeof(packet), &packet);
 }
 
+void send_dead_packet(Player* pl, Npc* attacker,  Npc* victim) {
+    sc_packet_dead packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_DEAD;
+    packet.id = victim->get_id();
+    packet.attacker_id = attacker->get_id();
+    pl->do_send(sizeof(packet), &packet);
+}
+
+void send_revive_packet(Player* pl, Npc* reviver)
+{
+    sc_packet_revive packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_REVIVE;
+    packet.id = reviver->get_id();
+    packet.x = reviver->get_x();
+    packet.y = reviver->get_y();
+    packet.z = reviver->get_z();
+    packet.hp = reviver->get_hp();
+    packet.exp = reinterpret_cast<Player*>(reviver)->get_exp();
+    pl->do_send(sizeof(packet), &packet);
+}
+
 void send_look_packet(Player* pl, Npc* changer)
 {
     sc_packet_look packet;

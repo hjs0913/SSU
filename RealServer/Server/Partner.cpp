@@ -655,6 +655,7 @@ void Partner::attack_success(Partner* pa, Gaia* gaia, float atk_factor)
 
 	gaia->boss->set_hp(target_hp);
 	for (int i = 0; i < GAIA_ROOM; ++i) {
+		send_animation_attack(gaia->get_party_palyer()[i], pa->get_id());
 		send_change_hp_packet(gaia->get_party_palyer()[i], gaia->boss);
 	}
 

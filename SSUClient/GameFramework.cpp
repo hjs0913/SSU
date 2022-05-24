@@ -69,6 +69,7 @@ CGameFramework::CGameFramework()
 	m_nWndClientHeight = FRAME_BUFFER_HEIGHT;
 
 	m_pScene = NULL;
+	m_pRaid_Scene = NULL;
 	m_pPlayer = NULL;
 
 	_tcscpy_s(m_pszFrameRate, _T("SSU ("));
@@ -418,7 +419,12 @@ void CGameFramework::ChangeSwapChainState()
 
 void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 {
-	if (m_pScene) m_pScene->OnProcessingMouseMessage(hWnd, nMessageID, wParam, lParam);
+	if (!InDungeon) {
+		if (m_pScene) m_pScene->OnProcessingMouseMessage(hWnd, nMessageID, wParam, lParam);
+	}
+	else {
+		if (m_pRaid_Scene) m_pRaid_Scene->OnProcessingMouseMessage(hWnd, nMessageID, wParam, lParam);
+	}
 	switch (nMessageID)
 	{
 		case WM_LBUTTONDOWN: {
@@ -568,7 +574,13 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 	const wchar_t* temp;
 	int len = 0;
 
-	if (m_pScene) m_pScene->OnProcessingKeyboardMessage(hWnd, nMessageID, wParam, lParam);
+	if (!InDungeon) {
+		if (m_pScene) m_pScene->OnProcessingKeyboardMessage(hWnd, nMessageID, wParam, lParam);
+	}
+	else {
+		if (m_pRaid_Scene) m_pRaid_Scene->OnProcessingKeyboardMessage(hWnd, nMessageID, wParam, lParam);
+	}
+
 	switch (nMessageID)
 	{
 		case WM_KEYUP:
@@ -903,7 +915,7 @@ void CGameFramework::Create_InDungeon_Object()
 	//get_basic_information(pPlayer, 0);
 
 #else
-	CAirplanePlayer* pPlayer = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), NULL);
+	CAirplanePlayer* pPlayer = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pRaid_Scene->GetGraphicsRootSignature(), NULL);
 	pPlayer->SetPosition(XMFLOAT3(425.0f, 240.0f, 640.0f));
 #endif
 
@@ -960,7 +972,12 @@ void CGameFramework::ProcessInput()
 {
 	static UCHAR pKeysBuffer[256];
 	bool bProcessedByScene = false;
-	if (GetKeyboardState(pKeysBuffer) && m_pScene) bProcessedByScene = m_pScene->ProcessInput(pKeysBuffer);
+	if (!InDungeon) {
+		if (GetKeyboardState(pKeysBuffer) && m_pScene) bProcessedByScene = m_pScene->ProcessInput(pKeysBuffer);
+	}
+	else {
+		if (GetKeyboardState(pKeysBuffer) && m_pRaid_Scene) bProcessedByScene = m_pRaid_Scene->ProcessInput(pKeysBuffer);
+	}
 	if (!bProcessedByScene)
 	{
 		float cxDelta = 0.0f, cyDelta = 0.0f;
@@ -1012,7 +1029,7 @@ void CGameFramework::ProcessInput()
 				
 				send_look_packet(m_pPlayer->GetLookVector(), m_pPlayer->GetRightVector());
 			}
-			if (dwDirection) m_pPlayer->Move(dwDirection, /*12.25f*/4.5f, true);
+			if (dwDirection) m_pPlayer->Move(dwDirection, /*12.25f*/6.5f, true);
 			if (dwAttack) {
 				// m_pPlayer->Attack(true);
 				send_attack_packet(0);
@@ -1037,8 +1054,6 @@ void CGameFramework::AnimateObjects()
 	else {
 		if (m_pRaid_Scene) m_pRaid_Scene->AnimateObjects(fTimeElapsed);
 	}
-
-
 	m_pPlayer->Animate(fTimeElapsed);
 }
 
