@@ -1142,11 +1142,19 @@ void get_object_information(CGameObject* m_otherPlayer, int id)
 		else {
 			if (sqrt(pow(m_otherPlayer->GetPosition().x - mPlayer[id]->GetPosition().x, 2) +
 				pow(m_otherPlayer->GetPosition().z - mPlayer[id]->GetPosition().z, 2)) < 1.0) {
-				m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 1);
+				if (!m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[3].m_bEnable) {
+					m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
+					m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(3, 3);
+					m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(3, true);
+				}
 				m_otherPlayer->SetPosition(get_position_to_server(id));
 			}
 			else {
-				m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 1);
+				if (!m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[3].m_bEnable) {
+					m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
+					m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(3, 3);
+					m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(3, true);
+				}
 				XMFLOAT3 shiftDirection = Vector3::Normalize(XMFLOAT3(
 					mPlayer[id]->GetPosition().x - m_otherPlayer->GetPosition().x ,
 					0,
@@ -1156,11 +1164,20 @@ void get_object_information(CGameObject* m_otherPlayer, int id)
 		}
 		//m_otherPlayer->SetPosition(get_position_to_server(id));
 	}
-	else m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
-
+	else {
+		if (!m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[1].m_bEnable) {
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(1, 1);
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(1, true);
+		}
+	}
 	if (mPlayer[id]->m_net_attack == true) {
 		mPlayer[id]->m_net_attack = false;
-		m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 2);
+		if (!m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[5].m_bEnable) {
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(5, 5);
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(5, true);
+		}
 	}
 }
 
@@ -1182,17 +1199,43 @@ void get_basic_information(CPlayer* m_otherPlayer, int id)
 
 void get_player_information(CPlayer* m_otherPlayer, int id)
 {
-	m_otherPlayer->m_mp = mPlayer[id]->m_mp;
-	m_otherPlayer->m_max_mp = mPlayer[id]->m_max_mp;
-	m_otherPlayer->m_physical_attack = mPlayer[id]->m_physical_attack;
-	m_otherPlayer->m_physical_defence = mPlayer[id]->m_physical_defence;
-	m_otherPlayer->m_magical_attack = mPlayer[id]->m_magical_attack;
-	m_otherPlayer->m_magical_defence = mPlayer[id]->m_magical_defence;
-	m_otherPlayer->m_basic_attack_factor = mPlayer[id]->m_basic_attack_factor;
-	m_otherPlayer->m_defence_factor = mPlayer[id]->m_defence_factor;
-	m_otherPlayer->m_move_speed = mPlayer[id]->m_move_speed;
-	m_otherPlayer->m_attack_speed = mPlayer[id]->m_attack_speed;
-	m_otherPlayer->m_exp = mPlayer[id]->m_exp;
+	if (mPlayer[id]->GetUse() == false) return;
+
+	if (mPlayer[id]->GetLook().x != m_otherPlayer->GetLook().x ||
+		mPlayer[id]->GetLook().y != m_otherPlayer->GetLook().y ||
+		mPlayer[id]->GetLook().z != m_otherPlayer->GetLook().z
+		) {
+		m_otherPlayer->SetLook(mPlayer[id]->GetLook());
+	}
+
+	if (mPlayer[id]->GetPosition().x != m_otherPlayer->GetPosition().x || mPlayer[id]->GetPosition().z != m_otherPlayer->GetPosition().z) {
+		if (abs(m_otherPlayer->GetPosition().x - mPlayer[id]->GetPosition().x) >= 100 ||
+			abs(m_otherPlayer->GetPosition().z - mPlayer[id]->GetPosition().z) >= 100) {
+			m_otherPlayer->SetPosition(get_position_to_server(id));
+		}
+		else {
+			if (sqrt(pow(m_otherPlayer->GetPosition().x - mPlayer[id]->GetPosition().x, 2) +
+				pow(m_otherPlayer->GetPosition().z - mPlayer[id]->GetPosition().z, 2)) < 1.0) {
+				m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 1);
+				m_otherPlayer->SetPosition(get_position_to_server(id));
+			}
+			else {
+				m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 1);
+				XMFLOAT3 shiftDirection = Vector3::Normalize(XMFLOAT3(
+					mPlayer[id]->GetPosition().x - m_otherPlayer->GetPosition().x,
+					0,
+					mPlayer[id]->GetPosition().z - m_otherPlayer->GetPosition().z));
+				m_otherPlayer->Move(shiftDirection, false);
+			}
+		}
+		//m_otherPlayer->SetPosition(get_position_to_server(id));
+	}
+	else m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+
+	if (mPlayer[id]->m_net_attack == true) {
+		mPlayer[id]->m_net_attack = false;
+		m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 2);
+	}
 }
 
 XMFLOAT3 return_myCamera() {

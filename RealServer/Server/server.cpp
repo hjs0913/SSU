@@ -2606,6 +2606,7 @@ void worker()
             lua_pop(L, 1);
             if (m) {
                 // 공격처리
+                // send_animation_attack(, client_id);
                 attack_success(players[client_id], players[exp_over->_target], players[client_id]->get_basic_attack_factor());
             }
             else {
@@ -3285,8 +3286,8 @@ void return_npc_position(int npc_id)
         now_z = mv.second;
     }
 
-    float look_x = players[npc_id]->get_x() - now_x;
-    float look_z = players[npc_id]->get_z() - now_z;
+    float look_x = now_x - players[npc_id]->get_x();
+    float look_z = now_z - players[npc_id]->get_z();
 
     players[npc_id]->set_look(look_x, 0.0f, look_z);
 
@@ -3413,8 +3414,8 @@ void do_npc_move(int npc_id, int target)
     x = mv.first;
     z = mv.second;
 
-    float look_x = players[npc_id]->get_x() - x;
-    float look_z = players[npc_id]->get_z() - z;
+    float look_x = x - players[npc_id]->get_x();
+    float look_z = z - players[npc_id]->get_z();
 
     players[npc_id]->set_look(look_x, 0.0f, look_z);
     players[npc_id]->set_x(x);
