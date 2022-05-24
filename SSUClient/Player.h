@@ -67,6 +67,7 @@ public:
 	TRIBE						m_tribe = HUMAN;
 	int							m_spices;
 	bool						m_net_attack;
+	bool						m_net_dead;
 public:
 	CPlayer();
 	virtual ~CPlayer();

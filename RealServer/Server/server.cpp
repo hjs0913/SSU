@@ -189,7 +189,9 @@ void magical_skill_success(int p_id, int target, float skill_factor)
     float damage = give_damage * (1 - defence_damage);
     int target_hp = players[target]->get_hp() - damage;
 
+    if (target_hp <= 0) target_hp = 0;
     players[target]->set_hp(target_hp);
+    
     if (target_hp <= 0) {
         players[target]->state_lock.lock();
         if (players[target]->get_state() != ST_INGAME) {
@@ -342,7 +344,9 @@ void physical_skill_success(int p_id, int target, float skill_factor)
     float damage = give_damage * (1 - defence_damage);
     int target_hp = players[target]->get_hp() - damage;
 
+    if (target_hp <= 0) target_hp = 0;
     players[target]->set_hp(target_hp);
+    
     if (target_hp <= 0) {
         players[target]->state_lock.lock();
         if (players[target]->get_state() != ST_INGAME) {
@@ -491,8 +495,7 @@ void attack_success(Npc* p, Npc* target, float atk_factor)
     float damage = give_damage * (1 - defence_damage);
     int target_hp = target->get_hp() - damage;
 
-
-
+    if (target_hp <= 0) target_hp = 0;
     target->set_hp(target_hp);
 
     //timer_event ev;
@@ -795,10 +798,10 @@ void process_packet(int client_id, unsigned char* p)
 
         }
         // 원래는 DB에서 받아와야 하는 정보를 기본 정보로 대체
-        pl->set_x(2100);
+        pl->set_x(3210);
         pl->set_y(0);
-        pl->set_z(1940);
-        pl->set_job(J_TANKER);
+        pl->set_z(940);
+        pl->set_job(J_DILLER);
         pl->set_lv(25);
         pl->set_element(E_WATER);
 
@@ -1229,8 +1232,8 @@ void process_packet(int client_id, unsigned char* p)
         if (pl->join_dungeon_room && dungeons[pl->indun_id]->start_game) {
             int indun = pl->indun_id;
             Npc* bos = dungeons[indun]->boss;
-            if (bos->get_x() >= pl->get_x() - 10 && bos->get_x() <= pl->get_x() + 10) {
-                if (bos->get_z() >= pl->get_z() - 10 && bos->get_z() <= pl->get_z() + 10) {
+            if (bos->get_x() >= pl->get_x() - 20 && bos->get_x() <= pl->get_x() + 20) {
+                if (bos->get_z() >= pl->get_z() - 20 && bos->get_z() <= pl->get_z() + 20) {
                     // 일단 고정값으로 제거해 주자
                     //bos->set_hp(bos->get_hp() - 130000);
                     attack_success(pl, bos, pl->get_basic_attack_factor());
@@ -1251,8 +1254,8 @@ void process_packet(int client_id, unsigned char* p)
                 continue;
             }
             players[i]->state_lock.unlock();
-            if (players[i]->get_x() >= pl->get_x() -10 && players[i]->get_x() <= pl->get_x() + 10) {
-                if (players[i]->get_z() >= pl->get_z() - 10 && players[i]->get_z() <= pl->get_z() + 10) {
+            if (players[i]->get_x() >= pl->get_x() -20 && players[i]->get_x() <= pl->get_x() + 20) {
+                if (players[i]->get_z() >= pl->get_z() - 20 && players[i]->get_z() <= pl->get_z() + 20) {
                     attack_success(pl, players[i], pl->get_basic_attack_factor());    // 데미지 계산
                     // 몬스터의 자동공격을 넣어주자
                     players[i]->set_target_id(pl->get_id());
@@ -2297,7 +2300,8 @@ void player_revive(int client_id)
                 send_change_hp_packet(partys[i], pl);
 
                 if (partys[i]->get_id() != pl->get_id()) {
-                    send_put_object_packet(partys[i], pl);
+                    //send_put_object_packet(partys[i], pl);
+                    send_revive_packet(partys[i], pl);
                 }
             }
 
@@ -2337,9 +2341,9 @@ void player_revive(int client_id)
 
     // 플레이어 죽은 후 초기화 설정
     pl->set_hp(players[client_id]->get_maxhp());
-    pl->set_x(2100);
+    pl->set_x(3210);
     pl->set_y(0);
-    pl->set_z(1940);
+    pl->set_z(940);
     pl->set_exp(pl->get_exp() / 2);
     send_status_change_packet(pl);
 
@@ -2602,6 +2606,7 @@ void worker()
             lua_pop(L, 1);
             if (m) {
                 // 공격처리
+                // send_animation_attack(, client_id);
                 attack_success(players[client_id], players[exp_over->_target], players[client_id]->get_basic_attack_factor());
             }
             else {
@@ -2907,8 +2912,8 @@ int API_get_z(lua_State* L)
 void initialise_NPC()
 {
     default_random_engine dre;
-    uniform_int_distribution<int> rng_x(1380, 1680);
-    uniform_int_distribution<int> rng_z(2070, 2370);
+    uniform_int_distribution<int> rng_x(2560, 2943);
+    uniform_int_distribution<int> rng_z(1100, 1701);
     
     cout << "NPC 로딩중" << endl;
     char name[MAX_NAME_SIZE];
@@ -3281,8 +3286,8 @@ void return_npc_position(int npc_id)
         now_z = mv.second;
     }
 
-    float look_x = players[npc_id]->get_x() - now_x;
-    float look_z = players[npc_id]->get_z() - now_z;
+    float look_x = now_x - players[npc_id]->get_x();
+    float look_z = now_z - players[npc_id]->get_z();
 
     players[npc_id]->set_look(look_x, 0.0f, look_z);
 
@@ -3409,8 +3414,8 @@ void do_npc_move(int npc_id, int target)
     x = mv.first;
     z = mv.second;
 
-    float look_x = players[npc_id]->get_x() - x;
-    float look_z = players[npc_id]->get_z() - z;
+    float look_x = x - players[npc_id]->get_x();
+    float look_z = z - players[npc_id]->get_z();
 
     players[npc_id]->set_look(look_x, 0.0f, look_z);
     players[npc_id]->set_x(x);
@@ -3661,6 +3666,7 @@ int main()
     initialise_NPC();
     initialise_DUNGEON();
 
+    // 장애물
     ifstream obstacles_read("tree_position.txt");
     if (!obstacles_read.is_open()) {
         cout << "파일을 읽을 수 없습니다" << endl;
@@ -3671,9 +3677,9 @@ int main()
         float x, y, z;
         obstacles_read >> x >> y >> z;
         obstacles[i].set_id(i);
-        obstacles[i].set_x(x+100);
-        obstacles[i].set_y(y);
-        obstacles[i].set_z(z+300);
+        obstacles[i].set_x(0);
+        obstacles[i].set_y(0);
+        obstacles[i].set_z(0);
     }
 
     obstacles_read.close();

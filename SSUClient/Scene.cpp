@@ -95,90 +95,44 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_pSkyBox = new CSkyBox(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
 	XMFLOAT3 xmf3Scale(8.0f, 2.0f, 8.0f);
-	XMFLOAT4 xmf4Color(0.0f, 0.3f, 0.0f, 0.0f);
+	XMFLOAT4 xmf4Color(0.1f, 0.1f, 0.1f, 0.0f);
 	m_pTerrain = new CHeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Image/HeightMap.raw"), 512, 512, xmf3Scale, xmf4Color);
 
-	m_nHierarchicalGameObjects = 12;
+	m_nHierarchicalGameObjects = 3+30;	// 성벽 + 집2개 + 몬스터 30 + 플레이어 30
 	m_ppHierarchicalGameObjects = new CGameObject * [m_nHierarchicalGameObjects];
 	//for (int i = 0; i < m_nHierarchicalGameObjects; ++i) m_ppHierarchicalGameObjects[i] = NULL;
 
-	CLoadedModelInfo* pMonsterModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Beast_Wolf.bin", NULL);
-	for (int i = 0; i < 6; ++i) {
-		m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMonsterModel, 1);
-		m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, i);
-		m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
-		m_ppHierarchicalGameObjects[i]->SetPosition((3450.0f + 50.0f * i), m_pTerrain->GetHeight((3450.0f + 50.0f * i), 650.0f), 650.0f);
-		m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
-	}
-
-	m_ppHierarchicalGameObjects[9] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMonsterModel, 6);
-	for (int i = 0; i < 6; ++i) {
-		m_ppHierarchicalGameObjects[9]->m_pSkinnedAnimationController->SetTrackAnimationSet(i, i);
-		if (i == 4)
-			m_ppHierarchicalGameObjects[9]->m_pSkinnedAnimationController->SetTrackEnable(i, true);
-		else
-			m_ppHierarchicalGameObjects[9]->m_pSkinnedAnimationController->SetTrackEnable(i, false);
-	}
-
-	m_ppHierarchicalGameObjects[9]->SetPosition(3500.0f, m_pTerrain->GetHeight(3500.0f, 600.0f), 600.0f);
-	m_ppHierarchicalGameObjects[9]->SetScale(10.0f, 10.0f, 10.0f);
-	if (pMonsterModel)	delete pMonsterModel;
-
 	CLoadedModelInfo* pCastleModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Castle_Wall.bin", NULL);
-	m_ppHierarchicalGameObjects[6] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pCastleModel, 0);
-	m_ppHierarchicalGameObjects[6]->SetPosition(3200.0f, m_pTerrain->GetHeight(3200.0f, 1000.0f) - 30.0f, 1000.0f);
-	m_ppHierarchicalGameObjects[6]->SetScale(35.0f, 20.0f, 15.0f);
+	m_ppHierarchicalGameObjects[0] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pCastleModel, 0);
+	m_ppHierarchicalGameObjects[0]->SetPosition(3200.0f, m_pTerrain->GetHeight(3200.0f, 1000.0f) - 30.0f, 1000.0f);
+	m_ppHierarchicalGameObjects[0]->SetScale(35.0f, 20.0f, 15.0f);
 	if (pCastleModel) delete pCastleModel;
 
 	CLoadedModelInfo* pHouseModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/House.bin", NULL);
-	m_ppHierarchicalGameObjects[7] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pHouseModel, 0);
-	m_ppHierarchicalGameObjects[7]->SetPosition(3200.0f, m_pTerrain->GetHeight(3200.0f, 700.0f), 700.0f);
-	m_ppHierarchicalGameObjects[7]->SetScale(4.0f, 4.0f, 4.0f);
+	m_ppHierarchicalGameObjects[1] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pHouseModel, 0);
+	m_ppHierarchicalGameObjects[1]->SetPosition(3200.0f, m_pTerrain->GetHeight(3200.0f, 700.0f), 700.0f);
+	m_ppHierarchicalGameObjects[1]->SetScale(4.0f, 4.0f, 4.0f);
 
 	CLoadedModelInfo* pHouseModell = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/House.bin", NULL);
-	m_ppHierarchicalGameObjects[8] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pHouseModell, 0);
-	m_ppHierarchicalGameObjects[8]->SetPosition(3200.0f, m_pTerrain->GetHeight(3200.0f, 500.0f) - 20.0f, 500.0f);
-	m_ppHierarchicalGameObjects[8]->SetScale(4.0f, 4.0f, 4.0f);
+	m_ppHierarchicalGameObjects[2] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pHouseModell, 0);
+	m_ppHierarchicalGameObjects[2]->SetPosition(3200.0f, m_pTerrain->GetHeight(3200.0f, 500.0f) - 20.0f, 500.0f);
+	m_ppHierarchicalGameObjects[2]->SetScale(4.0f, 4.0f, 4.0f);
 	if (pHouseModel) delete pHouseModel;
 	if (pHouseModell) delete pHouseModell;
 
-
-	CLoadedModelInfo* pGaiaModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Gaia.bin", NULL);
-	m_ppHierarchicalGameObjects[10] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pGaiaModel, 1);
-	m_ppHierarchicalGameObjects[10]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
-	m_ppHierarchicalGameObjects[10]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
-	m_ppHierarchicalGameObjects[10]->SetPosition(3600.0f, m_pTerrain->GetHeight(3600.0f, 600.0f), 600.0f);
-	m_ppHierarchicalGameObjects[10]->SetScale(20.0f, 20.0f, 20.0f);
-	if (pGaiaModel) delete pGaiaModel;
-
-
-	// 일단 다른플레이어 1명
-	CLoadedModelInfo* pCharacterModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Bastard_Warrior.bin", NULL);
-	int anim_cnt = pCharacterModel->m_pAnimationSets->m_nAnimationSets;
-
-	m_ppHierarchicalGameObjects[11] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pCharacterModel, anim_cnt);
-	m_ppHierarchicalGameObjects[11]->SetPosition(3550.0f, m_pTerrain->GetHeight(3550.0f, 650.0f), 650.0f);
-	m_ppHierarchicalGameObjects[11]->SetScale(10.0f, 10.0f, 10.0f);
-
-	for (int i = 11; i < 12; ++i) {
-		for (int j = 0; j < anim_cnt; ++j) {
+	CLoadedModelInfo* pMonsterModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Beast_Wolf.bin", NULL);
+	for (int i = 3; i < 33; ++i) {
+		m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMonsterModel, 6);
+		for (int j = 0; j < 6; ++j) {
 			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
-			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 0.5f;
+			if (j== 1)
+				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(j, true);
+			else
+				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(j, false);
 		}
-		m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
+		m_ppHierarchicalGameObjects[i]->SetPosition((3450.0f + 50.0f * i), m_pTerrain->GetHeight((3450.0f + 50.0f * i), 650.0f), 650.0f);
+		m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
 	}
-	if (pCharacterModel) delete pCharacterModel;
-
-	/*
-	m_nShaders = 1;
-	m_ppShaders = new CShader*[m_nShaders];
-
-	CEthanObjectsShader *pEthanObjectsShader = new CEthanObjectsShader();
-	pEthanObjectsShader->BuildObjects(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pEthanModel, m_pTerrain);
-
-	m_ppShaders[0] = pEthanObjectsShader;
-
-	if (pEthanModel) delete pEthanModel;*/
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
@@ -195,9 +149,9 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 	m_pSkyBox = new CSkyBox(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
-	XMFLOAT3 xmf3Scale(8.0f, 2.0f, 8.0f);
-	XMFLOAT4 xmf4Color(0.0f, 0.3f, 0.0f, 0.0f);
-	m_pTerrain = new CHeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Image/HeightMap.raw"), 512, 512, xmf3Scale, xmf4Color);
+	XMFLOAT3 xmf3Scale(8.0f, 50.0f, 8.0f); //조정 
+	XMFLOAT4 xmf4Color(0.0f, 0.0f, 0.0f, 0.0f);
+	m_pTerrain = new CHeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Image/Gaia2.raw"), 512, 512, xmf3Scale, xmf4Color);
 
 
 	m_nHierarchicalGameObjects = 4;
@@ -233,14 +187,14 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	}
 
 	// 나중에 가이아 모델로 바꿔준다
-	CLoadedModelInfo* pMonsterModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Gaia.bin", NULL);
-	m_ppHierarchicalGameObjects[3] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMonsterModel, 1);
+	CLoadedModelInfo* pGaiaModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Gaia.bin", NULL);
+	m_ppHierarchicalGameObjects[3] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pGaiaModel, 1);
 	m_ppHierarchicalGameObjects[3]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 	m_ppHierarchicalGameObjects[3]->m_pSkinnedAnimationController->SetTrackEnable(0,true);
 	m_ppHierarchicalGameObjects[3]->SetPosition(3500.0f, m_pTerrain->GetHeight(3500.0f, 650.0f), 650.0f);
 	m_ppHierarchicalGameObjects[3]->SetScale(10.0f, 10.0f, 10.0f);
 
-	for (int i = 0; i < 3; i++) get_raid_initialize_position(m_ppHierarchicalGameObjects[i], i);
+	for (int i = 0; i < m_nHierarchicalGameObjects; i++) get_raid_initialize_position(m_ppHierarchicalGameObjects[i], i);
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
@@ -669,16 +623,8 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 						)
 					);
 				}
-
-				m_ppHierarchicalGameObjects[i]->Animate(m_fElapsedTime);
-				if (!m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController) m_ppHierarchicalGameObjects[i]->UpdateTransform(NULL);
-				m_ppHierarchicalGameObjects[i]->Render(pd3dCommandList, pCamera);
-
-			}
-			else {
-				// 임시방편 데스요
-				if (i == 0 && my_id != 0) {
-					get_object_information(m_ppHierarchicalGameObjects[11], 0);
+				else if (i == 3) {
+					get_gaia_information(m_ppHierarchicalGameObjects[i]);
 					m_ppHierarchicalGameObjects[i]->SetPosition(
 						XMFLOAT3(m_ppHierarchicalGameObjects[i]->GetPosition().x,
 							m_pTerrain->GetHeight(m_ppHierarchicalGameObjects[i]->GetPosition().x, m_ppHierarchicalGameObjects[i]->GetPosition().z),
@@ -686,8 +632,15 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 						)
 					);
 				}
-				if (i == 1 && my_id != 1) {
-					get_object_information(m_ppHierarchicalGameObjects[11], 1);
+				m_ppHierarchicalGameObjects[i]->Animate(m_fElapsedTime);
+				if (!m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController) m_ppHierarchicalGameObjects[i]->UpdateTransform(NULL);
+				m_ppHierarchicalGameObjects[i]->Render(pd3dCommandList, pCamera);
+
+			}
+			else {
+				// 임시방편 데스요
+				if (i >= 3 && i < 33) {
+					get_object_information(m_ppHierarchicalGameObjects[i],NPC_ID_START + (i-3) );
 					m_ppHierarchicalGameObjects[i]->SetPosition(
 						XMFLOAT3(m_ppHierarchicalGameObjects[i]->GetPosition().x,
 							m_pTerrain->GetHeight(m_ppHierarchicalGameObjects[i]->GetPosition().x, m_ppHierarchicalGameObjects[i]->GetPosition().z),
