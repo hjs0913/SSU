@@ -995,7 +995,7 @@ void CGameFramework::ProcessInput()
 		DWORD dwAttack = 0;
 		DWORD dwSkill = 0;
 
-		if (!PartyInviteUI_ON && !Chatting_On) {
+		if (!PartyInviteUI_ON && !Chatting_On && Mouse_On) {
 			if (pKeysBuffer['S'] & 0xF0) {
 				dwDirection = DIR_BACKWARD;
 			}
