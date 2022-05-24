@@ -1013,8 +1013,8 @@ void get_raid_information(CGameObject* m_otherPlayer, int id)
 	else m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 
 	if (mPlayer[m_party_info->player_id[tmp_id]]->m_net_attack == true) {
-		mPlayer[m_party_info->player_id[tmp_id]]->m_net_attack == false;
-		m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 2);
+		mPlayer[m_party_info->player_id[tmp_id]]->m_net_attack = false;
+		//m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 2);
 	}
 }
 
@@ -1054,8 +1054,8 @@ void get_object_information(CGameObject* m_otherPlayer, int id)
 	else m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 
 	if (mPlayer[id]->m_net_attack == true) {
-		mPlayer[id]->m_net_attack == false;
-		m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 2);
+		mPlayer[id]->m_net_attack = false;
+		m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 5);
 	}
 }
 
@@ -1069,8 +1069,9 @@ void get_basic_information(CPlayer* m_otherPlayer, int id)
 	m_otherPlayer->m_tribe = mPlayer[id]->m_tribe;
 	m_otherPlayer->m_spices = mPlayer[id]->m_spices;
 	m_otherPlayer->m_element = mPlayer[id]->m_element;
+
 	if (mPlayer[id]->m_net_attack == true) {
-		mPlayer[id]->m_net_attack == false;
+		mPlayer[id]->m_net_attack = false;
 		m_otherPlayer->Attack(true);
 	}
 }
