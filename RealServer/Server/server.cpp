@@ -189,7 +189,9 @@ void magical_skill_success(int p_id, int target, float skill_factor)
     float damage = give_damage * (1 - defence_damage);
     int target_hp = players[target]->get_hp() - damage;
 
+    if (target_hp <= 0) target_hp = 0;
     players[target]->set_hp(target_hp);
+    
     if (target_hp <= 0) {
         players[target]->state_lock.lock();
         if (players[target]->get_state() != ST_INGAME) {
@@ -342,7 +344,9 @@ void physical_skill_success(int p_id, int target, float skill_factor)
     float damage = give_damage * (1 - defence_damage);
     int target_hp = players[target]->get_hp() - damage;
 
+    if (target_hp <= 0) target_hp = 0;
     players[target]->set_hp(target_hp);
+    
     if (target_hp <= 0) {
         players[target]->state_lock.lock();
         if (players[target]->get_state() != ST_INGAME) {
@@ -491,8 +495,7 @@ void attack_success(Npc* p, Npc* target, float atk_factor)
     float damage = give_damage * (1 - defence_damage);
     int target_hp = target->get_hp() - damage;
 
-
-
+    if (target_hp <= 0) target_hp = 0;
     target->set_hp(target_hp);
 
     //timer_event ev;
@@ -798,7 +801,7 @@ void process_packet(int client_id, unsigned char* p)
         pl->set_x(3210);
         pl->set_y(0);
         pl->set_z(940);
-        pl->set_job(J_TANKER);
+        pl->set_job(J_DILLER);
         pl->set_lv(25);
         pl->set_element(E_WATER);
 
@@ -1229,8 +1232,8 @@ void process_packet(int client_id, unsigned char* p)
         if (pl->join_dungeon_room && dungeons[pl->indun_id]->start_game) {
             int indun = pl->indun_id;
             Npc* bos = dungeons[indun]->boss;
-            if (bos->get_x() >= pl->get_x() - 10 && bos->get_x() <= pl->get_x() + 10) {
-                if (bos->get_z() >= pl->get_z() - 10 && bos->get_z() <= pl->get_z() + 10) {
+            if (bos->get_x() >= pl->get_x() - 20 && bos->get_x() <= pl->get_x() + 20) {
+                if (bos->get_z() >= pl->get_z() - 20 && bos->get_z() <= pl->get_z() + 20) {
                     // 일단 고정값으로 제거해 주자
                     //bos->set_hp(bos->get_hp() - 130000);
                     attack_success(pl, bos, pl->get_basic_attack_factor());
@@ -1251,8 +1254,8 @@ void process_packet(int client_id, unsigned char* p)
                 continue;
             }
             players[i]->state_lock.unlock();
-            if (players[i]->get_x() >= pl->get_x() -10 && players[i]->get_x() <= pl->get_x() + 10) {
-                if (players[i]->get_z() >= pl->get_z() - 10 && players[i]->get_z() <= pl->get_z() + 10) {
+            if (players[i]->get_x() >= pl->get_x() -20 && players[i]->get_x() <= pl->get_x() + 20) {
+                if (players[i]->get_z() >= pl->get_z() - 20 && players[i]->get_z() <= pl->get_z() + 20) {
                     attack_success(pl, players[i], pl->get_basic_attack_factor());    // 데미지 계산
                     // 몬스터의 자동공격을 넣어주자
                     players[i]->set_target_id(pl->get_id());
@@ -2908,8 +2911,8 @@ int API_get_z(lua_State* L)
 void initialise_NPC()
 {
     default_random_engine dre;
-    uniform_int_distribution<int> rng_x(1380, 1680);
-    uniform_int_distribution<int> rng_z(2070, 2370);
+    uniform_int_distribution<int> rng_x(2560, 2943);
+    uniform_int_distribution<int> rng_z(1100, 1701);
     
     cout << "NPC 로딩중" << endl;
     char name[MAX_NAME_SIZE];

@@ -1005,6 +1005,13 @@ void get_raid_information(CGameObject* m_otherPlayer, int id)
 			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(13, 13);
 			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(13, true);
 		}
+		else {
+			float playTime = m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[13]->m_fLength -
+				m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[13]->m_fPosition;
+			if (playTime < 0.1) {
+				m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[13]->m_fPosition = 0.99f;
+			}
+		}
 		return;
 	}
 	else {
