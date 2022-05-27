@@ -503,11 +503,17 @@ void process_packet(unsigned char* p)
 		if (packet->id == my_id) {
 			mPlayer[my_id]->SetUse(false);
 			mPlayer[my_id]->m_hp = 0;
-			combat_id = -1;
-			Combat_On = false;
+			if (!InDungeon) {
+				combat_id = -1;
+				Combat_On = false;
+			}
 			mPlayer[packet->id]->m_net_dead = true;
 		}
 		else {
+			if (combat_id == packet->id) {
+				combat_id = -1;
+				Combat_On = false;
+			}
 			mPlayer[packet->id]->m_net_dead = true;
 		}
 		break;
@@ -522,7 +528,7 @@ void process_packet(unsigned char* p)
 			mPlayer[my_id]->m_hp = mPlayer[my_id]->m_max_hp;
 			mPlayer[my_id]->m_mp = mPlayer[my_id]->m_max_mp;
 			mPlayer[my_id]->m_exp = packet->exp;
-			mPlayer[packet->id]->m_net_dead = false;
+			mPlayer[my_id]->m_net_dead = false;
 		}
 		else {
 			mPlayer[packet->id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
@@ -701,6 +707,7 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_PARTY_ROOM_INFO: {
+		if (InDungeon) break;
 		EnterCriticalSection(&UI_cs);
 		sc_packet_party_room_info* packet = reinterpret_cast<sc_packet_party_room_info*>(p);
 		int r_id = (int)packet->room_id;
@@ -1144,8 +1151,8 @@ void get_object_information(CGameObject* m_otherPlayer, int id)
 			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(4, true);
 		}
 		else {
-			float playTime = m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[13]->m_fLength -
-				m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[13]->m_fPosition;
+			float playTime = m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[4]->m_fLength -
+				m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[4]->m_fPosition;
 			if (playTime < 0.1f) {
 				//m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[13]->m_fPosition = 0.0f;
 				m_otherPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
@@ -1238,6 +1245,13 @@ void get_basic_information(CPlayer* m_otherPlayer, int id)
 			}
 		}
 		return;
+	}
+	else {
+		if (m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[13].m_bEnable) {
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(0, true);
+		}
 	}
 
 	if (mPlayer[id]->m_net_attack == true) {

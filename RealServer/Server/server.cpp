@@ -1207,14 +1207,11 @@ void process_packet(int client_id, unsigned char* p)
         pl->vl.lock();
         unordered_set <int> my_vl{ pl->viewlist };
         pl->vl.unlock();
-        cout << pl->get_id() << "ÀÇ viewlist "; 
         for (auto vl_id : my_vl) {
             if (players[vl_id]->get_tribe() == HUMAN) {
                 send_animation_attack(reinterpret_cast<Player*>(players[vl_id]), pl->get_id());
-                cout << vl_id << ", ";
             }
         }
-        cout << endl;
 
         timer_event ev;
         if (pl->attack_speed_up == false) {
@@ -2311,11 +2308,7 @@ void player_revive(int client_id)
             for (int i = 0; i < 4; i++) {
                 if (partys[i]->get_tribe() != HUMAN) continue;
                 send_change_hp_packet(partys[i], pl);
-
-                if (partys[i]->get_id() != pl->get_id()) {
-                    //send_put_object_packet(partys[i], pl);
-                    send_revive_packet(partys[i], pl);
-                }
+                send_revive_packet(partys[i], pl);
             }
 
             if (pl->get_tribe() == PARTNER) {
@@ -3446,7 +3439,6 @@ void do_npc_move(int npc_id, int target)
     players[npc_id]->vl.lock();
     players[npc_id]->viewlist.clear();
     players[npc_id]->viewlist = new_viewlist;
-    for (auto k : players[npc_id]->viewlist) cout << k << endl;
     players[npc_id]->vl.unlock();
 
     for (auto pl : new_viewlist) {
