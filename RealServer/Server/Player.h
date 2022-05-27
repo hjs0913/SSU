@@ -17,9 +17,6 @@ protected:
 public:
     atomic_bool         _auto_hp = false;
 
-	mutex		        vl;
-	unordered_set<int>	viewlist;
-
     mutex               ob_vl;
     unordered_set<int>  ob_viewlist;
 

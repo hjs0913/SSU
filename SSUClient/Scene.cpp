@@ -98,7 +98,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	XMFLOAT4 xmf4Color(0.1f, 0.1f, 0.1f, 0.0f);
 	m_pTerrain = new CHeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Image/HeightMap.raw"), 512, 512, xmf3Scale, xmf4Color);
 
-	m_nHierarchicalGameObjects = 3+30;	// 성벽 + 집2개 + 몬스터 30 + 플레이어 30
+	m_nHierarchicalGameObjects = 3 + 30 + 30;	// 성벽 + 집2개 + 몬스터 30 + 플레이어 30
 	m_ppHierarchicalGameObjects = new CGameObject * [m_nHierarchicalGameObjects];
 	//for (int i = 0; i < m_nHierarchicalGameObjects; ++i) m_ppHierarchicalGameObjects[i] = NULL;
 
@@ -130,7 +130,22 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 			else
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(j, false);
 		}
-		m_ppHierarchicalGameObjects[i]->SetPosition((3450.0f + 50.0f * i), m_pTerrain->GetHeight((3450.0f + 50.0f * i), 650.0f), 650.0f);
+		m_ppHierarchicalGameObjects[i]->SetPosition(0.f, -100.f, 0.f);
+		m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
+	}
+
+	CLoadedModelInfo* pCharacterModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Bastard_Warrior.bin", NULL);
+	int anim_cnt = pCharacterModel->m_pAnimationSets->m_nAnimationSets;
+	for (int i = 33; i < 63; ++i) {
+		m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pCharacterModel, anim_cnt);
+		for (int j = 0; j < 5; ++j) {
+			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
+			if (j == 0)
+				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(j, true);
+			else
+				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(j, false);
+		}
+		m_ppHierarchicalGameObjects[i]->SetPosition(0.f, -100.f, 0.f);
 		m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
 	}
 
@@ -642,7 +657,6 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 
 			}
 			else {
-				// 임시방편 데스요
 				if (i >= 3 && i < 33) {
 					get_object_information(m_ppHierarchicalGameObjects[i],NPC_ID_START + (i-3) );
 					m_ppHierarchicalGameObjects[i]->SetPosition(
@@ -652,6 +666,17 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 						)
 					);
 				}
+
+				if (i >= 33 && i < 63) {
+					get_player_information(m_ppHierarchicalGameObjects[i], i-33);
+					m_ppHierarchicalGameObjects[i]->SetPosition(
+						XMFLOAT3(m_ppHierarchicalGameObjects[i]->GetPosition().x,
+							m_pTerrain->GetHeight(m_ppHierarchicalGameObjects[i]->GetPosition().x, m_ppHierarchicalGameObjects[i]->GetPosition().z),
+							m_ppHierarchicalGameObjects[i]->GetPosition().z
+						)
+					);
+				}
+
 
 				m_ppHierarchicalGameObjects[i]->Animate(m_fElapsedTime);
 				if (!m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController) m_ppHierarchicalGameObjects[i]->UpdateTransform(NULL);

@@ -272,7 +272,8 @@ void magical_skill_success(int p_id, int target, float skill_factor)
             if (0 != other_player->viewlist.count(target)) {
                 other_player->viewlist.erase(target);
                 other_player->vl.unlock();
-                send_remove_object_packet(other_player, players[target]);
+                send_dead_packet(other_player, players[p_id], players[target]);
+                //send_remove_object_packet(other_player, players[target]);
             }
             else other_player->vl.unlock();
         }
@@ -426,7 +427,8 @@ void physical_skill_success(int p_id, int target, float skill_factor)
             if (0 != other_player->viewlist.count(target)) {
                 other_player->viewlist.erase(target);
                 other_player->vl.unlock();
-                send_remove_object_packet(other_player, players[target]);
+                send_dead_packet(other_player, players[p_id], players[target]);
+                //send_remove_object_packet(other_player, players[target]);
             }
             else other_player->vl.unlock();
         }
@@ -663,7 +665,8 @@ void attack_success(Npc* p, Npc* target, float atk_factor)
             if (0 != other_player->viewlist.count(target->get_id())) {
                 other_player->viewlist.erase(target->get_id());
                 other_player->vl.unlock();
-                send_remove_object_packet(other_player, target);
+                send_dead_packet(other_player, p, target);
+                // send_remove_object_packet(other_player, target);
             }
             else other_player->vl.unlock();
         }
@@ -3439,6 +3442,12 @@ void do_npc_move(int npc_id, int target)
             new_viewlist.insert(obj->get_id());
         }
     }
+
+    players[npc_id]->vl.lock();
+    players[npc_id]->viewlist.clear();
+    players[npc_id]->viewlist = new_viewlist;
+    for (auto k : players[npc_id]->viewlist) cout << k << endl;
+    players[npc_id]->vl.unlock();
 
     for (auto pl : new_viewlist) {
         // 새로 시야에 들어온 플레이어

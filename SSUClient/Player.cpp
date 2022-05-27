@@ -530,6 +530,9 @@ void CTerrainPlayer::OnCameraUpdateCallback(float fTimeElapsed)
 
 void CTerrainPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVelocity)
 {
+	if (m_pSkinnedAnimationController->m_pAnimationTracks[13].m_bEnable) {
+		return;
+	}
 	if (m_pSkinnedAnimationController->m_pAnimationTracks[5].m_bEnable || m_pSkinnedAnimationController->m_pAnimationTracks[9].m_bEnable) return;
 	m_pSkinnedAnimationController->SetTrackEnable(0, false);
 	m_pSkinnedAnimationController->SetTrackEnable(5, false);
@@ -575,6 +578,10 @@ void CTerrainPlayer::Update(float fTimeElapsed)
 
 	if (m_pSkinnedAnimationController)
 	{
+		if (m_pSkinnedAnimationController->m_pAnimationTracks[13].m_bEnable) {
+			return;
+		}
+
 		float fLength = sqrtf(m_xmf3Velocity.x * m_xmf3Velocity.x + m_xmf3Velocity.z * m_xmf3Velocity.z);
 		if (::IsZero(fLength))	// 가만히 서있을 때
 		{

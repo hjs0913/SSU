@@ -33,6 +33,11 @@ protected:
 public:
 	mutex	state_lock;
 	mutex	lua_lock;
+
+
+	mutex		        vl;
+	unordered_set<int>	viewlist;
+
 	lua_State* L;
 
 	Npc(int id);

@@ -145,7 +145,7 @@ int get_hp_to_server(int id);
 
 int get_max_hp_to_server(int id);
 
-void get_player_information(CPlayer* m_otherPlayer, int id);
+void get_player_information(CGameObject* m_otherPlayer, int id);
 
 bool get_use_to_server(int id);
 
