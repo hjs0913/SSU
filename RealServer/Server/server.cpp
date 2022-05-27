@@ -1538,24 +1538,34 @@ void process_packet(int client_id, unsigned char* p)
                             }
                             players[i]->state_lock.unlock();
 
-                            if ((players[i]->get_x() >= pl->get_x() - 40 && players[i]->get_x() <= pl->get_x() + 40) && (players[i]->get_z() >= pl->get_z() - 40 && players[i]->get_z() <= pl->get_z() + 40)) {
-                                pl->set_skill_factor(packet->skill_type, packet->skill_num);
-                              //  physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
-                                players[i]->set_target_id(pl->get_id());
-                                send_status_change_packet(pl);
-                                if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
-                                    players[i]->set_active(true);
-                                   
-                                    timer_event ev;
-                                     ev.obj_id = i;
-                                    ev.start_time = chrono::system_clock::now() + 1s;
-                                     ev.ev = EVENT_NPC_MOVE;
-                                 
-                                    ev.target_id = players[i]->get_id();
-                                   //  ev.target_id = client_id;
-                                     timer_queue.push(ev);
+                            if (dungeons[client_id]->start_game == false) {
+                                if ((players[i]->get_x() >= pl->get_x() - 40 && players[i]->get_x() <= pl->get_x() + 40) && (players[i]->get_z() >= pl->get_z() - 40 && players[i]->get_z() <= pl->get_z() + 40)) {
+                                    pl->set_skill_factor(packet->skill_type, packet->skill_num);
+                                    //  physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
+                                    players[i]->set_target_id(pl->get_id());
+                                    send_status_change_packet(pl);
+                                    if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
+                                        players[i]->set_active(true);
 
-                                    Activate_Npc_Move_Event(i,  players[i]->get_target_id());
+                                        timer_event ev;
+                                        ev.obj_id = i;
+                                        ev.start_time = chrono::system_clock::now() + 1s;
+                                        ev.ev = EVENT_NPC_MOVE;
+
+                                        ev.target_id = players[i]->get_id();
+                                        //  ev.target_id = client_id;
+                                        timer_queue.push(ev);
+
+                                        Activate_Npc_Move_Event(i, players[i]->get_target_id());
+                                    }
+                                }
+                            }
+                            else {
+                                if ((dungeons[client_id]->get_x() >= pl->get_x() - 40 && dungeons[client_id]->get_x() <= pl->get_x() + 40) && (dungeons[client_id]->get_z() >= pl->get_z() - 40 && dungeons[client_id]->get_z() <= pl->get_z() + 40)) {
+                                    pl->set_skill_factor(packet->skill_type, packet->skill_num);
+                                    send_status_change_packet(pl);
+                                    dungeons[client_id]->target_id = pl->get_indun_id();
+
                                 }
                             }
 

@@ -175,6 +175,7 @@ void Gaia::game_start()
 		party[i]->indun_id = dungeon_id;
 		// 가장 체력이 높은 플레이어를 일단 타겟으로 잡는다
 		if (party[i]->get_hp() > tmp_hp) target_id = 0;
+		target_id = 1;
 	}
 }
 
