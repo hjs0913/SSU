@@ -133,9 +133,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	int wmId, wmEvent;
 	PAINTSTRUCT ps;
 	HDC hdc;
+	TRACKMOUSEEVENT tme;
 
 	switch (message)
 	{
+	case WM_MOUSELEAVE: {
+		tme.cbSize = sizeof(TRACKMOUSEEVENT);
+		tme.hwndTrack = hWnd;
+		tme.dwFlags = TME_HOVER;
+		tme.dwHoverTime = 1;
+		TrackMouseEvent(&tme);
+		Mouse_On = false;
+		break;
+	}
 	case WM_SIZE:
 	case WM_LBUTTONDOWN:
 	case WM_LBUTTONUP:
@@ -143,9 +153,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_RBUTTONUP:
 	case WM_MOUSEMOVE:
 	case WM_KEYDOWN:
-	case WM_KEYUP:
+	case WM_KEYUP: {
+		tme.cbSize = sizeof(TRACKMOUSEEVENT);
+		tme.hwndTrack = hWnd;
+		tme.dwFlags = TME_LEAVE;
+		tme.dwHoverTime = 1;
+		TrackMouseEvent(&tme);
+		Mouse_On = true;
 		gGameFramework.OnProcessingWindowMessage(hWnd, message, wParam, lParam);
 		break;
+	}
 	case WM_COMMAND: {
 		wmId = LOWORD(wParam);
 		wmEvent = HIWORD(wParam);
