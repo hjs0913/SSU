@@ -624,6 +624,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //스킬을 쿨타임 돌때마다 �
 				gaia->get_party_palyer()[i]->attack_speed_up = true;
 				send_buff_ui_packet(gaia->get_party_palyer()[i], 4); 
 			}
+			pa->set_mp(pa->get_mp() - 1000);
 
 			ev.obj_id = pa->get_id();
 			ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
