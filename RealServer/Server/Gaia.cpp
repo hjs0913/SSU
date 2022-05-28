@@ -16,7 +16,7 @@ Gaia::Gaia(int d_id)
 	start_game = false;
 	partner_cnt = 0;
 	running_pattern = false;
-	
+
 	// Boss Npc Intialize	
 	boss = new Npc(dungeon_id);
 	boss->set_tribe(BOSS);
@@ -90,7 +90,7 @@ void Gaia::join_player(Player* pl)
 	// game start
 	if (player_cnt == GAIA_ROOM) {
 		// 여기에 인원이 꽉찼으면 5초후 게임을 시작하는 타이머를 돌려주자
-		
+
 		timer_event ev;
 		ev.obj_id = dungeon_id;
 		ev.start_time = chrono::system_clock::now() + 5s;
@@ -99,7 +99,7 @@ void Gaia::join_player(Player* pl)
 		timer_queue.push(ev);
 
 		start_time = ev.start_time;
-		
+
 		// 5초후 게임을 시작한다는 패킷을 보내주자
 		for (int i = 0; i < GAIA_ROOM; i++) {
 			if (party[i]->get_tribe() != HUMAN) continue;
@@ -143,7 +143,7 @@ void Gaia::game_start()
 	for (int i = 0; i < GAIA_ROOM; i++) {
 		if (party[i]->get_tribe() == PARTNER) {
 			for (int j = 0; j < GAIA_ROOM; j++) {
-				if(party[j]->get_tribe() == HUMAN) send_put_object_packet(party[j], party[i]);
+				if (party[j]->get_tribe() == HUMAN) send_put_object_packet(party[j], party[i]);
 			}
 		}
 	}
@@ -162,7 +162,7 @@ void Gaia::game_start()
 	boss->set_z(2130);
 
 	for (int i = 0; i < GAIA_ROOM; i++) {
-		party[i]->set_x(party[0]->get_x()+10*i);
+		party[i]->set_x(party[0]->get_x() + 10 * i);
 		party[i]->set_z(party[0]->get_z());
 	}
 
@@ -170,11 +170,12 @@ void Gaia::game_start()
 		party[i]->state_lock.lock();
 		party[i]->set_state(ST_INDUN);
 		party[i]->state_lock.unlock();
-		if(party[i]->get_tribe() == HUMAN)
+		if (party[i]->get_tribe() == HUMAN)
 			send_start_gaia_packet(party[i], party_id);
 		party[i]->indun_id = dungeon_id;
 		// 가장 체력이 높은 플레이어를 일단 타겟으로 잡는다
 		if (party[i]->get_hp() > tmp_hp) target_id = 0;
+		target_id = 1;
 	}
 }
 
@@ -183,7 +184,7 @@ void Gaia::destroy_dungeon()
 	state_lock.lock();
 	set_dun_st(DUN_ST_FREE);
 	state_lock.unlock();
-	
+
 	player_cnt = 0;
 	partner_cnt = 0;
 
@@ -194,7 +195,7 @@ void Gaia::destroy_dungeon()
 	start_game = false;
 	running_pattern = false;
 
-	ZeroMemory(party, sizeof(Player*)*4);
+	ZeroMemory(party, sizeof(Player*) * 4);
 	ZeroMemory(party_id, sizeof(int) * 4);
 	player_death_count = 4;
 
@@ -279,7 +280,7 @@ void Gaia::boss_move()
 		send_look_packet(pt, boss);
 	}
 
-	
+
 }
 
 void Gaia::boss_attack()
@@ -292,7 +293,7 @@ void Gaia::boss_attack()
 	pattern_num = pattern(gen) % 5;
 
 	if (fifteen_pattern == false) {
-		if (boss->get_hp() < boss->get_maxhp()/2) {
+		if (boss->get_hp() < boss->get_maxhp() / 2) {
 			fifteen_pattern = true;
 			return;
 		}
@@ -330,7 +331,7 @@ void Gaia::boss_attack()
 		ev.ev = EVENT_GAIA_PATTERN;
 		ev.target_id = 0;
 		timer_queue.push(ev);
-		
+
 		//
 		ev.obj_id = dungeon_id;
 		ev.start_time = chrono::system_clock::now() + 5s;
@@ -470,7 +471,7 @@ void Gaia::boss_attack()
 	}
 	case 4: {//참격 1개 
 		running_pattern = true;
-		pattern_five_position[0] = pos(boss->get_x()+ boss->get_look_x(), boss->get_z() + boss->get_look_z());
+		pattern_five_position[0] = pos(boss->get_x() + boss->get_look_x(), boss->get_z() + boss->get_look_z());
 		for (int i = 0; i < GAIA_ROOM; i++) {
 			if (party[i]->get_tribe() != HUMAN) continue;
 			send_gaia_pattern_five_packet(party[i], &pattern_five_position[0]);
@@ -726,7 +727,7 @@ void Gaia::pattern_active(int pattern)
 			for (int i = 0; i < 3; i++) {
 				pattern_two_position[i].first += movesize;
 				pattern_two_position[i].second -= movesize;
-	
+
 			}
 			for (int i = 0; i < 4; i++) {
 				pattern_two_safe_zone[i].first += movesize;
@@ -760,7 +761,7 @@ void Gaia::pattern_active(int pattern)
 		}
 
 
-		for(int i=0; i<GAIA_ROOM; i++) send_gaia_pattern_two_packet(party[i], pattern_two_position, pattern_two_number);
+		for (int i = 0; i < GAIA_ROOM; i++) send_gaia_pattern_two_packet(party[i], pattern_two_position, pattern_two_number);
 		// 타이머
 		pattern_two_count++;
 		if (pattern_two_count <= 20) {
@@ -802,7 +803,7 @@ void Gaia::pattern_active(int pattern)
 			}
 			p->state_lock.unlock();
 
-			if (isInsideTriangle(rect[0], rect[1], rect[2], pos(p->get_x(), p->get_z())) 
+			if (isInsideTriangle(rect[0], rect[1], rect[2], pos(p->get_x(), p->get_z()))
 				|| isInsideTriangle(rect[0], rect[2], rect[3], pos(p->get_x(), p->get_z()))) {
 				// 쳐 맞는 판정
 				p->set_hp(p->get_hp() - 100);

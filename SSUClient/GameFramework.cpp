@@ -1049,7 +1049,56 @@ void CGameFramework::ProcessInput()
 			}
 
 			if (pKeysBuffer[VK_SPACE] & 0xF0) dwAttack |= 0x30;
-			if ((pKeysBuffer[VK_NUMPAD1] & 0xF0) || (pKeysBuffer['1'] & 0xF0)) dwSkill |= 0x31;
+			if ((pKeysBuffer[VK_NUMPAD1] & 0xF0) || (pKeysBuffer['1'] & 0xF0)) {
+				dwSkill |= 0x31;
+				send_skill_packet(0, 0);
+			}
+			//	if ((pKeysBuffer[VK_NUMPAD2] & 0xF0) || (pKeysBuffer['2'] & 0xF0)) {     //   2 
+			//		send_skill_packet(0, 1);
+			//	}
+			//	if ((pKeysBuffer[VK_NUMPAD3] & 0xF0) || (pKeysBuffer['3'] & 0xF0)) {     //   3	
+			//		send_skill_packet(0, 2);
+			//	}
+
+			if (pKeysBuffer[VK_NUMPAD4] & 0xF0 || (pKeysBuffer['4'] & 0xF0)) {     //   4 
+				send_skill_packet(1, 0);
+			}
+			if (pKeysBuffer[VK_NUMPAD5] & 0xF0 || (pKeysBuffer['5'] & 0xF0)) {     //   5 
+				send_skill_packet(1, 1);
+				/*
+				if (pushCTRL && my_job == J_MAGICIAN) {
+
+					if (shoot) {
+						++bulletidx;
+						pushCTRL = false;
+						shoot = false;
+					}
+					if (bulletidx >= BULLETCNT + 2) {
+						bulletidx = 2;
+						for (int i = 0; i < BULLETCNT; ++i) {
+							if (IsFire[i]) {
+								if (!InDungeon) m_pScene->Rotate(2 + i, 0, tmp[i], 0.0f);
+								else m_pRaid_Scene->Rotate(2 + i, 0, tmp[i], 0.0f);
+							}
+							IsFire[i] = false;
+						}
+					}
+					IsFire[bulletidx - 2] = true;
+				}*/
+			}
+			//	if (pKeysBuffer[VK_NUMPAD6] & 0xF0 || (pKeysBuffer['6'] & 0xF0)) {     //   6
+			//		send_skill_packet(1, 2);
+			//	}
+
+			if (pKeysBuffer[VK_NUMPAD7] & 0xF0 || (pKeysBuffer['7'] & 0xF0)) {    // 7 
+				send_skill_packet(2, 0);
+			}
+			//if (pKeysBuffer[VK_NUMPAD8] & 0xF0 || (pKeysBuffer['8'] & 0xF0)) {    // 8 
+			//	send_skill_packet(2, 1);
+			//}
+			//if (pKeysBuffer[VK_NUMPAD9] & 0xF0 || (pKeysBuffer['9'] & 0xF0)) {    // 9
+		//		send_skill_packet(2, 2);
+		//	}
 		}
 
 		//if (pKeysBuffer[VK_UP] & 0xF0) dwDirection |= DIR_FORWARD;
