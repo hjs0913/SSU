@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Player.h"
 #include "Gaia.h"
 #include "database.h"
@@ -76,7 +76,7 @@ bool check_move_alright(int x, int z, bool monster)
 
 
     for (auto& ob : obstacles) {
-        if ((ob.get_x() - size <= x && x <= ob.get_x() + size) && (ob.get_z() - size <= z && z <= ob.get_z()+size )) {
+        if ((ob.get_x() - size <= x && x <= ob.get_x() + size) && (ob.get_z() - size <= z && z <= ob.get_z() + size)) {
             return false;
         }
     }
@@ -96,8 +96,8 @@ bool is_player(int id)
 void Disconnect(int c_id)
 {
     Player* pl = reinterpret_cast<Player*>(players[c_id]);
-    // indunÃ³¸®
-    // viewlist Ã³¸®
+    // indunì²˜ë¦¬
+    // viewlist ì²˜ë¦¬
     pl->vl.lock();
     unordered_set <int> my_vl = pl->viewlist;
     if (pl->join_dungeon_room == true) {
@@ -108,7 +108,7 @@ void Disconnect(int c_id)
 
         Player** party_players = dun->get_party_palyer();
         if (dun->player_cnt - dun->partner_cnt == 0) {
-            // ¾Æ¹«µµ ¾ø´Ù´Â ¶æ
+            // ì•„ë¬´ë„ ì—†ë‹¤ëŠ” ëœ»
             dun->state_lock.lock();
             dun->set_dun_st(DUN_ST_FREE);
             dun->state_lock.unlock();
@@ -135,13 +135,13 @@ void Disconnect(int c_id)
                 send_party_room_info_packet(party_players[i], dun->get_party_palyer(), dun->player_cnt, dun->get_dungeon_id());
             }
         }
-    }   
+    }
     else pl->vl.unlock();
 
     for (auto& other : my_vl) {
         Player* target = reinterpret_cast<Player*>(players[other]);
-        if (true == is_npc(target->get_id())) continue;   // npcÀÏ °æ¿ì º¸³»Áö ¾Ê´Â´Ù
-        if (ST_INGAME != target->get_state() && ST_DEAD!=target->get_state()) continue;
+        if (true == is_npc(target->get_id())) continue;   // npcì¼ ê²½ìš° ë³´ë‚´ì§€ ì•ŠëŠ”ë‹¤
+        if (ST_INGAME != target->get_state() && ST_DEAD != target->get_state()) continue;
         target->vl.lock();
         if (0 != target->viewlist.count(c_id)) {
             target->viewlist.erase(c_id);
@@ -151,7 +151,7 @@ void Disconnect(int c_id)
         else target->vl.unlock();
     }
 
-    // DB ¿¬°á
+    // DB ì—°ê²°
     /*
     if (players[c_id]->get_state() == ST_INGAME ||
         players[c_id]->get_state() == ST_DEAD) {
@@ -160,8 +160,8 @@ void Disconnect(int c_id)
         LeaveCriticalSection(&cs);
     }
     */
-    
-    // ÀÌ ÆÄÆ¼¿øÀÌ ÆÄÆ¼¿¡ Âü°¡ÇÏ°í ÀÖ°Å³ª ·¹ÀÌµå¿¡ ÀÖÀ¸¸é ÇØÁ¦ÇØÁÖÀÚ
+
+    // ì´ íŒŒí‹°ì›ì´ íŒŒí‹°ì— ì°¸ê°€í•˜ê³  ìˆê±°ë‚˜ ë ˆì´ë“œì— ìˆìœ¼ë©´ í•´ì œí•´ì£¼ì
 
 
     players[c_id]->state_lock.lock();
@@ -170,7 +170,7 @@ void Disconnect(int c_id)
     players[c_id]->state_lock.unlock();
 }
 
-// ½ºÅ©¸³Æ® Ãß°¡
+// ìŠ¤í¬ë¦½íŠ¸ ì¶”ê°€
 void Activate_Npc_Move_Event(int target, int player_id)
 {
     EXP_OVER* exp_over = new EXP_OVER;
@@ -191,7 +191,7 @@ void magical_skill_success(int p_id, int target, float skill_factor)
 
     if (target_hp <= 0) target_hp = 0;
     players[target]->set_hp(target_hp);
-    
+
     if (target_hp <= 0) {
         players[target]->state_lock.lock();
         if (players[target]->get_state() != ST_INGAME) {
@@ -210,7 +210,7 @@ void magical_skill_success(int p_id, int target, float skill_factor)
             packet.attacker_id = p_id;
             reinterpret_cast<Player*>(players[target])->do_send(sizeof(packet), &packet);
 
-            send_notice(reinterpret_cast<Player*>(players[target]), "»ç¸ÁÇß½À´Ï´Ù. 10ÃÊ ÈÄ ºÎÈ°ÇÕ´Ï´Ù", 1);
+            send_notice(reinterpret_cast<Player*>(players[target]), "ì‚¬ë§í–ˆìŠµë‹ˆë‹¤. 10ì´ˆ í›„ ë¶€í™œí•©ë‹ˆë‹¤", 1);
 
             timer_event ev;
             ev.obj_id = target;
@@ -232,7 +232,7 @@ void magical_skill_success(int p_id, int target, float skill_factor)
             if (players[target]->get_tribe() == BOSS)
                 get_exp = get_exp * 2;
             char mess[MAX_CHAT_SIZE];
-            sprintf_s(mess, MAX_CHAT_SIZE, "%sÀ» Á×¿´½À´Ï´Ù, %dÀÇ °æÇèÄ¡¸¦ È¹µæÇÕ´Ï´Ù",
+            sprintf_s(mess, MAX_CHAT_SIZE, "%sì„ ì£½ì˜€ìŠµë‹ˆë‹¤, %dì˜ ê²½í—˜ì¹˜ë¥¼ íšë“í•©ë‹ˆë‹¤",
                 players[target]->get_name(), get_exp);
             send_chat_packet(reinterpret_cast<Player*>(players[p_id]), p_id, mess);
 
@@ -316,8 +316,8 @@ void magical_skill_success(int p_id, int target, float skill_factor)
     else {
         for (auto& obj : players) {
             if (obj->get_state() != ST_INGAME) continue;
-            if (true == is_npc(obj->get_id())) break;   // npc°¡ ¾Æ´Ò¶§
-            if (true == is_near(target, obj->get_id())) {      // ±ÙÃ³¿¡ ÀÖÀ»¶§
+            if (true == is_npc(obj->get_id())) break;   // npcê°€ ì•„ë‹ë•Œ
+            if (true == is_near(target, obj->get_id())) {      // ê·¼ì²˜ì— ìˆì„ë•Œ
                 send_change_hp_packet(reinterpret_cast<Player*>(obj), players[target]);
             }
         }
@@ -347,7 +347,7 @@ void physical_skill_success(int p_id, int target, float skill_factor)
 
     if (target_hp <= 0) target_hp = 0;
     players[target]->set_hp(target_hp);
-    
+
     if (target_hp <= 0) {
         players[target]->state_lock.lock();
         if (players[target]->get_state() != ST_INGAME) {
@@ -365,7 +365,7 @@ void physical_skill_success(int p_id, int target, float skill_factor)
             packet.attacker_id = p_id;
             reinterpret_cast<Player*>(players[target])->do_send(sizeof(packet), &packet);
 
-            send_notice(reinterpret_cast<Player*>(players[target]), "»ç¸ÁÇß½À´Ï´Ù. 10ÃÊ ÈÄ ºÎÈ°ÇÕ´Ï´Ù", 1);
+            send_notice(reinterpret_cast<Player*>(players[target]), "ì‚¬ë§í–ˆìŠµë‹ˆë‹¤. 10ì´ˆ í›„ ë¶€í™œí•©ë‹ˆë‹¤", 1);
 
             timer_event ev;
             ev.obj_id = target;
@@ -387,7 +387,7 @@ void physical_skill_success(int p_id, int target, float skill_factor)
             if (players[target]->get_tribe() == BOSS)
                 get_exp = get_exp * 2;
             char mess[MAX_CHAT_SIZE];
-            sprintf_s(mess, MAX_CHAT_SIZE, "%sÀ» Á×¿´½À´Ï´Ù, %dÀÇ °æÇèÄ¡¸¦ È¹µæÇÕ´Ï´Ù",
+            sprintf_s(mess, MAX_CHAT_SIZE, "%sì„ ì£½ì˜€ìŠµë‹ˆë‹¤, %dì˜ ê²½í—˜ì¹˜ë¥¼ íšë“í•©ë‹ˆë‹¤",
                 players[target]->get_name(), get_exp);
             send_chat_packet(reinterpret_cast<Player*>(players[p_id]), p_id, mess);
 
@@ -468,8 +468,8 @@ void physical_skill_success(int p_id, int target, float skill_factor)
     else {
         for (auto& obj : players) {
             if (obj->get_state() != ST_INGAME) continue;
-            if (true == is_npc(obj->get_id())) break;   // npc°¡ ¾Æ´Ò¶§
-            if (true == is_near(target, obj->get_id())) {      // ±ÙÃ³¿¡ ÀÖÀ»¶§
+            if (true == is_npc(obj->get_id())) break;   // npcê°€ ì•„ë‹ë•Œ
+            if (true == is_near(target, obj->get_id())) {      // ê·¼ì²˜ì— ìˆì„ë•Œ
                 send_change_hp_packet(reinterpret_cast<Player*>(obj), players[target]);
             }
         }
@@ -483,13 +483,13 @@ void physical_skill_success(int p_id, int target, float skill_factor)
         char mess[MAX_CHAT_SIZE];
         sprintf_s(mess, MAX_CHAT_SIZE, "%s -> %s damage : %d",
             players[p_id]->get_name(), players[target]->get_name(), damage);
-       // send_chat_packet(reinterpret_cast<Player*>(players[p_id]), p_id, mess);
+        // send_chat_packet(reinterpret_cast<Player*>(players[p_id]), p_id, mess);
     }
 }
 
 void attack_success(Npc* p, Npc* target, float atk_factor)
 {
-    // ÇöÀç ¹°¸® °ø°İ¿¡ ´ëÇØ¼­¸¸ »ı°¢ÇÑ´Ù
+    // í˜„ì¬ ë¬¼ë¦¬ ê³µê²©ì— ëŒ€í•´ì„œë§Œ ìƒê°í•œë‹¤
     float give_damage = p->get_physical_attack() * atk_factor;
     float defence_damage = (target->get_defence_factor() *
         target->get_physical_defence()) / (1 + (target->get_defence_factor() *
@@ -502,7 +502,7 @@ void attack_success(Npc* p, Npc* target, float atk_factor)
 
     //timer_event ev;
     //ev.obj_id = p_id;
-    //ev.start_time = chrono::system_clock::now() + 10s;  //ÄğÅ¸ÀÓ
+    //ev.start_time = chrono::system_clock::now() + 10s;  //ì¿¨íƒ€ì„
     //ev.ev = EVENT_ELEMENT_COOLTIME;;
     //ev.target_id = target;
     //timer_queue.push(ev);
@@ -530,14 +530,14 @@ void attack_success(Npc* p, Npc* target, float atk_factor)
             if (target->get_element() == E_WATER || target->get_element() == E_EARTH
                 || target->get_element() == E_FIRE) {
                 reinterpret_cast<Player*>(p)->attack_speed_up = true;
-                //°ø¼Ó  »ó½Â , ÄğÅ¸ÀÓ °¨¼Ò 
+                //ê³µì†  ìƒìŠ¹ , ì¿¨íƒ€ì„ ê°ì†Œ 
                 target->set_element_cooltime(true);
             }
             break;
         case E_FIRE:
             if (target->get_element() == E_ICE || target->get_element() == E_TREE
                 || target->get_element() == E_FULLMETAL) {
-                //10ÃÊ °ø°İ·Â 10ÇÁ·ÎÀÇ È­»ó ÇÇÇØ 
+                //10ì´ˆ ê³µê²©ë ¥ 10í”„ë¡œì˜ í™”ìƒ í”¼í•´ 
                 target->set_element_cooltime(true);
             }
             break;
@@ -558,7 +558,7 @@ void attack_success(Npc* p, Npc* target, float atk_factor)
         case E_ICE:
             if (target->get_element() == E_TREE || target->get_element() == E_WATER
                 || target->get_element() == E_WIND) {
-                //µ¿°á and  10ÃÊµ¿¾È °ø¼Ó, ½ÃÀü¼Óµµ, ÀÌµ¿¼Óµµ 10ÇÁ·Î°¨¼Ò 
+                //ë™ê²° and  10ì´ˆë™ì•ˆ ê³µì†, ì‹œì „ì†ë„, ì´ë™ì†ë„ 10í”„ë¡œê°ì†Œ 
                 target->set_element_cooltime(true);
             }
             break;
@@ -568,42 +568,42 @@ void attack_success(Npc* p, Npc* target, float atk_factor)
         if (target->get_element_cooltime() == true) {
             timer_event ev;
             ev.obj_id = p->get_id();
-            ev.start_time = chrono::system_clock::now() + 10s;  //ÄğÅ¸ÀÓ
+            ev.start_time = chrono::system_clock::now() + 10s;  //ì¿¨íƒ€ì„
             ev.ev = EVENT_ELEMENT_COOLTIME;;
             ev.target_id = target->get_id();
             timer_queue.push(ev);
         }
     }
 
-   
-  //  EXP_OVER* exp_over = new EXP_OVER;
-   // exp_over->_comp_op = OP_ELEMENT_COOLTIME;
-  //  exp_over->_target = target;
-  //  PostQueuedCompletionStatus(g_h_iocp, p_id, target, &exp_over->_wsa_over);
+
+    //  EXP_OVER* exp_over = new EXP_OVER;
+     // exp_over->_comp_op = OP_ELEMENT_COOLTIME;
+    //  exp_over->_target = target;
+    //  PostQueuedCompletionStatus(g_h_iocp, p_id, target, &exp_over->_wsa_over);
 
 
     if (target_hp <= 0) {
         target->state_lock.lock();
-        if(target->get_state()!=ST_INGAME){
+        if (target->get_state() != ST_INGAME) {
             target->state_lock.unlock();
             return;
         }
         target->set_state(ST_DEAD);
         target->state_lock.unlock();
-        if (target->get_id() < NPC_ID_START) {    // Á×Àº°Ô ÇÃ·¹ÀÌ¾îÀÌ´Ù
-            if (target->get_tribe() == BOSS) return;    // º¸½º Á×À½
+        if (target->get_id() < NPC_ID_START) {    // ì£½ì€ê²Œ í”Œë ˆì´ì–´ì´ë‹¤
+            if (target->get_tribe() == BOSS) return;    // ë³´ìŠ¤ ì£½ìŒ
             p->set_active(false);
-            // Á×Àº°ÍÀÌ ÇÃ·¹ÀÌ¾î¶ó¸é Á×¾ú´Ù´Â ÆĞÅ¶À» º¸³»ÁØ´Ù
+            // ì£½ì€ê²ƒì´ í”Œë ˆì´ì–´ë¼ë©´ ì£½ì—ˆë‹¤ëŠ” íŒ¨í‚·ì„ ë³´ë‚´ì¤€ë‹¤
             sc_packet_dead packet;
             packet.size = sizeof(packet);
             packet.type = SC_PACKET_DEAD;
             packet.id = target->get_id();
             packet.attacker_id = p->get_id();
-            reinterpret_cast<Player*>(target) ->do_send(sizeof(packet), &packet);
-            
-            send_notice(reinterpret_cast<Player*>(target), "»ç¸ÁÇß½À´Ï´Ù. 10ÃÊ ÈÄ ºÎÈ°ÇÕ´Ï´Ù", 1);
+            reinterpret_cast<Player*>(target)->do_send(sizeof(packet), &packet);
 
-            // 3ÃÊÈÄ ºÎÈ°ÇÏ¸ç ºÎÈ°°ú µ¿½Ã¿¡ À§Ä¡ ÁÂÇ¥¸¦ ¼öÁ¤ÇØÁØ´Ù
+            send_notice(reinterpret_cast<Player*>(target), "ì‚¬ë§í–ˆìŠµë‹ˆë‹¤. 10ì´ˆ í›„ ë¶€í™œí•©ë‹ˆë‹¤", 1);
+
+            // 3ì´ˆí›„ ë¶€í™œí•˜ë©° ë¶€í™œê³¼ ë™ì‹œì— ìœ„ì¹˜ ì¢Œí‘œë¥¼ ìˆ˜ì •í•´ì¤€ë‹¤
             timer_event ev;
             ev.obj_id = target->get_id();
             ev.start_time = chrono::system_clock::now() + 10s;
@@ -611,7 +611,7 @@ void attack_success(Npc* p, Npc* target, float atk_factor)
             ev.target_id = 0;
             timer_queue.push(ev);
         }
-        else {  // NPC¶ó¸é 30ÃÊ ÈÄ¿¡ ºÎÈ°ÇÒ ¼ö ÀÖµµ·Ï ÇÏÀÚ
+        else {  // NPCë¼ë©´ 30ì´ˆ í›„ì— ë¶€í™œí•  ìˆ˜ ìˆë„ë¡ í•˜ì
             target->set_active(false);
             timer_event ev;
             ev.obj_id = target->get_id();
@@ -620,13 +620,13 @@ void attack_success(Npc* p, Npc* target, float atk_factor)
             ev.target_id = 0;
             timer_queue.push(ev);
 
-            // ÇÃ·¹ÀÌ¾î¿¡°Ô °æÇèÄ¡ Á¦°ø, ±×¸®°í ¹Ù²ï °æÇèÄ¡¿Í ·¹º§À» º¸³»ÁÖÀÚ
+            // í”Œë ˆì´ì–´ì—ê²Œ ê²½í—˜ì¹˜ ì œê³µ, ê·¸ë¦¬ê³  ë°”ë€ ê²½í—˜ì¹˜ì™€ ë ˆë²¨ì„ ë³´ë‚´ì£¼ì
             int get_exp = target->get_lv() * target->get_lv() * 2;
             if (target->get_tribe() == BOSS)
                 get_exp = get_exp * 2;
             char mess[MAX_CHAT_SIZE];
-            sprintf_s(mess, MAX_CHAT_SIZE, "%sÀ» Á×¿´½À´Ï´Ù, %dÀÇ °æÇèÄ¡¸¦ È¹µæÇÕ´Ï´Ù",
-                 target->get_name(), get_exp);
+            sprintf_s(mess, MAX_CHAT_SIZE, "%sì„ ì£½ì˜€ìŠµë‹ˆë‹¤, %dì˜ ê²½í—˜ì¹˜ë¥¼ íšë“í•©ë‹ˆë‹¤",
+                target->get_name(), get_exp);
             send_chat_packet(reinterpret_cast<Player*>(p), p->get_id(), mess);
 
             send_status_change_packet(reinterpret_cast<Player*>(p));
@@ -635,7 +635,7 @@ void attack_success(Npc* p, Npc* target, float atk_factor)
             if (reinterpret_cast<Player*>(p)->get_exp() + get_exp >= max_exp) {
                 p->set_lv(p->get_lv() + 1);
                 reinterpret_cast<Player*>(p)->
-                    set_exp(reinterpret_cast<Player*>(p)->get_exp()+ get_exp - max_exp);
+                    set_exp(reinterpret_cast<Player*>(p)->get_exp() + get_exp - max_exp);
                 sprintf_s(mess, MAX_CHAT_SIZE, "Level up : %d",
                     p->get_lv());
                 send_chat_packet(reinterpret_cast<Player*>(p), p->get_id(), mess);
@@ -647,7 +647,7 @@ void attack_success(Npc* p, Npc* target, float atk_factor)
             }
             send_status_change_packet(reinterpret_cast<Player*>(p));
         }
-        // Á×Àº target ÁÖÀ§ÀÇ ÇÃ·¹ÀÌ¾î¿¡°Ô »ç¶óÁö°Ô ÇØÁÖÀÚ
+        // ì£½ì€ target ì£¼ìœ„ì˜ í”Œë ˆì´ì–´ì—ê²Œ ì‚¬ë¼ì§€ê²Œ í•´ì£¼ì
         unordered_set <int> nearlist;
         for (auto& other : players) {
             if (false == is_near(target->get_id(), other->get_id()))
@@ -671,11 +671,11 @@ void attack_success(Npc* p, Npc* target, float atk_factor)
             else other_player->vl.unlock();
         }
     }
-    else if(p->get_id() >= NPC_ID_START){
-        // ÇÃ·¹ÀÌ¾î°¡ °ø°İÀ» ´çÇÑ °ÍÀÌ¹Ç·Î hpÁ¤º¸°¡ ¹Ù²î¾úÀ¸¹Ç·Î ±×°ÍÀ» º¸³»ÁÖÀÚ
+    else if (p->get_id() >= NPC_ID_START) {
+        // í”Œë ˆì´ì–´ê°€ ê³µê²©ì„ ë‹¹í•œ ê²ƒì´ë¯€ë¡œ hpì •ë³´ê°€ ë°”ë€Œì—ˆìœ¼ë¯€ë¡œ ê·¸ê²ƒì„ ë³´ë‚´ì£¼ì
         // send_status_change_packet(reinterpret_cast<Player*>(players[target]));
-        
-        // ÇÃ·¹ÀÌ¾îÀÇ ViewList¿¡ ÀÖ´Â ÇÃ·¹ÀÌ¾îµé¿¡°Ô º¸³»ÁÖÀÚ
+
+        // í”Œë ˆì´ì–´ì˜ ViewListì— ìˆëŠ” í”Œë ˆì´ì–´ë“¤ì—ê²Œ ë³´ë‚´ì£¼ì
         send_change_hp_packet(reinterpret_cast<Player*>(target), target);
         reinterpret_cast<Player*>(target)->vl.lock();
         for (auto id : reinterpret_cast<Player*>(target)->viewlist) {
@@ -688,7 +688,7 @@ void attack_success(Npc* p, Npc* target, float atk_factor)
         char mess[MAX_CHAT_SIZE];
         //send_chat_packet(reinterpret_cast<Player*>(players[target]), target, mess);
 
-        // hp°¡ ±ğÀÌ¿´À¸¹Ç·Î hpÀÚµ¿È¸º¹À» ÇØÁÖµµ·Ï ÇÏÀÚ
+        // hpê°€ ê¹ì´ì˜€ìœ¼ë¯€ë¡œ hpìë™íšŒë³µì„ í•´ì£¼ë„ë¡ í•˜ì
         if (reinterpret_cast<Player*>(target)->_auto_hp == false) {
             timer_event ev;
             ev.obj_id = target->get_id();
@@ -699,7 +699,7 @@ void attack_success(Npc* p, Npc* target, float atk_factor)
             reinterpret_cast<Player*>(target)->_auto_hp = true;
         }
 
-        // npc°ø°İÀÌ¸é Å¸ÀÌ¸Ó Å¥¿¡ ´Ù½Ã ³Ö¾îÁÖÀÚ
+        // npcê³µê²©ì´ë©´ íƒ€ì´ë¨¸ íì— ë‹¤ì‹œ ë„£ì–´ì£¼ì
         timer_event ev;
         ev.obj_id = p->get_id();
         ev.start_time = chrono::system_clock::now() + 3s;
@@ -707,20 +707,20 @@ void attack_success(Npc* p, Npc* target, float atk_factor)
         ev.target_id = target->get_id();
         timer_queue.push(ev);
     }
-    else {  // ÇÃ·¹ÀÌ¾î°¡ °ø°İÀ» ÀÔÈû
+    else {  // í”Œë ˆì´ì–´ê°€ ê³µê²©ì„ ì…í˜
         for (auto& obj : players) {
             if (obj->get_state() != ST_INGAME) continue;
-            if (true == is_npc(obj->get_id())) break;   // npc°¡ ¾Æ´Ò¶§
-            if (true == is_near(target->get_id(), obj->get_id())) {      // ±ÙÃ³¿¡ ÀÖÀ»¶§
+            if (true == is_npc(obj->get_id())) break;   // npcê°€ ì•„ë‹ë•Œ
+            if (true == is_near(target->get_id(), obj->get_id())) {      // ê·¼ì²˜ì— ìˆì„ë•Œ
                 send_change_hp_packet(reinterpret_cast<Player*>(obj), target);
             }
         }
-        
+
         sc_packet_combat_id packet;
         packet.size = sizeof(packet);
         packet.type = SC_PACKET_COMBAT_ID;
         packet.id = target->get_id();
-        
+
         reinterpret_cast<Player*>(p)->do_send(sizeof(packet), &packet);
 
         char mess[MAX_CHAT_SIZE];
@@ -761,18 +761,18 @@ bool isInsideTriangle(Coord a, Coord b, Coord c, Coord n)
 
 void process_packet(int client_id, unsigned char* p)
 {
-   
+
     unsigned char packet_type = p[1];
     Player* pl = reinterpret_cast<Player*>(players[client_id]);
     switch (packet_type) {
     case CS_PACKET_LOGIN: {
         cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(p);
         // pl->set_name(packet->name);
-        // DB ¿¬°á
+        // DB ì—°ê²°
         /*
         EnterCriticalSection(&cs);
         if (!(Search_Id(pl, packet->name))) {
-            send_login_fail_packet(pl, 0);   // ¾ÆÀÌµğ ¾øÀ½
+            send_login_fail_packet(pl, 0);   // ì•„ì´ë”” ì—†ìŒ
             Disconnect(client_id);
             LeaveCriticalSection(&cs);
             return;
@@ -780,27 +780,27 @@ void process_packet(int client_id, unsigned char* p)
         LeaveCriticalSection(&cs);
         */
 
-        // Áßº¹ ¾ÆÀÌµğ °Ë»ç
-        
+        // ì¤‘ë³µ ì•„ì´ë”” ê²€ì‚¬
+
         for (auto* p : players) {
             if (p->get_tribe() != HUMAN) break;
             if (p->get_state() == ST_FREE) continue;
             if (p->get_id() == client_id) continue;
-            if (strcmp(reinterpret_cast<Player*>(p)->get_login_id(), packet->id)==0) {
-                cout << "Áßº¹µÈ ¾ÆÀÌµğ Á¢¼Ó È®ÀÎ" << endl;
-                send_login_fail_packet(pl, 1);   // Áßº¹ ·Î±×ÀÎ
+            if (strcmp(reinterpret_cast<Player*>(p)->get_login_id(), packet->id) == 0) {
+                cout << "ì¤‘ë³µëœ ì•„ì´ë”” ì ‘ì† í™•ì¸" << endl;
+                send_login_fail_packet(pl, 1);   // ì¤‘ë³µ ë¡œê·¸ì¸
                 Disconnect(client_id);
                 return;
             }
             if (strcmp(reinterpret_cast<Player*>(p)->get_name(), packet->name) == 0) {
-                cout << "Áßº¹µÈ ´Ğ³×ÀÓ Á¢¼Ó È®ÀÎ" << endl;
-                send_login_fail_packet(pl, 1);   // Áßº¹ ·Î±×ÀÎ
+                cout << "ì¤‘ë³µëœ ë‹‰ë„¤ì„ ì ‘ì† í™•ì¸" << endl;
+                send_login_fail_packet(pl, 1);   // ì¤‘ë³µ ë¡œê·¸ì¸
                 Disconnect(client_id);
                 return;
             }
 
         }
-        // ¿ø·¡´Â DB¿¡¼­ ¹Ş¾Æ¿Í¾ß ÇÏ´Â Á¤º¸¸¦ ±âº» Á¤º¸·Î ´ëÃ¼
+        // ì›ë˜ëŠ” DBì—ì„œ ë°›ì•„ì™€ì•¼ í•˜ëŠ” ì •ë³´ë¥¼ ê¸°ë³¸ ì •ë³´ë¡œ ëŒ€ì²´
         pl->set_x(3210);
         pl->set_y(0);
         pl->set_z(940);
@@ -844,7 +844,7 @@ void process_packet(int client_id, unsigned char* p)
             pl->set_element(E_WATER);
             break;
         }
-        case J_SUPPORTER: { 
+        case J_SUPPORTER: {
             int lv = pl->get_lv();
             pl->set_maxhp(18 * lv * lv + 70 * lv);
             pl->set_hp(pl->get_maxhp());
@@ -858,7 +858,7 @@ void process_packet(int client_id, unsigned char* p)
             pl->set_defence_factor(0.0002);
             break;
         }
-        case J_MAGICIAN: { 
+        case J_MAGICIAN: {
             int lv = pl->get_lv();
             pl->set_maxhp(16 * lv * lv + 70 * lv);
             pl->set_hp(pl->get_maxhp());
@@ -876,11 +876,11 @@ void process_packet(int client_id, unsigned char* p)
             break;
         }
         }
-        // -- DB ´ëÃ¼ ³¡ --
+        // -- DB ëŒ€ì²´ ë --
 
-        // HpÈ¸º¹
+        // HpíšŒë³µ
         if (pl->get_hp() < pl->get_maxhp()) {
-            // hp°¡ ±ğÀÌ¿´À¸¹Ç·Î hpÀÚµ¿È¸º¹À» ÇØÁÖµµ·Ï ÇÏÀÚ
+            // hpê°€ ê¹ì´ì˜€ìœ¼ë¯€ë¡œ hpìë™íšŒë³µì„ í•´ì£¼ë„ë¡ í•˜ì
             if (reinterpret_cast<Player*>(players[client_id])->_auto_hp == false) {
                 timer_event ev;
                 ev.obj_id = client_id;
@@ -897,9 +897,9 @@ void process_packet(int client_id, unsigned char* p)
         pl->set_state(ST_INGAME);
         pl->state_lock.unlock();
 
-        // »õ·Î Á¢¼ÓÇÑ Á¤º¸¸¦ ´Ù¸¥ÀÌ¿¡°Ô º¸³»ÁÜ
+        // ìƒˆë¡œ ì ‘ì†í•œ ì •ë³´ë¥¼ ë‹¤ë¥¸ì´ì—ê²Œ ë³´ë‚´ì¤Œ
         for (auto& other : players) {
-            if (other->get_id() == client_id) continue;   // ³ª´Ù
+            if (other->get_id() == client_id) continue;   // ë‚˜ë‹¤
 
             if (true == is_npc(other->get_id())) break;
 
@@ -912,12 +912,12 @@ void process_packet(int client_id, unsigned char* p)
 
             if (false == is_near(other->get_id(), client_id)) continue;
 
-            // ¿©±â´Â ÇÃ·¹ÀÌ¾î Ã³¸®
+            // ì—¬ê¸°ëŠ” í”Œë ˆì´ì–´ ì²˜ë¦¬
             Player* other_player = reinterpret_cast<Player*>(other);
             other_player->vl.lock();
             other_player->viewlist.insert(client_id);
             other_player->vl.unlock();
-            
+
             send_put_object_packet(other_player, pl);
 
             /*sc_packet_put_object packet;
@@ -931,7 +931,7 @@ void process_packet(int client_id, unsigned char* p)
             packet.z = pl->get_z();
             other_player->do_send(sizeof(packet), &packet);*/
         }
-        // »õ·Î Á¢¼ÓÇÑ ÇÃ·¹ÀÌ¾î¿¡°Ô ±âÁ¸ Á¤º¸¸¦ º¸³»Áß
+        // ìƒˆë¡œ ì ‘ì†í•œ í”Œë ˆì´ì–´ì—ê²Œ ê¸°ì¡´ ì •ë³´ë¥¼ ë³´ë‚´ì¤‘
         pl->viewlist.clear();
         for (auto& other : players) {
             if (other->get_id() == client_id) continue;
@@ -945,8 +945,8 @@ void process_packet(int client_id, unsigned char* p)
             if (false == is_near(other->get_id(), client_id))
                 continue;
 
-            // ½ºÅ©¸³Æ®¿Í ÇÔ²² Ãß°¡µÈ ºÎºĞ
-            if (true == is_npc(other->get_id())) {	// ½Ã¾ß¿¡ npc°¡ ÀÖ´Ù¸é 
+            // ìŠ¤í¬ë¦½íŠ¸ì™€ í•¨ê»˜ ì¶”ê°€ëœ ë¶€ë¶„
+            if (true == is_npc(other->get_id())) {	// ì‹œì•¼ì— npcê°€ ìˆë‹¤ë©´ 
                 if (is_agro_near(client_id, other->get_id())) {
                     if (other->get_active() == false) {
                         other->set_active(true);
@@ -977,7 +977,7 @@ void process_packet(int client_id, unsigned char* p)
             packet.z = other->get_z();
             pl->do_send(sizeof(packet), &packet);*/
         }
-        // Àå¾Ö¹° Á¤º¸
+        // ì¥ì• ë¬¼ ì •ë³´
         for (auto& ob : obstacles) {
             if (RANGE < abs(pl->get_x() - ob.get_x())) continue;
             if (RANGE < abs(pl->get_z() - ob.get_z())) continue;
@@ -1007,7 +1007,7 @@ void process_packet(int client_id, unsigned char* p)
         pl->last_move_time = packet->move_time;
         float x = packet->x;
         float y = packet->y;
-        float z = packet->z;       
+        float z = packet->z;
 
         pl->state_lock.lock();
         if (pl->get_state() == ST_DEAD || pl->get_state() == ST_FREE) {
@@ -1017,8 +1017,8 @@ void process_packet(int client_id, unsigned char* p)
         pl->state_lock.unlock();
         // InDunProcess
         if (pl->get_state() == ST_INDUN) {
-            // À¯È¿¼º °Ë»ç
-            //if (check_move_alright(x, z, false) == false) { // Raid Map¿¡ ¸Â´Â À¯È¿¼º °Ë»ç ÇÊ¿ä
+            // ìœ íš¨ì„± ê²€ì‚¬
+            //if (check_move_alright(x, z, false) == false) { // Raid Mapì— ë§ëŠ” ìœ íš¨ì„± ê²€ì‚¬ í•„ìš”
             //    send_move_packet(pl, pl);   
             //    break;
             //}
@@ -1041,9 +1041,9 @@ void process_packet(int client_id, unsigned char* p)
         }
 
 
-        // À¯È¿¼º °Ë»ç
+        // ìœ íš¨ì„± ê²€ì‚¬
         if (check_move_alright(x, z, false) == false) {
-            // ¿Ã¹Ù¸£Áö ¾ÊÀ»°æ¿ì À§Ä¡¸¦ ¼öÁ¤À» ÇØÁÖ¾î¾ß ÇÑ´Ù
+            // ì˜¬ë°”ë¥´ì§€ ì•Šì„ê²½ìš° ìœ„ì¹˜ë¥¼ ìˆ˜ì •ì„ í•´ì£¼ì–´ì•¼ í•œë‹¤
             send_move_packet(pl, pl, 0);
             break;
         }
@@ -1058,7 +1058,7 @@ void process_packet(int client_id, unsigned char* p)
                 continue;
             if (ST_INGAME != other->get_state())
                 continue;
-            //½ºÅ©¸³Æ® Ãß°¡
+            //ìŠ¤í¬ë¦½íŠ¸ ì¶”ê°€
             if (true == is_npc(other->get_id())) {
                 if (is_agro_near(client_id, other->get_id())) {
                     if (other->get_active() == false) {
@@ -1075,42 +1075,42 @@ void process_packet(int client_id, unsigned char* p)
             }
             nearlist.insert(other->get_id());
         }
-        nearlist.erase(client_id);  // ³» ¾ÆÀÌµğ´Â ¹«Á¶°Ç µé¾î°¡´Ï ±×°ÍÀ» Áö¿öÁÖÀÚ
+        nearlist.erase(client_id);  // ë‚´ ì•„ì´ë””ëŠ” ë¬´ì¡°ê±´ ë“¤ì–´ê°€ë‹ˆ ê·¸ê²ƒì„ ì§€ì›Œì£¼ì
 
-        send_move_packet(pl, pl, 1); // ³» ÀÚ½ÅÀÇ ¿òÁ÷ÀÓÀ» ¸ÕÀú º¸³»ÁÖÀÚ
+        send_move_packet(pl, pl, 1); // ë‚´ ìì‹ ì˜ ì›€ì§ì„ì„ ë¨¼ì € ë³´ë‚´ì£¼ì
 
         pl->vl.lock();
         unordered_set <int> my_vl{ pl->viewlist };
         pl->vl.unlock();
 
-        // »õ·Î½Ã¾ß¿¡ µé¾î¿Â ÇÃ·¹ÀÌ¾î Ã³¸®
+        // ìƒˆë¡œì‹œì•¼ì— ë“¤ì–´ì˜¨ í”Œë ˆì´ì–´ ì²˜ë¦¬
         for (auto other : nearlist) {
-            if (0 == my_vl.count(other)) {   // ¿ø·¡ ¾ø´ø ÇÃ·¹ÀÌ¾î/npc
+            if (0 == my_vl.count(other)) {   // ì›ë˜ ì—†ë˜ í”Œë ˆì´ì–´/npc
                 pl->vl.lock();
                 pl->viewlist.insert(other);
                 pl->vl.unlock();
                 send_put_object_packet(pl, players[other]);
 
-                // ½ºÅ©¸³Æ® Ãß°¡
+                // ìŠ¤í¬ë¦½íŠ¸ ì¶”ê°€
                 if (true == is_npc(other)) break;
 
-                // ¿©±â´Â ÇÃ·¹ÀÌ¾î Ã³¸®ÀÌ´Ù.
+                // ì—¬ê¸°ëŠ” í”Œë ˆì´ì–´ ì²˜ë¦¬ì´ë‹¤.
                 Player* other_player = reinterpret_cast<Player*>(players[other]);
                 other_player->vl.lock();
                 if (0 == other_player->viewlist.count(pl->get_id())) {
                     other_player->viewlist.insert(pl->get_id());
                     other_player->vl.unlock();
                     send_put_object_packet(other_player, pl);
-                    
+
                 }
                 else {
                     other_player->vl.unlock();
                     send_move_packet(other_player, pl, 1);
                 }
             }
-            // °è¼Ó ½Ã¾ß¿¡ Á¸ÀçÇÏ´Â ÇÃ·¹ÀÌ¾î Ã³¸®
+            // ê³„ì† ì‹œì•¼ì— ì¡´ì¬í•˜ëŠ” í”Œë ˆì´ì–´ ì²˜ë¦¬
             else {
-                if (true == is_npc(other)) continue;   // ¿ø·¡ ÀÖ´ø npc´Â npc_move¿¡¼­ Ã³¸®
+                if (true == is_npc(other)) continue;   // ì›ë˜ ìˆë˜ npcëŠ” npc_moveì—ì„œ ì²˜ë¦¬
 
                 Player* other_player = reinterpret_cast<Player*>(players[other]);
                 other_player->vl.lock();
@@ -1125,7 +1125,7 @@ void process_packet(int client_id, unsigned char* p)
                 }
             }
         }
-        // ½Ã¾ß¿¡¼­ »ç¶óÁø ÇÃ·¹ÀÌ¾î Ã³¸®
+        // ì‹œì•¼ì—ì„œ ì‚¬ë¼ì§„ í”Œë ˆì´ì–´ ì²˜ë¦¬
         for (auto other : my_vl) {
             if (0 == nearlist.count(other)) {
                 pl->vl.lock();
@@ -1144,13 +1144,13 @@ void process_packet(int client_id, unsigned char* p)
                 else other_player->vl.unlock();
             }
         }
-        // »õ·Î »ı±ä Àå¾Ö¹°ÀÌ Á¸Àç °¡´É
-        // Àå¾Ö¹° Á¤º¸
+        // ìƒˆë¡œ ìƒê¸´ ì¥ì• ë¬¼ì´ ì¡´ì¬ ê°€ëŠ¥
+        // ì¥ì• ë¬¼ ì •ë³´
 
         for (auto& ob : obstacles) {
             if ((RANGE < abs(pl->get_x() - ob.get_x())) &&
                 (RANGE < abs(pl->get_z() - ob.get_z()))) {
-                // ¹üÀ§ ¹ş¾î³­°ÅÀÓ(Á¸ÀçÇÏ´ø°Ô ÀÖÀ¸¸é ¾ø¾ÖÀÚ)
+                // ë²”ìœ„ ë²—ì–´ë‚œê±°ì„(ì¡´ì¬í•˜ë˜ê²Œ ìˆìœ¼ë©´ ì—†ì• ì)
                 pl->ob_vl.lock();
                 if (pl->ob_viewlist.count(ob.get_id()) != 0) {
                     pl->ob_viewlist.erase(ob.get_id());
@@ -1166,7 +1166,7 @@ void process_packet(int client_id, unsigned char* p)
                 pl->ob_vl.unlock();
                 continue;
             }
-            // ÀÌ¹Ì Á¸ÀçÇÏ´Â°¡
+            // ì´ë¯¸ ì¡´ì¬í•˜ëŠ”ê°€
             pl->ob_vl.lock();
             if (pl->ob_viewlist.count(ob.get_id()) != 0) {
                 pl->ob_vl.unlock();
@@ -1185,13 +1185,13 @@ void process_packet(int client_id, unsigned char* p)
             packet.y = ob.get_y();
             packet.z = ob.get_z();
             //pl->do_send(sizeof(packet), &packet);
-            pl->do_send(sizeof(packet), &packet);      
+            pl->do_send(sizeof(packet), &packet);
         }
         break;
     }
     case CS_PACKET_ATTACK: {
         // cs_packet_attack* packet = reinterpret_cast<cs_packet_attack*>(p);
-        // ÇÃ·¹ÀÌ¾î°¡ °ø°İÇÏ°í ¹İ°æ 1Ä­ ÀÌ³»¿¡ ¸ó½ºÅÍ°¡ ÀÖ´Ù¸é ÀüÅõ
+        // í”Œë ˆì´ì–´ê°€ ê³µê²©í•˜ê³  ë°˜ê²½ 1ì¹¸ ì´ë‚´ì— ëª¬ìŠ¤í„°ê°€ ìˆë‹¤ë©´ ì „íˆ¬
 
         pl->state_lock.lock();
         if (pl->get_state() == ST_DEAD || pl->get_state() == ST_FREE) {
@@ -1201,7 +1201,7 @@ void process_packet(int client_id, unsigned char* p)
         pl->state_lock.unlock();
 
         if (pl->get_attack_active()) break;
-        
+
         pl->set_attack_active(true);
         send_animation_attack(pl, pl->get_id());
         pl->vl.lock();
@@ -1228,13 +1228,13 @@ void process_packet(int client_id, unsigned char* p)
             ev.target_id = client_id;
             timer_queue.push(ev);
         }
-        
+
         if (pl->join_dungeon_room && dungeons[pl->indun_id]->start_game) {
             int indun = pl->indun_id;
             Npc* bos = dungeons[indun]->boss;
             if (bos->get_x() >= pl->get_x() - 20 && bos->get_x() <= pl->get_x() + 20) {
                 if (bos->get_z() >= pl->get_z() - 20 && bos->get_z() <= pl->get_z() + 20) {
-                    // ÀÏ´Ü °íÁ¤°ªÀ¸·Î Á¦°ÅÇØ ÁÖÀÚ
+                    // ì¼ë‹¨ ê³ ì •ê°’ìœ¼ë¡œ ì œê±°í•´ ì£¼ì
                     //bos->set_hp(bos->get_hp() - 130000);
                     attack_success(pl, bos, pl->get_basic_attack_factor());
 
@@ -1254,10 +1254,10 @@ void process_packet(int client_id, unsigned char* p)
                 continue;
             }
             players[i]->state_lock.unlock();
-            if (players[i]->get_x() >= pl->get_x() -20 && players[i]->get_x() <= pl->get_x() + 20) {
+            if (players[i]->get_x() >= pl->get_x() - 20 && players[i]->get_x() <= pl->get_x() + 20) {
                 if (players[i]->get_z() >= pl->get_z() - 20 && players[i]->get_z() <= pl->get_z() + 20) {
-                    attack_success(pl, players[i], pl->get_basic_attack_factor());    // µ¥¹ÌÁö °è»ê
-                    // ¸ó½ºÅÍÀÇ ÀÚµ¿°ø°İÀ» ³Ö¾îÁÖÀÚ
+                    attack_success(pl, players[i], pl->get_basic_attack_factor());    // ë°ë¯¸ì§€ ê³„ì‚°
+                    // ëª¬ìŠ¤í„°ì˜ ìë™ê³µê²©ì„ ë„£ì–´ì£¼ì
                     players[i]->set_target_id(pl->get_id());
                     if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
                         players[i]->set_active(true);
@@ -1266,7 +1266,7 @@ void process_packet(int client_id, unsigned char* p)
                         ev.ev = EVENT_NPC_ATTACK;
                         ev.target_id = players[i]->get_target_id();
                         timer_queue.push(ev);
-                        // ¸ó½ºÅÍÀÇ ÀÌµ¿µµ ³Ö¾îÁÖÀÚ
+                        // ëª¬ìŠ¤í„°ì˜ ì´ë™ë„ ë„£ì–´ì£¼ì
                         Activate_Npc_Move_Event(i, players[i]->get_target_id());
                     }
                 }
@@ -1313,7 +1313,7 @@ void process_packet(int client_id, unsigned char* p)
                 s_pl->state_lock.unlock();
                 if (s_pl->get_tribe() == MONSTER) break;
                 send_chat_packet(reinterpret_cast<Player*>(s_pl), client_id, c_temp);
-            
+
             }
         }
         break;
@@ -1332,7 +1332,7 @@ void process_packet(int client_id, unsigned char* p)
         break;
     }
     case CS_PACKET_SKILL: {
-        if (pl->get_mp() - 1000 < 0)  //mp¾øÀ¸¸é ¾ÈµÊ 
+        if (pl->get_mp() - 1000 < 0)  //mpì—†ìœ¼ë©´ ì•ˆë¨ 
             return;
         pl->state_lock.lock();
         if (pl->get_state() == ST_DEAD || pl->get_state() == ST_FREE) {
@@ -1343,148 +1343,26 @@ void process_packet(int client_id, unsigned char* p)
 
         cs_packet_skill* packet = reinterpret_cast<cs_packet_skill*>(p);
         if (pl->get_skill_active(packet->skill_type) == true) return;
-        pl->set_skill_active(packet->skill_type, true);     //ÀÏ¹İ°ø°İ °è¼ö´Â 5
+        pl->set_skill_active(packet->skill_type, true);     //ì¼ë°˜ê³µê²© ê³„ìˆ˜ëŠ” 5
         switch (pl->get_job())
         {
         case J_DILLER:
             switch (packet->skill_type)
             {
-            case 0:    // ¹°¸® °ø°İ ½ºÅ³ 
+            case 0:    // ë¬¼ë¦¬ ê³µê²© ìŠ¤í‚¬ 
                 switch (packet->skill_num)
                 {
-                case 0:  //¹°¸® °ø°İ½ºÅ³ Áß 0¹ø ½ºÅ³ -> ½ÊÀÚ°ø°İ ¾îÅÃ 
+                case 0:  //ë¬¼ë¦¬ ê³µê²©ìŠ¤í‚¬ ì¤‘ 0ë²ˆ ìŠ¤í‚¬ -> ì‹­ìê³µê²© ì–´íƒ 
                     timer_event ev;
                     ev.obj_id = client_id;
-                    ev.start_time = chrono::system_clock::now() + 3s;  //ÄğÅ¸ÀÓ
+                    ev.start_time = chrono::system_clock::now() + 3s;  //ì¿¨íƒ€ì„
                     ev.ev = EVENT_SKILL_COOLTIME;
                     ev.target_id = 0;
                     timer_queue.push(ev);
 
                     pl->set_mp(pl->get_mp() - 1000);
 
-                    for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
-                        players[i]->state_lock.lock();
-                        if (players[i]->get_state() != ST_INGAME) {
-                            players[i]->state_lock.unlock();
-                            continue;
-                        }
-                        players[i]->state_lock.unlock();
-
-                        if ((players[i]->get_x() >= pl->get_x() - 10 && players[i]->get_x() <= pl->get_x() + 10) && (players[i]->get_z() >= pl->get_z() - 10 && players[i]->get_z() <= pl->get_z() + 10)) {
-                            pl->set_skill_factor(packet->skill_type, packet->skill_num);
-                            physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
-                            players[i]->set_target_id(pl->get_id());
-                            send_status_change_packet(pl);
-                            if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
-                                players[i]->set_active(true);
-                                timer_event ev;
-                                ev.obj_id = i;
-                                ev.start_time = chrono::system_clock::now() + 1s;
-                                ev.ev = EVENT_NPC_ATTACK;
-                                ev.target_id = players[i]->get_target_id();
-                                timer_queue.push(ev);
-
-                                Activate_Npc_Move_Event(i, pl->get_id());
-                            }
-                        }
-                    }
-
-                    break;
-                }
-                break;
-            case 1:  //¸¶¹ı °ø°İ ½ºÅ³  »ï°¢Çü ¹üÀ§?
-                switch (packet->skill_num)
-                {
-                case 0:  //¹°¸® °ø°İ½ºÅ³ Áß 0¹ø ½ºÅ³ -> ½ÊÀÚ°ø°İ ¾îÅÃ 
-                    timer_event ev;
-                    ev.obj_id = client_id;
-                    ev.start_time = chrono::system_clock::now() + 3s;  //ÄğÅ¸ÀÓ
-                    ev.ev = EVENT_SKILL_COOLTIME;
-                    ev.target_id = 1;
-                    timer_queue.push(ev);
-
-              
-                    Coord a = { pl->get_x(), pl->get_z() };    //ÇÃ·¹ÀÌ¾î ±âÁØ Àü¹æ »ï°¢Çü ¹üÀ§ 
-                    Coord b = { pl->get_x() - pl->get_right_x() * 40 + pl->get_look_x() * 100,
-                        pl->get_z() - pl->get_right_z() * 40 + pl->get_look_z() * 100 };  // ¿ŞÂÊ À§
-                    Coord c = { pl->get_x() + pl->get_right_x() * 40 + pl->get_look_x() * 100,
-                        pl->get_z() + pl->get_right_z() * 40 + pl->get_look_z() * 100 };  // ¿À¸¥ÂÊ À§
-           
-                    pl->set_mp(pl->get_mp() - 1000);
-                    for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
-                        players[i]->state_lock.lock();
-                        if (players[i]->get_state() != ST_INGAME) {
-                            players[i]->state_lock.unlock();
-                            continue;
-                        }
-                        players[i]->state_lock.unlock();
-
-                        Coord n = { players[i]->get_x(), players[i]->get_z() };
-                        float px = players[i]->get_x();
-                        float pz = players[i]->get_z();
-
-                        if (isInsideTriangle(a, b, c, n)) {
-            
-                            pl->set_skill_factor(packet->skill_type, packet->skill_num);
-       
-                            magical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
-                            players[i]->set_target_id(pl->get_id());
-                            send_status_change_packet(pl);
-                            if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
-                                players[i]->set_active(true);
-                                timer_event ev;
-                                ev.obj_id = i;
-                                ev.start_time = chrono::system_clock::now() + 1s;
-                                ev.ev = EVENT_NPC_ATTACK;
-                                ev.target_id = players[i]->get_target_id();
-                                timer_queue.push(ev);
-                                Activate_Npc_Move_Event(i, pl->get_id());
-                            }
-                        }
-                    }
-                    break;
-                }
-
-                break;
-            case 2:  //¹öÇÁ   //°ø°İ·Â Áõ°¡·Î º¯°æ 
-                switch (packet->skill_num)
-                {
-                case 0:
-                    timer_event ev;
-                    ev.obj_id = client_id;
-                    ev.start_time = chrono::system_clock::now() + 10s;  //ÄğÅ¸ÀÓ
-                    ev.ev = EVENT_SKILL_COOLTIME;
-                    ev.target_id = 2;
-                    timer_queue.push(ev);
-
-                    pl->set_mp(pl->get_mp() - 1000);
-                    send_buff_ui_packet(pl, 3); //ui
-                    pl->set_physical_attack(0.6 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv()); //ÀÏ´Ü µÎ¹è 
-                    pl->set_magical_attack(0.2 * pl->get_lv() * pl->get_lv() + 5 * pl->get_lv());
-                    send_status_change_packet(pl);
-                    break;
-                }
-                break;
-            }
-            break;
-          
-            case J_TANKER:
-                switch (packet->skill_type)
-                {
-                case 0:    // ¹°¸® °ø°İ ½ºÅ³ // ¹æÆĞ 
-                    switch (packet->skill_num)
-                    {
-                    case 0:  //¹°¸® °ø°İ½ºÅ³ Áß 0¹ø ½ºÅ³ -> ½ÊÀÚ°ø°İ ¾îÅÃ 
-                        timer_event ev;
-                        ev.obj_id = client_id;
-                        ev.start_time = chrono::system_clock::now() + 3s;  //ÄğÅ¸ÀÓ
-                        ev.ev = EVENT_SKILL_COOLTIME;
-                        ev.target_id = 0;
-                        timer_queue.push(ev);
-
-
-                        pl->set_mp(pl->get_mp() - 1000);
-
+                    if (dungeons[client_id]->start_game == false) {
                         for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
                             players[i]->state_lock.lock();
                             if (players[i]->get_state() != ST_INGAME) {
@@ -1493,12 +1371,170 @@ void process_packet(int client_id, unsigned char* p)
                             }
                             players[i]->state_lock.unlock();
 
+
+                            if ((players[i]->get_x() >= pl->get_x() - 10 && players[i]->get_x() <= pl->get_x() + 10) && (players[i]->get_z() >= pl->get_z() - 10 && players[i]->get_z() <= pl->get_z() + 10)) {
+                                pl->set_skill_factor(packet->skill_type, packet->skill_num);
+                                physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
+                                players[i]->set_target_id(pl->get_id());
+                                send_status_change_packet(pl);
+                                if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
+                                    players[i]->set_active(true);
+                                    timer_event ev;
+                                    ev.obj_id = i;
+                                    ev.start_time = chrono::system_clock::now() + 1s;
+                                    ev.ev = EVENT_NPC_ATTACK;
+                                    ev.target_id = players[i]->get_target_id();
+                                    timer_queue.push(ev);
+
+                                    Activate_Npc_Move_Event(i, pl->get_id());
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        if ((dungeons[client_id]->get_x() >= pl->get_x() - 10 && dungeons[client_id]->get_x() <= pl->get_x() + 10) && (dungeons[client_id]->get_z() >= pl->get_z() - 10 && dungeons[client_id]->get_z() <= pl->get_z() + 10)) {
+                            pl->set_skill_factor(0, 0);
+                            float give_damage = pl->get_physical_attack() * pl->get_skill_factor(0, 0);
+                            float defence_damage = (dungeons[client_id]->boss->get_defence_factor() *
+                                dungeons[client_id]->boss->get_physical_defence()) / (1 + (dungeons[client_id]->boss->get_defence_factor() *
+                                    dungeons[client_id]->boss->get_physical_defence()));
+                            float damage = give_damage * (1 - defence_damage);
+                            dungeons[client_id]->boss->set_hp(dungeons[client_id]->boss->get_hp() - damage);
+                            // physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
+                            send_status_change_packet(pl);
+                            for (int i = 0; i < GAIA_ROOM; ++i) {
+                                send_change_hp_packet(dungeons[client_id]->get_party_palyer()[i], dungeons[client_id]->boss);
+                            }
+                        }
+                    }
+
+                    break;
+                }
+                break;
+            case 1:  //ë§ˆë²• ê³µê²© ìŠ¤í‚¬  ì‚¼ê°í˜• ë²”ìœ„?
+                switch (packet->skill_num)
+                {
+                case 0:  //ë¬¼ë¦¬ ê³µê²©ìŠ¤í‚¬ ì¤‘ 0ë²ˆ ìŠ¤í‚¬ -> ì‹­ìê³µê²© ì–´íƒ 
+                    timer_event ev;
+                    ev.obj_id = client_id;
+                    ev.start_time = chrono::system_clock::now() + 3s;  //ì¿¨íƒ€ì„
+                    ev.ev = EVENT_SKILL_COOLTIME;
+                    ev.target_id = 1;
+                    timer_queue.push(ev);
+
+
+                    Coord a = { pl->get_x(), pl->get_z() };    //í”Œë ˆì´ì–´ ê¸°ì¤€ ì „ë°© ì‚¼ê°í˜• ë²”ìœ„ 
+                    Coord b = { pl->get_x() - pl->get_right_x() * 40 + pl->get_look_x() * 100,
+                        pl->get_z() - pl->get_right_z() * 40 + pl->get_look_z() * 100 };  // ì™¼ìª½ ìœ„
+                    Coord c = { pl->get_x() + pl->get_right_x() * 40 + pl->get_look_x() * 100,
+                        pl->get_z() + pl->get_right_z() * 40 + pl->get_look_z() * 100 };  // ì˜¤ë¥¸ìª½ ìœ„
+
+                    pl->set_mp(pl->get_mp() - 1000);
+                    if (dungeons[client_id]->start_game == false) {
+                        for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
+                            players[i]->state_lock.lock();
+                            if (players[i]->get_state() != ST_INGAME) {
+                                players[i]->state_lock.unlock();
+                                continue;
+                            }
+                            players[i]->state_lock.unlock();
+
+                            Coord n = { players[i]->get_x(), players[i]->get_z() };
+
+                            if (isInsideTriangle(a, b, c, n)) {
+                                pl->set_skill_factor(packet->skill_type, packet->skill_num);
+                                magical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
+                                players[i]->set_target_id(pl->get_id());
+                                send_status_change_packet(pl);
+                                if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
+                                    players[i]->set_active(true);
+                                    timer_event ev;
+                                    ev.obj_id = i;
+                                    ev.start_time = chrono::system_clock::now() + 1s;
+                                    ev.ev = EVENT_NPC_ATTACK;
+                                    ev.target_id = players[i]->get_target_id();
+                                    timer_queue.push(ev);
+                                    Activate_Npc_Move_Event(i, pl->get_id());
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        Coord n = { dungeons[client_id]->boss->get_x(), dungeons[client_id]->boss->get_z() };
+
+                        if (isInsideTriangle(a, b, c, n)) {
+                            pl->set_skill_factor(1, 0);
+                            float give_damage = pl->get_magical_attack() * pl->get_skill_factor(1, 0);
+                            float defence_damage = (dungeons[client_id]->boss->get_defence_factor() *
+                                dungeons[client_id]->boss->get_magical_defence()) / (1 + (dungeons[client_id]->boss->get_defence_factor() *
+                                    dungeons[client_id]->boss->get_magical_defence()));
+                            float damage = give_damage * (1 - defence_damage);
+                            dungeons[client_id]->boss->set_hp(dungeons[client_id]->boss->get_hp() - damage);
+                            send_status_change_packet(pl);
+                            for (int i = 0; i < GAIA_ROOM; ++i) {
+                                send_change_hp_packet(dungeons[client_id]->get_party_palyer()[i], dungeons[client_id]->boss);
+                            }
+                        }
+
+                    }
+                    break;
+                }
+
+                break;
+            case 2:  //ë²„í”„   //ê³µê²©ë ¥ ì¦ê°€ë¡œ ë³€ê²½ 
+                switch (packet->skill_num)
+                {
+                case 0:
+                    timer_event ev;
+                    ev.obj_id = client_id;
+                    ev.start_time = chrono::system_clock::now() + 10s;  //ì¿¨íƒ€ì„
+                    ev.ev = EVENT_SKILL_COOLTIME;
+                    ev.target_id = 2;
+                    timer_queue.push(ev);
+
+                    pl->set_mp(pl->get_mp() - 1000);
+                    send_buff_ui_packet(pl, 3); //ui
+                    pl->set_physical_attack(0.6 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv()); //ì¼ë‹¨ ë‘ë°° 
+                    pl->set_magical_attack(0.2 * pl->get_lv() * pl->get_lv() + 5 * pl->get_lv());
+                    send_status_change_packet(pl);
+                    break;
+                }
+                break;
+            }
+            break;
+
+        case J_TANKER:
+            switch (packet->skill_type)
+            {
+            case 0:    // ë¬¼ë¦¬ ê³µê²© ìŠ¤í‚¬ // ë°©íŒ¨ 
+                switch (packet->skill_num)
+                {
+                case 0:  //ë¬¼ë¦¬ ê³µê²©ìŠ¤í‚¬ ì¤‘ 0ë²ˆ ìŠ¤í‚¬ -> ì‹­ìê³µê²© ì–´íƒ 
+                    timer_event ev;
+                    ev.obj_id = client_id;
+                    ev.start_time = chrono::system_clock::now() + 3s;  //ì¿¨íƒ€ì„
+                    ev.ev = EVENT_SKILL_COOLTIME;
+                    ev.target_id = 0;
+                    timer_queue.push(ev);
+
+
+                    pl->set_mp(pl->get_mp() - 1000);
+                    if (dungeons[client_id]->start_game == false) {
+                        for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
+                            players[i]->state_lock.lock();
+                            if (players[i]->get_state() != ST_INGAME) {
+                                players[i]->state_lock.unlock();
+                                continue;
+                            }
+                            players[i]->state_lock.unlock();
+
+
                             if ((players[i]->get_x() >= pl->get_x() - 15 && players[i]->get_x() <= pl->get_x() + 15) && (players[i]->get_z() >= pl->get_z() - 15 && players[i]->get_z() <= pl->get_z() + 15)) {
                                 pl->set_skill_factor(packet->skill_type, packet->skill_num);
                                 physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
 
                                 players[i]->set_pos(players[i]->get_x() + pl->get_look_x() * 40, players[i]->get_z() + pl->get_look_z() * 40);
-                                send_move_packet(pl, players[i], 1);  //³ªÁß¿¡ ¼öÁ¤ÇÊ¿ä 
+                                send_move_packet(pl, players[i], 1);  //ë‚˜ì¤‘ì— ìˆ˜ì •í•„ìš” 
                                 send_status_change_packet(pl);
                                 players[i]->set_target_id(pl->get_id());
                                 if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
@@ -1514,22 +1550,41 @@ void process_packet(int client_id, unsigned char* p)
                                 }
                             }
                         }
-
-                        break;
+                    }
+                    else {
+                        if ((dungeons[client_id]->get_x() >= pl->get_x() - 15 && dungeons[client_id]->get_x() <= pl->get_x() + 15) && (dungeons[client_id]->get_z() >= pl->get_z() - 15 && dungeons[client_id]->get_z() <= pl->get_z() + 15)) {
+                            pl->set_skill_factor(0, 0);
+                            float give_damage = pl->get_physical_attack() * pl->get_skill_factor(0, 0);
+                            float defence_damage = (dungeons[client_id]->boss->get_defence_factor() *
+                                dungeons[client_id]->boss->get_physical_defence()) / (1 + (dungeons[client_id]->boss->get_defence_factor() *
+                                    dungeons[client_id]->boss->get_physical_defence()));
+                            float damage = give_damage * (1 - defence_damage);
+                            dungeons[client_id]->boss->set_pos(dungeons[client_id]->boss->get_x() + pl->get_look_x() * 40, dungeons[client_id]->boss->get_z() + pl->get_look_z() * 40);
+                            dungeons[client_id]->boss->set_hp(dungeons[client_id]->boss->get_hp() - damage);
+                            send_move_packet(pl, dungeons[client_id]->boss, 1);  //ë‚˜ì¤‘ì— ìˆ˜ì •í•„ìš” 
+                            for (int i = 0; i < GAIA_ROOM; ++i) {
+                                send_change_hp_packet(dungeons[client_id]->get_party_palyer()[i], dungeons[client_id]->boss);
+                            }
+                            send_status_change_packet(pl);
+                        }
                     }
                     break;
-                case 1:  //¸¶¹ı °ø°İ ½ºÅ³:  ¾î±×·Î   ´Ù¸¥ ÇÃ·¹ÀÌ¾î°¡ °ø°İ µµÁß ¾²¸é ´ë»óÀÌ ³ª·Î ¾È¹Ù²ï´Ù ¼öÁ¤ ÇÊ¿ä 
-                    switch (packet->skill_num)
-                    {
-                    case 0:   //¾î±×·Î
-                        timer_event ev;
-                        ev.obj_id = client_id;
-                        ev.start_time = chrono::system_clock::now() + 3s;  //ÄğÅ¸ÀÓ
-                        ev.ev = EVENT_SKILL_COOLTIME;
-                        ev.target_id = 1;
-                        timer_queue.push(ev);
+                }
+                break;
+            case 1:  //ë§ˆë²• ê³µê²© ìŠ¤í‚¬:  ì–´ê·¸ë¡œ   ë‹¤ë¥¸ í”Œë ˆì´ì–´ê°€ ê³µê²© ë„ì¤‘ ì“°ë©´ ëŒ€ìƒì´ ë‚˜ë¡œ ì•ˆë°”ë€ë‹¤ ìˆ˜ì • í•„ìš” 
+                switch (packet->skill_num)
+                {
+                case 0:   //ì–´ê·¸ë¡œ
+                    timer_event ev;
+                    ev.obj_id = client_id;
+                    ev.start_time = chrono::system_clock::now() + 3s;  //ì¿¨íƒ€ì„
+                    ev.ev = EVENT_SKILL_COOLTIME;
+                    ev.target_id = 1;
+                    timer_queue.push(ev);
 
-                        pl->set_mp(pl->get_mp() - 1000);
+                    pl->set_mp(pl->get_mp() - 1000);
+
+                    if (dungeons[client_id]->start_game == false) {
                         for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
                             players[i]->state_lock.lock();
                             if (players[i]->get_state() != ST_INGAME) {
@@ -1540,222 +1595,331 @@ void process_packet(int client_id, unsigned char* p)
 
                             if ((players[i]->get_x() >= pl->get_x() - 40 && players[i]->get_x() <= pl->get_x() + 40) && (players[i]->get_z() >= pl->get_z() - 40 && players[i]->get_z() <= pl->get_z() + 40)) {
                                 pl->set_skill_factor(packet->skill_type, packet->skill_num);
-                              //  physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
+                                //  physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
                                 players[i]->set_target_id(pl->get_id());
                                 send_status_change_packet(pl);
                                 if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
                                     players[i]->set_active(true);
-                                   
-                                    timer_event ev;
-                                     ev.obj_id = i;
-                                    ev.start_time = chrono::system_clock::now() + 1s;
-                                     ev.ev = EVENT_NPC_MOVE;
-                                 
-                                    ev.target_id = players[i]->get_id();
-                                   //  ev.target_id = client_id;
-                                     timer_queue.push(ev);
 
-                                    Activate_Npc_Move_Event(i,  players[i]->get_target_id());
+                                    timer_event ev;
+                                    ev.obj_id = i;
+                                    ev.start_time = chrono::system_clock::now() + 1s;
+                                    ev.ev = EVENT_NPC_MOVE;
+                                    ev.target_id = client_id;
+                                    timer_queue.push(ev);
+
+                                    Activate_Npc_Move_Event(i, client_id);
                                 }
                             }
-
+                        }
+                    }
+                    else {
+                        if ((dungeons[client_id]->get_x() >= pl->get_x() - 40 && dungeons[client_id]->get_x() <= pl->get_x() + 40) && (dungeons[client_id]->get_z() >= pl->get_z() - 40 && dungeons[client_id]->get_z() <= pl->get_z() + 40)) {
+                            pl->set_skill_factor(packet->skill_type, packet->skill_num);
+                            send_status_change_packet(pl);
+                            dungeons[client_id]->target_id = pl->get_indun_id();
 
                         }
-                        break;
-                    }
-
-                    break;
-                case 2:  //¹öÇÁ  ¹æ¾î·Â Áõ°¡ 
-                    switch (packet->skill_num)
-                    {
-                    case 0:
-                        timer_event ev;
-                        ev.obj_id = client_id;
-                        ev.start_time = chrono::system_clock::now() + 10s;  //ÄğÅ¸ÀÓ
-                        ev.ev = EVENT_SKILL_COOLTIME;
-                        ev.target_id = 2;
-                        timer_queue.push(ev);
-
-                        pl->set_mp(pl->get_mp() - 1000);
-                        send_buff_ui_packet(pl, 1);
-                        pl->set_physical_defence(0.54 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv()); //ÀÏ´Ü µÎ¹è 
-                        pl->set_magical_defence(0.4 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv());
-                        send_status_change_packet(pl);
-                        break;
                     }
                     break;
                 }
                 break;
-                case J_SUPPORTER://¼­Æ÷ÅÍ 
-                    switch (packet->skill_type)
-                    {
-                    case 2: //¹öÇÁ
-                        switch (packet->skill_num)
-                        {
-                        case 0:  // »ç°¢Çü ³»ºÎ ¹üÀ§ ÇÃ·¹ÀÌ¾î hp È¸º¹  
-
-                            timer_event ev;
-                            ev.obj_id = client_id;
-                            ev.start_time = chrono::system_clock::now() + 5s;  //ÄğÅ¸ÀÓ
-                            ev.ev = EVENT_SKILL_COOLTIME;
-                            ev.target_id = 3;
-                            timer_queue.push(ev);
-
-                
-                            pl->set_mp(pl->get_mp() - 1000);
-                            send_status_change_packet(pl);
-
-                            for (int i = 0; i <= MAX_USER; ++i) {
-                                players[i]->state_lock.lock();
-                                if (players[i]->get_state() != ST_INGAME) {
-                                    players[i]->state_lock.unlock();
-                                    continue;
-                                }
-                                players[i]->state_lock.unlock();
-                                if ((players[i]->get_x() >= pl->get_x() - 15 && players[i]->get_x() <= pl->get_x() + 15) && (players[i]->get_z() >= pl->get_z() - 15 && players[i]->get_z() <= pl->get_z() + 15)) {
-                             
-                                    players[i]->set_hp(players[i]->get_hp() + players[i]->get_maxhp() / 10);
-                                    send_status_change_packet(reinterpret_cast<Player*>(players[i]));
-                                }
-                            }
-                            break;
-                       // case 1: // Àü¹æÀ¸·Î º¸È£¸·À» ³¯·Á ´ê´Â »ç¶÷¸¸ º¸È£¸· »ı¼º 
-                  
-         
-                            
-                        }
-                        break;
-                    }
-                    break;
-                case J_MAGICIAN:
+            case 2:  //ë²„í”„  ë°©ì–´ë ¥ ì¦ê°€ 
+                switch (packet->skill_num)
+                {
+                case 0:
                     timer_event ev;
                     ev.obj_id = client_id;
-                    ev.start_time = chrono::system_clock::now() + 5s;  //ÄğÅ¸ÀÓ
+                    ev.start_time = chrono::system_clock::now() + 10s;  //ì¿¨íƒ€ì„
                     ev.ev = EVENT_SKILL_COOLTIME;
-                    ev.target_id = 1;
+                    ev.target_id = 2;
                     timer_queue.push(ev);
-                    switch (packet->skill_type)
-                    {
-                    case 0:
-                        break;
-                    case 1: //¸¶¹ı
-                        switch (packet->skill_num)
-                        {
-                           
-                        case 0: // mpÈí¼ö 
-              
-                            pl->set_hp(pl->get_hp() - 300);
-                            send_status_change_packet(pl);
 
-                            for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
-                                players[i]->state_lock.lock();
-                                if (players[i]->get_state() != ST_INGAME) {
-                                    players[i]->state_lock.unlock();
-                                    continue;
-                                }
+                    pl->set_mp(pl->get_mp() - 1000);
+                    send_buff_ui_packet(pl, 1);
+                    pl->set_physical_defence(0.54 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv()); //ì¼ë‹¨ ë‘ë°° 
+                    pl->set_magical_defence(0.4 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv());
+                    send_status_change_packet(pl);
+                    break;
+                }
+                break;
+            }
+            break;
+        case J_SUPPORTER://ì„œí¬í„° 
+            switch (packet->skill_type)
+            {
+            case 2: //ë²„í”„
+                switch (packet->skill_num)
+                {
+                case 0: {// ì‚¬ê°í˜• ë‚´ë¶€ ë²”ìœ„ í”Œë ˆì´ì–´ hp íšŒë³µ  
+                    timer_event ev;
+                    ev.obj_id = client_id;
+                    ev.start_time = chrono::system_clock::now() + 5s;  //ì¿¨íƒ€ì„
+                    ev.ev = EVENT_SKILL_COOLTIME;
+                    ev.target_id = 10;
+                    timer_queue.push(ev);
+
+                    pl->set_mp(pl->get_mp() - 1000);
+                    send_status_change_packet(pl);
+
+                    if (dungeons[client_id]->start_game == false) {
+                        for (int i = 0; i <= MAX_USER; ++i) {
+                            players[i]->state_lock.lock();
+                            if (players[i]->get_state() != ST_INGAME) {
                                 players[i]->state_lock.unlock();
-
-
-
-                                if ((players[i]->get_x() >= pl->get_x() - 10 && players[i]->get_x() <= pl->get_x() + 10) && (players[i]->get_z() >= pl->get_z() - 10 && players[i]->get_z() <= pl->get_z() + 10)) {
-
-                                    pl->set_mp(pl->get_mp() + players[i]->get_hp() / 10);
-                                    if (pl->get_mp() > pl->get_maxmp())
-                                        pl->set_mp(pl->get_maxmp());
-
-
-                                    pl->set_skill_factor(packet->skill_type, packet->skill_num);
-                                    magical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
-                                    players[i]->set_target_id(pl->get_id());
-                                    send_status_change_packet(pl);
-                                    send_status_change_packet(reinterpret_cast<Player*>(players[i]));
-                                    if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
-                                        players[i]->set_active(true);
-                                        timer_event ev;
-                                        ev.obj_id = i;
-                                        ev.start_time = chrono::system_clock::now() + 1s;
-                                        ev.ev = EVENT_NPC_ATTACK;
-                                        ev.target_id = players[i]->get_target_id();
-                                        timer_queue.push(ev);
-
-                                        Activate_Npc_Move_Event(i, pl->get_id());
-                                    }
-                                }
+                                continue;
                             }
-                            break;
-                        case 1:
-                     
-    
-                            send_play_shoot_packet(pl); // ½î¶ó°í º¸³»Áà¾ß ½îÀÚ 
+                            players[i]->state_lock.unlock();
+                            if ((players[i]->get_x() >= pl->get_x() - 15 && players[i]->get_x() <= pl->get_x() + 15) && (players[i]->get_z() >= pl->get_z() - 15 && players[i]->get_z() <= pl->get_z() + 15)) {
 
-                            pl->set_mp(pl->get_mp() - 1500);
-                            send_status_change_packet(pl);
-
-                            Coord a = { pl->get_x() + pl->get_right_x() * -10, pl->get_z() + pl->get_right_z() * -10 };    
-                            Coord b = { pl->get_x() + pl->get_right_x() * 10, pl->get_z() + pl->get_right_z() * 10 };
-                            Coord c = { (pl->get_x() + pl->get_right_x() * -10) + pl->get_look_x() * 100,
-                           (pl->get_z() + pl->get_right_z() * -10) + pl->get_look_z() * 100, };
-                            
-
-                            Coord d = { pl->get_x() + pl->get_right_x() * 10, pl->get_z() + pl->get_right_z() * 10 };
-                            Coord e = { (pl->get_x() + pl->get_right_x() * 10) + pl->get_look_x() * 100
-                                , (pl->get_z() + pl->get_right_z() * 10) + pl->get_look_x() * 100 };
-                            Coord f = { (pl->get_x() + pl->get_right_x() * -10) + pl->get_look_x() * 100,
-                           (pl->get_z() + pl->get_right_z() * -10) + pl->get_look_z() * 100, };
-
-                     
-
-
-                            for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
-                                players[i]->state_lock.lock();
-                                if (players[i]->get_state() != ST_INGAME) {
-                                    players[i]->state_lock.unlock();
-                                    continue;
-                                }
-                                players[i]->state_lock.unlock();
-
-                                Coord n = { players[i]->get_x(), players[i]->get_z() };
-                               //  players[i]->set_pos(players[i]->get_x() + pl->get_look_x() * 40 , players[i]->get_z() + pl->get_look_z() * 40);
-
-                                
-                                //if (players[i]->get_x() < pl->get_x() + pl->get_look_x() * 20 &&  players[i]->get_z() < pl->get_z()  + pl->get_look_z() * 100) {
-                                if (isInsideTriangle(a,b,c,n) || isInsideTriangle(d, e, f, n)){
-
-                                        pl->set_skill_factor(packet->skill_type, packet->skill_num);
-                                        players[i]->set_target_id(pl->get_id());
-                                        magical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
-                                        send_play_effect_packet(pl, players[i]); // ÀÌÆåÆ® ÅÍÆ®¸± À§Ä¡ 
-
-
-
-                                        if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
-                                            players[i]->set_active(true);
-                                            timer_event ev;
-                                            ev.obj_id = i;
-                                            ev.start_time = chrono::system_clock::now() + 1s;
-                                            ev.ev = EVENT_NPC_ATTACK;
-                                            ev.target_id = players[i]->get_target_id();
-                                            timer_queue.push(ev);
-
-                                            Activate_Npc_Move_Event(i, pl->get_id());
-                                        }
-                                    
-                                }
+                                players[i]->set_hp(players[i]->get_hp() + players[i]->get_maxhp() / 10);
+                                send_status_change_packet(reinterpret_cast<Player*>(players[i]));
                             }
-                        
-                            break;
                         }
-                        break;
-                    case 2: 
-                        break;
-                 
+                    }
+                    else {
+                        int tmp_hp = 0;
+                        int target_player = 0;
+                        for (int i = 0; i < GAIA_ROOM; i++) {
+                            if (i == 0) {
+                                target_player = i;
+                                tmp_hp = dungeons[client_id]->get_party_palyer()[i]->get_hp();
+                            }
+                            else {
+                                if (tmp_hp > dungeons[client_id]->get_party_palyer()[i]->get_hp()) {
+                                    target_player = i;
+                                    tmp_hp = dungeons[client_id]->get_party_palyer()[i]->get_hp();
+                                }
+                            }
+                        }
+                        pl->set_mp(pl->get_mp() - 1000);
+                        send_status_change_packet(pl);
+                        send_buff_ui_packet(dungeons[client_id]->get_party_palyer()[target_player], 2); //ui
+                        dungeons[client_id]->get_party_palyer()[target_player]->set_hp(dungeons[client_id]->get_party_palyer()[target_player]->get_hp() + dungeons[client_id]->get_party_palyer()[target_player]->get_maxhp() / 10);
+                        if (dungeons[client_id]->get_party_palyer()[target_player]->get_hp() > dungeons[client_id]->get_party_palyer()[target_player]->get_maxhp())
+                            dungeons[client_id]->get_party_palyer()[target_player]->set_hp(dungeons[client_id]->get_party_palyer()[target_player]->get_maxhp());
+
+                        for (int i = 0; i < GAIA_ROOM; ++i) {
+                            send_change_hp_packet(dungeons[client_id]->get_party_palyer()[i], dungeons[client_id]->get_party_palyer()[target_player]);
+                        }
+                    }
+                }
+                      break;
+                case 1: {  //mpíšŒë³µ 
+                    timer_event ev1;
+                    ev1.obj_id = client_id;
+                    ev1.start_time = chrono::system_clock::now() + 5s;  //ì¿¨íƒ€ì„
+                    ev1.ev = EVENT_SKILL_COOLTIME;
+                    ev1.target_id = 10;
+                    timer_queue.push(ev1);
+
+                    pl->set_mp(pl->get_mp() - 1000);
+                    send_status_change_packet(pl);
+
+                    if (dungeons[client_id]->start_game == false) {
+                        for (int i = 0; i <= MAX_USER; ++i) {
+                            players[i]->state_lock.lock();
+                            if (players[i]->get_state() != ST_INGAME) {
+                                players[i]->state_lock.unlock();
+                                continue;
+                            }
+                            players[i]->state_lock.unlock();
+                            if ((players[i]->get_x() >= pl->get_x() - 15 && players[i]->get_x() <= pl->get_x() + 15) && (players[i]->get_z() >= pl->get_z() - 15 && players[i]->get_z() <= pl->get_z() + 15)) {
+                                players[i]->set_mp(players[i]->get_mp() + players[i]->get_maxmp() / 10);
+                                send_change_mp_packet(pl, players[i]);
+                            }
+                        }
+                    }
+                    else {
+                        int tmp_mp = 0;
+                        int target_player = 0;
+                        for (int i = 0; i < GAIA_ROOM; i++) {
+                            if (i == 0) {
+                                target_player = i;
+                                tmp_mp = dungeons[client_id]->get_party_palyer()[i]->get_mp();
+                            }
+                            else {
+                                if (tmp_mp > dungeons[client_id]->get_party_palyer()[i]->get_mp()) {
+                                    target_player = i;
+                                    tmp_mp = dungeons[client_id]->get_party_palyer()[i]->get_mp();
+                                }
+                            }
+                        }
+                        pl->set_mp(pl->get_mp() - 1000);
+                        send_status_change_packet(pl);
+                        send_buff_ui_packet(dungeons[client_id]->get_party_palyer()[target_player], 0); //ui
+                        dungeons[client_id]->get_party_palyer()[target_player]->set_mp(dungeons[client_id]->get_party_palyer()[target_player]->get_mp() + dungeons[client_id]->get_party_palyer()[target_player]->get_maxmp() / 10);
+                        if (dungeons[client_id]->get_party_palyer()[target_player]->get_mp() > dungeons[client_id]->get_party_palyer()[target_player]->get_maxmp())
+                            dungeons[client_id]->get_party_palyer()[target_player]->set_mp(dungeons[client_id]->get_party_palyer()[target_player]->get_maxmp());
+
+                        for (int i = 0; i < GAIA_ROOM; ++i) {
+                            send_change_mp_packet(dungeons[client_id]->get_party_palyer()[i], dungeons[client_id]->get_party_palyer()[target_player]);
+                        }
+                    }
+                }
+                      break;
+                case 2:  {//ê³µì† 
+                    timer_event ev2;
+                    ev2.obj_id = client_id;
+                    ev2.start_time = chrono::system_clock::now() + 5s;  //ì¿¨íƒ€ì„
+                    ev2.ev = EVENT_SKILL_COOLTIME;
+                    ev2.target_id = 10;
+                    timer_queue.push(ev2);
+
+                    pl->set_mp(pl->get_mp() - 1000);
+                    send_status_change_packet(pl);
+
+                    if (dungeons[client_id]->start_game == false) {
+                        for (int i = 0; i <= MAX_USER; ++i) {
+                            players[i]->state_lock.lock();
+                            if (players[i]->get_state() != ST_INGAME) {
+                                players[i]->state_lock.unlock();
+                                continue;
+                            }
+                            players[i]->state_lock.unlock();
+                            if ((players[i]->get_x() >= pl->get_x() - 15 && players[i]->get_x() <= pl->get_x() + 15) && (players[i]->get_z() >= pl->get_z() - 15 && players[i]->get_z() <= pl->get_z() + 15)) {
+                                reinterpret_cast<Player*>(players[i])->attack_speed_up = true;
+                                send_buff_ui_packet(reinterpret_cast<Player*>(players[i]), 4);
+                            }
+                        }
+                    }
+
+                    for (int i = 0; i < GAIA_ROOM; ++i) {
+                        dungeons[client_id]->get_party_palyer()[i]->attack_speed_up = true;
+                        send_buff_ui_packet(dungeons[client_id]->get_party_palyer()[i], 4);
                     }
                     break;
+                }
+                }
+                break;
+            }
+            break;
+
+        case J_MAGICIAN:
+            timer_event ev;
+            ev.obj_id = client_id;
+            ev.start_time = chrono::system_clock::now() + 5s;  //ì¿¨íƒ€ì„
+            ev.ev = EVENT_SKILL_COOLTIME;
+            ev.target_id = 1;
+            timer_queue.push(ev);
+            switch (packet->skill_type)
+            {
+            case 0:
+                break;
+            case 1: //ë§ˆë²•
+                switch (packet->skill_num)
+                {
+
+                case 0: // mpí¡ìˆ˜ 
+
+                    pl->set_hp(pl->get_hp() - 300);
+                    send_status_change_packet(pl);
+
+                    for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
+                        players[i]->state_lock.lock();
+                        if (players[i]->get_state() != ST_INGAME) {
+                            players[i]->state_lock.unlock();
+                            continue;
+                        }
+                        players[i]->state_lock.unlock();
 
 
+
+                        if ((players[i]->get_x() >= pl->get_x() - 10 && players[i]->get_x() <= pl->get_x() + 10) && (players[i]->get_z() >= pl->get_z() - 10 && players[i]->get_z() <= pl->get_z() + 10)) {
+
+                            pl->set_mp(pl->get_mp() + players[i]->get_hp() / 10);
+                            if (pl->get_mp() > pl->get_maxmp())
+                                pl->set_mp(pl->get_maxmp());
+
+
+                            pl->set_skill_factor(packet->skill_type, packet->skill_num);
+                            magical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
+                            players[i]->set_target_id(pl->get_id());
+                            send_status_change_packet(pl);
+                            send_status_change_packet(reinterpret_cast<Player*>(players[i]));
+                            if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
+                                players[i]->set_active(true);
+                                timer_event ev;
+                                ev.obj_id = i;
+                                ev.start_time = chrono::system_clock::now() + 1s;
+                                ev.ev = EVENT_NPC_ATTACK;
+                                ev.target_id = players[i]->get_target_id();
+                                timer_queue.push(ev);
+
+                                Activate_Npc_Move_Event(i, pl->get_id());
+                            }
+                        }
+                    }
+                    break;
+                case 1:
+
+                    send_play_shoot_packet(pl); // ì˜ë¼ê³  ë³´ë‚´ì¤˜ì•¼ ì˜ì 
+
+                    pl->set_mp(pl->get_mp() - 1500);
+                    send_status_change_packet(pl);
+
+                    Coord a = { pl->get_x() + pl->get_right_x() * -10, pl->get_z() + pl->get_right_z() * -10 };
+                    Coord b = { pl->get_x() + pl->get_right_x() * 10, pl->get_z() + pl->get_right_z() * 10 };
+                    Coord c = { (pl->get_x() + pl->get_right_x() * -10) + pl->get_look_x() * 100,
+                   (pl->get_z() + pl->get_right_z() * -10) + pl->get_look_z() * 100, };
+
+
+                    Coord d = { pl->get_x() + pl->get_right_x() * 10, pl->get_z() + pl->get_right_z() * 10 };
+                    Coord e = { (pl->get_x() + pl->get_right_x() * 10) + pl->get_look_x() * 100
+                        , (pl->get_z() + pl->get_right_z() * 10) + pl->get_look_x() * 100 };
+                    Coord f = { (pl->get_x() + pl->get_right_x() * -10) + pl->get_look_x() * 100,
+                   (pl->get_z() + pl->get_right_z() * -10) + pl->get_look_z() * 100, };
+
+
+
+
+                    for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
+                        players[i]->state_lock.lock();
+                        if (players[i]->get_state() != ST_INGAME) {
+                            players[i]->state_lock.unlock();
+                            continue;
+                        }
+                        players[i]->state_lock.unlock();
+
+                        Coord n = { players[i]->get_x(), players[i]->get_z() };
+                        //  players[i]->set_pos(players[i]->get_x() + pl->get_look_x() * 40 , players[i]->get_z() + pl->get_look_z() * 40);
+
+
+                         //if (players[i]->get_x() < pl->get_x() + pl->get_look_x() * 20 &&  players[i]->get_z() < pl->get_z()  + pl->get_look_z() * 100) {
+                        if (isInsideTriangle(a, b, c, n) || isInsideTriangle(d, e, f, n)) {
+
+                            pl->set_skill_factor(packet->skill_type, packet->skill_num);
+                            players[i]->set_target_id(pl->get_id());
+                            magical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
+                            send_play_effect_packet(pl, players[i]); // ì´í™íŠ¸ í„°íŠ¸ë¦´ ìœ„ì¹˜ 
+
+
+
+                            if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
+                                players[i]->set_active(true);
+                                timer_event ev;
+                                ev.obj_id = i;
+                                ev.start_time = chrono::system_clock::now() + 1s;
+                                ev.ev = EVENT_NPC_ATTACK;
+                                ev.target_id = players[i]->get_target_id();
+                                timer_queue.push(ev);
+
+                                Activate_Npc_Move_Event(i, pl->get_id());
+                            }
+
+                        }
+                    }
+
+                    break;
+
+                }
+                break;
+            }
+            break;
         }
         break;
     }
+    break;
     case CS_PACKET_LOOK: {
         pl->state_lock.lock();
         if (pl->get_state() == ST_DEAD || pl->get_state() == ST_FREE) {
@@ -1768,7 +1932,7 @@ void process_packet(int client_id, unsigned char* p)
         pl->set_look(packet->x, packet->y, packet->z);
         pl->set_right(packet->right_x, packet->right_y, packet->right_z);
 
-        // ±ÙÃ³¿¡ ÀÖ´Â ¸ğµç ÇÃ·¹ÀÌ¾î¿¡°Ô ¹æÇâÀÌ ¹Ù²î¾ú´Ù´Â°ÍÀ» º¸³»ÁØ´Ù
+        // ê·¼ì²˜ì— ìˆëŠ” ëª¨ë“  í”Œë ˆì´ì–´ì—ê²Œ ë°©í–¥ì´ ë°”ë€Œì—ˆë‹¤ëŠ”ê²ƒì„ ë³´ë‚´ì¤€ë‹¤
         pl->vl.lock();
         unordered_set <int> my_vl{ pl->viewlist };
         pl->vl.unlock();
@@ -1777,7 +1941,7 @@ void process_packet(int client_id, unsigned char* p)
             // Npc
             if (is_npc(i) == true) continue;
             // Player
-            send_look_packet(reinterpret_cast<Player*>(players[i]),pl);
+            send_look_packet(reinterpret_cast<Player*>(players[i]), pl);
         }
         break;
     }
@@ -1863,7 +2027,7 @@ void process_packet(int client_id, unsigned char* p)
 
         cs_packet_picking_skill* packet = reinterpret_cast<cs_packet_picking_skill*>(p);
         if (pl->get_skill_active(packet->skill_type) == true) return;
-        pl->set_skill_active(packet->skill_type, true);   
+        pl->set_skill_active(packet->skill_type, true);
 
         switch (packet->skill_type)
         {
@@ -1873,18 +2037,18 @@ void process_packet(int client_id, unsigned char* p)
             case 0:
                 timer_event ev;
                 ev.obj_id = client_id;
-                ev.start_time = chrono::system_clock::now() + 5s;  //ÄğÅ¸ÀÓ
+                ev.start_time = chrono::system_clock::now() + 5s;  //ì¿¨íƒ€ì„
                 ev.ev = EVENT_SKILL_COOLTIME;
                 ev.target_id = 0; // packet->target;
                 timer_queue.push(ev);
 
-           
+
                 pl->set_mp(pl->get_mp() - 1000);
                 send_status_change_packet(pl);
 
                 int taget = packet->target;// -9615;
 
-          
+
                 players[taget]->set_mp(players[taget]->get_mp() + players[taget]->get_maxmp() / 10);
                 send_status_change_packet(reinterpret_cast<Player*>(players[taget]));
 
@@ -1899,7 +2063,7 @@ void process_packet(int client_id, unsigned char* p)
             case 0:
                 timer_event ev;
                 ev.obj_id = client_id;
-                ev.start_time = chrono::system_clock::now() + 5s;  //ÄğÅ¸ÀÓ
+                ev.start_time = chrono::system_clock::now() + 5s;  //ì¿¨íƒ€ì„
                 ev.ev = EVENT_SKILL_COOLTIME;
                 ev.target_id = 1; //packet->target;
                 timer_queue.push(ev);
@@ -1909,7 +2073,7 @@ void process_packet(int client_id, unsigned char* p)
 
                 int taget = packet->target; //  -9615;
 
-                players[taget]->set_physical_defence(players[taget]->get_physical_defence()  * 11 / 10);
+                players[taget]->set_physical_defence(players[taget]->get_physical_defence() * 11 / 10);
                 players[taget]->set_magical_defence(players[taget]->get_magical_defence() * 11 / 10);
                 send_status_change_packet(reinterpret_cast<Player*>(players[taget]));
                 send_buff_ui_packet(reinterpret_cast<Player*>(players[taget]), 1);
@@ -1923,11 +2087,11 @@ void process_packet(int client_id, unsigned char* p)
             case 0:
                 timer_event ev;
                 ev.obj_id = client_id;
-                ev.start_time = chrono::system_clock::now() + 5s;  //ÄğÅ¸ÀÓ
+                ev.start_time = chrono::system_clock::now() + 5s;  //ì¿¨íƒ€ì„
                 ev.ev = EVENT_SKILL_COOLTIME;
                 ev.target_id = 2;// packet->target;
                 timer_queue.push(ev);
-                 
+
                 pl->set_mp(pl->get_mp() - 1000);
                 send_status_change_packet(pl);
 
@@ -1945,11 +2109,11 @@ void process_packet(int client_id, unsigned char* p)
         break;
     }
     case CS_PACKET_PARTY_ROOM: {
-        // ÇöÀç È°¼ºÈ­ µÇ¾ú´Â ´øÀüÀÇ Á¤º¸µéÀ» º¸³½´Ù
+        // í˜„ì¬ í™œì„±í™” ë˜ì—ˆëŠ” ë˜ì „ì˜ ì •ë³´ë“¤ì„ ë³´ë‚¸ë‹¤
         for (auto& dun : dungeons) {
             dun->state_lock.lock();
             if (dun->get_dun_st() == DUN_ST_ROBBY) {
-                // ´øÀüÀÇ Á¤º¸µéÀ» º¸³»ÁØ´Ù
+                // ë˜ì „ì˜ ì •ë³´ë“¤ì„ ë³´ë‚´ì¤€ë‹¤
                 dun->state_lock.unlock();
                 send_party_room_packet(pl, dun->get_party_name(), dun->get_dungeon_id());
                 continue;
@@ -1973,11 +2137,11 @@ void process_packet(int client_id, unsigned char* p)
                 dun->set_dun_st(DUN_ST_ROBBY);
                 dun->state_lock.unlock();
 
-                // ÀÌ ¹æ¿¡ ÀÌ ÇÃ·¹ÀÌ¾î¸¦ Áı¾î ³Ö´Â´Ù
+                // ì´ ë°©ì— ì´ í”Œë ˆì´ì–´ë¥¼ ì§‘ì–´ ë„£ëŠ”ë‹¤
                 dun->set_party_name(pl->get_name());
                 dun->join_player(pl);
 
-                // ÀÌ ¹æ¿¡ ´ëÇÑ Á¤º¸¸¦ º¸³»ÁØ´Ù
+                // ì´ ë°©ì— ëŒ€í•œ ì •ë³´ë¥¼ ë³´ë‚´ì¤€ë‹¤
                 send_party_room_packet(pl, dun->get_party_name(), dun->get_dungeon_id());
                 send_party_room_info_packet(pl, dun->get_party_palyer(), dun->player_cnt, dun->get_dungeon_id());
                 send_party_room_enter_ok_packet(pl, dun->get_dungeon_id());
@@ -1989,7 +2153,7 @@ void process_packet(int client_id, unsigned char* p)
     }
     case CS_PACKET_PARTY_ROOM_INFO_REQUEST: {
         int r_id = reinterpret_cast<cs_packet_party_room_info_request*>(p)->room_id;
-        send_party_room_info_packet(pl, dungeons[r_id]->get_party_palyer(), 
+        send_party_room_info_packet(pl, dungeons[r_id]->get_party_palyer(),
             dungeons[r_id]->player_cnt, dungeons[r_id]->get_dungeon_id());
         break;
     }
@@ -1999,10 +2163,10 @@ void process_packet(int client_id, unsigned char* p)
         if (dungeons[pl->indun_id]->player_rander_ok == GAIA_ROOM - dungeons[pl->indun_id]->partner_cnt) {
             dungeons[pl->indun_id]->start_game = true;
 
-            // Ai¿òÁ÷ÀÌ±â ½ÃÀÛ
+            // Aiì›€ì§ì´ê¸° ì‹œì‘
             Player** party_players = dungeons[pl->indun_id]->get_party_palyer();
 
-            // ·¹ÀÌµå À§Ä¡ ¼öÁ¤
+            // ë ˆì´ë“œ ìœ„ì¹˜ ìˆ˜ì •
             for (int i = 0; i < GAIA_ROOM; i++) {
                 party_players[i]->set_x(2025 + 10 * i);
                 party_players[i]->set_z(2110);
@@ -2056,36 +2220,36 @@ void process_packet(int client_id, unsigned char* p)
         int r_id = (int)reinterpret_cast<cs_packet_party_room_enter_request*>(p)->room_id;
         pl->state_lock.lock();
         if (pl->get_state() != ST_INGAME || pl->join_dungeon_room == true) {
-            if(pl->get_state() == ST_INGAME) send_party_room_enter_failed_packet(pl, r_id, 2);
+            if (pl->get_state() == ST_INGAME) send_party_room_enter_failed_packet(pl, r_id, 2);
             pl->state_lock.unlock();
             break;
         }
         pl->state_lock.unlock();
-       
+
         Gaia* dun = dungeons[r_id];
-        
+
         // join dungeon party
         dun->state_lock.lock();
         if (dun->get_dun_st() != DUN_ST_ROBBY) {
-            // ´øÀüÀÔÀå ½ÇÆĞ ÆĞÅ¶ º¸³»±â
-            if(dun->get_dun_st() == DUN_ST_FREE) send_party_room_enter_failed_packet(pl, r_id, 1);
+            // ë˜ì „ì…ì¥ ì‹¤íŒ¨ íŒ¨í‚· ë³´ë‚´ê¸°
+            if (dun->get_dun_st() == DUN_ST_FREE) send_party_room_enter_failed_packet(pl, r_id, 1);
             else send_party_room_enter_failed_packet(pl, r_id, 0);
             dun->state_lock.unlock();
             break;
         }
         dun->state_lock.unlock();
-        // ÀÌ ¹æ¿¡ ÀÌ ÇÃ·¹ÀÌ¾î¸¦ Áı¾î ³Ö´Â´Ù
+        // ì´ ë°©ì— ì´ í”Œë ˆì´ì–´ë¥¼ ì§‘ì–´ ë„£ëŠ”ë‹¤
         if (dun->player_cnt == GAIA_ROOM) {
             send_party_room_enter_failed_packet(pl, r_id, 0);
             break;
         }
         dun->join_player(pl);
-        
-        // ÀÌ ¹æ¿¡ ´ëÇÑ Á¤º¸¸¦ º¸³»ÁØ´Ù
+
+        // ì´ ë°©ì— ëŒ€í•œ ì •ë³´ë¥¼ ë³´ë‚´ì¤€ë‹¤
         for (auto& dun : dungeons) {
             dun->state_lock.lock();
             if (dun->get_dun_st() == DUN_ST_ROBBY) {
-                // ´øÀüÀÇ Á¤º¸µéÀ» º¸³»ÁØ´Ù
+                // ë˜ì „ì˜ ì •ë³´ë“¤ì„ ë³´ë‚´ì¤€ë‹¤
                 dun->state_lock.unlock();
                 send_party_room_packet(pl, dun->get_party_name(), dun->get_dungeon_id());
                 continue;
@@ -2104,13 +2268,13 @@ void process_packet(int client_id, unsigned char* p)
         int r_id = (int)reinterpret_cast<cs_packet_party_room_quit_request*>(p)->room_id;
         Gaia* dun = dungeons[r_id];
         dun->quit_palyer(pl);
-        // ³ª°¬´Ù´Â Á¤º¸¸¦ player¿¡°Ô º¸³»ÁØ´Ù
+        // ë‚˜ê°”ë‹¤ëŠ” ì •ë³´ë¥¼ playerì—ê²Œ ë³´ë‚´ì¤€ë‹¤
         send_party_room_quit_ok_packet(pl);
         pl->join_dungeon_room = false;
 
         Player** party_players = dun->get_party_palyer();
         if (dun->player_cnt - dun->partner_cnt == 0) {
-            // ¾Æ¹«µµ ¾ø´Ù´Â ¶æ
+            // ì•„ë¬´ë„ ì—†ë‹¤ëŠ” ëœ»
             for (auto& pls : players) {
                 if (true == is_npc(pls->get_id())) break;
                 pls->state_lock.lock();
@@ -2148,12 +2312,12 @@ void process_packet(int client_id, unsigned char* p)
                 continue;
             }
             else {
-                if (check_pl->get_tribe() != HUMAN ) {
+                if (check_pl->get_tribe() != HUMAN) {
                     check_pl->state_lock.unlock();
                     continue;
                 }
                 check_pl->state_lock.unlock();
-                // ÀÌ¸§ ºñ±³
+                // ì´ë¦„ ë¹„êµ
                 char* tmp = packet->user_name;
                 if (strcmp(check_pl->get_name(), packet->user_name) == 0) {
                     find_player = true;
@@ -2179,25 +2343,25 @@ void process_packet(int client_id, unsigned char* p)
             // join dungeon party
             dun->state_lock.lock();
             if (dun->get_dun_st() != DUN_ST_ROBBY) {
-                // ´øÀüÀÔÀå ½ÇÆĞ ÆĞÅ¶ º¸³»±â
+                // ë˜ì „ì…ì¥ ì‹¤íŒ¨ íŒ¨í‚· ë³´ë‚´ê¸°
                 if (dun->get_dun_st() == DUN_ST_FREE) send_party_room_enter_failed_packet(pl, r_id, 1);
                 else send_party_room_enter_failed_packet(pl, r_id, 0);
                 dun->state_lock.unlock();
                 break;
             }
             dun->state_lock.unlock();
-            // ÀÌ ¹æ¿¡ ÀÌ ÇÃ·¹ÀÌ¾î¸¦ Áı¾î ³Ö´Â´Ù
+            // ì´ ë°©ì— ì´ í”Œë ˆì´ì–´ë¥¼ ì§‘ì–´ ë„£ëŠ”ë‹¤
             if (dun->player_cnt == GAIA_ROOM) {
                 send_party_room_enter_failed_packet(pl, r_id, 0);
                 break;
             }
             dun->join_player(pl);
 
-            // ÀÌ ¹æ¿¡ ´ëÇÑ Á¤º¸¸¦ º¸³»ÁØ´Ù
+            // ì´ ë°©ì— ëŒ€í•œ ì •ë³´ë¥¼ ë³´ë‚´ì¤€ë‹¤
             for (auto& duns : dungeons) {
                 duns->state_lock.lock();
                 if (duns->get_dun_st() == DUN_ST_ROBBY) {
-                    // ´øÀüÀÇ Á¤º¸µéÀ» º¸³»ÁØ´Ù
+                    // ë˜ì „ì˜ ì •ë³´ë“¤ì„ ë³´ë‚´ì¤€ë‹¤
                     duns->state_lock.unlock();
                     send_party_room_packet(pl, duns->get_party_name(), duns->get_dungeon_id());
                     continue;
@@ -2222,7 +2386,7 @@ void process_packet(int client_id, unsigned char* p)
         int r_id = (int)reinterpret_cast<cs_packet_party_add_partner*>(p)->room_id;
         Gaia* dun = dungeons[r_id];
 
-        if (dun->player_cnt < GAIA_ROOM) {  // Á¦ÇÑ ÀÎ¿ø¼ö º¸´Ù ÀûÀ» ¶§¸¸ Ãß°¡ °¡´ÉÇÏµµ·Ï ÇÏÀÚ 
+        if (dun->player_cnt < GAIA_ROOM) {  // ì œí•œ ì¸ì›ìˆ˜ ë³´ë‹¤ ì ì„ ë•Œë§Œ ì¶”ê°€ ê°€ëŠ¥í•˜ë„ë¡ í•˜ì 
 
             int new_id = get_new_id();
             if (-1 == new_id) {
@@ -2236,7 +2400,7 @@ void process_packet(int client_id, unsigned char* p)
 
             Partner* partner = reinterpret_cast<Partner*>(players[new_id]);
 
-            // players ¿¡¼­ ÆÄÆ®³ÊÀÇ ¾ÆÀÌµğ¿Í ±âº»Á¤º¸ ¾÷µ¥ÀÌÆ® 
+            // players ì—ì„œ íŒŒíŠ¸ë„ˆì˜ ì•„ì´ë””ì™€ ê¸°ë³¸ì •ë³´ ì—…ë°ì´íŠ¸ 
             char ai_name[MAX_NAME_SIZE];
             sprintf_s(ai_name, "%s%d", "AI", dun->partner_cnt);
 
@@ -2260,14 +2424,14 @@ void process_packet(int client_id, unsigned char* p)
             partner->set_basic_attack_factor(50.0f);
             partner->set_defence_factor(0.0002);
             partner->set_element(E_WATER);
-            //  ¿©±â±îÁö Å¬¶ó¿¡¼­ ÆĞÅ¶ ¹ŞÀ¸¸é, »õ player id »ı¼º ÈÄ Á¤º¸ ÃÊ±âÈ­  
+            //  ì—¬ê¸°ê¹Œì§€ í´ë¼ì—ì„œ íŒ¨í‚· ë°›ìœ¼ë©´, ìƒˆ player id ìƒì„± í›„ ì •ë³´ ì´ˆê¸°í™”  
 
             // join dungeon party
-            // ÀÌ ¹æ¿¡ ÀÌ ÇÃ·¹ÀÌ¾î¸¦ Áı¾î ³Ö´Â´Ù
+            // ì´ ë°©ì— ì´ í”Œë ˆì´ì–´ë¥¼ ì§‘ì–´ ë„£ëŠ”ë‹¤
             dun->partner_cnt++;
             dun->join_player(reinterpret_cast<Player*>(players[new_id]));
 
-            // ÀÌ ¹æ¿¡ ´ëÇÑ Á¤º¸¸¦ º¸³»ÁØ´Ù
+            // ì´ ë°©ì— ëŒ€í•œ ì •ë³´ë¥¼ ë³´ë‚´ì¤€ë‹¤
             Player** party_players = dun->get_party_palyer();
             for (int i = 0; i < dun->player_cnt; i++) {
                 if (party_players[i]->get_tribe() == HUMAN)
@@ -2289,7 +2453,7 @@ void player_revive(int client_id)
         dungeons[pl->indun_id]->state_lock.lock();
         if (dungeons[pl->indun_id]->get_dun_st() == DUN_ST_START) {
             dungeons[pl->indun_id]->state_lock.unlock();
-            
+
             pl->state_lock.lock();
             if (pl->get_state() != ST_DEAD) {
                 pl->state_lock.unlock();
@@ -2298,12 +2462,12 @@ void player_revive(int client_id)
             pl->set_state(ST_INDUN);
             pl->state_lock.unlock();
 
-            // ÃÊ±âÈ­
+            // ì´ˆê¸°í™”
             pl->set_hp(pl->get_maxhp());
             pl->set_mp(pl->get_maxmp());
             send_status_change_packet(pl);
 
-            // ½Ã¾ßÃ³¸®
+            // ì‹œì•¼ì²˜ë¦¬
             Player** partys = dungeons[pl->indun_id]->get_party_palyer();
             for (int i = 0; i < 4; i++) {
                 if (partys[i]->get_tribe() != HUMAN) continue;
@@ -2336,7 +2500,7 @@ void player_revive(int client_id)
         }
         dungeons[pl->indun_id]->state_lock.unlock();
     }
-    
+
     pl->state_lock.lock();
     if (pl->get_state() != ST_DEAD) {
         pl->state_lock.unlock();
@@ -2345,7 +2509,7 @@ void player_revive(int client_id)
     pl->set_state(ST_INGAME);
     pl->state_lock.unlock();
 
-    // ÇÃ·¹ÀÌ¾î Á×Àº ÈÄ ÃÊ±âÈ­ ¼³Á¤
+    // í”Œë ˆì´ì–´ ì£½ì€ í›„ ì´ˆê¸°í™” ì„¤ì •
     pl->set_hp(players[client_id]->get_maxhp());
     pl->set_x(3210);
     pl->set_y(0);
@@ -2364,13 +2528,13 @@ void player_revive(int client_id)
     packet.exp = pl->get_exp();
     pl->do_send(sizeof(packet), &packet);
 
-    // ÁÖº¯¿¡ ÀÖ´Â ¾êµé¿¡°Ô ½Ã¾ßÃ³¸® ÇØÁÖ¾î¾ßÇÔ
+    // ì£¼ë³€ì— ìˆëŠ” ì–˜ë“¤ì—ê²Œ ì‹œì•¼ì²˜ë¦¬ í•´ì£¼ì–´ì•¼í•¨
     pl->vl.lock();
     pl->viewlist.clear();
     pl->vl.unlock();
     for (auto& other : players) {
-        if (other->get_id() == client_id) continue;   // ³ª´Ù
-        if (true == is_npc(other->get_id())) break;// ¸¸¾à ³»°¡ ÀÖ´Â °÷¿¡ NPC°¡ ÀÖ´Ù¸é
+        if (other->get_id() == client_id) continue;   // ë‚˜ë‹¤
+        if (true == is_npc(other->get_id())) break;// ë§Œì•½ ë‚´ê°€ ìˆëŠ” ê³³ì— NPCê°€ ìˆë‹¤ë©´
         other->state_lock.lock();
         if (ST_INGAME != other->get_state()) {
             other->state_lock.unlock();
@@ -2379,7 +2543,7 @@ void player_revive(int client_id)
         other->state_lock.unlock();
         if (false == is_near(other->get_id(), client_id)) continue;
 
-        // ¿©±â´Â ÇÃ·¹ÀÌ¾î Ã³¸®
+        // ì—¬ê¸°ëŠ” í”Œë ˆì´ì–´ ì²˜ë¦¬
         Player* other_player = reinterpret_cast<Player*>(other);
         other_player->vl.lock();
         other_player->viewlist.insert(client_id);
@@ -2388,7 +2552,7 @@ void player_revive(int client_id)
         send_put_object_packet(other_player, pl);
     }
 
-    // »õ·Î Á¢¼ÓÇÑ ÇÃ·¹ÀÌ¾î¿¡°Ô ±âÁ¸ Á¤º¸¸¦ º¸³»Áß
+    // ìƒˆë¡œ ì ‘ì†í•œ í”Œë ˆì´ì–´ì—ê²Œ ê¸°ì¡´ ì •ë³´ë¥¼ ë³´ë‚´ì¤‘
     for (auto& other : players) {
         if (other->get_id() == client_id) continue;
         other->state_lock.lock();
@@ -2401,8 +2565,8 @@ void player_revive(int client_id)
         if (false == is_near(other->get_id(), client_id))
             continue;
 
-        // ½ºÅ©¸³Æ®¿Í ÇÔ²² Ãß°¡µÈ ºÎºĞ 
-        if (true == is_npc(other->get_id())) {	// ½Ã¾ß¿¡ npc°¡ ÀÖ´Ù¸é 
+        // ìŠ¤í¬ë¦½íŠ¸ì™€ í•¨ê»˜ ì¶”ê°€ëœ ë¶€ë¶„ 
+        if (true == is_npc(other->get_id())) {	// ì‹œì•¼ì— npcê°€ ìˆë‹¤ë©´ 
             if (is_agro_near(client_id, other->get_id())) {
                 if (other->get_active() == false) {
                     other->set_active(true);
@@ -2411,8 +2575,8 @@ void player_revive(int client_id)
                     ev.start_time = chrono::system_clock::now() + 1s;
                     ev.ev = EVENT_NPC_ATTACK;
 
-                  //  ev.target_id = client_id;
-                    ev.target_id = other->get_target_id(); //ÀÓ½Ã ¼öÁ¤ 
+                    //  ev.target_id = client_id;
+                    ev.target_id = other->get_target_id(); //ì„ì‹œ ìˆ˜ì • 
                     timer_queue.push(ev);
                     Activate_Npc_Move_Event(other->get_id(), pl->get_id());
                 }
@@ -2425,7 +2589,7 @@ void player_revive(int client_id)
 
         send_put_object_packet(pl, other);
     }
-    // Àå¾Ö¹° Á¤º¸
+    // ì¥ì• ë¬¼ ì •ë³´
     pl->ob_vl.lock();
     pl->ob_viewlist.clear();
     pl->ob_vl.unlock();
@@ -2539,7 +2703,7 @@ void worker()
                 break;
             }
             players[client_id]->state_lock.unlock();
-            // Á¦ÀÚ¸®·Î µ¹¾Æ°¡´Â °ÍÀÎ°¡
+            // ì œìë¦¬ë¡œ ëŒì•„ê°€ëŠ” ê²ƒì¸ê°€
             if (exp_over->_target == -1) {
                 return_npc_position(client_id);
                 delete exp_over;
@@ -2549,7 +2713,7 @@ void worker()
             int target_id = exp_over->_target;
             players[target_id]->state_lock.lock();
 
-            //¦i¾Æ°¡´ø Å¸°ÙÀÌ »ì¾ÆÀÖ´Â°¡
+            //ì«’ì•„ê°€ë˜ íƒ€ê²Ÿì´ ì‚´ì•„ìˆëŠ”ê°€
             if (players[target_id]->get_state() != ST_INGAME) {
                 players[target_id]->state_lock.unlock();
                 players[client_id]->set_active(false);
@@ -2559,8 +2723,8 @@ void worker()
             }
             players[target_id]->state_lock.unlock();
 
-            if(players[client_id]->get_target_id() != -1)
-               do_npc_move(client_id, exp_over->_target);
+            if (players[client_id]->get_target_id() != -1)
+                do_npc_move(client_id, exp_over->_target);
 
             /*
             players[client_id]->lua_lock.lock();
@@ -2571,8 +2735,8 @@ void worker()
             if (error != 0) {
                 cout << "LUA_NPC_MOVE ERROR" << endl;
             }
-            // bool°ªµµ ¸®ÅÏÀ» ÇØÁÖÀÚ 
-            // true¸é ¦i¾Æ°£´Ù 
+            // boolê°’ë„ ë¦¬í„´ì„ í•´ì£¼ì
+            // trueë©´ ì«’ì•„ê°„ë‹¤
             bool m = lua_toboolean(L, -1);
             lua_pop(L, 1);
             players[client_id]->lua_lock.unlock();
@@ -2580,17 +2744,17 @@ void worker()
                 do_npc_move(client_id, exp_over->_target);
             }
             else {
-                // ¿ø·¡ ÀÚ¸®·Î µ¹¾Æ°¡ÀÚ
+                // ì›ë˜ ìë¦¬ë¡œ ëŒì•„ê°€ì
                 players[client_id]->set_active(false);
                 return_npc_position(client_id);
             }
             */
             delete exp_over;
-            
+
             break;
         }
         case OP_NPC_ATTACK: {
-            // Á×Àº »óÅÂ³ª °ø°İÇÏ´Â »óÅÂÀÎÁö ¾Æ´ÑÁö È®ÀÎ
+            // ì£½ì€ ìƒíƒœë‚˜ ê³µê²©í•˜ëŠ” ìƒíƒœì¸ì§€ ì•„ë‹Œì§€ í™•ì¸
             players[client_id]->state_lock.lock();
             if ((players[client_id]->get_state() != ST_INGAME) || (false == players[client_id]->get_active())) {
                 players[client_id]->state_lock.unlock();
@@ -2611,13 +2775,13 @@ void worker()
             m = lua_toboolean(L, -1);
             lua_pop(L, 1);
             if (m) {
-                // °ø°İÃ³¸®
-                send_animation_attack(reinterpret_cast<Player*>( players[exp_over->_target]), client_id);
+                // ê³µê²©ì²˜ë¦¬
+                send_animation_attack(reinterpret_cast<Player*>(players[exp_over->_target]), client_id);
                 attack_success(players[client_id], players[exp_over->_target], players[client_id]->get_basic_attack_factor());
             }
             else {
                 if (players[client_id]->get_active()) {
-                    // °ø°İÀº ½ÇÆĞÇßÁö¸¸ °è¼Ó(±×·¸Áö¸¸ 1ÃÊÈÄ) °ø°İ½Ãµµ
+                    // ê³µê²©ì€ ì‹¤íŒ¨í–ˆì§€ë§Œ ê³„ì†(ê·¸ë ‡ì§€ë§Œ 1ì´ˆí›„) ê³µê²©ì‹œë„
                     timer_event ev;
                     ev.obj_id = client_id;
                     ev.start_time = chrono::system_clock::now() + 1s;
@@ -2629,7 +2793,7 @@ void worker()
             players[client_id]->lua_lock.unlock();
             delete exp_over;
             break;
-        }               
+        }
         case OP_AUTO_PLAYER_HP: {
             Player* pl = reinterpret_cast<Player*>(players[client_id]);
             pl->state_lock.lock();
@@ -2638,7 +2802,7 @@ void worker()
                 break;
             }
             pl->state_lock.unlock();
-            pl->set_hp(pl->get_hp() + (pl->get_maxhp()*0.1));
+            pl->set_hp(pl->get_hp() + (pl->get_maxhp() * 0.1));
             if (pl->get_hp() >= pl->get_maxhp()) {
                 pl->set_hp(pl->get_maxhp());
                 reinterpret_cast<Player*>(players[client_id])->_auto_hp = false;
@@ -2661,17 +2825,17 @@ void worker()
             break;
         }
         case OP_NPC_REVIVE: {
-            // »óÅÂ ¹Ù²ãÁÖ°í
+            // ìƒíƒœ ë°”ê¿”ì£¼ê³ 
             players[client_id]->state_lock.lock();
             players[client_id]->set_state(ST_INGAME);
             players[client_id]->state_lock.unlock();
-            // NPCÀÇ Á¤º¸ °¡Á®¿À±â
+            // NPCì˜ ì •ë³´ ê°€ì ¸ì˜¤ê¸°
             players[client_id]->lua_lock.lock();
             lua_State* L = players[client_id]->L;
             lua_getglobal(L, "monster_revive");
             int error = lua_pcall(L, 0, 4, 0);
             if (error != 0) {
-                cout << "ÃÊ±âÈ­ ¿À·ù" << endl;
+                cout << "ì´ˆê¸°í™” ì˜¤ë¥˜" << endl;
             }
 
             players[client_id]->set_x(lua_tonumber(L, -4));
@@ -2680,7 +2844,7 @@ void worker()
             players[client_id]->set_hp(lua_tointeger(L, -1));
             lua_pop(L, 5);
             players[client_id]->lua_lock.unlock();
-            // ºÎÈ°ÇÏ´Â NPCÁÖº¯ ¾êµé¿¡°Ô º¸ÀÌ°Ô ÇØÁÖÀÚ
+            // ë¶€í™œí•˜ëŠ” NPCì£¼ë³€ ì–˜ë“¤ì—ê²Œ ë³´ì´ê²Œ í•´ì£¼ì
             unordered_set <int> nearlist;
             for (auto& other : players) {
                 // if (other._id == client_id) continue;
@@ -2841,7 +3005,7 @@ void worker()
             dun->state_lock.lock();
             if (dun->get_dun_st() == DUN_ST_START) {
                 dun->state_lock.unlock();
-                // °ÔÀÓÀÌ ½ÃÀÛ µÇ¾úÀ¸´Ï ½Ã¾ßÃ³¸®¸¦ ÇØÁÖÀÚ
+                // ê²Œì„ì´ ì‹œì‘ ë˜ì—ˆìœ¼ë‹ˆ ì‹œì•¼ì²˜ë¦¬ë¥¼ í•´ì£¼ì
                 Player** vl_pl;
                 vl_pl = dun->get_party_palyer();
 
@@ -2885,7 +3049,7 @@ void worker()
     }
 }
 
-// ½ºÅ©¸³Æ® API
+// ìŠ¤í¬ë¦½íŠ¸ API
 int API_get_x(lua_State* L)
 {
     int user_id = (int)lua_tointeger(L, -1);
@@ -2920,12 +3084,12 @@ void initialise_NPC()
     default_random_engine dre;
     uniform_int_distribution<int> rng_x(2560, 2943);
     uniform_int_distribution<int> rng_z(1100, 1701);
-    
-    cout << "NPC ·ÎµùÁß" << endl;
+
+    cout << "NPC ë¡œë”©ì¤‘" << endl;
     char name[MAX_NAME_SIZE];
 
-    // Å¸¶ôÇÑ °³±¸¸® ¼ÒÈ¯
-    for (int i = NPC_ID_START; i < NPC_ID_START+30; ++i) {
+    // íƒ€ë½í•œ ê°œêµ¬ë¦¬ ì†Œí™˜
+    for (int i = NPC_ID_START; i < NPC_ID_START + 30; ++i) {
         players[i] = new Npc(i);
         lua_State* L = players[i]->L = luaL_newstate();
         luaL_openlibs(L);
@@ -2933,9 +3097,9 @@ void initialise_NPC()
             lua_pcall(L, 0, 0, 0);
 
         //-------------------------------------------
-        // ¿©±â¼­ À§Ä¡¸¦ ¹Ş¾Æ¿ÀÀÚ
+        // ì—¬ê¸°ì„œ ìœ„ì¹˜ë¥¼ ë°›ì•„ì˜¤ì
 
-        // ÀÓ½Ã ÁÂÇ¥(¿ø·¡´Â ¸ó½ºÅÍ ³õÀ» °÷ÀÇ ÁÂÇ¥¸¦ »Ì¾Æ¿Í¾ßÇÑ´Ù)
+        // ì„ì‹œ ì¢Œí‘œ(ì›ë˜ëŠ” ëª¬ìŠ¤í„° ë†“ì„ ê³³ì˜ ì¢Œí‘œë¥¼ ë½‘ì•„ì™€ì•¼í•œë‹¤)
         players[i]->set_x(rng_x(dre));
         players[i]->set_z(rng_z(dre));
         float temp_x = players[i]->get_x();
@@ -2952,7 +3116,7 @@ void initialise_NPC()
         error = lua_pcall(L, 4, 10, 0);
 
         if (error != 0) {
-            cout << "ÃÊ±âÈ­ ¿À·ù" << endl;
+            cout << "ì´ˆê¸°í™” ì˜¤ë¥˜" << endl;
         }
         players[i]->set_element(static_cast<ELEMENT>(lua_tointeger(L, -10)));
         players[i]->set_lv(lua_tointeger(L, -9));
@@ -2968,19 +3132,19 @@ void initialise_NPC()
 
         lua_pop(L, 11);// eliminate set_uid from stack after call
 
-        // ³ªÁß¿¡ ¾î¶»°Ô ÀÌ¿ëÇÒ °ÍÀÎÁö »ı°¢
+        // ë‚˜ì¤‘ì— ì–´ë–»ê²Œ ì´ìš©í•  ê²ƒì¸ì§€ ìƒê°
         lua_register(L, "API_get_x", API_get_x);
         lua_register(L, "API_get_y", API_get_y);
         lua_register(L, "API_get_z", API_get_z);
-        
+
         players[i]->set_mon_species(FALLEN_FLOG);
 
     }
 
-    // Å¸¶ôÇÑ ´ß ¼ÒÈ¯
+    // íƒ€ë½í•œ ë‹­ ì†Œí™˜
     rng_x.param(uniform_int_distribution<int>::param_type(2660, 2960));
     rng_z.param(uniform_int_distribution<int>::param_type(1990, 2290));
-    for (int i = NPC_ID_START+30; i < NPC_ID_START + 60; ++i) {
+    for (int i = NPC_ID_START + 30; i < NPC_ID_START + 60; ++i) {
         players[i] = new Npc(i);
         lua_State* L = players[i]->L = luaL_newstate();
         luaL_openlibs(L);
@@ -2988,9 +3152,9 @@ void initialise_NPC()
             lua_pcall(L, 0, 0, 0);
 
         //-------------------------------------------
-        // ¿©±â¼­ À§Ä¡¸¦ ¹Ş¾Æ¿ÀÀÚ
+        // ì—¬ê¸°ì„œ ìœ„ì¹˜ë¥¼ ë°›ì•„ì˜¤ì
 
-        // ÀÓ½Ã ÁÂÇ¥(¿ø·¡´Â ¸ó½ºÅÍ ³õÀ» °÷ÀÇ ÁÂÇ¥¸¦ »Ì¾Æ¿Í¾ßÇÑ´Ù)
+        // ì„ì‹œ ì¢Œí‘œ(ì›ë˜ëŠ” ëª¬ìŠ¤í„° ë†“ì„ ê³³ì˜ ì¢Œí‘œë¥¼ ë½‘ì•„ì™€ì•¼í•œë‹¤)
         players[i]->set_x(rng_x(dre));
         players[i]->set_z(rng_z(dre));
         float temp_x = players[i]->get_x();
@@ -3007,7 +3171,7 @@ void initialise_NPC()
         error = lua_pcall(L, 4, 10, 0);
 
         if (error != 0) {
-            cout << "ÃÊ±âÈ­ ¿À·ù" << endl;
+            cout << "ì´ˆê¸°í™” ì˜¤ë¥˜" << endl;
         }
         players[i]->set_element(static_cast<ELEMENT>(lua_tointeger(L, -10)));
         players[i]->set_lv(lua_tointeger(L, -9));
@@ -3022,7 +3186,7 @@ void initialise_NPC()
         players[i]->set_defence_factor(lua_tonumber(L, -1));
         lua_pop(L, 11);// eliminate set_uid from stack after call
 
-        // ¿©±â´Â ³ªÁß¿¡ »ı°¢ÇÏÀÚ
+        // ì—¬ê¸°ëŠ” ë‚˜ì¤‘ì— ìƒê°í•˜ì
         lua_register(L, "API_get_x", API_get_x);
         lua_register(L, "API_get_y", API_get_y);
         lua_register(L, "API_get_z", API_get_z);
@@ -3030,7 +3194,7 @@ void initialise_NPC()
         players[i]->set_mon_species(FALLEN_CHICKEN);
     }
 
-    // Å¸¶ôÇÑ Åä³¢ ¼ÒÈ¯
+    // íƒ€ë½í•œ í† ë¼ ì†Œí™˜
     rng_x.param(uniform_int_distribution<int>::param_type(1900, 2200));
     rng_z.param(uniform_int_distribution<int>::param_type(3080, 3380));
     for (int i = NPC_ID_START + 60; i < NPC_ID_START + 90; ++i) {
@@ -3041,9 +3205,9 @@ void initialise_NPC()
             lua_pcall(L, 0, 0, 0);
 
         //-------------------------------------------
-        // ¿©±â¼­ À§Ä¡¸¦ ¹Ş¾Æ¿ÀÀÚ
+        // ì—¬ê¸°ì„œ ìœ„ì¹˜ë¥¼ ë°›ì•„ì˜¤ì
 
-        // ÀÓ½Ã ÁÂÇ¥(¿ø·¡´Â ¸ó½ºÅÍ ³õÀ» °÷ÀÇ ÁÂÇ¥¸¦ »Ì¾Æ¿Í¾ßÇÑ´Ù)
+        // ì„ì‹œ ì¢Œí‘œ(ì›ë˜ëŠ” ëª¬ìŠ¤í„° ë†“ì„ ê³³ì˜ ì¢Œí‘œë¥¼ ë½‘ì•„ì™€ì•¼í•œë‹¤)
         players[i]->set_x(rng_x(dre));
         players[i]->set_z(rng_z(dre));
         float temp_x = players[i]->get_x();
@@ -3060,7 +3224,7 @@ void initialise_NPC()
         error = lua_pcall(L, 4, 10, 0);
 
         if (error != 0) {
-            cout << "ÃÊ±âÈ­ ¿À·ù" << endl;
+            cout << "ì´ˆê¸°í™” ì˜¤ë¥˜" << endl;
         }
         players[i]->set_element(static_cast<ELEMENT>(lua_tointeger(L, -10)));
         players[i]->set_lv(lua_tointeger(L, -9));
@@ -3075,14 +3239,14 @@ void initialise_NPC()
         players[i]->set_defence_factor(lua_tonumber(L, -1));
         lua_pop(L, 11);// eliminate set_uid from stack after call
 
-        // ¿©±â´Â ³ªÁß¿¡ »ı°¢ÇÏÀÚ
+        // ì—¬ê¸°ëŠ” ë‚˜ì¤‘ì— ìƒê°í•˜ì
         lua_register(L, "API_get_x", API_get_x);
         lua_register(L, "API_get_y", API_get_y);
         lua_register(L, "API_get_z", API_get_z);
 
         players[i]->set_mon_species(FALLEN_RABBIT);
     }
-    // Å¸¶ôÇÑ ¹Ù³ª³ª ¿ø¼şÀÌ ¼ÒÈ¯
+    // íƒ€ë½í•œ ë°”ë‚˜ë‚˜ ì›ìˆ­ì´ ì†Œí™˜
     rng_x.param(uniform_int_distribution<int>::param_type(3400, 3700));
     rng_z.param(uniform_int_distribution<int>::param_type(2575, 2875));
     for (int i = NPC_ID_START + 90; i < NPC_ID_START + 120; ++i) {
@@ -3092,9 +3256,9 @@ void initialise_NPC()
         int error = luaL_loadfile(L, "fallen_monkey.lua") ||
             lua_pcall(L, 0, 0, 0);
         //-------------------------------------------
-        // ¿©±â¼­ À§Ä¡¸¦ ¹Ş¾Æ¿ÀÀÚ
+        // ì—¬ê¸°ì„œ ìœ„ì¹˜ë¥¼ ë°›ì•„ì˜¤ì
 
-        // ÀÓ½Ã ÁÂÇ¥(¿ø·¡´Â ¸ó½ºÅÍ ³õÀ» °÷ÀÇ ÁÂÇ¥¸¦ »Ì¾Æ¿Í¾ßÇÑ´Ù)
+        // ì„ì‹œ ì¢Œí‘œ(ì›ë˜ëŠ” ëª¬ìŠ¤í„° ë†“ì„ ê³³ì˜ ì¢Œí‘œë¥¼ ë½‘ì•„ì™€ì•¼í•œë‹¤)
         players[i]->set_x(rng_x(dre));
         players[i]->set_z(rng_z(dre));
         float temp_x = players[i]->get_x();
@@ -3110,7 +3274,7 @@ void initialise_NPC()
         lua_pushnumber(L, temp_z);
         error = lua_pcall(L, 4, 10, 0);
         if (error != 0) {
-            cout << "ÃÊ±âÈ­ ¿À·ù" << endl;
+            cout << "ì´ˆê¸°í™” ì˜¤ë¥˜" << endl;
         }
         players[i]->set_element(static_cast<ELEMENT>(lua_tointeger(L, -10)));
         players[i]->set_lv(lua_tointeger(L, -9));
@@ -3125,14 +3289,14 @@ void initialise_NPC()
         players[i]->set_defence_factor(lua_tonumber(L, -1));
         lua_pop(L, 11);// eliminate set_uid from stack after call
 
-        // ¿©±â´Â ³ªÁß¿¡ »ı°¢ÇÏÀÚ
+        // ì—¬ê¸°ëŠ” ë‚˜ì¤‘ì— ìƒê°í•˜ì
         lua_register(L, "API_get_x", API_get_x);
         lua_register(L, "API_get_y", API_get_y);
         lua_register(L, "API_get_z", API_get_z);
 
         players[i]->set_mon_species(FALLEN_MONKEY);
     }
-    // ´Á´ë ¿ìµÎ¸Ó¸® ¼ÒÈ¯
+    // ëŠ‘ëŒ€ ìš°ë‘ë¨¸ë¦¬ ì†Œí™˜
     rng_x.param(uniform_int_distribution<int>::param_type(3125, 3425));
     rng_z.param(uniform_int_distribution<int>::param_type(3210, 3510));
     for (int i = NPC_ID_START + 120; i < NPC_ID_START + 150; ++i) {
@@ -3143,9 +3307,9 @@ void initialise_NPC()
             lua_pcall(L, 0, 0, 0);
 
         //-------------------------------------------
-        // ¿©±â¼­ À§Ä¡¸¦ ¹Ş¾Æ¿ÀÀÚ
+        // ì—¬ê¸°ì„œ ìœ„ì¹˜ë¥¼ ë°›ì•„ì˜¤ì
 
-        // ÀÓ½Ã ÁÂÇ¥(¿ø·¡´Â ¸ó½ºÅÍ ³õÀ» °÷ÀÇ ÁÂÇ¥¸¦ »Ì¾Æ¿Í¾ßÇÑ´Ù)
+        // ì„ì‹œ ì¢Œí‘œ(ì›ë˜ëŠ” ëª¬ìŠ¤í„° ë†“ì„ ê³³ì˜ ì¢Œí‘œë¥¼ ë½‘ì•„ì™€ì•¼í•œë‹¤)
         players[i]->set_x(rng_x(dre));
         players[i]->set_z(rng_z(dre));
         float temp_x = players[i]->get_x();
@@ -3162,7 +3326,7 @@ void initialise_NPC()
         error = lua_pcall(L, 4, 10, 0);
 
         if (error != 0) {
-            cout << "ÃÊ±âÈ­ ¿À·ù" << endl;
+            cout << "ì´ˆê¸°í™” ì˜¤ë¥˜" << endl;
         }
         players[i]->set_element(static_cast<ELEMENT>(lua_tointeger(L, -10)));
         players[i]->set_lv(lua_tointeger(L, -9));
@@ -3177,7 +3341,7 @@ void initialise_NPC()
         players[i]->set_defence_factor(lua_tonumber(L, -1));
         lua_pop(L, 11);// eliminate set_uid from stack after call
 
-        // ¿©±â´Â ³ªÁß¿¡ »ı°¢ÇÏÀÚ
+        // ì—¬ê¸°ëŠ” ë‚˜ì¤‘ì— ìƒê°í•˜ì
         lua_register(L, "API_get_x", API_get_x);
         lua_register(L, "API_get_y", API_get_y);
         lua_register(L, "API_get_z", API_get_z);
@@ -3185,7 +3349,7 @@ void initialise_NPC()
         players[i]->set_mon_species(WOLF_BOSS);
     }
 
-    // Å¸¶ôÇÑ È£¶ûÀÌ ¼ÒÈ¯
+    // íƒ€ë½í•œ í˜¸ë‘ì´ ì†Œí™˜
     rng_x.param(uniform_int_distribution<int>::param_type(3020, 3320));
     rng_z.param(uniform_int_distribution<int>::param_type(3622, 3922));
     for (int i = NPC_ID_START + 150; i < NPC_ID_START + 180; ++i) {
@@ -3196,9 +3360,9 @@ void initialise_NPC()
             lua_pcall(L, 0, 0, 0);
 
         //-------------------------------------------
-        // ¿©±â¼­ À§Ä¡¸¦ ¹Ş¾Æ¿ÀÀÚ
+        // ì—¬ê¸°ì„œ ìœ„ì¹˜ë¥¼ ë°›ì•„ì˜¤ì
 
-        // ÀÓ½Ã ÁÂÇ¥(¿ø·¡´Â ¸ó½ºÅÍ ³õÀ» °÷ÀÇ ÁÂÇ¥¸¦ »Ì¾Æ¿Í¾ßÇÑ´Ù)
+        // ì„ì‹œ ì¢Œí‘œ(ì›ë˜ëŠ” ëª¬ìŠ¤í„° ë†“ì„ ê³³ì˜ ì¢Œí‘œë¥¼ ë½‘ì•„ì™€ì•¼í•œë‹¤)
         players[i]->set_x(rng_x(dre));
         players[i]->set_z(rng_z(dre));
         float temp_x = players[i]->get_x();
@@ -3215,7 +3379,7 @@ void initialise_NPC()
         error = lua_pcall(L, 4, 10, 0);
 
         if (error != 0) {
-            cout << "ÃÊ±âÈ­ ¿À·ù" << endl;
+            cout << "ì´ˆê¸°í™” ì˜¤ë¥˜" << endl;
         }
         players[i]->set_element(static_cast<ELEMENT>(lua_tointeger(L, -10)));
         players[i]->set_lv(lua_tointeger(L, -9));
@@ -3231,7 +3395,7 @@ void initialise_NPC()
 
         lua_pop(L, 11);// eliminate set_uid from stack after call
 
-        // ¿©±â´Â ³ªÁß¿¡ »ı°¢ÇÏÀÚ
+        // ì—¬ê¸°ëŠ” ë‚˜ì¤‘ì— ìƒê°í•˜ì
         lua_register(L, "API_get_x", API_get_x);
         lua_register(L, "API_get_y", API_get_y);
         lua_register(L, "API_get_z", API_get_z);
@@ -3239,13 +3403,13 @@ void initialise_NPC()
         players[i]->set_mon_species(FALLEN_TIGER);
     }
 
-    cout << "NPC·Îµù ¿Ï·á" << endl;
+    cout << "NPCë¡œë”© ì™„ë£Œ" << endl;
 }
 
 void return_npc_position(int npc_id)
 {
-    players[npc_id]->set_target_id(-1); //Ãß°¡
-    
+    players[npc_id]->set_target_id(-1); //ì¶”ê°€
+
 
     if (players[npc_id]->get_active() == true) {
         return;
@@ -3254,14 +3418,14 @@ void return_npc_position(int npc_id)
     unordered_set<int> new_viewlist;
     for (auto& obj : players) {
         if (obj->get_state() != ST_INGAME) continue;
-        // if (true == is_npc(obj._id)) continue;   // npc°¡ ¾Æ´Ò¶§
-        if (true == is_npc(obj->get_id())) break;   // npc°¡ ¾Æ´Ò¶§
-        if (true == is_near(npc_id, obj->get_id())) {      // ±ÙÃ³¿¡ ÀÖÀ»¶§
-            old_viewlist.insert(obj->get_id());         // npc±ÙÃ³¿¡ ÇÃ·¹ÀÌ¾î°¡ ÀÖÀ¸¸é old_viewlist¿¡ ÇÃ·¹ÀÌ¾î id¸¦ ³Ö´Â´Ù
+        // if (true == is_npc(obj._id)) continue;   // npcê°€ ì•„ë‹ë•Œ
+        if (true == is_npc(obj->get_id())) break;   // npcê°€ ì•„ë‹ë•Œ
+        if (true == is_near(npc_id, obj->get_id())) {      // ê·¼ì²˜ì— ìˆì„ë•Œ
+            old_viewlist.insert(obj->get_id());         // npcê·¼ì²˜ì— í”Œë ˆì´ì–´ê°€ ìˆìœ¼ë©´ old_viewlistì— í”Œë ˆì´ì–´ idë¥¼ ë„£ëŠ”ë‹¤
         }
     }
 
-    // ¿ø·¡ ÀÚ¸®·Î µ¹¾Æ°¡ÀÚ
+    // ì›ë˜ ìë¦¬ë¡œ ëŒì•„ê°€ì
     players[npc_id]->lua_lock.lock();
     lua_State* L = players[npc_id]->L;
     lua_getglobal(L, "return_my_position");
@@ -3282,7 +3446,7 @@ void return_npc_position(int npc_id)
     bool my_pos_fail = true;
 
     pos mv = players[npc_id]->a_star(my_x, my_z, now_x, now_z, obstacles);
-    if (abs(mv.first-my_x) <=10 && abs(mv.second - my_z) <= 10) {
+    if (abs(mv.first - my_x) <= 10 && abs(mv.second - my_z) <= 10) {
         now_x = my_x;
         now_z = my_z;
         my_pos_fail = false;
@@ -3302,22 +3466,22 @@ void return_npc_position(int npc_id)
 
 
     for (auto& obj : players) {
-        if (obj->get_state() != ST_INGAME) continue;   // in gameÀÌ ¾Æ´Ò¶§
-        //if (true == is_npc(obj._id)) continue;   // npc°¡ ¾Æ´Ò¶§ -> ingameÁßÀÎ ÇÃ·¹ÀÌ¾î Ã£±â
-        if (true == is_npc(obj->get_id())) break;   // npc°¡ ¾Æ´Ò¶§ -> ingameÁßÀÎ ÇÃ·¹ÀÌ¾î Ã£±â
+        if (obj->get_state() != ST_INGAME) continue;   // in gameì´ ì•„ë‹ë•Œ
+        //if (true == is_npc(obj._id)) continue;   // npcê°€ ì•„ë‹ë•Œ -> ingameì¤‘ì¸ í”Œë ˆì´ì–´ ì°¾ê¸°
+        if (true == is_npc(obj->get_id())) break;   // npcê°€ ì•„ë‹ë•Œ -> ingameì¤‘ì¸ í”Œë ˆì´ì–´ ì°¾ê¸°
         if (true == is_near(npc_id, obj->get_id())) {
             new_viewlist.insert(obj->get_id());
         }
     }
 
     for (auto pl : new_viewlist) {
-        // »õ·Î ½Ã¾ß¿¡ µé¾î¿Â ÇÃ·¹ÀÌ¾î
+        // ìƒˆë¡œ ì‹œì•¼ì— ë“¤ì–´ì˜¨ í”Œë ˆì´ì–´
         if (0 == old_viewlist.count(pl)) {
             reinterpret_cast<Player*>(players[pl])->vl.lock();
             reinterpret_cast<Player*>(players[pl])->viewlist.insert(npc_id);
             reinterpret_cast<Player*>(players[pl])->vl.unlock();
             send_put_object_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id]);
-  
+
         }
         else {
             send_move_packet(reinterpret_cast<Player*>(players[pl]), players[npc_id], 1);
@@ -3325,7 +3489,7 @@ void return_npc_position(int npc_id)
         }
     }
 
-    // ½Ã¾ß¿¡ »ç¶óÁø °æ¿ì
+    // ì‹œì•¼ì— ì‚¬ë¼ì§„ ê²½ìš°
     for (auto pl : old_viewlist) {
         if (0 == new_viewlist.count(pl)) {
             reinterpret_cast<Player*>(players[pl])->vl.lock();
@@ -3342,7 +3506,7 @@ void return_npc_position(int npc_id)
     }
     players[npc_id]->state_lock.unlock();
 
-    if (my_pos_fail) {    // ´õ ¿òÁ÷¿©¾ßµÅ
+    if (my_pos_fail) {    // ë” ì›€ì§ì—¬ì•¼ë¼
         timer_event ev;
         ev.obj_id = npc_id;
         ev.start_time = chrono::system_clock::now() + 1s;
@@ -3354,7 +3518,7 @@ void return_npc_position(int npc_id)
 
 void do_npc_move(int npc_id, int target)
 {
-  
+
     players[npc_id]->lua_lock.lock();
     lua_State* L = players[npc_id]->L;
     lua_getglobal(L, "event_npc_move");
@@ -3363,8 +3527,8 @@ void do_npc_move(int npc_id, int target)
     if (error != 0) {
         cout << "LUA_NPC_MOVE ERROR" << endl;
     }
-    // bool°ªµµ ¸®ÅÏÀ» ÇØÁÖÀÚ 
-    // true¸é ¦i¾Æ°£´Ù 
+    // boolê°’ë„ ë¦¬í„´ì„ í•´ì£¼ì 
+    // trueë©´ ì«’ì•„ê°„ë‹¤ 
     bool m = lua_toboolean(L, -1);
     lua_pop(L, 1);
     players[npc_id]->lua_lock.unlock();
@@ -3379,9 +3543,9 @@ void do_npc_move(int npc_id, int target)
     unordered_set<int> new_viewlist;
     for (auto& obj : players) {
         if (obj->get_state() != ST_INGAME) continue;
-        if (true == is_npc(obj->get_id())) break;   // npc°¡ ¾Æ´Ò¶§
-        if (true == is_near(npc_id, obj->get_id())) {      // ±ÙÃ³¿¡ ÀÖÀ»¶§
-            old_viewlist.insert(obj->get_id());         // npc±ÙÃ³¿¡ ÇÃ·¹ÀÌ¾î°¡ ÀÖÀ¸¸é old_viewlist¿¡ ÇÃ·¹ÀÌ¾î id¸¦ ³Ö´Â´Ù
+        if (true == is_npc(obj->get_id())) break;   // npcê°€ ì•„ë‹ë•Œ
+        if (true == is_near(npc_id, obj->get_id())) {      // ê·¼ì²˜ì— ìˆì„ë•Œ
+            old_viewlist.insert(obj->get_id());         // npcê·¼ì²˜ì— í”Œë ˆì´ì–´ê°€ ìˆìœ¼ë©´ old_viewlistì— í”Œë ˆì´ì–´ idë¥¼ ë„£ëŠ”ë‹¤
         }
     }
 
@@ -3397,7 +3561,7 @@ void do_npc_move(int npc_id, int target)
     int t_x = players[target]->get_x();
     int t_z = players[target]->get_z();
 
-    // ¿òÁ÷ÀÏ ÇÊ¿ä°¡ ¾ø´Ù
+    // ì›€ì§ì¼ í•„ìš”ê°€ ì—†ë‹¤
     if ((t_x >= x - 8 && t_x <= x + 8) && (t_z >= z - 8 && t_z <= z + 8)) {
         players[npc_id]->state_lock.lock();
         if (players[npc_id]->get_state() != ST_INGAME) {
@@ -3415,7 +3579,7 @@ void do_npc_move(int npc_id, int target)
         return;
     }
 
-    // A*¾Ë°í¸®Áò
+    // A*ì•Œê³ ë¦¬ì¦˜
     pos mv = players[npc_id]->a_star(t_x, t_z, x, z, obstacles);
     x = mv.first;
     z = mv.second;
@@ -3428,9 +3592,9 @@ void do_npc_move(int npc_id, int target)
     players[npc_id]->set_z(z);
 
     for (auto& obj : players) {
-        if (obj->get_state() != ST_INGAME) continue;   // in gameÀÌ ¾Æ´Ò¶§
-        //if (true == is_npc(obj._id)) continue;   // npc°¡ ¾Æ´Ò¶§ -> ingameÁßÀÎ ÇÃ·¹ÀÌ¾î Ã£±â
-        if (true == is_npc(obj->get_id())) break;   // npc°¡ ¾Æ´Ò¶§ -> ingameÁßÀÎ ÇÃ·¹ÀÌ¾î Ã£±â
+        if (obj->get_state() != ST_INGAME) continue;   // in gameì´ ì•„ë‹ë•Œ
+        //if (true == is_npc(obj._id)) continue;   // npcê°€ ì•„ë‹ë•Œ -> ingameì¤‘ì¸ í”Œë ˆì´ì–´ ì°¾ê¸°
+        if (true == is_npc(obj->get_id())) break;   // npcê°€ ì•„ë‹ë•Œ -> ingameì¤‘ì¸ í”Œë ˆì´ì–´ ì°¾ê¸°
         if (true == is_near(npc_id, obj->get_id())) {
             new_viewlist.insert(obj->get_id());
         }
@@ -3442,7 +3606,7 @@ void do_npc_move(int npc_id, int target)
     players[npc_id]->vl.unlock();
 
     for (auto pl : new_viewlist) {
-        // »õ·Î ½Ã¾ß¿¡ µé¾î¿Â ÇÃ·¹ÀÌ¾î
+        // ìƒˆë¡œ ì‹œì•¼ì— ë“¤ì–´ì˜¨ í”Œë ˆì´ì–´
         if (0 == old_viewlist.count(pl)) {
             reinterpret_cast<Player*>(players[pl])->vl.lock();
             reinterpret_cast<Player*>(players[pl])->viewlist.insert(npc_id);
@@ -3455,7 +3619,7 @@ void do_npc_move(int npc_id, int target)
         }
     }
 
-    // ½Ã¾ß¿¡ »ç¶óÁø °æ¿ì
+    // ì‹œì•¼ì— ì‚¬ë¼ì§„ ê²½ìš°
     for (auto pl : old_viewlist) {
         if (0 == new_viewlist.count(pl)) {
             reinterpret_cast<Player*>(players[pl])->vl.lock();
@@ -3507,7 +3671,7 @@ COMP_OP EVtoOP(EVENT_TYPE ev) {
         break;
 
     case EVENT_ELEMENT_COOLTIME:
-       // return OP_ELEMENT_COOLTIME;
+        // return OP_ELEMENT_COOLTIME;
         break;
     case EVENT_GAIA_PATTERN:
         return OP_GAIA_PATTERN;
@@ -3541,18 +3705,27 @@ void do_timer()
                 reinterpret_cast<Player*>(players[temp.obj_id])->set_attack_active(false);
             }
             else if (temp.ev == EVENT_SKILL_COOLTIME) {
-                if (temp.target_id == 2) {  // Àü»ç BUFF
+                if (temp.target_id == 2) {  // ì „ì‚¬ BUFF
                     players[temp.obj_id]->set_physical_attack(0.3 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 10 * players[temp.obj_id]->get_lv());
                     players[temp.obj_id]->set_magical_attack(0.1 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 5 * players[temp.obj_id]->get_lv());
-                 
+
                     //send_status_change_packet(reinterpret_cast<Player*>(players[temp.obj_id]));
+                }
+                else if (temp.target_id == 10) {  // ê³µì†
+                    int indun_id = reinterpret_cast<Player*>(players[temp.obj_id])->get_indun_id();
+                    if (indun_id < 0) continue;
+                    for (int i = 0; i < GAIA_ROOM; ++i) {
+                        dungeons[indun_id]->get_party_palyer()[i]->attack_speed_up = false;
+                    }
+                    for (int i = 0; i < MAX_USER; ++i) {
+                        reinterpret_cast<Player*>(players[i])->attack_speed_up = false;
+                    }
                 }
                 reinterpret_cast<Player*>(players[temp.obj_id])->set_skill_active(temp.target_id, false);
             }
             else if (temp.ev == EVENT_PARTNER_SKILL) {
                 if (temp.target_id == 10) {
-                    int indun_id = reinterpret_cast<Player*>(players[temp.obj_id])->get_indun_id();
-
+                    int indun_id = reinterpret_cast<Player*>(players[temp.obj_id])->get_indun_id();       
                     if (indun_id < 0) continue;
 
                     for (int i = 0; i < GAIA_ROOM; ++i) {
@@ -3562,13 +3735,13 @@ void do_timer()
                 EXP_OVER* ex_over = new EXP_OVER;
                 ex_over->_comp_op = EVtoOP(temp.ev);
                 ex_over->_target = temp.target_id;
-                PostQueuedCompletionStatus(g_h_iocp, 1, temp.obj_id, &ex_over->_wsa_over);   //0Àº ¼ÒÄÏÃë±ŞÀ» ¹ŞÀ½
+                PostQueuedCompletionStatus(g_h_iocp, 1, temp.obj_id, &ex_over->_wsa_over);   //0ì€ ì†Œì¼“ì·¨ê¸‰ì„ ë°›ìŒ
             }
             else {
                 EXP_OVER* ex_over = new EXP_OVER;
                 ex_over->_comp_op = EVtoOP(temp.ev);
                 ex_over->_target = temp.target_id;
-                PostQueuedCompletionStatus(g_h_iocp, 1, temp.obj_id, &ex_over->_wsa_over);   //0Àº ¼ÒÄÏÃë±ŞÀ» ¹ŞÀ½
+                PostQueuedCompletionStatus(g_h_iocp, 1, temp.obj_id, &ex_over->_wsa_over);   //0ì€ ì†Œì¼“ì·¨ê¸‰ì„ ë°›ìŒ
             }
         }
 
@@ -3584,15 +3757,24 @@ void do_timer()
                     reinterpret_cast<Player*>(players[ev.obj_id])->set_attack_active(false);
                     continue;
                 }
-        
+
                 if (ev.ev == EVENT_SKILL_COOLTIME) {
-                    if (ev.target_id == 2) {  // Àü»ç BUFF
+                    if (ev.target_id == 2) {  // ì „ì‚¬ BUFF
                         players[ev.obj_id]->set_physical_attack(0.3 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 10 * players[ev.obj_id]->get_lv());
                         players[ev.obj_id]->set_magical_attack(0.1 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 5 * players[ev.obj_id]->get_lv());
-                        // ÀÏ´Ü ÀÌ°ÍÀ» ³ÖÀ¸¸é ¾Èµ¹¾Æ°¨(ÀÌÀ¯ ¸ğ¸§)
+                        // ì¼ë‹¨ ì´ê²ƒì„ ë„£ìœ¼ë©´ ì•ˆëŒì•„ê°(ì´ìœ  ëª¨ë¦„)
                         //send_status_change_packet(reinterpret_cast<Player*>(players[ev.obj_id]));
                     }
-            
+                    else if (ev.target_id == 10) {  // ê³µì†
+                        int indun_id = reinterpret_cast<Player*>(players[ev.obj_id])->get_indun_id();
+                        if (indun_id < 0) continue;
+                        for (int i = 0; i < GAIA_ROOM; ++i) {
+                            dungeons[indun_id]->get_party_palyer()[i]->attack_speed_up = false;
+                        }
+                        for (int i = 0; i < MAX_USER; ++i) {
+                            reinterpret_cast<Player*>(players[i])->attack_speed_up = false;
+                        }
+                    }
                     reinterpret_cast<Player*>(players[ev.obj_id])->set_skill_active(ev.target_id, false);
                     continue;
                 }
@@ -3607,10 +3789,10 @@ void do_timer()
                         }
                     }
                 }
-               
+
                 ex_over->_comp_op = EVtoOP(ev.ev);
                 ex_over->_target = ev.target_id;
-                PostQueuedCompletionStatus(g_h_iocp, 1, ev.obj_id, &ex_over->_wsa_over);   //0Àº ¼ÒÄÏÃë±ŞÀ» ¹ŞÀ½
+                PostQueuedCompletionStatus(g_h_iocp, 1, ev.obj_id, &ex_over->_wsa_over);   //0ì€ ì†Œì¼“ì·¨ê¸‰ì„ ë°›ìŒ
             }
             else if (dura <= waittime) {
                 temp = ev;
@@ -3618,11 +3800,11 @@ void do_timer()
                 break;
             }
             else {
-                timer_queue.push(ev);   // Å¸ÀÌ¸Ó Å¥¿¡ ³ÖÁö ¾Ê°í ÃÖÀûÈ­ ÇÊ¿ä
+                timer_queue.push(ev);   // íƒ€ì´ë¨¸ íì— ë„£ì§€ ì•Šê³  ìµœì í™” í•„ìš”
             }
         }
         this_thread::sleep_for(dura);
-        // Âß »ç¿©ÀÖ¾î¼­ °è¼Ó Ã³¸®¸¦ ÇÏµµ·Ï ÇØ¾ßÇÔ
+        // ì­‰ ì‚¬ì—¬ìˆì–´ì„œ ê³„ì† ì²˜ë¦¬ë¥¼ í•˜ë„ë¡ í•´ì•¼í•¨
     }
 }
 
@@ -3631,7 +3813,7 @@ void initialise_DUNGEON()
     for (int i = 0; i < MAX_USER / GAIA_ROOM; i++) {
         dungeons[i] = new Gaia(i);
     }
-    cout << "´øÀü ÃÊ±âÈ­ ¿Ï·á" << endl;
+    cout << "ë˜ì „ ì´ˆê¸°í™” ì™„ë£Œ" << endl;
 }
 
 
@@ -3653,7 +3835,7 @@ int main()
     g_h_iocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, NULL, 0);
     CreateIoCompletionPort(reinterpret_cast<HANDLE>(g_s_socket), g_h_iocp, 0, 0);
 
-    // DB ¿¬°á (µ¿½Ã¿¡ DB¿¡ ¸¹ÀÌ Á¢±ÙÇÏ¸é DB¿¡¼­ Æ¨±â±â ¶§¹®)
+    // DB ì—°ê²° (ë™ì‹œì— DBì— ë§ì´ ì ‘ê·¼í•˜ë©´ DBì—ì„œ íŠ•ê¸°ê¸° ë•Œë¬¸)
     InitializeCriticalSection(&cs);
 
     SOCKET c_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
@@ -3667,20 +3849,20 @@ int main()
         sizeof(SOCKADDR_IN) + 16, NULL, &accept_ex._wsa_over);
     cout << "Accept Called\n";
 
-    // ÃÊ±âÈ­ ½ÇÇà
+    // ì´ˆê¸°í™” ì‹¤í–‰
     for (int i = 0; i < MAX_USER; ++i) {
         players[i] = new Player(i);
     }
 
-    // DB ¿¬°á1
+    // DB ì—°ê²°1
     // Initialise_DB();
     initialise_NPC();
     initialise_DUNGEON();
 
-    // Àå¾Ö¹°
+    // ì¥ì• ë¬¼
     ifstream obstacles_read("tree_position.txt");
     if (!obstacles_read.is_open()) {
-        cout << "ÆÄÀÏÀ» ÀĞÀ» ¼ö ¾ø½À´Ï´Ù" << endl;
+        cout << "íŒŒì¼ì„ ì½ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤" << endl;
         return 0;
     }
 
@@ -3711,7 +3893,7 @@ int main()
     closesocket(g_s_socket);
     DeleteCriticalSection(&cs);
     WSACleanup();
-    
-    // DB ¿¬°á
+
+    // DB ì—°ê²°
     // Disconnect_DB();
 }
