@@ -425,6 +425,12 @@ void process_packet(unsigned char* p)
 			mPlayer[p_id]->m_net_attack = false;
 			mPlayer[p_id]->m_net_dead = false;
 			mPlayer[p_id]->m_tribe = static_cast<TRIBE>(packet->object_type);
+			if (mPlayer[p_id]->m_tribe == HUMAN || mPlayer[p_id]->m_tribe == PARTNER) {
+				mPlayer[p_id]->m_job = static_cast<JOB>(packet->object_class);
+			}
+			else {
+				mPlayer[p_id]->m_job = J_DILLER;
+			}
 			strcpy_s(mPlayer[p_id]->m_name, packet->name);
 			mPlayer[p_id]->m_spices = packet->object_class;
 		}
@@ -466,6 +472,7 @@ void process_packet(unsigned char* p)
 		mPlayer[my_id]->m_max_hp = packet->maxhp;
 		mPlayer[my_id]->m_max_mp = packet->maxmp;
 		mPlayer[my_id]->m_exp = packet->exp;
+		mPlayer[my_id]->m_job = packet->job;
 		my_element = packet->element;
 		my_job = packet->job;
 
@@ -1404,6 +1411,15 @@ wchar_t* get_user_name_to_server(int id)
 	temp = new TCHAR[len];
 	mbstowcs(temp, mPlayer[id]->m_name, len);
 	return temp;
+}
+
+JOB get_job(int id)
+{
+	int tmp_id = 0;
+	if (id >= m_party_info->myId_in_partyIndex) tmp_id = id + 1;
+	else tmp_id = id;
+
+	return mPlayer[m_party_info->player_id[tmp_id]]->m_job;
 }
 
 void set_myPosition(XMFLOAT3 pos)

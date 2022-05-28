@@ -433,12 +433,14 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 			POINT CursorPosInClient = m_ptOldCursorPos;
 			ScreenToClient(hWnd, &CursorPosInClient);
 			if (InvitationCardUI_On) {
-				if (CursorPosInClient.y >= 420 && CursorPosInClient.y <= 460) {
-					if (CursorPosInClient.x >= 360 && CursorPosInClient.x <= 460) {
+				if (CursorPosInClient.y >= (m_nWndClientHeight - m_nWndClientHeight / 10) && CursorPosInClient.y <= (m_nWndClientHeight - 10)) {
+					if (CursorPosInClient.x >= (m_nWndClientWidth - m_nWndClientWidth / 6 - m_nWndClientWidth / 60 - m_nWndClientWidth / 9)
+						&& CursorPosInClient.x <= (m_nWndClientWidth - m_nWndClientWidth / 6 - m_nWndClientWidth / 60)) {
 						send_party_invitation_reply(1);
 						InvitationCardUI_On = false;
 					}
-					if (CursorPosInClient.x >= 520 && CursorPosInClient.x <= 620) {
+					if (CursorPosInClient.x >= (m_nWndClientWidth - m_nWndClientWidth / 6 + m_nWndClientWidth / 60)
+						&& CursorPosInClient.x <= (m_nWndClientWidth - m_nWndClientWidth / 6 + m_nWndClientWidth / 60 + m_nWndClientWidth / 9)) {
 						send_party_invitation_reply(0);
 						InvitationCardUI_On = false;
 					}
@@ -451,20 +453,25 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 				}
 
 				if (AddAIUI_On) {
-					if (CursorPosInClient.y >= 240 && CursorPosInClient.y <= 260) {
-						if (CursorPosInClient.x >= 205 && CursorPosInClient.x <= 255) {
+					if (CursorPosInClient.y >= (m_nWndClientHeight / 2 + m_nWndClientHeight / 20 - m_nWndClientHeight / 22.5)
+						&& CursorPosInClient.y <= (m_nWndClientHeight / 2 + m_nWndClientHeight / 20 - 10)) {
+						if (CursorPosInClient.x >= (m_nWndClientWidth / 2 - m_nWndClientWidth / 10 + m_nWndClientWidth / 360)
+							&& CursorPosInClient.x <= (m_nWndClientWidth / 2 - m_nWndClientWidth / 10 + m_nWndClientWidth / 360 + m_nWndClientWidth / 22.5)) {
 							send_party_add_partner(J_DILLER);
 							AddAIUI_On = false;
 						}
-						if (CursorPosInClient.x >= 265 && CursorPosInClient.x <= 315) {
+						if (CursorPosInClient.x >= (m_nWndClientWidth / 2 - m_nWndClientWidth / 360 - m_nWndClientWidth / 22.5)
+							&& CursorPosInClient.x <= (m_nWndClientWidth / 2 - m_nWndClientWidth / 360)) {
 							send_party_add_partner(J_TANKER);
 							AddAIUI_On = false;
 						}
-						if (CursorPosInClient.x >= 325 && CursorPosInClient.x <= 375) {
+						if (CursorPosInClient.x >= (m_nWndClientWidth / 2 + m_nWndClientWidth / 360)
+							&& CursorPosInClient.x <= (m_nWndClientWidth / 2 + m_nWndClientWidth / 360 + m_nWndClientWidth / 22.5)) {
 							send_party_add_partner(J_MAGICIAN);
 							AddAIUI_On = false;
 						}
-						if (CursorPosInClient.x >= 385 && CursorPosInClient.x <= 435) {
+						if (CursorPosInClient.x >= (m_nWndClientWidth / 2 + m_nWndClientWidth / 10 - m_nWndClientWidth / 360 - m_nWndClientWidth / 22.5)
+							&& CursorPosInClient.x <= (m_nWndClientWidth / 2 + m_nWndClientWidth / 10 - m_nWndClientWidth / 360)) {
 							send_party_add_partner(J_SUPPORTER);
 							AddAIUI_On = false;
 						}
@@ -472,22 +479,27 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 					break;
 				}
 
-				if (CursorPosInClient.y >= 360 && CursorPosInClient.y <= 400) {
-					if (CursorPosInClient.x >= 140 && CursorPosInClient.x <= 205) {
+				if (CursorPosInClient.y >= (m_nWndClientHeight/2 + m_nWndClientHeight / 3 - m_nWndClientHeight / 10)
+					&& CursorPosInClient.y <= (m_nWndClientHeight / 2 + m_nWndClientHeight / 3 - 10)) {
+					if (CursorPosInClient.x >= (m_nWndClientWidth / 4 + m_nWndClientWidth / 90) 
+						&& CursorPosInClient.x <= (m_nWndClientWidth / 4 + m_nWndClientWidth / 90 + m_nWndClientWidth / 9)) {
 						if (!party_enter)send_party_room_make();
 					}
-					if (CursorPosInClient.x >= 215 && CursorPosInClient.x <= 280) {
+					if (CursorPosInClient.x >= (m_nWndClientWidth / 2 - m_nWndClientWidth / 180 - m_nWndClientWidth / 9)
+						&& CursorPosInClient.x <= (m_nWndClientWidth / 2 - m_nWndClientWidth / 180)) {
 						if (!party_info_on) break;
 						if (party_enter == false) send_party_room_enter_request();
 						else send_party_room_quit_request();
 					}
-					if (CursorPosInClient.x >= 360 && CursorPosInClient.x <= 425) {
+					if (CursorPosInClient.x >= (m_nWndClientWidth / 2 + m_nWndClientWidth / 180)
+						&& CursorPosInClient.x <= (m_nWndClientWidth / 2 + m_nWndClientWidth / 180 + m_nWndClientWidth / 9)) {
 						if (party_enter) {
 							PartyInviteUI_ON = true;
 							Invite_Str = L"";
 						}
 					}
-					if (CursorPosInClient.x >= 435 && CursorPosInClient.x <= 500) {
+					if (CursorPosInClient.x >= (m_nWndClientWidth - m_nWndClientWidth / 4 - m_nWndClientWidth / 90 - m_nWndClientWidth / 9)
+						&& CursorPosInClient.x <= (m_nWndClientWidth - m_nWndClientWidth / 4 - m_nWndClientWidth / 90)) {
 						if (party_enter) {
 							AddAIUI_On = true;
 						}
@@ -495,20 +507,31 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 				}
 				else {
 					if (party_enter) break;
-					if (CursorPosInClient.x >= 120 && CursorPosInClient.x <= 300) {
-						if (CursorPosInClient.y >= 60 && CursorPosInClient.y <= 100 && robby_cnt >= 1) {
+					if (CursorPosInClient.x >= (m_nWndClientWidth / 4 + m_nWndClientWidth / 90)
+						&& CursorPosInClient.x <= (m_nWndClientWidth / 2 - m_nWndClientWidth / 180)) {
+						if (CursorPosInClient.y >= (m_nWndClientHeight / 2 - m_nWndClientHeight / 3 + m_nWndClientHeight / 90)
+							&& CursorPosInClient.y <= (m_nWndClientHeight / 2 - m_nWndClientHeight / 3 + m_nWndClientHeight / 10)
+							&& robby_cnt >= 1) {
 							send_party_room_info_request(party_id_index_vector[0]);
 						}
-						if (CursorPosInClient.y >= 110 && CursorPosInClient.y <= 150 && robby_cnt >= 2) {
+						if (CursorPosInClient.y >= (m_nWndClientHeight / 2 - m_nWndClientHeight / 3 + m_nWndClientHeight / 90 + m_nWndClientHeight / 10)
+							&& CursorPosInClient.y <= (m_nWndClientHeight / 2 - m_nWndClientHeight / 3 + (m_nWndClientHeight / 10) * 2)
+							&& robby_cnt >= 2) {
 							send_party_room_info_request(party_id_index_vector[1]);
 						}
-						if (CursorPosInClient.y >= 160 && CursorPosInClient.y <= 200 && robby_cnt >= 3) {
+						if (CursorPosInClient.y >= (m_nWndClientHeight / 2 - m_nWndClientHeight / 3 + m_nWndClientHeight / 90 + (m_nWndClientHeight / 10)*2)
+							&& CursorPosInClient.y <= (m_nWndClientHeight / 2 - m_nWndClientHeight / 3 + (m_nWndClientHeight / 10)*3)
+							&& robby_cnt >= 3) {
 							send_party_room_info_request(party_id_index_vector[2]);
 						}
-						if (CursorPosInClient.y >= 210 && CursorPosInClient.y <= 250 && robby_cnt >= 4) {
+						if (CursorPosInClient.y >= (m_nWndClientHeight / 2 - m_nWndClientHeight / 3 + m_nWndClientHeight / 90 + (m_nWndClientHeight / 10) * 3)
+							&& CursorPosInClient.y <= (m_nWndClientHeight / 2 - m_nWndClientHeight / 3 + (m_nWndClientHeight / 10) * 4)
+							&& robby_cnt >= 4) {
 							send_party_room_info_request(party_id_index_vector[3]);
 						}
-						if (CursorPosInClient.y >= 260 && CursorPosInClient.y <= 300 && robby_cnt >= 5) {
+						if (CursorPosInClient.y >= (m_nWndClientHeight / 2 - m_nWndClientHeight / 3 + m_nWndClientHeight / 90 + (m_nWndClientHeight / 10) * 4)
+							&& CursorPosInClient.y <= (m_nWndClientHeight / 2 - m_nWndClientHeight / 3 + (m_nWndClientHeight / 10) * 5)
+							&& robby_cnt >= 5) {
 							send_party_room_info_request(party_id_index_vector[4]);
 						}
 					}
@@ -771,13 +794,13 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[15] = new PartyUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::White);
 
 		// 파티초대 UI
-		m_ppUILayer[16] = new PartyInviteUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::Black);
+		m_ppUILayer[16] = new PartyInviteUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::SkyBlue, D2D1::ColorF::Black);
 
 		// 파티 초대장
 		m_ppUILayer[17] = new InvitationCardUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::DarkGray, D2D1::ColorF::White);
 
 		// AI추가 UI
-		m_ppUILayer[18] = new AddAIUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::White);
+		m_ppUILayer[18] = new AddAIUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::SkyBlue, D2D1::ColorF::White);
 
 		// Notice AI
 		m_ppUILayer[19] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::Black);
@@ -849,23 +872,39 @@ void CGameFramework::BuildObjects()
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 		// UIBar Setting
-		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, 40, 20 + (m_nWndClientWidth / 10) * 3, 60);
-		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetColorBrush(D2D1::ColorF::Red, 1.0, 20, 40, 20 + (m_nWndClientWidth / 10) * 3, 60);
-		reinterpret_cast<UIBar*>(m_ppUILayer[4])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, 60, 20 + (m_nWndClientWidth / 10) * 3, 80);
-		reinterpret_cast<UIBar*>(m_ppUILayer[4])->SetColorBrush(D2D1::ColorF::Blue, 1.0, 20, 60, 20 + (m_nWndClientWidth / 10) * 3, 80);
-		reinterpret_cast<UIBar*>(m_ppUILayer[6])->SetBehindBrush(D2D1::ColorF::Black, 1.0, (m_nWndClientWidth / 2) - 70, 40, (m_nWndClientWidth / 2) + 70, (m_nWndClientHeight / 6) - 20);
-		reinterpret_cast<UIBar*>(m_ppUILayer[6])->SetColorBrush(D2D1::ColorF::Red, 1.0, (m_nWndClientWidth / 2) - 70, 40, (m_nWndClientWidth / 2) + 70, (m_nWndClientHeight / 6) - 20);
-		reinterpret_cast<UIBar*>(m_ppUILayer[8])->SetBehindBrush(D2D1::ColorF::Black, 1.0, (m_nWndClientWidth / 2) - 70, 40, (m_nWndClientWidth / 2) + 70 * 4, (m_nWndClientHeight / 6) - 20);
-		reinterpret_cast<UIBar*>(m_ppUILayer[8])->SetColorBrush(D2D1::ColorF::Red, 1.0, (m_nWndClientWidth / 2) - 70, 40, (m_nWndClientWidth / 2) + 70 * 4, (m_nWndClientHeight / 6) - 20);
+		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, m_nWndClientHeight / 5 - 2*(m_nWndClientHeight / 22.5) - 20,
+			20 + (m_nWndClientWidth / 10) * 3, m_nWndClientHeight / 5 - m_nWndClientHeight / 22.5 - 20);
+		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetColorBrush(D2D1::ColorF::Red, 1.0, 20, m_nWndClientHeight / 5 - 2*(m_nWndClientHeight / 22.5) - 20,
+			20 + (m_nWndClientWidth / 10) * 3, m_nWndClientHeight / 5 - m_nWndClientHeight / 22.5 - 20);
+		reinterpret_cast<UIBar*>(m_ppUILayer[4])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, m_nWndClientHeight / 5 - m_nWndClientHeight / 22.5 - 10,
+			20 + (m_nWndClientWidth / 10) * 3, m_nWndClientHeight / 5 - 10);
+		reinterpret_cast<UIBar*>(m_ppUILayer[4])->SetColorBrush(D2D1::ColorF::Blue, 1.0, 20, m_nWndClientHeight / 5 - m_nWndClientHeight / 22.5 - 10,
+			20 + (m_nWndClientWidth / 10) * 3, m_nWndClientHeight / 5 - 10);
+		reinterpret_cast<UIBar*>(m_ppUILayer[6])->SetBehindBrush(D2D1::ColorF::Black, 1.0, (m_nWndClientWidth / 2) - ((m_nWndClientWidth / 10) - 10), (m_nWndClientHeight / 6) - 20 - m_nWndClientHeight / 22.5,
+			(m_nWndClientWidth / 2) + ((m_nWndClientWidth / 10) - 10), (m_nWndClientHeight / 6) - 20);
+		reinterpret_cast<UIBar*>(m_ppUILayer[6])->SetColorBrush(D2D1::ColorF::Red, 1.0, (m_nWndClientWidth / 2) - ((m_nWndClientWidth / 10) - 10), (m_nWndClientHeight / 6) - 20 - m_nWndClientHeight / 22.5,
+			(m_nWndClientWidth / 2) + ((m_nWndClientWidth / 10) - 10), (m_nWndClientHeight / 6) - 20);
+		reinterpret_cast<UIBar*>(m_ppUILayer[8])->SetBehindBrush(D2D1::ColorF::Black, 1.0, (m_nWndClientWidth / 2) - (m_nWndClientWidth / 18) + (m_nWndClientWidth / 180), (m_nWndClientHeight / 6) - (m_nWndClientHeight / 12.5),
+			(m_nWndClientWidth) - 10, (m_nWndClientHeight / 6) - 10);
+		reinterpret_cast<UIBar*>(m_ppUILayer[8])->SetColorBrush(D2D1::ColorF::Red, 1.0, (m_nWndClientWidth / 2) - (m_nWndClientWidth / 18) + (m_nWndClientWidth / 180), (m_nWndClientHeight / 6) - (m_nWndClientHeight / 12.5),
+			(m_nWndClientWidth)- 10, (m_nWndClientHeight / 6) - 10);
 
-		reinterpret_cast<UIBar*>(m_ppUILayer[10])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 10, (m_nWndClientHeight / 2) - 60, 140, (m_nWndClientHeight / 2) - 40);
-		reinterpret_cast<UIBar*>(m_ppUILayer[10])->SetColorBrush(D2D1::ColorF::Red, 1.0, 10, (m_nWndClientHeight / 2) - 60, 140, (m_nWndClientHeight / 2) - 40);
-		reinterpret_cast<UIBar*>(m_ppUILayer[11])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 10, (m_nWndClientHeight / 2) - 30, 140, (m_nWndClientHeight / 2) - 10);
-		reinterpret_cast<UIBar*>(m_ppUILayer[11])->SetColorBrush(D2D1::ColorF::Red, 1.0, 10, (m_nWndClientHeight / 2) - 30, 140, (m_nWndClientHeight / 2) - 10);
-		reinterpret_cast<UIBar*>(m_ppUILayer[12])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 10, (m_nWndClientHeight / 2), 140, (m_nWndClientHeight / 2) + 20);
-		reinterpret_cast<UIBar*>(m_ppUILayer[12])->SetColorBrush(D2D1::ColorF::Red, 1.0, 10, (m_nWndClientHeight / 2), 140, (m_nWndClientHeight / 2) + 20);
-		reinterpret_cast<UIBar*>(m_ppUILayer[13])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 10, (m_nWndClientHeight / 2) + 30, 140, (m_nWndClientHeight / 2) + 50);
-		reinterpret_cast<UIBar*>(m_ppUILayer[13])->SetColorBrush(D2D1::ColorF::Red, 1.0, 10, (m_nWndClientHeight / 2) + 30, 140, (m_nWndClientHeight / 2) + 50);
+		reinterpret_cast<UIBar*>(m_ppUILayer[10])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 10, (m_nWndClientHeight / 2) - (m_nWndClientHeight / 9) + (m_nWndClientHeight / 90),
+			10 + (m_nWndClientWidth / 9 - 20), (m_nWndClientHeight / 2) - (m_nWndClientHeight / 9) + (m_nWndClientHeight / 90) + (m_nWndClientHeight / 22.5));
+		reinterpret_cast<UIBar*>(m_ppUILayer[10])->SetColorBrush(D2D1::ColorF::Red, 1.0, 10,  (m_nWndClientHeight / 2) - (m_nWndClientHeight / 9) + (m_nWndClientHeight / 90),
+			10 + (m_nWndClientWidth / 9 - 20), (m_nWndClientHeight / 2) - (m_nWndClientHeight / 9) + (m_nWndClientHeight / 90) + (m_nWndClientHeight / 22.5));
+		reinterpret_cast<UIBar*>(m_ppUILayer[11])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 10, (m_nWndClientHeight / 2) - (m_nWndClientHeight / 180) - (m_nWndClientHeight / 22.5),
+			10 + (m_nWndClientWidth / 9 - 20), (m_nWndClientHeight / 2) - (m_nWndClientHeight / 180));
+		reinterpret_cast<UIBar*>(m_ppUILayer[11])->SetColorBrush(D2D1::ColorF::Red, 1.0, 10, (m_nWndClientHeight / 2) - (m_nWndClientHeight / 180) - (m_nWndClientHeight / 22.5),
+			10 + (m_nWndClientWidth / 9 - 20), (m_nWndClientHeight / 2) - (m_nWndClientHeight / 180));
+		reinterpret_cast<UIBar*>(m_ppUILayer[12])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 10, (m_nWndClientHeight / 2) + (m_nWndClientHeight / 180),
+			10 + (m_nWndClientWidth / 9 - 20), (m_nWndClientHeight / 2) + (m_nWndClientHeight / 180) + (m_nWndClientHeight / 22.5));
+		reinterpret_cast<UIBar*>(m_ppUILayer[12])->SetColorBrush(D2D1::ColorF::Red, 1.0, 10, (m_nWndClientHeight / 2) + (m_nWndClientHeight / 180),
+			10 + (m_nWndClientWidth / 9 - 20), (m_nWndClientHeight / 2) + (m_nWndClientHeight / 180) + (m_nWndClientHeight / 22.5));
+		reinterpret_cast<UIBar*>(m_ppUILayer[13])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 10, (m_nWndClientHeight / 2) + (m_nWndClientHeight / 9) - (m_nWndClientHeight / 90) - (m_nWndClientHeight / 22.5),
+			10 + (m_nWndClientWidth / 9 - 20), (m_nWndClientHeight / 2) + (m_nWndClientHeight / 9) - (m_nWndClientHeight / 90));
+		reinterpret_cast<UIBar*>(m_ppUILayer[13])->SetColorBrush(D2D1::ColorF::Red, 1.0, 10, (m_nWndClientHeight / 2) + (m_nWndClientHeight / 9) - (m_nWndClientHeight / 90) - (m_nWndClientHeight / 22.5),
+			10 + (m_nWndClientWidth / 9 - 20), (m_nWndClientHeight / 2) + (m_nWndClientHeight / 9) - (m_nWndClientHeight / 90));
 	}
 
 	Create_OpenWorld_Object();
@@ -1237,22 +1276,23 @@ void CGameFramework::FrameAdvance()
 				Send_str += L"\n";
 				delete temp;
 			}
-			m_ppUILayer[i]->UpdateLabels(Send_str, 0, 340, m_nWndClientWidth / 2, 300 + (m_nWndClientHeight / 3));
+			m_ppUILayer[i]->UpdateLabels(Send_str, 0, 2*(m_nWndClientHeight/3), m_nWndClientWidth / 3, m_nWndClientHeight - 40);
 		}
 			  break;
 		case 1:
-			m_ppUILayer[i]->UpdateLabels(Chatting_Str, 0, 300 + (m_nWndClientHeight / 3), m_nWndClientWidth / 2, 300 + (m_nWndClientHeight / 3) + 20);
+			m_ppUILayer[i]->UpdateLabels(Chatting_Str, 0, m_nWndClientHeight - m_nWndClientHeight/22.5, m_nWndClientWidth/3, m_nWndClientHeight);
 			break;
 
 		case 2:
-			m_ppUILayer[i]->UpdateLabels(Info_str, 0, 0, (m_nWndClientWidth / 10) * 3 + 30, 90);
+			m_ppUILayer[i]->UpdateLabels(Info_str, 0, 0, (m_nWndClientWidth / 10) * 3 + 30, m_nWndClientHeight/5);
 			break;
 		case 3: {
 			Hp_str.append(L" Hp : ");
 			Hp_str.append(to_wstring(m_pPlayer->m_hp));
 			Hp_str.append(L" / ");
 			Hp_str.append(to_wstring(m_pPlayer->m_max_hp));
-			m_ppUILayer[i]->UpdateLabels(Hp_str, 20, 40, 20 + ((float)m_pPlayer->m_hp / m_pPlayer->m_max_hp) * (m_nWndClientWidth / 10) * 3, 60);
+			m_ppUILayer[i]->UpdateLabels(Hp_str, 20, m_nWndClientHeight / 5 - 2*(m_nWndClientHeight / 22.5) - 20, // x0, y0
+				20 + ((float)m_pPlayer->m_hp / m_pPlayer->m_max_hp) * (m_nWndClientWidth / 10) * 3, m_nWndClientHeight / 5 - m_nWndClientHeight / 22.5 - 20);// x1, y1
 			break;
 		}
 		case 4: {
@@ -1260,12 +1300,13 @@ void CGameFramework::FrameAdvance()
 			Mp_str.append(to_wstring(m_pPlayer->m_mp));
 			Mp_str.append(L" / ");
 			Mp_str.append(to_wstring(m_pPlayer->m_max_mp));
-			m_ppUILayer[i]->UpdateLabels(Mp_str, 20, 60, 20 + ((float)m_pPlayer->m_mp / m_pPlayer->m_max_mp) * (m_nWndClientWidth / 10) * 3, 80);
+			m_ppUILayer[i]->UpdateLabels(Mp_str, 20, m_nWndClientHeight / 5 - m_nWndClientHeight/22.5 - 10,	// x0, y0
+				20 + ((float)m_pPlayer->m_mp / m_pPlayer->m_max_mp) * (m_nWndClientWidth / 10) * 3, m_nWndClientHeight / 5-10); // x1, y1
 			break;
 		}
 		case 5: {
 			if (!Combat_On) break;
-			m_ppUILayer[i]->UpdateLabels(Combat_str, (m_nWndClientWidth / 2) - 80, 0, (m_nWndClientWidth / 2) + 80, (m_nWndClientHeight / 6));
+			m_ppUILayer[i]->UpdateLabels(Combat_str, (m_nWndClientWidth / 2) - (m_nWndClientWidth/10), 0, (m_nWndClientWidth / 2) + (m_nWndClientWidth / 10), (m_nWndClientHeight / 6));
 			break;
 		}
 		case 6: {
@@ -1274,13 +1315,14 @@ void CGameFramework::FrameAdvance()
 			ang.append(to_wstring((int)get_combat_id_hp()));
 			ang.append(L"/");
 			ang.append(to_wstring((int)get_combat_id_max_hp()));
-			m_ppUILayer[i]->UpdateLabels(ang, (m_nWndClientWidth / 2) - 70, 40, 140 * ((get_combat_id_hp() / get_combat_id_max_hp())) + ((m_nWndClientWidth / 2) - 70), (m_nWndClientHeight / 6) - 20);
+			m_ppUILayer[i]->UpdateLabels(ang, (m_nWndClientWidth / 2) - (m_nWndClientWidth / 10)+10, (m_nWndClientHeight / 6) - 20 - m_nWndClientHeight / 22.5,
+				2*((m_nWndClientWidth / 10) - 10) * ((get_combat_id_hp() / get_combat_id_max_hp())) + (m_nWndClientWidth / 2) - (m_nWndClientWidth / 10) + 10, (m_nWndClientHeight / 6) - 20);
 			break;
 		}
 		case 7: {
 			if (!InDungeon) break;
 
-			m_ppUILayer[i]->UpdateLabels(L"가이아", (m_nWndClientWidth / 2) - 80, 0, (m_nWndClientWidth / 2) + 80 * 4, (m_nWndClientHeight / 6));
+			m_ppUILayer[i]->UpdateLabels(L"가이아", (m_nWndClientWidth / 2) - (m_nWndClientWidth / 18), 0, m_nWndClientWidth, (m_nWndClientHeight / 6));
 			break;
 		}
 		case 8: {
@@ -1322,10 +1364,13 @@ void CGameFramework::FrameAdvance()
 
 			if (hp_x == 0)  bc = D2D1::ColorF::Black;
 
-			reinterpret_cast<UIBar*>(m_ppUILayer[i])->SetBehindBrush(bc, 1.0, (m_nWndClientWidth / 2) - 70, 40, (m_nWndClientWidth / 2) + 70 * 4, (m_nWndClientHeight / 6) - 20);
-			reinterpret_cast<UIBar*>(m_ppUILayer[i])->SetColorBrush(fc, 1.0, (m_nWndClientWidth / 2) - 70, 40, (m_nWndClientWidth / 2) + 70 * 4, (m_nWndClientHeight / 6) - 20);
+			reinterpret_cast<UIBar*>(m_ppUILayer[i])->SetBehindBrush(bc, 1.0, (m_nWndClientWidth / 2) - (m_nWndClientWidth / 18) + (m_nWndClientWidth / 180), (m_nWndClientHeight / 6) - (m_nWndClientHeight / 12.5),
+				(m_nWndClientWidth) -10, (m_nWndClientHeight / 6) - 10);
+			reinterpret_cast<UIBar*>(m_ppUILayer[i])->SetColorBrush(fc, 1.0, (m_nWndClientWidth / 2) - (m_nWndClientWidth / 18) + (m_nWndClientWidth / 180), (m_nWndClientHeight / 6) - (m_nWndClientHeight / 12.5),
+				(m_nWndClientWidth) - 10, (m_nWndClientHeight / 6) - 10);
 
-			m_ppUILayer[i]->UpdateLabels(ang, (m_nWndClientWidth / 2) - 70, 40, (m_nWndClientWidth / 2) - 70 + (70 * 5) * bar_percent, (m_nWndClientHeight / 6) - 20);
+			m_ppUILayer[i]->UpdateLabels(ang, (m_nWndClientWidth / 2) - (m_nWndClientWidth / 18) + (m_nWndClientWidth / 180), (m_nWndClientHeight / 6) - (m_nWndClientHeight / 12.5),
+				(m_nWndClientWidth / 2) - (m_nWndClientWidth / 18) + (m_nWndClientWidth / 180) + (11*(m_nWndClientWidth/20) - 10) * bar_percent, (m_nWndClientHeight / 6) - 10);
 			break;
 		}
 
@@ -1334,31 +1379,31 @@ void CGameFramework::FrameAdvance()
 			wstring party_info_str = L"파티원정보(DC : ";
 			party_info_str.append(to_wstring(indun_death_count));
 			party_info_str.append(L")");
-			m_ppUILayer[i]->UpdateLabels(party_info_str, 0, (m_nWndClientHeight / 2) - 80, 150, (m_nWndClientHeight / 2) + 60);
+			m_ppUILayer[i]->UpdateLabels(party_info_str, 0, (m_nWndClientHeight / 2) - (m_nWndClientHeight / 6), m_nWndClientWidth/9 , (m_nWndClientHeight / 2) + (m_nWndClientHeight / 9));
 			break;
 		}
 		case 10: {
 			if (!InDungeon) break;
-			m_ppUILayer[i]->UpdateLabels(party_name[0], 10, (m_nWndClientHeight / 2) - 60, 
-				10 + 130 * ((float)get_hp_to_server(m_party_info->player_id[0]) / get_max_hp_to_server(m_party_info->player_id[0])), (m_nWndClientHeight / 2) - 40);
+			m_ppUILayer[i]->UpdateLabels(party_name[0], 10, (m_nWndClientHeight / 2) - (m_nWndClientHeight / 9) + (m_nWndClientHeight / 90),
+				10 + (m_nWndClientWidth / 9 - 20) * ((float)get_hp_to_server(m_party_info->player_id[0]) / get_max_hp_to_server(m_party_info->player_id[0])), (m_nWndClientHeight / 2) - (m_nWndClientHeight / 9) + (m_nWndClientHeight / 90) + (m_nWndClientHeight / 22.5));
 			break;
 		}
 		case 11: {
 			if (!InDungeon) break;
-			m_ppUILayer[i]->UpdateLabels(party_name[1], 10, (m_nWndClientHeight / 2) - 30, 
-				10 + 130 * ((float)get_hp_to_server(m_party_info->player_id[1]) / get_max_hp_to_server(m_party_info->player_id[1])), (m_nWndClientHeight / 2) - 10);
+			m_ppUILayer[i]->UpdateLabels(party_name[1], 10, (m_nWndClientHeight / 2) - (m_nWndClientHeight / 180) - (m_nWndClientHeight / 22.5),
+				10 + (m_nWndClientWidth / 9 - 20) * ((float)get_hp_to_server(m_party_info->player_id[1]) / get_max_hp_to_server(m_party_info->player_id[1])), (m_nWndClientHeight / 2) - (m_nWndClientHeight / 180));
 			break;
 		}
 		case 12: {
 			if (!InDungeon) break;
-			m_ppUILayer[i]->UpdateLabels(party_name[2], 10, (m_nWndClientHeight / 2), 
-				10 + 130 * ((float)get_hp_to_server(m_party_info->player_id[2]) / get_max_hp_to_server(m_party_info->player_id[2])), (m_nWndClientHeight / 2) + 20);
+			m_ppUILayer[i]->UpdateLabels(party_name[2], 10, (m_nWndClientHeight / 2) + (m_nWndClientHeight / 180),
+				10 + (m_nWndClientWidth/9 - 20) * ((float)get_hp_to_server(m_party_info->player_id[2]) / get_max_hp_to_server(m_party_info->player_id[2])), (m_nWndClientHeight / 2) + (m_nWndClientHeight / 180) + (m_nWndClientHeight / 22.5));
 			break;
 		}
 		case 13: {
 			if (!InDungeon) break;
-			m_ppUILayer[i]->UpdateLabels(party_name[3], 10, (m_nWndClientHeight / 2) + 30, 
-				10 + 130 * ((float)get_hp_to_server(m_party_info->player_id[3]) / get_max_hp_to_server(m_party_info->player_id[3])), (m_nWndClientHeight / 2) + 50);
+			m_ppUILayer[i]->UpdateLabels(party_name[3], 10, (m_nWndClientHeight / 2) + (m_nWndClientHeight / 9) - (m_nWndClientHeight / 90) - (m_nWndClientHeight / 22.5),
+				10 + (m_nWndClientWidth / 9 - 20) * ((float)get_hp_to_server(m_party_info->player_id[3]) / get_max_hp_to_server(m_party_info->player_id[3])), (m_nWndClientHeight / 2) + (m_nWndClientHeight / 9) - (m_nWndClientHeight / 90));
 			break;
 		}
 
@@ -1435,7 +1480,7 @@ void CGameFramework::FrameAdvance()
 		}
 		case 19:
 			if (!NoticeUI_On) break;
-			m_ppUILayer[i]->UpdateLabels(Notice_str, 0, 0, 640, 50);
+			m_ppUILayer[i]->UpdateLabels(Notice_str, 0, 0, m_nWndClientWidth, m_nWndClientHeight/15);
 			break;
 		}
 	}

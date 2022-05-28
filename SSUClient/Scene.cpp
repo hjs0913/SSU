@@ -173,39 +173,53 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	CLoadedModelInfo* pBastardModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Bastard_Warrior.bin", NULL);
 	int anim_cnt = pBastardModel->m_pAnimationSets->m_nAnimationSets;
 
-	m_ppHierarchicalGameObjects[0] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pBastardModel, anim_cnt);
-	m_ppHierarchicalGameObjects[0]->SetPosition(3550.0f, m_pTerrain->GetHeight(3550.0f, 650.0f), 650.0f);
-	m_ppHierarchicalGameObjects[0]->SetScale(10.0f, 10.0f, 10.0f);
-
-	m_ppHierarchicalGameObjects[1] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pBastardModel, anim_cnt);
-	m_ppHierarchicalGameObjects[1]->SetPosition(3600.0f, m_pTerrain->GetHeight(3600.0f, 650.0f), 650.0f);
-	m_ppHierarchicalGameObjects[1]->SetScale(10.0f, 10.0f, 10.0f);
-
 	CLoadedModelInfo* pTankerModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Mighty_Warrior.bin", NULL);
 	int tanker_anim_cnt = pTankerModel->m_pAnimationSets->m_nAnimationSets;
 
-	m_ppHierarchicalGameObjects[2] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pTankerModel, tanker_anim_cnt);
-	m_ppHierarchicalGameObjects[2]->SetPosition(3600.0f, m_pTerrain->GetHeight(3600.0f, 650.0f), 650.0f);
-	m_ppHierarchicalGameObjects[2]->SetScale(10.0f, 10.0f, 10.0f);
+	for (int i = 0; i < GAIA_ROOM - 1; i++) {
+		switch (get_job(i)) {
+		case J_DILLER: {
+			m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pBastardModel, anim_cnt);
+			m_ppHierarchicalGameObjects[i]->SetPosition(3550.0f, m_pTerrain->GetHeight(3550.0f, 650.0f), 650.0f);
+			m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
 
-	for (int i = 0; i < 2; ++i) {
-		for (int j = 0; j < anim_cnt; ++j) {
-			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
-			// release 일때는 0.4
-			// debug 일때는 0.2
-			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 0.5f;
+			for (int j = 0; j < anim_cnt; ++j) {
+				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
+				// release 일때는 0.4
+				// debug 일때는 0.2
+				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 0.5f;
+			}
+			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
+			break;
 		}
-		m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
+		case J_TANKER: {
+			m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pTankerModel, tanker_anim_cnt);
+			m_ppHierarchicalGameObjects[i]->SetPosition(3600.0f, m_pTerrain->GetHeight(3600.0f, 650.0f), 650.0f);
+			m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
+			for (int j = 0; j < tanker_anim_cnt; ++j) {
+				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
+				// release 일때는 0.4
+				// debug 일때는 0.2
+				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 1.0f;
+			}
+			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
+			break;
+		}
+		default: {
+			m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pBastardModel, anim_cnt);
+			m_ppHierarchicalGameObjects[i]->SetPosition(3550.0f, m_pTerrain->GetHeight(3550.0f, 650.0f), 650.0f);
+			m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
+			for (int j = 0; j < anim_cnt; ++j) {
+				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
+				// release 일때는 0.4
+				// debug 일때는 0.2
+				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 0.5f;
+			}
+			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
+			break;
+		}
+		}
 	}
-
-	for (int j = 0; j < tanker_anim_cnt; ++j) {
-		m_ppHierarchicalGameObjects[2]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
-		// release 일때는 0.4
-		// debug 일때는 0.2
-		m_ppHierarchicalGameObjects[2]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 1.0f;
-	}
-	m_ppHierarchicalGameObjects[2]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
-
 
 	CLoadedModelInfo* pGaiaModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Gaia.bin", NULL);
 	int gaia_anim_cnt = pGaiaModel->m_pAnimationSets->m_nAnimationSets;

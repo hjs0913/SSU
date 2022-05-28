@@ -1352,7 +1352,7 @@ void process_packet(int client_id, unsigned char* p)
             case 0:    // 물리 공격 스킬 
                 switch (packet->skill_num)
                 {
-                case 0:  //물리 공격스킬 중 0번 스킬 -> 십자공격 어택 
+                case 0: { //물리 공격스킬 중 0번 스킬 -> 십자공격 어택 
                     timer_event ev;
                     ev.obj_id = client_id;
                     ev.start_time = chrono::system_clock::now() + 3s;  //쿨타임
@@ -1409,6 +1409,7 @@ void process_packet(int client_id, unsigned char* p)
                     }
 
                     break;
+                }
                 }
                 break;
             case 1:  //마법 공격 스킬  삼각형 범위?

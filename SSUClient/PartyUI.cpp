@@ -62,7 +62,7 @@ char* Party::get_room_name()
 PartyUI::PartyUI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor) : UILayer(nFrame, pd3dDevice, pd3dCommandQueue, LayoutColor, TextColor)
 {
     m_vTextBlocks.resize(4);
-    BG_Rect = D2D1::RectF(100, 50, 540, 430);
+    BG_Rect = D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 4, FRAME_BUFFER_HEIGHT / 2 - FRAME_BUFFER_HEIGHT / 3, FRAME_BUFFER_WIDTH/2 + FRAME_BUFFER_WIDTH / 4, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 3);
 
     m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::DarkBlue), (ID2D1SolidColorBrush**)&m_pButtonBrush);
     m_pButtonBrush->SetColor(D2D1::ColorF(D2D1::ColorF::DarkBlue));
@@ -88,26 +88,37 @@ void PartyUI::ResizeTextBlock(int size)
 
 void PartyUI::UpdateLabels(const std::wstring* strUIText)
 {
-    m_vTextBlocks[0] = { L"방만들기", D2D1::RectF(140, 360, 205, 400), m_pdwTextFormat };
-    m_vTextBlocks[1] = { L"방들어가기", D2D1::RectF(215, 360, 280, 400), m_pdwTextFormat };
-    m_vTextBlocks[2] = { L"초대하기", D2D1::RectF(360, 360, 425, 400), m_pdwTextFormat};
-    m_vTextBlocks[3] = { L"AI넣기", D2D1::RectF(435, 360, 500, 400), m_pdwTextFormat };
+    m_vTextBlocks[0] = { L"방만들기", D2D1::RectF(FRAME_BUFFER_WIDTH / 4 + FRAME_BUFFER_WIDTH/90, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 3 - FRAME_BUFFER_HEIGHT / 10,
+        FRAME_BUFFER_WIDTH / 4 + FRAME_BUFFER_WIDTH / 9 + FRAME_BUFFER_WIDTH / 90, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 3 - 10), m_pdwTextFormat };
+    m_vTextBlocks[1] = { L"방들어가기", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 9 - FRAME_BUFFER_WIDTH / 180, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 3 - FRAME_BUFFER_HEIGHT / 10,
+        FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 180, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 3 - 10), m_pdwTextFormat };
+    m_vTextBlocks[2] = { L"초대하기", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 180, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 3 - FRAME_BUFFER_HEIGHT / 10,
+        FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 9 + FRAME_BUFFER_WIDTH / 180, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 3 - 10), m_pdwTextFormat};
+    m_vTextBlocks[3] = { L"AI넣기", D2D1::RectF(FRAME_BUFFER_WIDTH - FRAME_BUFFER_WIDTH / 4 - FRAME_BUFFER_WIDTH / 90 - FRAME_BUFFER_WIDTH / 9, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 3 - FRAME_BUFFER_HEIGHT / 10,
+        FRAME_BUFFER_WIDTH - FRAME_BUFFER_WIDTH / 4 - FRAME_BUFFER_WIDTH / 90, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 3 - 10), m_pdwTextFormat };
    
     for (int i = 4; i < m_room_cnt; i++) {
-        m_vTextBlocks[i] = { strUIText[i-4], D2D1::RectF(120, 60+50*(i-4), 300, 100 + 50 * (i - 4)), m_pdwTextFormat };
+        m_vTextBlocks[i] = { strUIText[i - 4], D2D1::RectF(FRAME_BUFFER_WIDTH / 4 + FRAME_BUFFER_WIDTH / 90,  FRAME_BUFFER_HEIGHT / 2 - FRAME_BUFFER_HEIGHT / 3 + FRAME_BUFFER_HEIGHT / 90 + (i - 4) * FRAME_BUFFER_HEIGHT / 10,
+            FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 180, FRAME_BUFFER_HEIGHT / 2 - FRAME_BUFFER_HEIGHT / 3 + (i - 3) * FRAME_BUFFER_HEIGHT / 10), m_pdwTextFormat };
     }
 }
 
 void PartyUI::UpdateLabels_PartyInfo(const std::wstring* strUIText, Party* p, bool party_enter)
 {
-    m_vTextBlocks[0] = { L"방만들기", D2D1::RectF(140, 360, 205, 400), m_pdwTextFormat };
-    if(party_enter) m_vTextBlocks[1] = { L"방나가기", D2D1::RectF(215, 360, 280, 400), m_pdwTextFormat };
-    else m_vTextBlocks[1] = { L"방들어가기", D2D1::RectF(215, 360, 280, 400), m_pdwTextFormat };
-    m_vTextBlocks[2] = { L"초대하기", D2D1::RectF(360, 360, 425, 400), m_pdwTextFormat };
-    m_vTextBlocks[3] = { L"AI넣기", D2D1::RectF(435, 360, 500, 400), m_pdwTextFormat };
+    m_vTextBlocks[0] = { L"방만들기", D2D1::RectF(FRAME_BUFFER_WIDTH / 4 + FRAME_BUFFER_WIDTH / 90, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 3 - FRAME_BUFFER_HEIGHT / 10,
+        FRAME_BUFFER_WIDTH / 4 + FRAME_BUFFER_WIDTH / 9 + FRAME_BUFFER_WIDTH / 90, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 3 - 10), m_pdwTextFormat };
+    if(party_enter) m_vTextBlocks[1] = { L"방나가기", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 9 - FRAME_BUFFER_WIDTH / 180, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 3 - FRAME_BUFFER_HEIGHT / 10,
+        FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 180, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 3 - 10), m_pdwTextFormat };
+    else m_vTextBlocks[1] = { L"방들어가기", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 9 - FRAME_BUFFER_WIDTH / 180, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 3 - FRAME_BUFFER_HEIGHT / 10,
+        FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 180, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 3 - 10), m_pdwTextFormat };
+    m_vTextBlocks[2] = { L"초대하기", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 180, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 3 - FRAME_BUFFER_HEIGHT / 10,
+       FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 9 + FRAME_BUFFER_WIDTH / 180, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 3 - 10), m_pdwTextFormat };
+    m_vTextBlocks[3] = { L"AI넣기", D2D1::RectF(FRAME_BUFFER_WIDTH - FRAME_BUFFER_WIDTH / 4 - FRAME_BUFFER_WIDTH / 90 - FRAME_BUFFER_WIDTH / 9, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 3 - FRAME_BUFFER_HEIGHT / 10,
+        FRAME_BUFFER_WIDTH - FRAME_BUFFER_WIDTH / 4 - FRAME_BUFFER_WIDTH / 90, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 3 - 10), m_pdwTextFormat };
 
     for (int i = 4; i < m_room_cnt-GAIA_ROOM; i++) {
-        m_vTextBlocks[i] = { strUIText[i - 4], D2D1::RectF(120, 60 + 50 * (i - 4), 300, 100 + 50 * (i - 4)), m_pdwTextFormat };
+        m_vTextBlocks[i] = { strUIText[i - 4], D2D1::RectF(FRAME_BUFFER_WIDTH / 4 + FRAME_BUFFER_WIDTH / 90,  FRAME_BUFFER_HEIGHT/2 - FRAME_BUFFER_HEIGHT/3 + FRAME_BUFFER_HEIGHT/90 + (i-4)* FRAME_BUFFER_HEIGHT / 10,
+            FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 180, FRAME_BUFFER_HEIGHT / 2 - FRAME_BUFFER_HEIGHT / 3 + (i - 3) * FRAME_BUFFER_HEIGHT / 10), m_pdwTextFormat };
     }
 
     int tmp = 0;
@@ -115,7 +126,8 @@ void PartyUI::UpdateLabels_PartyInfo(const std::wstring* strUIText, Party* p, bo
         std::wstring temp2 = L"";
         wchar_t* temp;
         if (tmp >= p->player_cnt) {
-            m_vTextBlocks[i] = { temp2, D2D1::RectF(320, 60 + 50 * (tmp), 520, 100 + 50 * (tmp)), m_pdwTextFormat };
+            m_vTextBlocks[i] = { temp2, D2D1::RectF(FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 180, FRAME_BUFFER_HEIGHT / 2 - FRAME_BUFFER_HEIGHT / 3 + FRAME_BUFFER_HEIGHT / 90 + tmp * FRAME_BUFFER_HEIGHT / 7.5,
+                FRAME_BUFFER_WIDTH - FRAME_BUFFER_WIDTH / 4 - FRAME_BUFFER_WIDTH / 90, FRAME_BUFFER_HEIGHT / 2 - FRAME_BUFFER_HEIGHT / 3 + (tmp+1) * FRAME_BUFFER_HEIGHT / 7.5), m_pdwTextFormat };
         }
         else {
             temp2 = L"";
@@ -136,7 +148,8 @@ void PartyUI::UpdateLabels_PartyInfo(const std::wstring* strUIText, Party* p, bo
             temp = new TCHAR[len];
             mbstowcs(temp, p->player_name[tmp], len);
             temp2.append(temp);
-            m_vTextBlocks[i] = { temp2, D2D1::RectF(320, 60 + 50 * (tmp), 520, 100 + 50 * (tmp)), m_pdwTextFormat };
+            m_vTextBlocks[i] = { temp2, D2D1::RectF(FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 180, FRAME_BUFFER_HEIGHT / 2 - FRAME_BUFFER_HEIGHT / 3 + FRAME_BUFFER_HEIGHT / 90 + tmp * FRAME_BUFFER_HEIGHT / 7.5,
+                FRAME_BUFFER_WIDTH - FRAME_BUFFER_WIDTH / 4 - FRAME_BUFFER_WIDTH / 90, FRAME_BUFFER_HEIGHT / 2 - FRAME_BUFFER_HEIGHT / 3 + (tmp + 1) * FRAME_BUFFER_HEIGHT / 7.5), m_pdwTextFormat };
             delete []temp;
         }
         tmp++;
@@ -195,8 +208,10 @@ PartyInviteUI::~PartyInviteUI()
 
 void PartyInviteUI::UpdateLabels(const std::wstring& strUIText)
 {
-    m_vTextBlocks[0] = { L"초대하기", D2D1::RectF(220, 210, 420, 260), m_pdwTextFormat };
-    m_vTextBlocks[1] = { strUIText, D2D1::RectF(230, 230, 410, 250), m_pdwTextFormat2 };
+    m_vTextBlocks[0] = { L"초대하기", D2D1::RectF(FRAME_BUFFER_WIDTH/2 - FRAME_BUFFER_WIDTH/10, FRAME_BUFFER_HEIGHT/2 - FRAME_BUFFER_HEIGHT/20, 
+        FRAME_BUFFER_WIDTH/2 + FRAME_BUFFER_WIDTH/10, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20), m_pdwTextFormat };
+    m_vTextBlocks[1] = { strUIText, D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 10 + FRAME_BUFFER_WIDTH / 90, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20 - FRAME_BUFFER_HEIGHT/22.5,
+        FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 10 - FRAME_BUFFER_WIDTH / 90, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20 - 10), m_pdwTextFormat2 };
 }
 
 void PartyInviteUI::Render(UINT nFrame)
@@ -284,9 +299,12 @@ InvitationCardUI::~InvitationCardUI()
 
 void InvitationCardUI::UpdateLabels(const std::wstring& strUIText)
 {
-    m_vTextBlocks[0] = { strUIText, D2D1::RectF(345, 340, 635, 475), m_pdwTextFormat };
-    m_vTextBlocks[1] = { L"수락", D2D1::RectF(360, 420, 460, 460), m_pdwTextFormat2 };
-    m_vTextBlocks[2] = { L"거절", D2D1::RectF( 520, 420, 620, 460), m_pdwTextFormat2 };
+    m_vTextBlocks[0] = { strUIText, D2D1::RectF(FRAME_BUFFER_WIDTH - FRAME_BUFFER_WIDTH/3, FRAME_BUFFER_HEIGHT - FRAME_BUFFER_HEIGHT/4,
+        FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT), m_pdwTextFormat };
+    m_vTextBlocks[1] = { L"수락", D2D1::RectF(FRAME_BUFFER_WIDTH - FRAME_BUFFER_WIDTH / 6 -FRAME_BUFFER_WIDTH / 60 - FRAME_BUFFER_WIDTH / 9, FRAME_BUFFER_HEIGHT - FRAME_BUFFER_HEIGHT/10,
+        FRAME_BUFFER_WIDTH - FRAME_BUFFER_WIDTH / 6 - FRAME_BUFFER_WIDTH / 60, FRAME_BUFFER_HEIGHT - 10), m_pdwTextFormat2 };
+    m_vTextBlocks[2] = { L"거절", D2D1::RectF(FRAME_BUFFER_WIDTH - FRAME_BUFFER_WIDTH / 6 + FRAME_BUFFER_WIDTH / 60, FRAME_BUFFER_HEIGHT - FRAME_BUFFER_HEIGHT / 10,
+        FRAME_BUFFER_WIDTH - FRAME_BUFFER_WIDTH / 6 + FRAME_BUFFER_WIDTH / 60 + FRAME_BUFFER_WIDTH / 9, FRAME_BUFFER_HEIGHT - 10), m_pdwTextFormat2 };
 }
 
 void InvitationCardUI::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT nHeight, UINT TextAlignment, UINT ParagraphAlignment)
@@ -366,7 +384,8 @@ AddAIUI::AddAIUI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
     : UILayer(nFrame, pd3dDevice, pd3dCommandQueue, LayoutColor, TextColor)
 {
     m_vTextBlocks.resize(4);
-    BG_Rect = D2D1::RectF(195, 210, 445, 270);
+    BG_Rect = D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 10, FRAME_BUFFER_HEIGHT / 2 - FRAME_BUFFER_HEIGHT / 20,
+        FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 10, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20);
 
     m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::DarkBlue), (ID2D1SolidColorBrush**)&m_pButtonBrush);
     m_pButtonBrush->SetColor(D2D1::ColorF(D2D1::ColorF::DarkBlue));
@@ -380,10 +399,14 @@ AddAIUI::~AddAIUI()
 
 void AddAIUI::UpdateLabels()
 {
-    m_vTextBlocks[0] = { L"딜러", D2D1::RectF(205, 240, 255, 260), m_pdwTextFormat };
-    m_vTextBlocks[1] = { L"탱커", D2D1::RectF(265, 240, 315, 260), m_pdwTextFormat };
-    m_vTextBlocks[2] = { L"마법사", D2D1::RectF(325, 240, 375, 260), m_pdwTextFormat };
-    m_vTextBlocks[3] = { L"서포터", D2D1::RectF(385, 240, 435, 260), m_pdwTextFormat };
+    m_vTextBlocks[0] = { L"딜러", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 10 + FRAME_BUFFER_WIDTH / 360, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20 - FRAME_BUFFER_HEIGHT / 22.5,
+        FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 10 + FRAME_BUFFER_WIDTH / 360 + FRAME_BUFFER_WIDTH / 22.5, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20 - 10), m_pdwTextFormat };
+    m_vTextBlocks[1] = { L"탱커", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 360 - FRAME_BUFFER_WIDTH / 22.5, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20 - FRAME_BUFFER_HEIGHT / 22.5,
+        FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 360, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20 - 10), m_pdwTextFormat };
+    m_vTextBlocks[2] = { L"마법사", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20 - FRAME_BUFFER_HEIGHT / 22.5,
+        FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 + FRAME_BUFFER_WIDTH / 22.5, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20 - 10), m_pdwTextFormat };
+    m_vTextBlocks[3] = { L"서포터", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 10 - FRAME_BUFFER_WIDTH / 360 - FRAME_BUFFER_WIDTH / 22.5 , FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20 - FRAME_BUFFER_HEIGHT / 22.5,
+        FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 10 - FRAME_BUFFER_WIDTH / 360, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20 - 10), m_pdwTextFormat };
 }
 
 void AddAIUI::Render(UINT nFrame)

@@ -64,3 +64,5 @@ void send_party_room_destroy(Player* pl, int r_id);
 void send_notice(Player* pl, const char* notice_str, int raid_notice);
 
 void send_animation_attack(Player* pl, int id);
+
+void send_animation_skill(Player* pl, int skill_type, int skill_num);
