@@ -1008,15 +1008,15 @@ void get_raid_information(CGameObject* m_otherPlayer, int id)
 
 
 	if (mPlayer[m_party_info->player_id[tmp_id]]->m_net_dead == true) {	// 사망 애니메이션 출력
-		if (!m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[13].m_bEnable) {
+		if (!m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[6].m_bEnable) {
 			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
-			m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[13]->m_fPosition = 0.0f;
-			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(13, 13);
-			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(13, true);
+			m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[6]->m_fPosition = 0.0f;
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(6, 6);
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(6, true);
 		}
 		else {
-			float playTime = m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[13]->m_fLength -
-				m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[13]->m_fPosition;
+			float playTime = m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[6]->m_fLength -
+				m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[6]->m_fPosition;
 			if (playTime < 0.1f) {
 				//m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[13]->m_fPosition = 0.0f;
 				m_otherPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
@@ -1026,17 +1026,17 @@ void get_raid_information(CGameObject* m_otherPlayer, int id)
 		return;
 	}
 	
-	if (m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[13].m_bEnable) {	// 부활
+	if (m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[6].m_bEnable) {	// 부활
 		m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
 		m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 		m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(0, true);
 	}
 
-	if (m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[5].m_bEnable) {
-		float playTime = m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[5]->m_fLength -
-			m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[5]->m_fPosition;
+	if (m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[2].m_bEnable) {
+		float playTime = m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[2]->m_fLength -
+			m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[2]->m_fPosition;
 		if (playTime < 0.1) {
-			m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[5]->m_fPosition = 0.0f;
+			m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[2]->m_fPosition = 0.0f;
 			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
 			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(0, true);
@@ -1091,10 +1091,10 @@ void get_raid_information(CGameObject* m_otherPlayer, int id)
 
 	if (mPlayer[m_party_info->player_id[tmp_id]]->m_net_attack == true) {
 		mPlayer[m_party_info->player_id[tmp_id]]->m_net_attack = false;
-		if (!m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[5].m_bEnable) {
+		if (!m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[2].m_bEnable) {
 			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
-			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(5, 5);
-			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(5, true);
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(2, 2);
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(2, true);
 		}
 	}
 
@@ -1133,6 +1133,7 @@ void get_gaia_information(CGameObject* m_otherPlayer)
 	else m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 }
 
+// 몬스터
 void get_object_information(CGameObject* m_otherPlayer, int id) 
 {
 	if (mPlayer[id]->GetUse() == false) {
@@ -1217,6 +1218,7 @@ void get_object_information(CGameObject* m_otherPlayer, int id)
 	}
 }
 
+// 나
 void get_basic_information(CPlayer* m_otherPlayer, int id)
 {
 	m_otherPlayer->m_hp = mPlayer[id]->m_hp;
@@ -1229,15 +1231,15 @@ void get_basic_information(CPlayer* m_otherPlayer, int id)
 	m_otherPlayer->m_element = mPlayer[id]->m_element;
 
 	if (mPlayer[id]->m_net_dead == true) {	// 사망 애니메이션 출력
-		if (!m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[13].m_bEnable) {
+		if (!m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[6].m_bEnable) {
 			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
-			m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[13]->m_fPosition = 0.0f;
-			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(13, 13);
-			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(13, true);
+			m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[6]->m_fPosition = 0.0f;
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(6, 6);
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(6, true);
 		}
 		else {
-			float playTime = m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[13]->m_fLength -
-				m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[13]->m_fPosition;
+			float playTime = m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[6]->m_fLength -
+				m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[6]->m_fPosition;
 			if (playTime < 0.1f) {
 				//m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[13]->m_fPosition = 0.0f;
 				m_otherPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
@@ -1247,7 +1249,7 @@ void get_basic_information(CPlayer* m_otherPlayer, int id)
 		return;
 	}
 	else {
-		if (m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[13].m_bEnable) {
+		if (m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[6].m_bEnable) {
 			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
 			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(0, true);
@@ -1260,6 +1262,7 @@ void get_basic_information(CPlayer* m_otherPlayer, int id)
 	}
 }
 
+// 다른 플레이어
 void get_player_information(CGameObject* m_otherPlayer, int id)
 {
 	if (mPlayer[id]->GetUse() == false || id == my_id) {
@@ -1271,15 +1274,15 @@ void get_player_information(CGameObject* m_otherPlayer, int id)
 	}
 
 	if (mPlayer[id]->m_net_dead == true) {	// 사망 애니메이션 출력
-		if (!m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[13].m_bEnable) {
+		if (!m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[6].m_bEnable) {
 			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
-			m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[13]->m_fPosition = 0.0f;
-			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(13, 13);
-			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(13, true);
+			m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[6]->m_fPosition = 0.0f;
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(6, 6);
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(6, true);
 		}
 		else {
-			float playTime = m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[13]->m_fLength -
-				m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[13]->m_fPosition;
+			float playTime = m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[6]->m_fLength -
+				m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[6]->m_fPosition;
 			if (playTime < 0.1f) {
 				//m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[13]->m_fPosition = 0.0f;
 				m_otherPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
@@ -1306,7 +1309,7 @@ void get_player_information(CGameObject* m_otherPlayer, int id)
 				pow(m_otherPlayer->GetPosition().z - mPlayer[id]->GetPosition().z, 2)) < 1.0) {
 				if (!m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[1].m_bEnable) {	// 이동 애니메이션
 					m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
-					m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(1, 1);
+					//m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(1, 1);
 					m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(1, true);
 				}
 				m_otherPlayer->SetPosition(get_position_to_server(id));
@@ -1314,7 +1317,7 @@ void get_player_information(CGameObject* m_otherPlayer, int id)
 			else {
 				if (!m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[1].m_bEnable) {	// 이동 애니메이션
 					m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
-					m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(1, 1);
+					//m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(1, 1);
 					m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(1, true);
 				}
 				XMFLOAT3 shiftDirection = Vector3::Normalize(XMFLOAT3(
@@ -1329,18 +1332,30 @@ void get_player_information(CGameObject* m_otherPlayer, int id)
 	else {
 		if (!m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[0].m_bEnable) {	// IDLE
 			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
-			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+			//m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(0, true);
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(1, false);
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(2, false);
+			m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[2].m_fPosition = 0.0f;
 		}
 	}
+
 	if (mPlayer[id]->m_net_attack == true) {	// 공격 애니메이션
-		mPlayer[id]->m_net_attack = false;
-		if (!m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[5].m_bEnable) {
+		// 0에서 시작이 되지 않음.
+		if (!m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[2].m_bEnable) {
+			float playtime = m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[2]->m_fLength - m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[2]->m_fPosition;
 			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
-			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(5, 5);
-			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(5, true);
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(0, false);
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(1, false);
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(2, true);
+			if (playtime <= 0.05) {
+				m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(2, false);
+				m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[2].m_fPosition = 0.0f;
+				mPlayer[id]->m_net_attack = false;
+			}
 		}
 	}
+
 }
 
 XMFLOAT3 return_myCamera() {
