@@ -68,6 +68,7 @@ public:
 	int							m_spices;
 	bool						m_net_attack;
 	bool						m_net_dead;
+	JOB							m_job;
 public:
 	CPlayer();
 	virtual ~CPlayer();

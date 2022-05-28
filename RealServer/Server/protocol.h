@@ -123,6 +123,7 @@ const char SC_PACKET_CHANGE_MP = 38;
 const char SC_PACKET_ANIMATION_ATTACK = 101;
 const char SC_PACKET_ANIMATION_MOVE = 102;
 const char SC_PACKET_ANIMATION_DEAD = 103;
+const char SC_PACKET_ANIMATION_SKILL = 104;
 // const char SC_PACKET_ANIMATION_IDLE = 101;
 
 //---------------------------------------------------
@@ -512,6 +513,10 @@ struct sc_packet_animation_attack {
 	unsigned char size;
 	char type;
 	int id;
+};
+
+struct sc_packet_animation_skill {
+
 };
 
 #pragma pack(pop)

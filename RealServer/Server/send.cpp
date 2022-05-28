@@ -63,6 +63,7 @@ void send_put_object_packet(Player* pl, Npc* target)
     else if (target->get_tribe() == MONSTER || target->get_tribe() == BOSS) {
         packet.object_class = target->get_mon_spices();
     }
+
     strcpy_s(packet.name, target->get_name());
     pl->do_send(sizeof(packet), &packet);
 }
@@ -384,4 +385,9 @@ void send_animation_attack(Player* pl, int id)
     packet.type = SC_PACKET_ANIMATION_ATTACK;
     packet.id = id;
     pl->do_send(sizeof(packet), &packet);
+}
+
+void send_animation_skill(Player* pl, int skill_type, int skill_num)
+{
+    sc_packet_animation_skill packet;
 }
