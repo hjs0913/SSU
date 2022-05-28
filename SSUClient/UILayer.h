@@ -102,11 +102,16 @@ private:
 
     ID2D1Bitmap* bitmap[5] = {};
 
-    D2D1_RECT_F buff_space0 = { 0.0f, 90.0f, 35.0f, 125.0f };
-    D2D1_RECT_F buff_space1 = { 40.0f, 90.0f, 75.0f, 125.0f };
-    D2D1_RECT_F buff_space2 = { 80.0f, 90.0f, 115.0f, 125.0f };
-    D2D1_RECT_F buff_space3 = { 120.0f, 90.0f, 155.0f, 125.0f };
-    D2D1_RECT_F buff_space4 = { 160.0f, 90.0f, 195.0f, 125.0f };
+    D2D1_RECT_F buff_space0 = { 0.0f, FRAME_BUFFER_HEIGHT/5, 
+        FRAME_BUFFER_WIDTH/30, FRAME_BUFFER_HEIGHT / 5 + FRAME_BUFFER_WIDTH / 30 };
+    D2D1_RECT_F buff_space1 = { FRAME_BUFFER_WIDTH / 30 + 5, FRAME_BUFFER_HEIGHT / 5,
+        (FRAME_BUFFER_WIDTH / 30 + 5) * 1 + FRAME_BUFFER_WIDTH / 30, FRAME_BUFFER_HEIGHT / 5 + FRAME_BUFFER_WIDTH / 30 };
+    D2D1_RECT_F buff_space2 = { (FRAME_BUFFER_WIDTH / 30 + 5) * 2, FRAME_BUFFER_HEIGHT / 5,
+        (FRAME_BUFFER_WIDTH / 30 + 5) * 2 + FRAME_BUFFER_WIDTH / 30, FRAME_BUFFER_HEIGHT / 5 + FRAME_BUFFER_WIDTH / 30 };
+    D2D1_RECT_F buff_space3 = { (FRAME_BUFFER_WIDTH / 30 + 5) * 3, FRAME_BUFFER_HEIGHT / 5,
+        (FRAME_BUFFER_WIDTH / 30 + 5) * 3 + FRAME_BUFFER_WIDTH / 30, FRAME_BUFFER_HEIGHT / 5 + FRAME_BUFFER_WIDTH / 30 };
+    D2D1_RECT_F buff_space4 = { (FRAME_BUFFER_WIDTH / 30 + 5) * 4, FRAME_BUFFER_HEIGHT / 5,
+        (FRAME_BUFFER_WIDTH / 30 + 5) * 4 + FRAME_BUFFER_WIDTH / 30, FRAME_BUFFER_HEIGHT / 5 + FRAME_BUFFER_WIDTH / 30 };
     int buff_space_used0 = -1;
     int buff_space_used1 = -1;
     int buff_space_used2 = -1;
