@@ -1343,8 +1343,8 @@ void process_packet(int client_id, unsigned char* p)
         pl->state_lock.unlock();
 
         cs_packet_skill* packet = reinterpret_cast<cs_packet_skill*>(p);
-        if (pl->get_skill_active(packet->skill_type) == true) return;
-        pl->set_skill_active(packet->skill_type, true);     //일반공격 계수는 5
+        if (pl->get_skill_active((int)packet->skill_type) == true) return;
+        pl->set_skill_active((int)packet->skill_type, true);     //일반공격 계수는 5
 
         pl->vl.lock();
         unordered_set <int> my_vl{ pl->viewlist };
@@ -1353,10 +1353,10 @@ void process_packet(int client_id, unsigned char* p)
         switch (pl->get_job())
         {
         case J_DILLER: {
-            switch (packet->skill_type)
+            switch ((int)packet->skill_type)
             {
             case 0:    // 물리 공격 스킬 
-                switch (packet->skill_num)
+                switch ((int)packet->skill_num)
                 {
                 case 0: { //물리 공격스킬 중 0번 스킬 -> 십자공격 어택 
                     timer_event ev;
@@ -1418,7 +1418,7 @@ void process_packet(int client_id, unsigned char* p)
                 }
                 break;
             case 1:  //마법 공격 스킬  삼각형 범위?
-                switch (packet->skill_num)
+                switch ((int)packet->skill_num)
                 {
                 case 0:  //물리 공격스킬 중 0번 스킬 -> 십자공격 어택 
                     timer_event ev;
@@ -1488,14 +1488,14 @@ void process_packet(int client_id, unsigned char* p)
                 }
                 break;
             case 2:  //버프   //공격력 증가로 변경 
-                switch (packet->skill_num)
+                switch ((int)packet->skill_num)
                 {
                 case 0:
                     timer_event ev;
                     ev.obj_id = client_id;
                     ev.start_time = chrono::system_clock::now() + 10s;  //쿨타임
                     ev.ev = EVENT_SKILL_COOLTIME;
-                    ev.target_id = 9;
+                    ev.target_id = 2;
                     timer_queue.push(ev);
 
                     pl->set_mp(pl->get_mp() - 1000);
@@ -1508,16 +1508,16 @@ void process_packet(int client_id, unsigned char* p)
                 break;
             }
             for (int vl_id : my_vl) {
-                send_animation_skill(reinterpret_cast<Player*>(players[vl_id]), pl->get_id(), packet->skill_type);
+                send_animation_skill(reinterpret_cast<Player*>(players[vl_id]), pl->get_id(), (int)packet->skill_type);
             }
-            send_animation_skill(pl, pl->get_id(), packet->skill_type);
+            send_animation_skill(pl, pl->get_id(), (int)packet->skill_type);
             break;
         }
         case J_TANKER: {
-            switch (packet->skill_type)
+            switch ((int)packet->skill_type)
             {
             case 0:    // 물리 공격 스킬 // 방패 
-                switch (packet->skill_num)
+                switch ((int)packet->skill_num)
                 {
                 case 0:  //밀어내기 
                     timer_event ev;
@@ -1583,7 +1583,7 @@ void process_packet(int client_id, unsigned char* p)
                 }
                 break;
             case 1:  //마법 공격 스킬:  어그로   다른 플레이어가 공격 도중 쓰면 대상이 나로 안바뀐다 수정 필요 
-                switch (packet->skill_num)
+                switch ((int)packet->skill_num)
                 {
                 case 0:   //어그로
                     timer_event ev;
@@ -1605,7 +1605,7 @@ void process_packet(int client_id, unsigned char* p)
                             players[i]->state_lock.unlock();
 
                             if ((players[i]->get_x() >= pl->get_x() - 40 && players[i]->get_x() <= pl->get_x() + 40) && (players[i]->get_z() >= pl->get_z() - 40 && players[i]->get_z() <= pl->get_z() + 40)) {
-                                pl->set_skill_factor(packet->skill_type, packet->skill_num);
+                                pl->set_skill_factor((int)packet->skill_type, (int)packet->skill_num);
                                 //  physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
                                 players[i]->set_target_id(pl->get_id());
                                 //send_status_change_packet(pl);
@@ -1625,7 +1625,7 @@ void process_packet(int client_id, unsigned char* p)
                     }
                     else {
                         if ((dungeons[client_id]->get_x() >= pl->get_x() - 40 && dungeons[client_id]->get_x() <= pl->get_x() + 40) && (dungeons[client_id]->get_z() >= pl->get_z() - 40 && dungeons[client_id]->get_z() <= pl->get_z() + 40)) {
-                            pl->set_skill_factor(packet->skill_type, packet->skill_num);
+                            pl->set_skill_factor((int)packet->skill_type, (int)packet->skill_num);
                             dungeons[client_id]->target_id = pl->get_indun_id();
                         }
                     }
@@ -1633,7 +1633,7 @@ void process_packet(int client_id, unsigned char* p)
                 }
                 break;
             case 2:  //버프  방어력 증가 
-                switch (packet->skill_num)
+                switch ((int)packet->skill_num)
                 {
                 case 0:
                     timer_event ev;
@@ -1654,13 +1654,13 @@ void process_packet(int client_id, unsigned char* p)
             }
      
             for (int vl_id : my_vl) {
-                send_animation_skill(reinterpret_cast<Player*>(players[vl_id]), pl->get_id(), packet->skill_type);
+                send_animation_skill(reinterpret_cast<Player*>(players[vl_id]), pl->get_id(), (int)packet->skill_type);
             }
-            send_animation_skill(pl, pl->get_id(), packet->skill_type);
+            send_animation_skill(pl, pl->get_id(), (int)packet->skill_type);
             break;
         }
         case J_SUPPORTER: { //서포터 
-            switch (packet->skill_type)
+            switch ((int)packet->skill_type)
             {
             case 2: //버프
                 switch (packet->skill_num)
@@ -1812,9 +1812,9 @@ void process_packet(int client_id, unsigned char* p)
                 break;
             }
             for (int vl_id : my_vl) {
-                send_animation_skill(reinterpret_cast<Player*>(players[vl_id]), pl->get_id(), packet->skill_num);
+                send_animation_skill(reinterpret_cast<Player*>(players[vl_id]), pl->get_id(), (int)packet->skill_num);
             }
-            send_animation_skill(pl, pl->get_id(), packet->skill_num);
+            send_animation_skill(pl, pl->get_id(), (int)packet->skill_num);
             break;
         }
         case J_MAGICIAN: {
@@ -1824,12 +1824,12 @@ void process_packet(int client_id, unsigned char* p)
             ev.ev = EVENT_SKILL_COOLTIME;
             ev.target_id = 1;
             timer_queue.push(ev);
-            switch (packet->skill_type)
+            switch ((int)packet->skill_type)
             {
             case 0:
                 break;
             case 1: //마법
-                switch (packet->skill_num)
+                switch ((int)packet->skill_num)
                 {
 
                 case 0: // mp흡수 
@@ -1854,8 +1854,8 @@ void process_packet(int client_id, unsigned char* p)
                                 pl->set_mp(pl->get_maxmp());
 
 
-                            pl->set_skill_factor(packet->skill_type, packet->skill_num);
-                            magical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
+                            pl->set_skill_factor((int)packet->skill_type, (int)packet->skill_num);
+                            magical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor((int)packet->skill_type, (int)packet->skill_num));
                             players[i]->set_target_id(pl->get_id());
                             send_status_change_packet(pl);
                             send_status_change_packet(reinterpret_cast<Player*>(players[i]));
@@ -1910,9 +1910,9 @@ void process_packet(int client_id, unsigned char* p)
                          //if (players[i]->get_x() < pl->get_x() + pl->get_look_x() * 20 &&  players[i]->get_z() < pl->get_z()  + pl->get_look_z() * 100) {
                         if (isInsideTriangle(a, b, c, n) || isInsideTriangle(d, e, f, n)) {
 
-                            pl->set_skill_factor(packet->skill_type, packet->skill_num);
+                            pl->set_skill_factor((int)packet->skill_type, (int)packet->skill_num);
                             players[i]->set_target_id(pl->get_id());
-                            magical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
+                            magical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor((int)packet->skill_type, (int)packet->skill_num));
                             send_play_effect_packet(pl, players[i]); // 이펙트 터트릴 위치 
 
 
@@ -3704,10 +3704,12 @@ void do_timer()
                 reinterpret_cast<Player*>(players[temp.obj_id])->set_attack_active(false);
             }
             else if (temp.ev == EVENT_SKILL_COOLTIME) {
-                if (temp.target_id == 9) {  // 전사 BUFF
-                    players[temp.obj_id]->set_physical_attack(0.3 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 10 * players[temp.obj_id]->get_lv());
-                    players[temp.obj_id]->set_magical_attack(0.1 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 5 * players[temp.obj_id]->get_lv());
-
+                
+                if (temp.target_id == 2) {  // 전사 BUFF
+                    if (reinterpret_cast<Player*>(players[temp.obj_id])->get_job() == J_DILLER) {
+                        players[temp.obj_id]->set_physical_attack(0.3 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 10 * players[temp.obj_id]->get_lv());
+                        players[temp.obj_id]->set_magical_attack(0.1 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 5 * players[temp.obj_id]->get_lv());
+                    }
                     //send_status_change_packet(reinterpret_cast<Player*>(players[temp.obj_id]));
                 }
                 else if (temp.target_id == 10) {  // 공속
@@ -3720,6 +3722,7 @@ void do_timer()
                         reinterpret_cast<Player*>(players[i])->attack_speed_up = false;
                     }
                 }
+
                 reinterpret_cast<Player*>(players[temp.obj_id])->set_skill_active(temp.target_id, false);
             }
             else if (temp.ev == EVENT_PARTNER_SKILL) {
@@ -3758,9 +3761,11 @@ void do_timer()
                 }
 
                 if (ev.ev == EVENT_SKILL_COOLTIME) {
-                    if (ev.target_id == 9) {  // 전사 BUFF
-                        players[ev.obj_id]->set_physical_attack(0.3 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 10 * players[ev.obj_id]->get_lv());
-                        players[ev.obj_id]->set_magical_attack(0.1 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 5 * players[ev.obj_id]->get_lv());
+                    if (ev.target_id == 2) {  // 전사 BUFF
+                        if (reinterpret_cast<Player*>(players[ev.obj_id])->get_job() == J_DILLER) {
+                            players[ev.obj_id]->set_physical_attack(0.3 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 10 * players[ev.obj_id]->get_lv());
+                            players[ev.obj_id]->set_magical_attack(0.1 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 5 * players[ev.obj_id]->get_lv());
+                        }
                         // 일단 이것을 넣으면 안돌아감(이유 모름)
                         //send_status_change_packet(reinterpret_cast<Player*>(players[ev.obj_id]));
                     }
