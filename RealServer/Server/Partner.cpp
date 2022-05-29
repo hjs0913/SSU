@@ -580,10 +580,10 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //스킬을 쿨타임 돌때마다 �
 			pa->set_mp(pa->get_mp() - 1000);
 			send_buff_ui_packet(gaia->get_party_palyer()[target_player], 2); //ui
 
-			gaia->get_party_palyer()[target_player]->set_hp(gaia->get_party_palyer()[target_player]->get_hp() + gaia->get_party_palyer()[target_player]->get_maxhp() / 10);
-			if (gaia->get_party_palyer()[target_player]->get_hp() > gaia->get_party_palyer()[target_player]->get_maxhp()) 
+			if (gaia->get_party_palyer()[target_player]->get_hp() + gaia->get_party_palyer()[target_player]->get_maxhp() / 10 >= gaia->get_party_palyer()[target_player]->get_maxhp())
 				gaia->get_party_palyer()[target_player]->set_hp(gaia->get_party_palyer()[target_player]->get_maxhp());
-			
+			else
+				gaia->get_party_palyer()[target_player]->set_hp(gaia->get_party_palyer()[target_player]->get_hp() + gaia->get_party_palyer()[target_player]->get_maxhp() / 10);
 			for (int i = 0; i < GAIA_ROOM; ++i) {
 				send_change_hp_packet(gaia->get_party_palyer()[i], gaia->get_party_palyer()[target_player]);
 			}
@@ -624,10 +624,11 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //스킬을 쿨타임 돌때마다 �
 			}
 			pa->set_mp(pa->get_mp() - 1000);
 			send_buff_ui_packet(gaia->get_party_palyer()[target_player], 0); //ui
-
-			gaia->get_party_palyer()[target_player]->set_mp(gaia->get_party_palyer()[target_player]->get_mp() + gaia->get_party_palyer()[target_player]->get_maxmp() / 10);
-			if (gaia->get_party_palyer()[target_player]->get_mp() > gaia->get_party_palyer()[target_player]->get_maxmp())
+			if(gaia->get_party_palyer()[target_player]->get_mp() + gaia->get_party_palyer()[target_player]->get_maxmp() / 10 >= gaia->get_party_palyer()[target_player]->get_maxmp())
 				gaia->get_party_palyer()[target_player]->set_mp(gaia->get_party_palyer()[target_player]->get_maxmp());
+			else
+				gaia->get_party_palyer()[target_player]->set_mp(gaia->get_party_palyer()[target_player]->get_mp() + gaia->get_party_palyer()[target_player]->get_maxmp() / 10);
+	
 			for (int i = 0; i < GAIA_ROOM; ++i) {
 				send_change_mp_packet(gaia->get_party_palyer()[i], gaia->get_party_palyer()[target_player]); 
 			}
