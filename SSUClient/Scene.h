@@ -61,6 +61,8 @@ public:
 	bool ProcessInput(UCHAR *pKeysBuffer);
     void AnimateObjects(float fTimeElapsed);
     void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera=NULL);
+	void OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL, int i = 0);
+	void Raid_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL, int i = 0);
 
 	void ReleaseUploadBuffers();
 

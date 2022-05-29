@@ -353,6 +353,8 @@ void process_packet(unsigned char* p)
 		mPlayer[my_id]->m_max_mp = packet->maxmp;
 		mPlayer[my_id]->m_exp = packet->exp;
 		mPlayer[my_id]->m_tribe = static_cast<TRIBE>(packet->tribe);
+		mPlayer[my_id]->m_net_attack = false;
+		mPlayer[my_id]->m_net_dead = false;
 		my_element = packet->element;
 		my_job = packet->job;
 		
