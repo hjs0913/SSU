@@ -18,6 +18,7 @@ wstring Info_str = L"";
 wstring Combat_str = L"";
 bool Combat_On = false;
 atomic_bool InDungeon = false;
+atomic_bool Login_ok = false;
 
 // locale variable
 XMFLOAT3 my_position(-1.0f, 5.0f, -1.0f);
@@ -392,7 +393,7 @@ void process_packet(unsigned char* p)
 		Info_str.append(my_job_str);
 		Info_str.append(L"  ¼Ó¼º : ");
 		Info_str.append(my_element_str);
-
+		Login_ok = true;
 		break;
 	}
 	case SC_PACKET_MOVE: {

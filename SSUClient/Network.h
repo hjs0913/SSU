@@ -38,6 +38,7 @@ extern wstring Combat_str;
 extern bool Combat_On;
 
 extern atomic_bool InDungeon;
+extern atomic_bool	Login_ok;
 
 extern wstring party_name[GAIA_ROOM];
 extern CPattern m_gaiaPattern;
