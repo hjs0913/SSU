@@ -804,7 +804,8 @@ void process_packet(int client_id, unsigned char* p)
         pl->set_x(3210);
         pl->set_y(0);
         pl->set_z(940);
-        pl->set_job(J_DILLER);
+        pl->set_job(static_cast<JOB>(packet->job));
+        //pl->set_job(J_DILLER);
         pl->set_lv(25);
         pl->set_element(E_WATER);
 

@@ -388,13 +388,30 @@ void CSoundCallbackHandler::HandleCallback(void *pCallbackData, float fTrackPosi
 #endif
 }
 
-CTerrainPlayer::CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, ID3D12RootSignature *pd3dGraphicsRootSignature, void *pContext)
+CTerrainPlayer::CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, ID3D12RootSignature *pd3dGraphicsRootSignature, void *pContext, JOB job)
 {
 	m_pCamera = ChangeCamera(THIRD_PERSON_CAMERA, 0.0f);
-
-	CLoadedModelInfo *pAngrybotModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Bastard_Warrior.bin", NULL);
-	SetChild(pAngrybotModel->m_pModelRootObject, true);
-	anim_cnt = pAngrybotModel->m_pAnimationSets->m_nAnimationSets;
+	CLoadedModelInfo* pAngrybotModel = NULL;
+	switch (job) {
+	case J_DILLER: {
+		pAngrybotModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Bastard_Warrior.bin", NULL);
+		SetChild(pAngrybotModel->m_pModelRootObject, true);
+		anim_cnt = pAngrybotModel->m_pAnimationSets->m_nAnimationSets;
+		break;
+	}
+	case J_TANKER: {
+		pAngrybotModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Mighty_Warrior.bin", NULL);
+		SetChild(pAngrybotModel->m_pModelRootObject, true);
+		anim_cnt = pAngrybotModel->m_pAnimationSets->m_nAnimationSets;
+		break;
+	}
+	default: {
+		pAngrybotModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Bastard_Warrior.bin", NULL);
+		SetChild(pAngrybotModel->m_pModelRootObject, true);
+		anim_cnt = pAngrybotModel->m_pAnimationSets->m_nAnimationSets;
+		break;
+	}
+	}
 
 	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, anim_cnt, pAngrybotModel, true);
 	m_pSkinnedAnimationController->m_pAnimationSets = pAngrybotModel->m_pAnimationSets;

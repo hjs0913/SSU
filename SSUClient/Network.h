@@ -38,6 +38,7 @@ extern wstring Combat_str;
 extern bool Combat_On;
 
 extern atomic_bool InDungeon;
+extern atomic_bool	Login_ok;
 
 extern wstring party_name[GAIA_ROOM];
 extern CPattern m_gaiaPattern;
@@ -75,7 +76,7 @@ void err_quit(const char* msg);
 
 void err_display(const char* msg);
 
-void send_login_packet(char* id, char* name);
+void send_login_packet(char* id, char* name, int job);
 
 void send_attack_packet(int skill);
 

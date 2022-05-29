@@ -43,6 +43,10 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	::LoadString(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
 	::LoadString(hInstance, IDC_SSU_CLIENT, szWindowClass, MAX_LOADSTRING);
 	MyRegisterClass(hInstance);
+	
+	while (1) {
+		if (Login_ok) break;
+	}
 
 	if (!InitInstance(hInstance, nCmdShow)) return(FALSE);
 
@@ -50,6 +54,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 
 
 	bool change_dungeon = false;
+
 	while (1)
 	{
 		if (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))

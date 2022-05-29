@@ -18,6 +18,7 @@ wstring Info_str = L"";
 wstring Combat_str = L"";
 bool Combat_On = false;
 atomic_bool InDungeon = false;
+atomic_bool Login_ok = false;
 
 // locale variable
 XMFLOAT3 my_position(-1.0f, 5.0f, -1.0f);
@@ -109,11 +110,12 @@ void err_quit(const char* msg)
 	exit(1);
 }
 
-void send_login_packet(char* id, char* name)
+void send_login_packet(char* id, char* name, int job)
 {
 	cs_packet_login packet;
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET_LOGIN;
+	packet.job = job;
 	strcpy_s(packet.id, id);
 	strcpy_s(packet.name, name);
 	do_send(sizeof(packet), &packet);
@@ -353,6 +355,8 @@ void process_packet(unsigned char* p)
 		mPlayer[my_id]->m_max_mp = packet->maxmp;
 		mPlayer[my_id]->m_exp = packet->exp;
 		mPlayer[my_id]->m_tribe = static_cast<TRIBE>(packet->tribe);
+		mPlayer[my_id]->m_net_attack = false;
+		mPlayer[my_id]->m_net_dead = false;
 		my_element = packet->element;
 		my_job = packet->job;
 		
@@ -389,7 +393,7 @@ void process_packet(unsigned char* p)
 		Info_str.append(my_job_str);
 		Info_str.append(L"  속성 : ");
 		Info_str.append(my_element_str);
-
+		Login_ok = true;
 		break;
 	}
 	case SC_PACKET_MOVE: {
@@ -968,11 +972,15 @@ int netInit()
 
 	char pl_id[MAX_NAME_SIZE];
 	char pl_name[MAX_NAME_SIZE];
+	int pl_job = 0;
 	cout << "ID를 입력하세요 : ";
 	cin >> pl_id;
 	cout << "이름을 입력하세요 : ";
 	cin >> pl_name;
-	send_login_packet(pl_id, pl_name);
+	cout << "직업을 고르세요(0 : 딜러, 1 : 탱커, 2 : 마법사, 3: 서포터) : ";
+	cin >> pl_job;
+	if (!(0 <= pl_job && pl_job <= 3)) pl_job = 0;
+	send_login_packet(pl_id, pl_name, pl_job);
 
 	do_recv();
 }

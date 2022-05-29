@@ -84,6 +84,8 @@ void CScene::BuildDefaultLightsAndMaterials()
 
 void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
 {
+	m_pd3dDevice = pd3dDevice;
+
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
 
 	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 100); //SuperCobra(17), Gunship(2), Player:Mi24(1), Angrybot()
@@ -133,11 +135,15 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
 	}
 
-	CLoadedModelInfo* pCharacterModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Mighty_Warrior.bin", NULL);
-	int anim_cnt = pCharacterModel->m_pAnimationSets->m_nAnimationSets;
+	pBastardModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Bastard_Warrior.bin", NULL);
+	basterd_anim_cnt = pBastardModel->m_pAnimationSets->m_nAnimationSets;
+
+	pTankerModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Mighty_Warrior.bin", NULL);
+	tanker_anim_cnt = pBastardModel->m_pAnimationSets->m_nAnimationSets;
+
 	for (int i = 33; i < 63; ++i) {
-		m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pCharacterModel, anim_cnt);
-		for (int j = 0; j < anim_cnt; ++j) {
+		m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pTankerModel, tanker_anim_cnt);
+		for (int j = 0; j < tanker_anim_cnt; ++j) {
 			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
 			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 0.05f;
 		}
@@ -151,6 +157,8 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
+	m_pd3dDevice = pd3dDevice;
+
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
 
 	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 100); //SuperCobra(17), Gunship(2), Player:Mi24(1), Angrybot()
@@ -166,24 +174,24 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	m_pTerrain = new CHeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Image/Gaia2.raw"), 512, 512, xmf3Scale, xmf4Color);
 
 
-	m_nHierarchicalGameObjects = 4;
+	m_nHierarchicalGameObjects = 3 + 1 + 4 + 3;	// 플레이어3 + 가이아1 + 장판4 + 파도 3
 	m_ppHierarchicalGameObjects = new CGameObject * [m_nHierarchicalGameObjects];
 	//for (int i = 0; i < m_nHierarchicalGameObjects; ++i) m_ppHierarchicalGameObjects[i] = NULL;
 
-	CLoadedModelInfo* pBastardModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Bastard_Warrior.bin", NULL);
-	int anim_cnt = pBastardModel->m_pAnimationSets->m_nAnimationSets;
+	pBastardModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Bastard_Warrior.bin", NULL);
+	basterd_anim_cnt = pBastardModel->m_pAnimationSets->m_nAnimationSets;
 
-	CLoadedModelInfo* pTankerModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Mighty_Warrior.bin", NULL);
-	int tanker_anim_cnt = pTankerModel->m_pAnimationSets->m_nAnimationSets;
+	pTankerModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Mighty_Warrior.bin", NULL);
+	tanker_anim_cnt = pTankerModel->m_pAnimationSets->m_nAnimationSets;
 
 	for (int i = 0; i < GAIA_ROOM - 1; i++) {
 		switch (get_job(i)) {
 		case J_DILLER: {
-			m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pBastardModel, anim_cnt);
+			m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pBastardModel, basterd_anim_cnt);
 			m_ppHierarchicalGameObjects[i]->SetPosition(3550.0f, m_pTerrain->GetHeight(3550.0f, 650.0f), 650.0f);
 			m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
 
-			for (int j = 0; j < anim_cnt; ++j) {
+			for (int j = 0; j < basterd_anim_cnt; ++j) {
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
 				// release 일때는 0.4
 				// debug 일때는 0.2
@@ -206,10 +214,10 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 			break;
 		}
 		default: {
-			m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pBastardModel, anim_cnt);
+			m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pBastardModel, basterd_anim_cnt);
 			m_ppHierarchicalGameObjects[i]->SetPosition(3550.0f, m_pTerrain->GetHeight(3550.0f, 650.0f), 650.0f);
 			m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
-			for (int j = 0; j < anim_cnt; ++j) {
+			for (int j = 0; j < basterd_anim_cnt; ++j) {
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
 				// release 일때는 0.4
 				// debug 일때는 0.2
@@ -221,6 +229,7 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 		}
 	}
 
+	// 가이아
 	CLoadedModelInfo* pGaiaModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Gaia.bin", NULL);
 	int gaia_anim_cnt = pGaiaModel->m_pAnimationSets->m_nAnimationSets;
 
@@ -232,7 +241,26 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	m_ppHierarchicalGameObjects[3]->SetPosition(3500.0f, m_pTerrain->GetHeight(3500.0f, 650.0f), 650.0f);
 	m_ppHierarchicalGameObjects[3]->SetScale(20.0f, 20.0f, 20.0f);
 
-	for (int i = 0; i < m_nHierarchicalGameObjects; i++) get_raid_initialize_position(m_ppHierarchicalGameObjects[i], i);
+	// 패턴(장판)
+	CLoadedModelInfo* pHouseModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/House.bin", NULL);
+	for (int i = 4; i < 8; i++) {
+		m_ppHierarchicalGameObjects[i] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pHouseModel, 0);
+		m_ppHierarchicalGameObjects[i]->SetPosition(3200.0f, m_pTerrain->GetHeight(3200.0f, 700.0f), 700.0f);
+		m_ppHierarchicalGameObjects[i]->SetScale(1.0f, 1.0f, 1.0f);
+	}
+
+	// 패턴(파도)
+	CLoadedModelInfo* pHouseModell = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/House.bin", NULL);
+	for (int i = 8; i < 11; i++) {
+		m_ppHierarchicalGameObjects[i] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pHouseModell, 0);
+		m_ppHierarchicalGameObjects[i]->SetPosition(0.f, -100.f, 0.f);
+		m_ppHierarchicalGameObjects[i]->SetScale(1.0f, 1.0f, 1.0f);
+	}
+
+	if (pHouseModel) delete pHouseModel;
+	if (pHouseModell) delete pHouseModell;
+
+	for (int i = 0; i < 4; i++) get_raid_initialize_position(m_ppHierarchicalGameObjects[i], i);
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
@@ -652,60 +680,146 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 		if (m_ppHierarchicalGameObjects[i])
 		{
 			if (InDungeon) {	// 레이드 상황
-				if (i < 3) {
-					get_raid_information(m_ppHierarchicalGameObjects[i], i);
-					m_ppHierarchicalGameObjects[i]->SetPosition(
-						XMFLOAT3(m_ppHierarchicalGameObjects[i]->GetPosition().x,
-							m_pTerrain->GetHeight(m_ppHierarchicalGameObjects[i]->GetPosition().x, m_ppHierarchicalGameObjects[i]->GetPosition().z),
-							m_ppHierarchicalGameObjects[i]->GetPosition().z
-						)
-					);
-				}
-				else if (i == 3) {
-					get_gaia_information(m_ppHierarchicalGameObjects[i]);
-					m_ppHierarchicalGameObjects[i]->SetPosition(
-						XMFLOAT3(m_ppHierarchicalGameObjects[i]->GetPosition().x,
-							m_pTerrain->GetHeight(m_ppHierarchicalGameObjects[i]->GetPosition().x, m_ppHierarchicalGameObjects[i]->GetPosition().z),
-							m_ppHierarchicalGameObjects[i]->GetPosition().z
-						)
-					);
-				}
-				// 사망 애니메이션 느리게 작동하기 위해
-				if (m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[13].m_bEnable) {
-					m_ppHierarchicalGameObjects[i]->Animate(0.005);
-				}
-				else m_ppHierarchicalGameObjects[i]->Animate(m_fElapsedTime);
-				if (!m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController) m_ppHierarchicalGameObjects[i]->UpdateTransform(NULL);
-				m_ppHierarchicalGameObjects[i]->Render(pd3dCommandList, pCamera);
-
+				Raid_Render(pd3dCommandList, pCamera, i);
 			}
 			else {
-				if (i >= 3 && i < 33) {
-					get_object_information(m_ppHierarchicalGameObjects[i],NPC_ID_START + (i-3) );
-					m_ppHierarchicalGameObjects[i]->SetPosition(
-						XMFLOAT3(m_ppHierarchicalGameObjects[i]->GetPosition().x,
-							m_pTerrain->GetHeight(m_ppHierarchicalGameObjects[i]->GetPosition().x, m_ppHierarchicalGameObjects[i]->GetPosition().z),
-							m_ppHierarchicalGameObjects[i]->GetPosition().z
-						)
-					);
-				}
-
-				if (i >= 33 && i < 63) {
-					get_player_information(m_ppHierarchicalGameObjects[i], i-33);
-					m_ppHierarchicalGameObjects[i]->SetPosition(
-						XMFLOAT3(m_ppHierarchicalGameObjects[i]->GetPosition().x,
-							m_pTerrain->GetHeight(m_ppHierarchicalGameObjects[i]->GetPosition().x, m_ppHierarchicalGameObjects[i]->GetPosition().z),
-							m_ppHierarchicalGameObjects[i]->GetPosition().z
-						)
-					);
-				}
-
-
-				m_ppHierarchicalGameObjects[i]->Animate(m_fElapsedTime);
-				if (!m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController) m_ppHierarchicalGameObjects[i]->UpdateTransform(NULL);
-				m_ppHierarchicalGameObjects[i]->Render(pd3dCommandList, pCamera);
+				OpenWorld_Render(pd3dCommandList, pCamera, i);
 			}
 		}
 	}
+}
+
+void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, int i)
+{
+	if (i >= 3 && i < 33) {
+		get_object_information(m_ppHierarchicalGameObjects[i], NPC_ID_START + (i - 3));
+		m_ppHierarchicalGameObjects[i]->SetPosition(
+			XMFLOAT3(m_ppHierarchicalGameObjects[i]->GetPosition().x,
+				m_pTerrain->GetHeight(m_ppHierarchicalGameObjects[i]->GetPosition().x, m_ppHierarchicalGameObjects[i]->GetPosition().z),
+				m_ppHierarchicalGameObjects[i]->GetPosition().z
+			)
+		);
+	}
+
+	if (i >= 33 && i < 63) {
+		if (mPlayer[i - 33]->GetUse() == true && m_ppHierarchicalGameObjects[i]->GetPosition().x == 0.f) {
+			switch (mPlayer[i-33]->m_job) {
+			case J_DILLER: {
+				delete m_ppHierarchicalGameObjects[i];
+				m_ppHierarchicalGameObjects[i] = new CMonsterObject(m_pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pBastardModel, basterd_anim_cnt);
+				m_ppHierarchicalGameObjects[i]->SetPosition(3550.0f, m_pTerrain->GetHeight(3550.0f, 650.0f), 650.0f);
+				m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
+
+				for (int j = 0; j < basterd_anim_cnt; ++j) {
+					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
+					// release 일때는 0.4
+					// debug 일때는 0.2
+					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 0.5f;
+				}
+				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
+				break;
+			}
+			case J_TANKER: {
+				delete m_ppHierarchicalGameObjects[i];
+				m_ppHierarchicalGameObjects[i] = new CMonsterObject(m_pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pTankerModel, tanker_anim_cnt);
+				m_ppHierarchicalGameObjects[i]->SetPosition(3600.0f, m_pTerrain->GetHeight(3600.0f, 650.0f), 650.0f);
+				m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
+				for (int j = 0; j < tanker_anim_cnt; ++j) {
+					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
+					// release 일때는 0.4
+					// debug 일때는 0.2
+					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 1.0f;
+				}
+				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
+				break;
+			}
+			default: {
+				delete m_ppHierarchicalGameObjects[i];
+				m_ppHierarchicalGameObjects[i] = new CMonsterObject(m_pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pBastardModel, basterd_anim_cnt);
+				m_ppHierarchicalGameObjects[i]->SetPosition(3550.0f, m_pTerrain->GetHeight(3550.0f, 650.0f), 650.0f);
+				m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
+				for (int j = 0; j < basterd_anim_cnt; ++j) {
+					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
+					// release 일때는 0.4
+					// debug 일때는 0.2
+					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 0.5f;
+				}
+				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
+				break;
+			}
+			}
+		}
+		get_player_information(m_ppHierarchicalGameObjects[i], i - 33);
+		m_ppHierarchicalGameObjects[i]->SetPosition(
+			XMFLOAT3(m_ppHierarchicalGameObjects[i]->GetPosition().x,
+				m_pTerrain->GetHeight(m_ppHierarchicalGameObjects[i]->GetPosition().x, m_ppHierarchicalGameObjects[i]->GetPosition().z),
+				m_ppHierarchicalGameObjects[i]->GetPosition().z
+			)
+		);
+	}
+
+
+	m_ppHierarchicalGameObjects[i]->Animate(m_fElapsedTime);
+	if (!m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController) m_ppHierarchicalGameObjects[i]->UpdateTransform(NULL);
+	m_ppHierarchicalGameObjects[i]->Render(pd3dCommandList, pCamera);
+}
+
+void CScene::Raid_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, int i)
+{
+	if (i < 3) {
+		get_raid_information(m_ppHierarchicalGameObjects[i], i);
+		m_ppHierarchicalGameObjects[i]->SetPosition(
+			XMFLOAT3(m_ppHierarchicalGameObjects[i]->GetPosition().x,
+				m_pTerrain->GetHeight(m_ppHierarchicalGameObjects[i]->GetPosition().x, m_ppHierarchicalGameObjects[i]->GetPosition().z),
+				m_ppHierarchicalGameObjects[i]->GetPosition().z
+			)
+		);
+		// 사망 애니메이션 느리게 작동하기 위해
+		if (m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[13].m_bEnable) {
+			m_ppHierarchicalGameObjects[i]->Animate(0.005);
+		}
+		else m_ppHierarchicalGameObjects[i]->Animate(m_fElapsedTime);
+	}
+	else if (i == 3) {
+		get_gaia_information(m_ppHierarchicalGameObjects[i]);
+		m_ppHierarchicalGameObjects[i]->SetPosition(
+			XMFLOAT3(m_ppHierarchicalGameObjects[i]->GetPosition().x,
+				m_pTerrain->GetHeight(m_ppHierarchicalGameObjects[i]->GetPosition().x, m_ppHierarchicalGameObjects[i]->GetPosition().z),
+				m_ppHierarchicalGameObjects[i]->GetPosition().z
+			)
+		);
+		m_ppHierarchicalGameObjects[i]->Animate(m_fElapsedTime);
+	}
+	else if (i >= 4 && i < 8) {
+		if (m_gaiaPattern.pattern_on[0]) {
+			m_ppHierarchicalGameObjects[i]->SetPosition(m_gaiaPattern.pattern_one[i-4]);
+			m_ppHierarchicalGameObjects[i]->SetPosition(
+				XMFLOAT3(m_ppHierarchicalGameObjects[i]->GetPosition().x,
+					m_pTerrain->GetHeight(m_ppHierarchicalGameObjects[i]->GetPosition().x, m_ppHierarchicalGameObjects[i]->GetPosition().z),
+					m_ppHierarchicalGameObjects[i]->GetPosition().z
+				)
+			);
+		}
+		else {
+			m_ppHierarchicalGameObjects[i]->SetPosition(XMFLOAT3(0, -100, 0));
+		}
+	}
+	else if (i >= 8 && i < 11) {
+		if (m_gaiaPattern.pattern_on[1]) {
+			m_ppHierarchicalGameObjects[i]->SetPosition(m_gaiaPattern.pattern_two[i-8]);
+			m_ppHierarchicalGameObjects[i]->SetPosition(
+				XMFLOAT3(m_ppHierarchicalGameObjects[i]->GetPosition().x,
+					m_pTerrain->GetHeight(m_ppHierarchicalGameObjects[i]->GetPosition().x, m_ppHierarchicalGameObjects[i]->GetPosition().z),
+					m_ppHierarchicalGameObjects[i]->GetPosition().z
+				)
+			);
+			m_ppHierarchicalGameObjects[i]->SetLook(m_gaiaPattern.pattern_two_look);
+		}
+		else {
+			m_ppHierarchicalGameObjects[i]->SetPosition(XMFLOAT3(0, -100, 0));
+		}
+	}
+	if (!m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController) m_ppHierarchicalGameObjects[i]->UpdateTransform(NULL);
+	m_ppHierarchicalGameObjects[i]->Render(pd3dCommandList, pCamera);
 }
 

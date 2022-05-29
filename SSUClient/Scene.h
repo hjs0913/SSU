@@ -61,6 +61,8 @@ public:
 	bool ProcessInput(UCHAR *pKeysBuffer);
     void AnimateObjects(float fTimeElapsed);
     void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera=NULL);
+	void OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL, int i = 0);
+	void Raid_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL, int i = 0);
 
 	void ReleaseUploadBuffers();
 
@@ -118,4 +120,12 @@ public:
 
 	ID3D12Resource						*m_pd3dcbLights = NULL;
 	LIGHTS								*m_pcbMappedLights = NULL;
+
+	ID3D12Device						*m_pd3dDevice = NULL;
+
+	CLoadedModelInfo					*pBastardModel = NULL;
+	CLoadedModelInfo					*pTankerModel = NULL;
+
+	int									basterd_anim_cnt = 0;
+	int									tanker_anim_cnt = 0;
 };
