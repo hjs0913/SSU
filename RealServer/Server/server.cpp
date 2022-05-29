@@ -1486,7 +1486,6 @@ void process_packet(int client_id, unsigned char* p)
                     }
                     break;
                 }
-
                 break;
             case 2:  //버프   //공격력 증가로 변경 
                 switch (packet->skill_num)
@@ -1520,7 +1519,7 @@ void process_packet(int client_id, unsigned char* p)
             case 0:    // 물리 공격 스킬 // 방패 
                 switch (packet->skill_num)
                 {
-                case 0:  //물리 공격스킬 중 0번 스킬 -> 십자공격 어택 
+                case 0:  //밀어내기 
                     timer_event ev;
                     ev.obj_id = client_id;
                     ev.start_time = chrono::system_clock::now() + 3s;  //쿨타임
@@ -1571,7 +1570,7 @@ void process_packet(int client_id, unsigned char* p)
                                 dungeons[client_id]->boss->get_physical_defence()) / (1 + (dungeons[client_id]->boss->get_defence_factor() *
                                     dungeons[client_id]->boss->get_physical_defence()));
                             float damage = give_damage * (1 - defence_damage);
-                            dungeons[client_id]->boss->set_pos(dungeons[client_id]->boss->get_x() + pl->get_look_x() * 40, dungeons[client_id]->boss->get_z() + pl->get_look_z() * 40);
+                            dungeons[client_id]->boss->set_pos(dungeons[client_id]->boss->get_x() + pl->get_look_x() * 100, dungeons[client_id]->boss->get_z() + pl->get_look_z() * 100);
                             dungeons[client_id]->boss->set_hp(dungeons[client_id]->boss->get_hp() - damage);
                             //send_move_packet(pl, dungeons[client_id]->boss, 1);  //나중에 수정필요 
                             for (int i = 0; i < GAIA_ROOM; ++i) {
@@ -1584,9 +1583,11 @@ void process_packet(int client_id, unsigned char* p)
                 }
                 break;
             case 1:  //마법 공격 스킬:  어그로   다른 플레이어가 공격 도중 쓰면 대상이 나로 안바뀐다 수정 필요 
+                cout << "여기0" << endl;
                 switch (packet->skill_num)
                 {
                 case 0:   //어그로
+                    cout << "여기1" << endl;
                     timer_event ev;
                     ev.obj_id = client_id;
                     ev.start_time = chrono::system_clock::now() + 3s;  //쿨타임
@@ -1612,15 +1613,14 @@ void process_packet(int client_id, unsigned char* p)
                                 //send_status_change_packet(pl);
                                 if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
                                     players[i]->set_active(true);
-
+                                 //   players[i]->set_agro_bool()
                                     timer_event ev;
                                     ev.obj_id = i;
                                     ev.start_time = chrono::system_clock::now() + 1s;
-                                    ev.ev = EVENT_NPC_MOVE;
+                                    ev.ev = EVENT_NPC_ATTACK;
                                     ev.target_id = client_id;
                                     timer_queue.push(ev);
-
-                                    Activate_Npc_Move_Event(i, client_id);
+                                    Activate_Npc_Move_Event(i, pl->get_id());
                                 }
                             }
                         }
@@ -1628,9 +1628,7 @@ void process_packet(int client_id, unsigned char* p)
                     else {
                         if ((dungeons[client_id]->get_x() >= pl->get_x() - 40 && dungeons[client_id]->get_x() <= pl->get_x() + 40) && (dungeons[client_id]->get_z() >= pl->get_z() - 40 && dungeons[client_id]->get_z() <= pl->get_z() + 40)) {
                             pl->set_skill_factor(packet->skill_type, packet->skill_num);
-                            //send_status_change_packet(pl);
                             dungeons[client_id]->target_id = pl->get_indun_id();
-
                         }
                     }
                     break;
@@ -1656,6 +1654,7 @@ void process_packet(int client_id, unsigned char* p)
                 }
                 break;
             }
+            cout << "여기" << endl;
             for (int vl_id : my_vl) {
                 send_animation_skill(reinterpret_cast<Player*>(players[vl_id]), pl->get_id(), packet->skill_type);
             }
