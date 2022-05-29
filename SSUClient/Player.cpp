@@ -619,7 +619,6 @@ void CTerrainPlayer::Update(float fTimeElapsed)
 
 		if (m_pSkinnedAnimationController->m_pAnimationTracks[4].m_bEnable) {
 			float playTime = m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[4]->m_fLength - m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[4]->m_fPosition;
-			cout << playTime << endl;
 			if (playTime <= 0.049) {
 				m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[4]->m_fPosition = 0.0f;
 				m_pSkinnedAnimationController->SetTrackEnable(0, true);

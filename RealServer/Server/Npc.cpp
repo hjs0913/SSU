@@ -350,11 +350,13 @@ pos Npc::non_a_star(int t_x, int t_z, int x, int z)
 	float sum = (m_x * m_x) + (m_z * m_z);
 	sum = sqrt(sum);
 
+	if (sum == 0) return pos(x, z);
+
 	m_x = m_x / sum;
 	m_z = m_z / sum;
 
-	x += m_x * REAL_DISTANCE*2;
-	z += m_z * REAL_DISTANCE*2;
+	int temp_x = x + m_x * REAL_DISTANCE*2;
+	int temp_z = z + m_z * REAL_DISTANCE*2;
 
 	_look_x = m_x;
 	_look_z = m_z;
@@ -362,7 +364,7 @@ pos Npc::non_a_star(int t_x, int t_z, int x, int z)
 	_right_x = _look_z;
 	_right_z = -_look_x;
 
-	return pos(x, z);
+	return pos(temp_x, temp_z);
 }
 
 

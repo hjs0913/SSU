@@ -950,7 +950,7 @@ void CGameFramework::Create_InDungeon_Object()
 	if (m_pRaid_Scene) m_pRaid_Scene->BuildObjects_Raid(m_pd3dDevice, m_pd3dCommandList);
 
 #ifdef _WITH_TERRAIN_PLAYER
-	CTerrainPlayer* pPlayer = new CTerrainPlayer(m_pd3dDevice, m_pd3dCommandList, m_pRaid_Scene->GetGraphicsRootSignature(), m_pRaid_Scene->m_pTerrain);
+	CTerrainPlayer* pPlayer = new CTerrainPlayer(m_pd3dDevice, m_pd3dCommandList, m_pRaid_Scene->GetGraphicsRootSignature(), m_pRaid_Scene->m_pTerrain, my_job);
 	//get_basic_information(pPlayer, 0);
 
 #else

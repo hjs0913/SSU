@@ -55,7 +55,7 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 	case J_DILLER: {      //전사류는 일단 보스몬스터를 따라가자 
 		if (gaia->running_pattern == false) {   //보스 패턴을 실행 안하면 붙어
 			target_id = gaia->get_dungeon_id();
-			pos mv = pa->non_a_star(gaia->get_x(), gaia->get_z(), pa->get_x(), pa->get_z());
+			pos mv = pa->non_a_star(gaia->boss->get_x(), gaia->boss->get_z(), pa->get_x(), pa->get_z());
 			pa->set_x(mv.first);
 			pa->set_z(mv.second);
 		}
@@ -111,7 +111,7 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 	case J_TANKER: {
 		if (gaia->running_pattern == false) {   //보스 패턴을 실행 안하면 붙어
 			target_id = gaia->get_dungeon_id();
-			pos mv = pa->non_a_star(gaia->get_x(), gaia->get_z(), pa->get_x(), pa->get_z());
+			pos mv = pa->non_a_star(gaia->boss->get_x(), gaia->boss->get_z(), pa->get_x(), pa->get_z());
 			pa->set_x(mv.first);
 			pa->set_z(mv.second);
 		}
@@ -136,7 +136,6 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 				break;
 			case 1:    //  안전지대 2개 중 가까운데로 가자 
 				dis = 0;
-
 				for (int i = 0; i < 2; i++) {
 					int x = gaia->pattern_two_safe_zone[i].first;
 					int z = gaia->pattern_two_safe_zone[i].second;
@@ -170,7 +169,7 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 	case J_MAGICIAN: {
 		if (gaia->running_pattern == false) {   //보스 패턴을 실행 안해도 그래도 일정기리는 유지해   // 일단 보스가 바라보는 반대방향?
 			target_id = gaia->get_dungeon_id();
-			pos mv = pa->non_a_star(gaia->get_x() - gaia->boss->get_look_x() * 100, gaia->get_z() + gaia->boss->get_look_z() * 100, pa->get_x(), pa->get_z());
+			pos mv = pa->non_a_star(gaia->boss->get_x() - gaia->boss->get_look_x() * 100, gaia->boss->get_z() + gaia->boss->get_look_z() * 100, pa->get_x(), pa->get_z());
 			pa->set_x(mv.first);
 			pa->set_z(mv.second);
 		}
@@ -229,7 +228,7 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 	case J_SUPPORTER: {
 		if (gaia->running_pattern == false) {   //보스 패턴을 실행 안해도 그래도 일정기리는 유지해 
 			target_id = gaia->get_dungeon_id();
-			pos mv = pa->non_a_star(gaia->get_x() - gaia->boss->get_look_x() * 100, gaia->get_z() + gaia->boss->get_look_z() * 100, pa->get_x(), pa->get_z());
+			pos mv = pa->non_a_star(gaia->boss->get_x() - gaia->boss->get_look_x() * 100, gaia->boss->get_z() + gaia->boss->get_look_z() * 100, pa->get_x(), pa->get_z());
 			pa->set_x(mv.first);
 			pa->set_z(mv.second);
 		}
@@ -288,9 +287,6 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 	default:
 		break;
 	}
-	
-	
-
 }
 
 void Partner::partner_attack(Partner* pa, Gaia* gaia) //스킬을 쿨타임 돌때마다 계속 쓰도록 하자     //  서포타가 오류인가?
