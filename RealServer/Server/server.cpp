@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "Player.h"
-#include "Gaia.h"
 #include "database.h"
 #include "send.h"
 #include <fstream>
