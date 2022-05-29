@@ -1066,7 +1066,7 @@ void CGameFramework::ProcessInput()
 			if (pKeysBuffer[VK_NUMPAD5] & 0xF0 || (pKeysBuffer['5'] & 0xF0)) {     //   5 
 				send_skill_packet(1, 1);
 				/*
-				if (pushCTRL && my_job == J_MAGICIAN) { 
+				if (pushCTRL && my_job == J_MAGICIAN) {
 
 					if (shoot) {
 						++bulletidx;
