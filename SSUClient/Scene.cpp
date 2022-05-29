@@ -139,7 +139,10 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	basterd_anim_cnt = pBastardModel->m_pAnimationSets->m_nAnimationSets;
 
 	pTankerModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Mighty_Warrior.bin", NULL);
-	tanker_anim_cnt = pBastardModel->m_pAnimationSets->m_nAnimationSets;
+	tanker_anim_cnt = pTankerModel->m_pAnimationSets->m_nAnimationSets;
+
+	pSupporterModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Priestess.bin", NULL);
+	supporter_anim_cnt = pSupporterModel->m_pAnimationSets->m_nAnimationSets;
 
 	for (int i = 33; i < 63; ++i) {
 		m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pTankerModel, tanker_anim_cnt);
@@ -738,7 +741,7 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 
 				for (int j = 0; j < basterd_anim_cnt; ++j) {
 					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
-					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 0.5f;
+					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 1.0f;
 				}
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
 				break;
