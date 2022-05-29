@@ -100,7 +100,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	XMFLOAT4 xmf4Color(0.1f, 0.1f, 0.1f, 0.0f);
 	m_pTerrain = new CHeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Image/HeightMap.raw"), 512, 512, xmf3Scale, xmf4Color);
 
-	m_nHierarchicalGameObjects = 3 + 30 + 30;	// ¼ºº® + Áý2°³ + ¸ó½ºÅÍ 30 + ÇÃ·¹ÀÌ¾î 30
+	m_nHierarchicalGameObjects = 3 + 30 + 30 + 1;	// ï¿½ï¿½ï¿½ï¿½ + ï¿½ï¿½2ï¿½ï¿½ + ï¿½ï¿½ï¿½ï¿½ 30 + ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ 30 + ï¿½ï¿½ï¿½ï¿½ 1
 	m_ppHierarchicalGameObjects = new CGameObject * [m_nHierarchicalGameObjects];
 	//for (int i = 0; i < m_nHierarchicalGameObjects; ++i) m_ppHierarchicalGameObjects[i] = NULL;
 
@@ -121,6 +121,11 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_ppHierarchicalGameObjects[2]->SetScale(4.0f, 4.0f, 4.0f);
 	if (pHouseModel) delete pHouseModel;
 	if (pHouseModell) delete pHouseModell;
+
+	CLoadedModelInfo* pTreeModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/RedWood_3.bin", NULL);
+	m_ppHierarchicalGameObjects[63] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pTreeModel, 0);
+	m_ppHierarchicalGameObjects[63]->SetPosition(3200.0f, m_pTerrain->GetHeight(3200.0f, 1100.0f), 1100.0f);
+	m_ppHierarchicalGameObjects[63]->SetScale(4.0f, 4.0f, 4.0f);
 
 	CLoadedModelInfo* pMonsterModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Beast_Wolf.bin", NULL);
 	int wolf_anim_cnt = pMonsterModel->m_pAnimationSets->m_nAnimationSets;
@@ -169,12 +174,12 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 	m_pSkyBox = new CSkyBox(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
-	XMFLOAT3 xmf3Scale(8.0f, 50.0f, 8.0f); //Á¶Á¤ 
+	XMFLOAT3 xmf3Scale(8.0f, 50.0f, 8.0f); //ï¿½ï¿½ï¿½ï¿½ 
 	XMFLOAT4 xmf4Color(0.0f, 0.0f, 0.0f, 0.0f);
 	m_pTerrain = new CHeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Image/Gaia2.raw"), 512, 512, xmf3Scale, xmf4Color);
 
 
-	m_nHierarchicalGameObjects = 3 + 1 + 4 + 3;	// ÇÃ·¹ÀÌ¾î3 + °¡ÀÌ¾Æ1 + ÀåÆÇ4 + ÆÄµµ 3
+	m_nHierarchicalGameObjects = 3 + 1 + 4 + 3;	// ï¿½Ã·ï¿½ï¿½Ì¾ï¿½3 + ï¿½ï¿½ï¿½Ì¾ï¿½1 + ï¿½ï¿½ï¿½ï¿½4 + ï¿½Äµï¿½ 3
 	m_ppHierarchicalGameObjects = new CGameObject * [m_nHierarchicalGameObjects];
 	//for (int i = 0; i < m_nHierarchicalGameObjects; ++i) m_ppHierarchicalGameObjects[i] = NULL;
 
@@ -193,8 +198,8 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 			for (int j = 0; j < basterd_anim_cnt; ++j) {
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
-				// release ÀÏ¶§´Â 0.4
-				// debug ÀÏ¶§´Â 0.2
+				// release ï¿½Ï¶ï¿½ï¿½ï¿½ 0.4
+				// debug ï¿½Ï¶ï¿½ï¿½ï¿½ 0.2
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 0.5f;
 			}
 			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
@@ -206,8 +211,8 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 			m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
 			for (int j = 0; j < tanker_anim_cnt; ++j) {
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
-				// release ÀÏ¶§´Â 0.4
-				// debug ÀÏ¶§´Â 0.2
+				// release ï¿½Ï¶ï¿½ï¿½ï¿½ 0.4
+				// debug ï¿½Ï¶ï¿½ï¿½ï¿½ 0.2
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 1.0f;
 			}
 			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
@@ -219,8 +224,8 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 			m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
 			for (int j = 0; j < basterd_anim_cnt; ++j) {
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
-				// release ÀÏ¶§´Â 0.4
-				// debug ÀÏ¶§´Â 0.2
+				// release ï¿½Ï¶ï¿½ï¿½ï¿½ 0.4
+				// debug ï¿½Ï¶ï¿½ï¿½ï¿½ 0.2
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 0.5f;
 			}
 			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
@@ -229,7 +234,7 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 		}
 	}
 
-	// °¡ÀÌ¾Æ
+	// ï¿½ï¿½ï¿½Ì¾ï¿½
 	CLoadedModelInfo* pGaiaModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Gaia.bin", NULL);
 	int gaia_anim_cnt = pGaiaModel->m_pAnimationSets->m_nAnimationSets;
 
@@ -241,7 +246,7 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	m_ppHierarchicalGameObjects[3]->SetPosition(3500.0f, m_pTerrain->GetHeight(3500.0f, 650.0f), 650.0f);
 	m_ppHierarchicalGameObjects[3]->SetScale(20.0f, 20.0f, 20.0f);
 
-	// ÆÐÅÏ(ÀåÆÇ)
+	// ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½)
 	CLoadedModelInfo* pHouseModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/House.bin", NULL);
 	for (int i = 4; i < 8; i++) {
 		m_ppHierarchicalGameObjects[i] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pHouseModel, 0);
@@ -249,7 +254,7 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 		m_ppHierarchicalGameObjects[i]->SetScale(1.0f, 1.0f, 1.0f);
 	}
 
-	// ÆÐÅÏ(ÆÄµµ)
+	// ï¿½ï¿½ï¿½ï¿½(ï¿½Äµï¿½)
 	CLoadedModelInfo* pHouseModell = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/House.bin", NULL);
 	for (int i = 8; i < 11; i++) {
 		m_ppHierarchicalGameObjects[i] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pHouseModell, 0);
@@ -494,7 +499,7 @@ ID3D12RootSignature *CScene::CreateGraphicsRootSignature(ID3D12Device *pd3dDevic
 
 void CScene::CreateShaderVariables(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
 {
-	UINT ncbElementBytes = ((sizeof(LIGHTS) + 255) & ~255); //256ÀÇ ¹è¼ö
+	UINT ncbElementBytes = ((sizeof(LIGHTS) + 255) & ~255); //256ï¿½ï¿½ ï¿½ï¿½ï¿½
 	m_pd3dcbLights = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, ncbElementBytes, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, NULL);
 
 	m_pd3dcbLights->Map(0, NULL, (void **)&m_pcbMappedLights);
@@ -679,7 +684,7 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	{
 		if (m_ppHierarchicalGameObjects[i])
 		{
-			if (InDungeon) {	// ·¹ÀÌµå »óÈ²
+			if (InDungeon) {	// ï¿½ï¿½ï¿½Ìµï¿½ ï¿½ï¿½È²
 				Raid_Render(pd3dCommandList, pCamera, i);
 			}
 			else {
@@ -712,8 +717,8 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 
 				for (int j = 0; j < basterd_anim_cnt; ++j) {
 					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
-					// release ÀÏ¶§´Â 0.4
-					// debug ÀÏ¶§´Â 0.2
+					// release ï¿½Ï¶ï¿½ï¿½ï¿½ 0.4
+					// debug ï¿½Ï¶ï¿½ï¿½ï¿½ 0.2
 					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 0.5f;
 				}
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
@@ -726,8 +731,8 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 				m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
 				for (int j = 0; j < tanker_anim_cnt; ++j) {
 					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
-					// release ÀÏ¶§´Â 0.4
-					// debug ÀÏ¶§´Â 0.2
+					// release ï¿½Ï¶ï¿½ï¿½ï¿½ 0.4
+					// debug ï¿½Ï¶ï¿½ï¿½ï¿½ 0.2
 					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 1.0f;
 				}
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
@@ -740,8 +745,8 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 				m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
 				for (int j = 0; j < basterd_anim_cnt; ++j) {
 					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
-					// release ÀÏ¶§´Â 0.4
-					// debug ÀÏ¶§´Â 0.2
+					// release ï¿½Ï¶ï¿½ï¿½ï¿½ 0.4
+					// debug ï¿½Ï¶ï¿½ï¿½ï¿½ 0.2
 					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 0.5f;
 				}
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
@@ -774,7 +779,7 @@ void CScene::Raid_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pC
 				m_ppHierarchicalGameObjects[i]->GetPosition().z
 			)
 		);
-		// »ç¸Á ¾Ö´Ï¸ÞÀÌ¼Ç ´À¸®°Ô ÀÛµ¿ÇÏ±â À§ÇØ
+		// ï¿½ï¿½ï¿½ ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ûµï¿½ï¿½Ï±ï¿½ ï¿½ï¿½ï¿½ï¿½
 		if (m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[6].m_bEnable) {
 			m_ppHierarchicalGameObjects[i]->Animate(0.005);
 		}
