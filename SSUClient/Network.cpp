@@ -1306,6 +1306,24 @@ void get_basic_information(CPlayer* m_otherPlayer, int id)
 		mPlayer[id]->m_net_attack = false;
 		reinterpret_cast<CTerrainPlayer*>(m_otherPlayer)->Attack(true);
 	}
+
+	for (int i = 0; i < 3; i++) {
+		if (mPlayer[id]->m_net_skill_animation[i] == true) {
+			if (!m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[3 + i].m_bEnable) {
+				reinterpret_cast<CTerrainPlayer*>(m_otherPlayer)->Skill(i);
+			}
+			else {
+				float playtime = m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[i + 3]->m_fLength - m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[i + 3]->m_fPosition;
+				if (playtime <= 0.05) {
+					m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
+					m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+					m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(0, true);
+					m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[i + 3].m_fPosition = 0.0f;
+					mPlayer[id]->m_net_skill_animation[i] = false;
+				}
+			}
+		}
+	}
 }
 
 // 다른 플레이어

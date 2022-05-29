@@ -1050,7 +1050,7 @@ void CGameFramework::ProcessInput()
 
 			if (pKeysBuffer[VK_SPACE] & 0xF0) dwAttack |= 0x30;
 			if ((pKeysBuffer[VK_NUMPAD1] & 0xF0) || (pKeysBuffer['1'] & 0xF0)) {
-				dwSkill |= 0x31;
+				//dwSkill |= 0x31;
 				send_skill_packet(0, 0);
 			}
 			//	if ((pKeysBuffer[VK_NUMPAD2] & 0xF0) || (pKeysBuffer['2'] & 0xF0)) {     //   2 

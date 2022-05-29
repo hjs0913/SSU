@@ -1367,7 +1367,7 @@ void process_packet(int client_id, unsigned char* p)
                     timer_queue.push(ev);
 
                     pl->set_mp(pl->get_mp() - 1000);
-
+                    send_status_change_packet(pl);
                     if (dungeons[client_id]->start_game == false) {
                         for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
                             players[i]->state_lock.lock();
@@ -1382,7 +1382,7 @@ void process_packet(int client_id, unsigned char* p)
                                 pl->set_skill_factor(packet->skill_type, packet->skill_num);
                                 physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
                                 players[i]->set_target_id(pl->get_id());
-                                send_status_change_packet(pl);
+                                //send_status_change_packet(pl);
                                 if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
                                     players[i]->set_active(true);
                                     timer_event ev;
@@ -1407,7 +1407,7 @@ void process_packet(int client_id, unsigned char* p)
                             float damage = give_damage * (1 - defence_damage);
                             dungeons[client_id]->boss->set_hp(dungeons[client_id]->boss->get_hp() - damage);
                             // physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
-                            send_status_change_packet(pl);
+                            //send_status_change_packet(pl);
                             for (int i = 0; i < GAIA_ROOM; ++i) {
                                 send_change_hp_packet(dungeons[client_id]->get_party_palyer()[i], dungeons[client_id]->boss);
                             }
@@ -1436,6 +1436,7 @@ void process_packet(int client_id, unsigned char* p)
                         pl->get_z() + pl->get_right_z() * 40 + pl->get_look_z() * 100 };  // 오른쪽 위
 
                     pl->set_mp(pl->get_mp() - 1000);
+                    send_status_change_packet(pl);
                     if (dungeons[client_id]->start_game == false) {
                         for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
                             players[i]->state_lock.lock();
@@ -1451,7 +1452,7 @@ void process_packet(int client_id, unsigned char* p)
                                 pl->set_skill_factor(packet->skill_type, packet->skill_num);
                                 magical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
                                 players[i]->set_target_id(pl->get_id());
-                                send_status_change_packet(pl);
+                                //send_status_change_packet(pl);
                                 if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
                                     players[i]->set_active(true);
                                     timer_event ev;
@@ -1476,7 +1477,7 @@ void process_packet(int client_id, unsigned char* p)
                                     dungeons[client_id]->boss->get_magical_defence()));
                             float damage = give_damage * (1 - defence_damage);
                             dungeons[client_id]->boss->set_hp(dungeons[client_id]->boss->get_hp() - damage);
-                            send_status_change_packet(pl);
+                            //send_status_change_packet(pl);
                             for (int i = 0; i < GAIA_ROOM; ++i) {
                                 send_change_hp_packet(dungeons[client_id]->get_party_palyer()[i], dungeons[client_id]->boss);
                             }
@@ -1510,6 +1511,7 @@ void process_packet(int client_id, unsigned char* p)
             for (int vl_id : my_vl) {
                 send_animation_skill(reinterpret_cast<Player*>(players[vl_id]), pl->get_id(), packet->skill_type);
             }
+            send_animation_skill(pl, pl->get_id(), packet->skill_type);
             break;
         }
         case J_TANKER: {
@@ -1528,6 +1530,7 @@ void process_packet(int client_id, unsigned char* p)
 
 
                     pl->set_mp(pl->get_mp() - 1000);
+                    send_status_change_packet(pl);
                     if (dungeons[client_id]->start_game == false) {
                         for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
                             players[i]->state_lock.lock();
@@ -1544,7 +1547,7 @@ void process_packet(int client_id, unsigned char* p)
 
                                 players[i]->set_pos(players[i]->get_x() + pl->get_look_x() * 40, players[i]->get_z() + pl->get_look_z() * 40);
                                 send_move_packet(pl, players[i], 1);  //나중에 수정필요 
-                                send_status_change_packet(pl);
+                                //send_status_change_packet(pl);
                                 players[i]->set_target_id(pl->get_id());
                                 if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
                                     players[i]->set_active(true);
@@ -1570,7 +1573,7 @@ void process_packet(int client_id, unsigned char* p)
                             float damage = give_damage * (1 - defence_damage);
                             dungeons[client_id]->boss->set_pos(dungeons[client_id]->boss->get_x() + pl->get_look_x() * 40, dungeons[client_id]->boss->get_z() + pl->get_look_z() * 40);
                             dungeons[client_id]->boss->set_hp(dungeons[client_id]->boss->get_hp() - damage);
-                            send_move_packet(pl, dungeons[client_id]->boss, 1);  //나중에 수정필요 
+                            //send_move_packet(pl, dungeons[client_id]->boss, 1);  //나중에 수정필요 
                             for (int i = 0; i < GAIA_ROOM; ++i) {
                                 send_change_hp_packet(dungeons[client_id]->get_party_palyer()[i], dungeons[client_id]->boss);
                             }
@@ -1592,7 +1595,7 @@ void process_packet(int client_id, unsigned char* p)
                     timer_queue.push(ev);
 
                     pl->set_mp(pl->get_mp() - 1000);
-
+                    send_status_change_packet(pl);
                     if (dungeons[client_id]->start_game == false) {
                         for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
                             players[i]->state_lock.lock();
@@ -1606,7 +1609,7 @@ void process_packet(int client_id, unsigned char* p)
                                 pl->set_skill_factor(packet->skill_type, packet->skill_num);
                                 //  physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
                                 players[i]->set_target_id(pl->get_id());
-                                send_status_change_packet(pl);
+                                //send_status_change_packet(pl);
                                 if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
                                     players[i]->set_active(true);
 
@@ -1625,7 +1628,7 @@ void process_packet(int client_id, unsigned char* p)
                     else {
                         if ((dungeons[client_id]->get_x() >= pl->get_x() - 40 && dungeons[client_id]->get_x() <= pl->get_x() + 40) && (dungeons[client_id]->get_z() >= pl->get_z() - 40 && dungeons[client_id]->get_z() <= pl->get_z() + 40)) {
                             pl->set_skill_factor(packet->skill_type, packet->skill_num);
-                            send_status_change_packet(pl);
+                            //send_status_change_packet(pl);
                             dungeons[client_id]->target_id = pl->get_indun_id();
 
                         }
@@ -1656,6 +1659,7 @@ void process_packet(int client_id, unsigned char* p)
             for (int vl_id : my_vl) {
                 send_animation_skill(reinterpret_cast<Player*>(players[vl_id]), pl->get_id(), packet->skill_type);
             }
+            send_animation_skill(pl, pl->get_id(), packet->skill_type);
             break;
         }
         case J_SUPPORTER: { //서포터 
