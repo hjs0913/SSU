@@ -405,6 +405,12 @@ CTerrainPlayer::CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLi
 		anim_cnt = pAngrybotModel->m_pAnimationSets->m_nAnimationSets;
 		break;
 	}
+	case J_SUPPORTER: {
+		pAngrybotModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Priestess.bin", NULL);
+		SetChild(pAngrybotModel->m_pModelRootObject, true);
+		anim_cnt = pAngrybotModel->m_pAnimationSets->m_nAnimationSets;
+		break;
+	}
 	default: {
 		pAngrybotModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Bastard_Warrior.bin", NULL);
 		SetChild(pAngrybotModel->m_pModelRootObject, true);
@@ -421,8 +427,8 @@ CTerrainPlayer::CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLi
 	}
 	m_pSkinnedAnimationController->SetTrackEnable(0, true);
 
-	// 5번 부터 ANIMATION_TYPE_ONCE
-	for (int i = 5; i < anim_cnt; ++i) {
+	// 2번 부터 ANIMATION_TYPE_ONCE
+	for (int i = 2; i < anim_cnt; ++i) {
 		m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[i]->m_nType = ANIMATION_TYPE_ONCE;
 	}
 
