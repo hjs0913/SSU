@@ -950,7 +950,7 @@ void CGameFramework::Create_InDungeon_Object()
 	if (m_pRaid_Scene) m_pRaid_Scene->BuildObjects_Raid(m_pd3dDevice, m_pd3dCommandList);
 
 #ifdef _WITH_TERRAIN_PLAYER
-	CTerrainPlayer* pPlayer = new CTerrainPlayer(m_pd3dDevice, m_pd3dCommandList, m_pRaid_Scene->GetGraphicsRootSignature(), m_pRaid_Scene->m_pTerrain);
+	CTerrainPlayer* pPlayer = new CTerrainPlayer(m_pd3dDevice, m_pd3dCommandList, m_pRaid_Scene->GetGraphicsRootSignature(), m_pRaid_Scene->m_pTerrain, my_job);
 	//get_basic_information(pPlayer, 0);
 
 #else
@@ -1050,7 +1050,7 @@ void CGameFramework::ProcessInput()
 
 			if (pKeysBuffer[VK_SPACE] & 0xF0) dwAttack |= 0x30;
 			if ((pKeysBuffer[VK_NUMPAD1] & 0xF0) || (pKeysBuffer['1'] & 0xF0)) {
-				dwSkill |= 0x31;
+				//dwSkill |= 0x31;
 				send_skill_packet(0, 0);
 			}
 			//	if ((pKeysBuffer[VK_NUMPAD2] & 0xF0) || (pKeysBuffer['2'] & 0xF0)) {     //   2 
@@ -1100,11 +1100,6 @@ void CGameFramework::ProcessInput()
 		//		send_skill_packet(2, 2);
 		//	}
 		}
-
-		//if (pKeysBuffer[VK_UP] & 0xF0) dwDirection |= DIR_FORWARD;
-		//if (pKeysBuffer[VK_DOWN] & 0xF0) dwDirection |= DIR_BACKWARD;
-		//if (pKeysBuffer[VK_LEFT] & 0xF0) dwDirection |= DIR_LEFT;
-		//if (pKeysBuffer[VK_RIGHT] & 0xF0) dwDirection |= DIR_RIGHT;
 		if (pKeysBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
 		if (pKeysBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
 

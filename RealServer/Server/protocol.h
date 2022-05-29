@@ -517,7 +517,10 @@ struct sc_packet_animation_attack {
 };
 
 struct sc_packet_animation_skill {
-
+	unsigned char size;
+	char type;
+	int id;
+	unsigned char animation_skill;
 };
 
 #pragma pack(pop)

@@ -775,7 +775,7 @@ void CScene::Raid_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pC
 			)
 		);
 		// 사망 애니메이션 느리게 작동하기 위해
-		if (m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[13].m_bEnable) {
+		if (m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[6].m_bEnable) {
 			m_ppHierarchicalGameObjects[i]->Animate(0.005);
 		}
 		else m_ppHierarchicalGameObjects[i]->Animate(m_fElapsedTime);
