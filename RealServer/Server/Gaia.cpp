@@ -325,7 +325,7 @@ void Gaia::boss_attack()
 			if (party[i]->get_tribe() != HUMAN) continue;
 			send_gaia_pattern_one_packet(party[i], pattern_one_position);
 		}
-		//
+
 		ev.obj_id = dungeon_id;
 		ev.start_time = chrono::system_clock::now() + 2s;
 		ev.ev = EVENT_GAIA_PATTERN;

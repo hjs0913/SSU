@@ -125,7 +125,11 @@ public:
 
 	CLoadedModelInfo					*pBastardModel = NULL;
 	CLoadedModelInfo					*pTankerModel = NULL;
+	CLoadedModelInfo					*pSupporterModel = NULL;
 
 	int									basterd_anim_cnt = 0;
 	int									tanker_anim_cnt = 0;
+	int									supporter_anim_cnt = 0;
+
+	float circle_time = 0.0f;
 };
