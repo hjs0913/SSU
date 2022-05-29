@@ -1126,7 +1126,6 @@ void get_raid_information(CGameObject* m_otherPlayer, int id)
 	for (int i = 0; i < 3; i++) {
 		if (mPlayer[m_party_info->player_id[tmp_id]]->m_net_skill_animation[i] == true) {
 			if (!m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[3 + i].m_bEnable) {
-				cout << "¾Ó±â¸ð¶ì 0" << endl;
 				m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
 				m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(i + 3, i + 3);
 				m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(i + 3, true);
@@ -1134,7 +1133,6 @@ void get_raid_information(CGameObject* m_otherPlayer, int id)
 			else {
 				float playtime = m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[i + 3]->m_fLength - m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[i + 3]->m_fPosition;
 				if (playtime <= 0.1) {
-					cout << "¾Ó±â¸ð¶ì 1" << endl;
 					m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
 					m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 					m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(0, true);
@@ -1145,14 +1143,11 @@ void get_raid_information(CGameObject* m_otherPlayer, int id)
 		}
 		else {
 			if (mPlayer[m_party_info->player_id[tmp_id]]->m_net_skill_animation[i] == true) {
-				cout << "¾Ó±â¸ð¶ì 2" << endl;
 				m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
 				m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 				m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(0, true);
 				m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[i + 3].m_fPosition = 0.0f;
 			}
-			else cout << "¾Ó±â¸ð¶ì 3" << endl;
-
 		}
 	}
 }
