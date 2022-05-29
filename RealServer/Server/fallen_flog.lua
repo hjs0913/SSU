@@ -1,7 +1,7 @@
 my_id = 99999;
 my_element = 1;
 my_lv = 12;
-my_name = "타락한 개구리";
+my_name = "타락한 늑대";
 my_hp = 100000;
 my_physical_attack = 140;
 my_magical_attck = 0;

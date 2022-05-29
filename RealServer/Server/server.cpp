@@ -1333,6 +1333,7 @@ void process_packet(int client_id, unsigned char* p)
         break;
     }
     case CS_PACKET_SKILL: {
+
         if (pl->get_mp() - 1000 < 0)  //mp없으면 안됨 
             return;
         pl->state_lock.lock();
@@ -1495,7 +1496,7 @@ void process_packet(int client_id, unsigned char* p)
                     ev.obj_id = client_id;
                     ev.start_time = chrono::system_clock::now() + 10s;  //쿨타임
                     ev.ev = EVENT_SKILL_COOLTIME;
-                    ev.target_id = 2;
+                    ev.target_id = 9;
                     timer_queue.push(ev);
 
                     pl->set_mp(pl->get_mp() - 1000);
@@ -1583,11 +1584,9 @@ void process_packet(int client_id, unsigned char* p)
                 }
                 break;
             case 1:  //마법 공격 스킬:  어그로   다른 플레이어가 공격 도중 쓰면 대상이 나로 안바뀐다 수정 필요 
-                cout << "여기0" << endl;
                 switch (packet->skill_num)
                 {
                 case 0:   //어그로
-                    cout << "여기1" << endl;
                     timer_event ev;
                     ev.obj_id = client_id;
                     ev.start_time = chrono::system_clock::now() + 3s;  //쿨타임
@@ -1613,7 +1612,7 @@ void process_packet(int client_id, unsigned char* p)
                                 //send_status_change_packet(pl);
                                 if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
                                     players[i]->set_active(true);
-                                 //   players[i]->set_agro_bool()
+                                    //   players[i]->set_agro_bool()
                                     timer_event ev;
                                     ev.obj_id = i;
                                     ev.start_time = chrono::system_clock::now() + 1s;
@@ -1654,7 +1653,7 @@ void process_packet(int client_id, unsigned char* p)
                 }
                 break;
             }
-            cout << "여기" << endl;
+     
             for (int vl_id : my_vl) {
                 send_animation_skill(reinterpret_cast<Player*>(players[vl_id]), pl->get_id(), packet->skill_type);
             }
@@ -1672,7 +1671,7 @@ void process_packet(int client_id, unsigned char* p)
                     ev.obj_id = client_id;
                     ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
                     ev.ev = EVENT_SKILL_COOLTIME;
-                    ev.target_id = 10;
+                    ev.target_id = 2;
                     timer_queue.push(ev);
 
                     pl->set_mp(pl->get_mp() - 1000);
@@ -1687,9 +1686,9 @@ void process_packet(int client_id, unsigned char* p)
                             }
                             players[i]->state_lock.unlock();
                             if ((players[i]->get_x() >= pl->get_x() - 15 && players[i]->get_x() <= pl->get_x() + 15) && (players[i]->get_z() >= pl->get_z() - 15 && players[i]->get_z() <= pl->get_z() + 15)) {
-
                                 players[i]->set_hp(players[i]->get_hp() + players[i]->get_maxhp() / 10);
                                 send_status_change_packet(reinterpret_cast<Player*>(players[i]));
+                                send_buff_ui_packet(reinterpret_cast<Player*>(players[i]), 2); //ui 
                             }
                         }
                     }
@@ -1719,15 +1718,15 @@ void process_packet(int client_id, unsigned char* p)
                             send_change_hp_packet(dungeons[client_id]->get_party_palyer()[i], dungeons[client_id]->get_party_palyer()[target_player]);
                         }
                     }
+                    break;
                 }
-                      break;
                 case 1: {  //mp회복 
-                    timer_event ev1;
-                    ev1.obj_id = client_id;
-                    ev1.start_time = chrono::system_clock::now() + 5s;  //쿨타임
-                    ev1.ev = EVENT_SKILL_COOLTIME;
-                    ev1.target_id = 10;
-                    timer_queue.push(ev1);
+                    timer_event ev;
+                    ev.obj_id = client_id;
+                    ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
+                    ev.ev = EVENT_SKILL_COOLTIME;
+                    ev.target_id = 2;
+                    timer_queue.push(ev);
 
                     pl->set_mp(pl->get_mp() - 1000);
                     send_status_change_packet(pl);
@@ -1743,6 +1742,8 @@ void process_packet(int client_id, unsigned char* p)
                             if ((players[i]->get_x() >= pl->get_x() - 15 && players[i]->get_x() <= pl->get_x() + 15) && (players[i]->get_z() >= pl->get_z() - 15 && players[i]->get_z() <= pl->get_z() + 15)) {
                                 players[i]->set_mp(players[i]->get_mp() + players[i]->get_maxmp() / 10);
                                 send_change_mp_packet(pl, players[i]);
+                                send_buff_ui_packet(reinterpret_cast<Player*>(players[i]), 0); //ui 
+
                             }
                         }
                     }
@@ -1767,20 +1768,20 @@ void process_packet(int client_id, unsigned char* p)
                         dungeons[client_id]->get_party_palyer()[target_player]->set_mp(dungeons[client_id]->get_party_palyer()[target_player]->get_mp() + dungeons[client_id]->get_party_palyer()[target_player]->get_maxmp() / 10);
                         if (dungeons[client_id]->get_party_palyer()[target_player]->get_mp() > dungeons[client_id]->get_party_palyer()[target_player]->get_maxmp())
                             dungeons[client_id]->get_party_palyer()[target_player]->set_mp(dungeons[client_id]->get_party_palyer()[target_player]->get_maxmp());
-
                         for (int i = 0; i < GAIA_ROOM; ++i) {
                             send_change_mp_packet(dungeons[client_id]->get_party_palyer()[i], dungeons[client_id]->get_party_palyer()[target_player]);
                         }
                     }
+                    break;
                 }
-                      break;
+
                 case 2: {//공속 
-                    timer_event ev2;
-                    ev2.obj_id = client_id;
-                    ev2.start_time = chrono::system_clock::now() + 5s;  //쿨타임
-                    ev2.ev = EVENT_SKILL_COOLTIME;
-                    ev2.target_id = 10;
-                    timer_queue.push(ev2);
+                    timer_event ev;
+                    ev.obj_id = client_id;
+                    ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
+                    ev.ev = EVENT_SKILL_COOLTIME;
+                    ev.target_id = 2;
+                    timer_queue.push(ev);
 
                     pl->set_mp(pl->get_mp() - 1000);
                     send_status_change_packet(pl);
@@ -1799,13 +1800,15 @@ void process_packet(int client_id, unsigned char* p)
                             }
                         }
                     }
-
-                    for (int i = 0; i < GAIA_ROOM; ++i) {
-                        dungeons[client_id]->get_party_palyer()[i]->attack_speed_up = true;
-                        send_buff_ui_packet(dungeons[client_id]->get_party_palyer()[i], 4);
+                    else {
+                        for (int i = 0; i < GAIA_ROOM; ++i) {
+                            dungeons[client_id]->get_party_palyer()[i]->attack_speed_up = true;
+                            send_buff_ui_packet(dungeons[client_id]->get_party_palyer()[i], 4);
+                        }
                     }
                     break;
                 }
+                      break;
                 }
                 break;
             }
@@ -1933,6 +1936,7 @@ void process_packet(int client_id, unsigned char* p)
             }
             break;
         }
+                       break;
         }
     }
     break;
@@ -2741,30 +2745,6 @@ void worker()
 
             if (players[client_id]->get_target_id() != -1)
                 do_npc_move(client_id, exp_over->_target);
-
-            /*
-            players[client_id]->lua_lock.lock();
-            lua_State* L = players[client_id]->L;
-            lua_getglobal(L, "event_npc_move");
-            lua_pushnumber(L, exp_over->_target);
-            int error = lua_pcall(L, 1, 1, 0);
-            if (error != 0) {
-                cout << "LUA_NPC_MOVE ERROR" << endl;
-            }
-            // bool값도 리턴을 해주자
-            // true면 쫒아간다
-            bool m = lua_toboolean(L, -1);
-            lua_pop(L, 1);
-            players[client_id]->lua_lock.unlock();
-            if (m) {
-                do_npc_move(client_id, exp_over->_target);
-            }
-            else {
-                // 원래 자리로 돌아가자
-                players[client_id]->set_active(false);
-                return_npc_position(client_id);
-            }
-            */
             delete exp_over;
 
             break;
@@ -3721,7 +3701,7 @@ void do_timer()
                 reinterpret_cast<Player*>(players[temp.obj_id])->set_attack_active(false);
             }
             else if (temp.ev == EVENT_SKILL_COOLTIME) {
-                if (temp.target_id == 2) {  // 전사 BUFF
+                if (temp.target_id == 9) {  // 전사 BUFF
                     players[temp.obj_id]->set_physical_attack(0.3 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 10 * players[temp.obj_id]->get_lv());
                     players[temp.obj_id]->set_magical_attack(0.1 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 5 * players[temp.obj_id]->get_lv());
 
@@ -3775,7 +3755,7 @@ void do_timer()
                 }
 
                 if (ev.ev == EVENT_SKILL_COOLTIME) {
-                    if (ev.target_id == 2) {  // 전사 BUFF
+                    if (ev.target_id == 9) {  // 전사 BUFF
                         players[ev.obj_id]->set_physical_attack(0.3 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 10 * players[ev.obj_id]->get_lv());
                         players[ev.obj_id]->set_magical_attack(0.1 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 5 * players[ev.obj_id]->get_lv());
                         // 일단 이것을 넣으면 안돌아감(이유 모름)
