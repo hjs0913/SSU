@@ -120,4 +120,12 @@ public:
 
 	ID3D12Resource						*m_pd3dcbLights = NULL;
 	LIGHTS								*m_pcbMappedLights = NULL;
+
+	ID3D12Device						*m_pd3dDevice = NULL;
+
+	CLoadedModelInfo					*pBastardModel = NULL;
+	CLoadedModelInfo					*pTankerModel = NULL;
+
+	int									basterd_anim_cnt = 0;
+	int									tanker_anim_cnt = 0;
 };
