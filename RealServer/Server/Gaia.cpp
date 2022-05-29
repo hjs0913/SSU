@@ -3,6 +3,18 @@
 #include <random>
 #include <ctime>
 
+pair<int, int> operator +(const pair<int, int>& x, const pair<int, int>& y) {
+	return std::make_pair(x.first + y.first, x.second + y.second);
+}
+
+pair<int, int> operator -(const pair<int, int>& x, const pair<int, int>& y) {
+	return std::make_pair(x.first - y.first, x.second - y.second);
+}
+
+pair<int, int> operator *(const int x, const pair<int, int>& y) {
+	return std::make_pair(x * y.first, x * y.second);
+}
+
 Gaia::Gaia(int d_id)
 {
 	dungeon_id = d_id;
@@ -334,7 +346,7 @@ void Gaia::boss_attack()
 
 		//
 		ev.obj_id = dungeon_id;
-		ev.start_time = chrono::system_clock::now() + 5s;
+		ev.start_time = chrono::system_clock::now() + 10s;
 		ev.ev = EVENT_BOSS_ATTACK;
 		ev.target_id = -1;
 		timer_queue.push(ev);
@@ -455,7 +467,7 @@ void Gaia::boss_attack()
 	}
 	case 2: {
 		ev.obj_id = dungeon_id;
-		ev.start_time = chrono::system_clock::now() + 3s;
+		ev.start_time = chrono::system_clock::now() + 1s;
 		ev.ev = EVENT_BOSS_ATTACK;
 		ev.target_id = -1;
 		timer_queue.push(ev);
@@ -463,7 +475,7 @@ void Gaia::boss_attack()
 	}
 	case 3: {
 		ev.obj_id = dungeon_id;
-		ev.start_time = chrono::system_clock::now() + 3s;
+		ev.start_time = chrono::system_clock::now() + 1s;
 		ev.ev = EVENT_BOSS_ATTACK;
 		ev.target_id = -1;
 		timer_queue.push(ev);
@@ -484,7 +496,7 @@ void Gaia::boss_attack()
 		timer_queue.push(ev);
 		//
 		ev.obj_id = dungeon_id;
-		ev.start_time = chrono::system_clock::now() + 6s;
+		ev.start_time = chrono::system_clock::now() + 10s;
 		ev.ev = EVENT_BOSS_ATTACK;
 		ev.target_id = -1;
 		timer_queue.push(ev);
@@ -781,18 +793,15 @@ void Gaia::pattern_active(int pattern)
 	}
 	case 4: {
 		// 쳐 맞는 판정
-		int t_x = pattern_five_position[0].first + 5 * sqrt(26) * boss->get_look_x();
-		int t_z = pattern_five_position[0].second + 5 * sqrt(26) * boss->get_look_z();
-
-		float cos_rect = 1 / sqrt(26);
-		float sin_rect = 5 / sqrt(26);
-
 		pos rect[4];
-		rect[0] = pos(cos_rect * t_x - sin_rect * t_z, sin_rect * t_x + cos_rect * t_z);
-		rect[1] = pos(-cos_rect * t_x - sin_rect * t_z, sin_rect * t_x - cos_rect * t_z);
-		rect[2] = pos(-cos_rect * t_x + sin_rect * t_z, -sin_rect * t_x - cos_rect * t_z);
-		rect[3] = pos(cos_rect * t_x + sin_rect * t_z, -sin_rect * t_x + cos_rect * t_z);
-
+		rect[0] = pos(pattern_five_position[0]) +pos(5 * sqrt(26) * boss->get_right_x(), 5 * sqrt(26) * boss->get_right_z())
+			+ pos(5 * boss->get_look_x(), 5 * boss->get_look_z());
+		rect[1] = pos(pattern_five_position[0]) - pos(5 * sqrt(26) * boss->get_right_x(), 5 * sqrt(26) * boss->get_right_z())
+			+ pos(5 * boss->get_look_x(), 5 * boss->get_look_z());
+		rect[2] = pos(pattern_five_position[0]) - pos(5 * sqrt(26) * boss->get_right_x(), 5 * sqrt(26) * boss->get_right_z())
+			-  pos(5 * boss->get_look_x(), 5 * boss->get_look_z());
+		rect[3] = pos(pattern_five_position[0]) + pos(5 * sqrt(26) * boss->get_right_x(), 5 * sqrt(26) * boss->get_right_z())
+			- pos(5 * boss->get_look_x(), 5 * boss->get_look_z());
 
 		for (auto& p : party) {
 
