@@ -98,7 +98,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	XMFLOAT4 xmf4Color(0.1f, 0.1f, 0.1f, 0.0f);
 	m_pTerrain = new CHeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Image/HeightMap.raw"), 512, 512, xmf3Scale, xmf4Color);
 
-	m_nHierarchicalGameObjects = 3 + 30 + 30;	// 성벽 + 집2개 + 몬스터 30 + 플레이어 30
+	m_nHierarchicalGameObjects = 3 + 30 + 30 + 1;	// 성벽 + 집2개 + 몬스터 30 + 플레이어 30 + 나무 1
 	m_ppHierarchicalGameObjects = new CGameObject * [m_nHierarchicalGameObjects];
 	//for (int i = 0; i < m_nHierarchicalGameObjects; ++i) m_ppHierarchicalGameObjects[i] = NULL;
 
@@ -120,6 +120,11 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	if (pHouseModel) delete pHouseModel;
 	if (pHouseModell) delete pHouseModell;
 
+	CLoadedModelInfo* pTreeModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/RedWood_3.bin", NULL);
+	m_ppHierarchicalGameObjects[63] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pTreeModel, 0);
+	m_ppHierarchicalGameObjects[63]->SetPosition(3200.0f, m_pTerrain->GetHeight(3200.0f, 1100.0f), 1100.0f);
+	m_ppHierarchicalGameObjects[63]->SetScale(4.0f, 4.0f, 4.0f);
+
 	CLoadedModelInfo* pMonsterModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Beast_Wolf.bin", NULL);
 	int wolf_anim_cnt = pMonsterModel->m_pAnimationSets->m_nAnimationSets;
 	for (int i = 3; i < 33; ++i) {
@@ -132,8 +137,10 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_ppHierarchicalGameObjects[i]->SetPosition(0.f, -100.f, 0.f);
 		m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
 	}
-
-	CLoadedModelInfo* pCharacterModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Mighty_Warrior.bin", NULL);
+	// Bastard_Warror은 10.0f
+	// Mighty_Warrior은 scale을 12.0f
+	// Priestess는 10.0f,
+	CLoadedModelInfo* pCharacterModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Priestess.bin", NULL);
 	int anim_cnt = pCharacterModel->m_pAnimationSets->m_nAnimationSets;
 	for (int i = 33; i < 63; ++i) {
 		m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pCharacterModel, anim_cnt);
@@ -143,7 +150,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		}
 		m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
 		m_ppHierarchicalGameObjects[i]->SetPosition(0.f, -100.f, 0.f);
-		m_ppHierarchicalGameObjects[i]->SetScale(12.0f, 12.0f, 12.0f);
+		m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
 	}
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
