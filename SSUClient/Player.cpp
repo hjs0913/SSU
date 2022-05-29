@@ -30,7 +30,7 @@ CPlayer::CPlayer()
 	m_fPitch = 0.0f;
 	m_fRoll = 0.0f;
 	m_fYaw = 0.0f;
-
+	m_net_skill_animation[3] = { false };
 	m_pPlayerUpdatedContext = NULL;
 	m_pCameraUpdatedContext = NULL;
 }

@@ -387,7 +387,12 @@ void send_animation_attack(Player* pl, int id)
     pl->do_send(sizeof(packet), &packet);
 }
 
-void send_animation_skill(Player* pl, int skill_type, int skill_num)
+void send_animation_skill(Player* pl, int id, int animation_skill)
 {
     sc_packet_animation_skill packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_ANIMATION_SKILL;
+    packet.id = id;
+    packet.animation_skill = animation_skill;
+    pl->do_send(sizeof(packet), &packet);
 }

@@ -1345,9 +1345,14 @@ void process_packet(int client_id, unsigned char* p)
         cs_packet_skill* packet = reinterpret_cast<cs_packet_skill*>(p);
         if (pl->get_skill_active(packet->skill_type) == true) return;
         pl->set_skill_active(packet->skill_type, true);     //일반공격 계수는 5
+
+        pl->vl.lock();
+        unordered_set <int> my_vl{ pl->viewlist };
+        pl->vl.unlock();
+
         switch (pl->get_job())
         {
-        case J_DILLER:
+        case J_DILLER: {
             switch (packet->skill_type)
             {
             case 0:    // 물리 공격 스킬 
@@ -1408,7 +1413,6 @@ void process_packet(int client_id, unsigned char* p)
                             }
                         }
                     }
-
                     break;
                 }
                 }
@@ -1503,9 +1507,12 @@ void process_packet(int client_id, unsigned char* p)
                 }
                 break;
             }
+            for (int vl_id : my_vl) {
+                send_animation_skill(reinterpret_cast<Player*>(players[vl_id]), pl->get_id(), packet->skill_type);
+            }
             break;
-
-        case J_TANKER:
+        }
+        case J_TANKER: {
             switch (packet->skill_type)
             {
             case 0:    // 물리 공격 스킬 // 방패 
@@ -1646,8 +1653,12 @@ void process_packet(int client_id, unsigned char* p)
                 }
                 break;
             }
+            for (int vl_id : my_vl) {
+                send_animation_skill(reinterpret_cast<Player*>(players[vl_id]), pl->get_id(), packet->skill_type);
+            }
             break;
-        case J_SUPPORTER://서포터 
+        }
+        case J_SUPPORTER: { //서포터 
             switch (packet->skill_type)
             {
             case 2: //버프
@@ -1760,7 +1771,7 @@ void process_packet(int client_id, unsigned char* p)
                     }
                 }
                       break;
-                case 2:  {//공속 
+                case 2: {//공속 
                     timer_event ev2;
                     ev2.obj_id = client_id;
                     ev2.start_time = chrono::system_clock::now() + 5s;  //쿨타임
@@ -1796,8 +1807,8 @@ void process_packet(int client_id, unsigned char* p)
                 break;
             }
             break;
-
-        case J_MAGICIAN:
+        }
+        case J_MAGICIAN: {
             timer_event ev;
             ev.obj_id = client_id;
             ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
@@ -1919,7 +1930,7 @@ void process_packet(int client_id, unsigned char* p)
             }
             break;
         }
-        break;
+        }
     }
     break;
     case CS_PACKET_LOOK: {

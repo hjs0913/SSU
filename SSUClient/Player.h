@@ -66,9 +66,12 @@ public:
 	int							m_exp;
 	TRIBE						m_tribe = HUMAN;
 	int							m_spices;
+	JOB							m_job;
+
 	bool						m_net_attack;
 	bool						m_net_dead;
-	JOB							m_job;
+	bool						m_net_skill_animation[3];
+
 public:
 	CPlayer();
 	virtual ~CPlayer();
