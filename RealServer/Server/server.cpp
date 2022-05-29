@@ -2929,7 +2929,7 @@ void worker()
             dungeons[client_id]->boss_move();
             timer_event ev;
             ev.obj_id = client_id;
-            ev.start_time = chrono::system_clock::now() + 1s;
+            ev.start_time = chrono::system_clock::now() + 500ms;
             ev.ev = EVENT_BOSS_MOVE;
             ev.target_id = -1;
             timer_queue.push(ev);
@@ -2976,7 +2976,7 @@ void worker()
 
             timer_event ev;
             ev.obj_id = client_id;
-            ev.start_time = chrono::system_clock::now() + 1s;
+            ev.start_time = chrono::system_clock::now() + 500ms;
             ev.ev = EVENT_PARTNER_MOVE;
             ev.target_id = -1;
             timer_queue.push(ev);

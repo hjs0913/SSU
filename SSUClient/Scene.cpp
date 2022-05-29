@@ -174,12 +174,12 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 	m_pSkyBox = new CSkyBox(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
-	XMFLOAT3 xmf3Scale(8.0f, 50.0f, 8.0f); //���� 
+	XMFLOAT3 xmf3Scale(8.0f, 50.0f, 8.0f); 
 	XMFLOAT4 xmf4Color(0.0f, 0.0f, 0.0f, 0.0f);
 	m_pTerrain = new CHeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Image/Gaia2.raw"), 512, 512, xmf3Scale, xmf4Color);
 
 
-	m_nHierarchicalGameObjects = 3 + 1 + 4 + 3;	// �÷��̾�3 + ���̾�1 + ����4 + �ĵ� 3
+	m_nHierarchicalGameObjects = 3 + 1 + 4 + 3;	
 	m_ppHierarchicalGameObjects = new CGameObject * [m_nHierarchicalGameObjects];
 	//for (int i = 0; i < m_nHierarchicalGameObjects; ++i) m_ppHierarchicalGameObjects[i] = NULL;
 
@@ -198,8 +198,6 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 			for (int j = 0; j < basterd_anim_cnt; ++j) {
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
-				// release �϶��� 0.4
-				// debug �϶��� 0.2
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 0.5f;
 			}
 			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
@@ -211,8 +209,6 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 			m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
 			for (int j = 0; j < tanker_anim_cnt; ++j) {
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
-				// release �϶��� 0.4
-				// debug �϶��� 0.2
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 1.0f;
 			}
 			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);

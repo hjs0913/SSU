@@ -346,7 +346,7 @@ void Gaia::boss_attack()
 
 		//
 		ev.obj_id = dungeon_id;
-		ev.start_time = chrono::system_clock::now() + 5s;
+		ev.start_time = chrono::system_clock::now() + 10s;
 		ev.ev = EVENT_BOSS_ATTACK;
 		ev.target_id = -1;
 		timer_queue.push(ev);
@@ -467,7 +467,7 @@ void Gaia::boss_attack()
 	}
 	case 2: {
 		ev.obj_id = dungeon_id;
-		ev.start_time = chrono::system_clock::now() + 3s;
+		ev.start_time = chrono::system_clock::now() + 1s;
 		ev.ev = EVENT_BOSS_ATTACK;
 		ev.target_id = -1;
 		timer_queue.push(ev);
@@ -475,7 +475,7 @@ void Gaia::boss_attack()
 	}
 	case 3: {
 		ev.obj_id = dungeon_id;
-		ev.start_time = chrono::system_clock::now() + 3s;
+		ev.start_time = chrono::system_clock::now() + 1s;
 		ev.ev = EVENT_BOSS_ATTACK;
 		ev.target_id = -1;
 		timer_queue.push(ev);
@@ -496,7 +496,7 @@ void Gaia::boss_attack()
 		timer_queue.push(ev);
 		//
 		ev.obj_id = dungeon_id;
-		ev.start_time = chrono::system_clock::now() + 6s;
+		ev.start_time = chrono::system_clock::now() + 10s;
 		ev.ev = EVENT_BOSS_ATTACK;
 		ev.target_id = -1;
 		timer_queue.push(ev);
