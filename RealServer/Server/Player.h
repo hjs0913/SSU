@@ -71,7 +71,7 @@ public:
                     NULL, error_num,
                     MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
                     (LPTSTR)&lpMsgBuf, 0, 0);
-                cout << "전송 실패" << endl;
+                cout << _id << "\t";
                 wcout << lpMsgBuf << endl;
                 LocalFree(lpMsgBuf);
             }

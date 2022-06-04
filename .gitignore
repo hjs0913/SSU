@@ -34,6 +34,10 @@ SSU_Server_Dx/SSU_Server/x64
 RealServer/.vs
 RealServer/Server/x64
 
+StressTest/.vs
+StressTest/x64
+StressTest/dummy_client/x64
+
 
 *.exe
 *.pdb

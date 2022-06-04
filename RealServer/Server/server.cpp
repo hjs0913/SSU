@@ -785,6 +785,8 @@ void process_packet(int client_id, unsigned char* p)
             if (p->get_tribe() != HUMAN) break;
             if (p->get_state() == ST_FREE) continue;
             if (p->get_id() == client_id) continue;
+            if (strcmp(packet->id, "admin") == 0) break;
+
             if (strcmp(reinterpret_cast<Player*>(p)->get_login_id(), packet->id) == 0) {
                 cout << "중복된 아이디 접속 확인" << endl;
                 send_login_fail_packet(pl, 1);   // 중복 로그인
@@ -813,6 +815,13 @@ void process_packet(int client_id, unsigned char* p)
 
         pl->indun_id - 1;
         pl->join_dungeon_room = false;
+
+
+        // Stress Test용
+        if (strcmp(packet->id, "admin") == 0) {
+            pl->set_x(rand()%4000);
+            pl->set_z(rand() % 4000);
+        }
 
         switch (pl->get_job()) {
         case J_DILLER: {
@@ -1319,8 +1328,10 @@ void process_packet(int client_id, unsigned char* p)
         break;
     }
     case CS_PACKET_TELEPORT: {
+        cout << client_id << endl;
         pl->set_x(rand() % WORLD_WIDTH);
-        pl->set_y(rand() % WORLD_HEIGHT);
+        //pl->set_y(rand() % WORLD_HEIGHT);
+        pl->set_z(rand() % WORLD_HEIGHT);
         sc_packet_move packet;
         packet.size = sizeof(packet);
         packet.type = SC_PACKET_MOVE;
