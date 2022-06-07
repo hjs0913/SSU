@@ -68,6 +68,11 @@ public:
 
 	CPlayer								*m_pPlayer = NULL;
 
+	void SetAnimationEnableTrue(int nObject, int nAnim, int speed = 1.0f);
+	// nAnim제외한 나머지를 제로로 만들어
+	void SetAnimationPositionZero(int nObject, int nAnim);
+	bool IsAnimationEnd(int nObject, int nAnim);
+
 protected:
 	ID3D12RootSignature					*m_pd3dGraphicsRootSignature = NULL;
 
@@ -132,4 +137,6 @@ public:
 	int									supporter_anim_cnt = 0;
 
 	float circle_time = 0.0f;
+
+	bool m_isIdle = true;
 };
