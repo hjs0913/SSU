@@ -3715,40 +3715,71 @@ void do_timer()
                 reinterpret_cast<Player*>(players[temp.obj_id])->set_attack_active(false);
             }
             else if (temp.ev == EVENT_SKILL_COOLTIME) {
-                
                 if (temp.target_id == 2) {  // 전사 BUFF
-                    if (reinterpret_cast<Player*>(players[temp.obj_id])->get_job() == J_DILLER) {
+                    switch (reinterpret_cast<Player*>(players[temp.obj_id])->get_job())
+                    {
+                    case J_DILLER: {
                         players[temp.obj_id]->set_physical_attack(0.3 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 10 * players[temp.obj_id]->get_lv());
                         players[temp.obj_id]->set_magical_attack(0.1 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 5 * players[temp.obj_id]->get_lv());
+                        break;
                     }
-                    //send_status_change_packet(reinterpret_cast<Player*>(players[temp.obj_id]));
-                }
-                else if (temp.target_id == 10) {  // 공속
-                    int indun_id = reinterpret_cast<Player*>(players[temp.obj_id])->get_indun_id();
-                    if (indun_id < 0) continue;
-                    for (int i = 0; i < GAIA_ROOM; ++i) {
-                        dungeons[indun_id]->get_party_palyer()[i]->attack_speed_up = false;
+                    case J_TANKER: {
+                        players[temp.obj_id]->set_physical_defence(0.27 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 10 * players[temp.obj_id]->get_lv());
+                        players[temp.obj_id]->set_magical_defence(0.2 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 10 * players[temp.obj_id]->get_lv());
+                        break;
                     }
-                    for (int i = 0; i < MAX_USER; ++i) {
-                        reinterpret_cast<Player*>(players[i])->attack_speed_up = false;
-                    }
-                }
+                    case J_MAGICIAN: {  //없음 
 
+                        break;
+                    }
+                    case J_SUPPORTER: {   // 대상이 여러명일 때는 어떻게 다시 초기화할까 
+                        if (dungeons[temp.obj_id]->start_game == false) {
+                            for (int i = 0; i < MAX_USER; ++i) {
+                                reinterpret_cast<Player*>(players[i])->attack_speed_up = false;
+                            }
+                        }
+                        else {
+                            for (int i = 0; i < GAIA_ROOM; ++i) {
+                                dungeons[temp.obj_id]->get_party_palyer()[i]->attack_speed_up = false;
+                            }
+                        }
+                        break;
+                    }
+                    }
+                    // 일단 이것을 넣으면 안돌아감(이유 모름)
+                    //send_status_change_packet(reinterpret_cast<Player*>(players[ev.obj_id]));
+                }
                 reinterpret_cast<Player*>(players[temp.obj_id])->set_skill_active(temp.target_id, false);
+                continue;
             }
             else if (temp.ev == EVENT_PARTNER_SKILL) {
-                if (temp.target_id == 10) {
-                    int indun_id = reinterpret_cast<Player*>(players[temp.obj_id])->get_indun_id();       
-                    if (indun_id < 0) continue;
-
-                    for (int i = 0; i < GAIA_ROOM; ++i) {
-                        dungeons[indun_id]->get_party_palyer()[i]->attack_speed_up = false;
+                // obj는 가이아의 넘버,  taget은 파트너 자신  
+                switch (dungeons[temp.obj_id]->get_party_palyer()[temp.target_id]->get_job())
+                {
+                case J_DILLER: {
+                    if (temp.obj_id != MAX_USER / GAIA_ROOM + 1) {
+                        dungeons[temp.obj_id]->get_party_palyer()[temp.target_id]->set_physical_attack(0.3 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 10 * players[temp.obj_id]->get_lv());
+                        dungeons[temp.obj_id]->get_party_palyer()[temp.target_id]->set_magical_attack(0.1 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 5 * players[temp.obj_id]->get_lv());
                     }
+                    break;
                 }
-                EXP_OVER* ex_over = new EXP_OVER;
-                ex_over->_comp_op = EVtoOP(temp.ev);
-                ex_over->_target = temp.target_id;
-                PostQueuedCompletionStatus(g_h_iocp, 1, temp.obj_id, &ex_over->_wsa_over);   //0은 소켓취급을 받음
+                case J_TANKER: {
+                    if (temp.obj_id != MAX_USER / GAIA_ROOM + 1) {
+                        dungeons[temp.obj_id]->get_party_palyer()[temp.target_id]->set_physical_defence(0.27 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 10 * players[temp.obj_id]->get_lv());
+                        dungeons[temp.obj_id]->get_party_palyer()[temp.target_id]->set_magical_defence(0.2 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 10 * players[temp.obj_id]->get_lv());
+                    }
+                    break;
+                }
+                case J_SUPPORTER: {   
+                    if (temp.target_id == MAX_USER / GAIA_ROOM + 1) {
+                        for (int i = 0; i < GAIA_ROOM; ++i) {
+                            dungeons[temp.obj_id]->get_party_palyer()[i]->attack_speed_up = false;
+                        }
+                    }
+                    break;
+                }
+                }
+
             }
             else {
                 EXP_OVER* ex_over = new EXP_OVER;
@@ -3770,39 +3801,72 @@ void do_timer()
                     reinterpret_cast<Player*>(players[ev.obj_id])->set_attack_active(false);
                     continue;
                 }
-
-                if (ev.ev == EVENT_SKILL_COOLTIME) {
+                else if (ev.ev == EVENT_SKILL_COOLTIME) {
                     if (ev.target_id == 2) {  // 전사 BUFF
-                        if (reinterpret_cast<Player*>(players[ev.obj_id])->get_job() == J_DILLER) {
+                        switch (reinterpret_cast<Player*>(players[ev.obj_id])->get_job())
+                        {
+                        case J_DILLER: {
                             players[ev.obj_id]->set_physical_attack(0.3 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 10 * players[ev.obj_id]->get_lv());
                             players[ev.obj_id]->set_magical_attack(0.1 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 5 * players[ev.obj_id]->get_lv());
+                            break;
+                        }
+                        case J_TANKER: {
+                            players[ev.obj_id]->set_physical_defence(0.27 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 10 * players[ev.obj_id]->get_lv());
+                            players[ev.obj_id]->set_magical_defence(0.2 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 10 * players[ev.obj_id]->get_lv());
+                            break;
+                        }
+                        case J_MAGICIAN: {  //없음 
+
+                            break;
+                        }
+                        case J_SUPPORTER: {   // 대상이 여러명일 때는 어떻게 다시 초기화할까 
+                            if (dungeons[ev.obj_id]->start_game == false) {
+                                for (int i = 0; i < MAX_USER; ++i) {
+                                    reinterpret_cast<Player*>(players[i])->attack_speed_up = false;
+                                }
+                            }
+                            else {
+                                for (int i = 0; i < GAIA_ROOM; ++i) {
+                                    dungeons[ev.obj_id]->get_party_palyer()[i]->attack_speed_up = false;
+                                }
+                            }
+                            break;
+                        }
                         }
                         // 일단 이것을 넣으면 안돌아감(이유 모름)
                         //send_status_change_packet(reinterpret_cast<Player*>(players[ev.obj_id]));
-                    }
-                    else if (ev.target_id == 10) {  // 공속
-                        int indun_id = reinterpret_cast<Player*>(players[ev.obj_id])->get_indun_id();
-                        if (indun_id < 0) continue;
-                        for (int i = 0; i < GAIA_ROOM; ++i) {
-                            dungeons[indun_id]->get_party_palyer()[i]->attack_speed_up = false;
-                        }
-                        for (int i = 0; i < MAX_USER; ++i) {
-                            reinterpret_cast<Player*>(players[i])->attack_speed_up = false;
-                        }
-                    }
+                    }           
                     reinterpret_cast<Player*>(players[ev.obj_id])->set_skill_active(ev.target_id, false);
                     continue;
                 }
                 else if (ev.ev == EVENT_PARTNER_SKILL) {
-                    if (ev.target_id == 10) {
-                        int indun_id = reinterpret_cast<Player*>(players[ev.obj_id])->get_indun_id();
-
-                        if (indun_id < 0) continue;
-
-                        for (int i = 0; i < GAIA_ROOM; ++i) {
-                            dungeons[indun_id]->get_party_palyer()[i]->attack_speed_up = false;
+                    // obj는 가이아의 넘버,  taget은 파트너 자신  
+                    switch (dungeons[ev.obj_id]->get_party_palyer()[ev.target_id]->get_job())
+                    {
+                    case J_DILLER: {
+                        if (ev.obj_id != MAX_USER / GAIA_ROOM + 1) {
+                            dungeons[ev.obj_id]->get_party_palyer()[ev.target_id]->set_physical_attack(0.3 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 10 * players[ev.obj_id]->get_lv());
+                            dungeons[ev.obj_id]->get_party_palyer()[ev.target_id]->set_magical_attack(0.1 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 5 * players[ev.obj_id]->get_lv());
                         }
+                        break;
                     }
+                    case J_TANKER: {
+                        if (ev.obj_id != MAX_USER / GAIA_ROOM + 1) {
+                            dungeons[ev.obj_id]->get_party_palyer()[ev.target_id]->set_physical_defence(0.27 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 10 * players[ev.obj_id]->get_lv());
+                            dungeons[ev.obj_id]->get_party_palyer()[ev.target_id]->set_magical_defence(0.2 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 10 * players[ev.obj_id]->get_lv());
+                        }
+                        break;
+                    }
+                    case J_SUPPORTER: {   // 대상이 여러명일 때는 어떻게 다시 초기화할까 
+                        if (ev.target_id == MAX_USER / GAIA_ROOM + 1) {
+                            for (int i = 0; i < GAIA_ROOM; ++i) {
+                                dungeons[ev.obj_id]->get_party_palyer()[i]->attack_speed_up = false;
+                            }
+                           }
+                        break;
+                    }
+                    }
+
                 }
 
                 ex_over->_comp_op = EVtoOP(ev.ev);
