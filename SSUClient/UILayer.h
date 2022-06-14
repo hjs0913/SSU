@@ -94,6 +94,22 @@ public:
     void SetColorBrush(D2D1::ColorF::Enum c, float a, UINT LeftTop_x, UINT LeftTop_y, UINT RightBottom_x, UINT RightBottom_y);
 };
 
+class UIBitmap : public UILayer
+{
+private:
+    IWICImagingFactory* imagingFactory = {};
+public:
+    ID2D1Bitmap* bitmap = {};
+    UIBitmap(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor);
+    ~UIBitmap();
+    HRESULT WICInit(IWICImagingFactory** factory);
+    HRESULT D2DLoadBitmap(LPCWSTR fileName, ID2D1RenderTarget* target, IWICImagingFactory* factory, ID2D1Bitmap** bitmap);
+    virtual void UpdateLabels(const std::wstring& strUIText, UINT LeftTop_x, UINT LeftTop_y, UINT RightBottom_x, UINT RightBottom_y);
+    virtual void Render(UINT nFrame);
+    bool Setup(LPCWSTR fileName);
+    void Display();
+    void Clean();
+};
 
 class BuffUI : public UILayer
 {

@@ -768,66 +768,73 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[0] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::White);
 		m_ppUILayer[1] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::White);
 
-		// PlayerInfo( 2 : Info, 3: Hp, 4 : Mp)
+		// PlayerInfo( 2 : Info, 3: Hp, 4 : Mp, 5: exp, 6 : element)
 		m_ppUILayer[2] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::White, D2D1::ColorF::Black);
 		m_ppUILayer[3] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
 		m_ppUILayer[4] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Blue, D2D1::ColorF::White);
+		m_ppUILayer[5] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Blue, D2D1::ColorF::White);
+		m_ppUILayer[6] = new UIBitmap(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
 
-		// Combat Npc Info( 5: info, 6 : Hp)
-		m_ppUILayer[5] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::White, D2D1::ColorF::Black);
-		m_ppUILayer[6] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
-
-		// Boss Hp Info
+		// Combat Npc Info( 7: info, 8 : Hp)
 		m_ppUILayer[7] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::White, D2D1::ColorF::Black);
 		m_ppUILayer[8] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
 
-		// Party Hp Info
+		// Boss Hp Info
 		m_ppUILayer[9] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::White, D2D1::ColorF::Black);
 		m_ppUILayer[10] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
-		m_ppUILayer[11] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
+
+		// Party Hp Info
+		m_ppUILayer[11] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::White, D2D1::ColorF::Black);
 		m_ppUILayer[12] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
 		m_ppUILayer[13] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
+		m_ppUILayer[14] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
+		m_ppUILayer[15] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
 
 		// Buff UI
-		m_ppUILayer[14] = new BuffUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
+		m_ppUILayer[16] = new BuffUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
 
 		// Party UI
-		m_ppUILayer[15] = new PartyUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::White);
+		m_ppUILayer[17] = new PartyUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::White);
 
 		// 파티초대 UI
-		m_ppUILayer[16] = new PartyInviteUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::SkyBlue, D2D1::ColorF::Black);
+		m_ppUILayer[18] = new PartyInviteUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::SkyBlue, D2D1::ColorF::Black);
 
 		// 파티 초대장
-		m_ppUILayer[17] = new InvitationCardUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::DarkGray, D2D1::ColorF::White);
+		m_ppUILayer[19] = new InvitationCardUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::DarkGray, D2D1::ColorF::White);
 
 		// AI추가 UI
-		m_ppUILayer[18] = new AddAIUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::SkyBlue, D2D1::ColorF::White);
+		m_ppUILayer[20] = new AddAIUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::SkyBlue, D2D1::ColorF::White);
 
 		// Notice AI
-		m_ppUILayer[19] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::Black);
+		m_ppUILayer[21] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::Black);
 
 		m_ppUILayer[0]->setAlpha(0.5, 1.0);
 		m_ppUILayer[1]->setAlpha(0.5, 1.0);
+
 		m_ppUILayer[2]->setAlpha(0.3, 1.0);
 		m_ppUILayer[3]->setAlpha(0.0, 1.0);
 		m_ppUILayer[4]->setAlpha(0.0, 1.0);
-		m_ppUILayer[5]->setAlpha(0.3, 1.0);
+		m_ppUILayer[5]->setAlpha(0.0, 1.0);
 		m_ppUILayer[6]->setAlpha(0.0, 1.0);
+
 		m_ppUILayer[7]->setAlpha(0.3, 1.0);
 		m_ppUILayer[8]->setAlpha(0.0, 1.0);
 
 		m_ppUILayer[9]->setAlpha(0.3, 1.0);
 		m_ppUILayer[10]->setAlpha(0.0, 1.0);
-		m_ppUILayer[11]->setAlpha(0.0, 1.0);
+
+		m_ppUILayer[11]->setAlpha(0.3, 1.0);
 		m_ppUILayer[12]->setAlpha(0.0, 1.0);
 		m_ppUILayer[13]->setAlpha(0.0, 1.0);
-
 		m_ppUILayer[14]->setAlpha(0.0, 1.0);
-		m_ppUILayer[15]->setAlpha(0.7, 1.0);
-		m_ppUILayer[16]->setAlpha(1.0, 1.0);
-		m_ppUILayer[17]->setAlpha(1.0, 1.0);
+		m_ppUILayer[15]->setAlpha(0.0, 1.0);
+
+		m_ppUILayer[16]->setAlpha(0.0, 1.0);
+		m_ppUILayer[17]->setAlpha(0.7, 1.0);
 		m_ppUILayer[18]->setAlpha(1.0, 1.0);
-		m_ppUILayer[19]->setAlpha(0.8, 1.0);
+		m_ppUILayer[19]->setAlpha(1.0, 1.0);
+		m_ppUILayer[20]->setAlpha(1.0, 1.0);
+		m_ppUILayer[21]->setAlpha(0.8, 1.0);
 
 		m_ppUILayer[0]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_FAR);
@@ -840,36 +847,41 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[4]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		m_ppUILayer[5]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
-			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		m_ppUILayer[6]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
 		m_ppUILayer[7]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
-			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 		m_ppUILayer[8]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-
 		m_ppUILayer[9]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 		m_ppUILayer[10]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
 		m_ppUILayer[11]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
-			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 		m_ppUILayer[12]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		m_ppUILayer[13]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-
 		m_ppUILayer[14]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		m_ppUILayer[15]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+		m_ppUILayer[16]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[17]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-		reinterpret_cast<PartyInviteUI*>(m_ppUILayer[16])->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+		reinterpret_cast<PartyInviteUI*>(m_ppUILayer[18])->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
-		reinterpret_cast<InvitationCardUI*>(m_ppUILayer[17])->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+		reinterpret_cast<InvitationCardUI*>(m_ppUILayer[19])->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
-		m_ppUILayer[18]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+		m_ppUILayer[20]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-		m_ppUILayer[19]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+		m_ppUILayer[21]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 		// UIBar Setting
@@ -881,30 +893,34 @@ void CGameFramework::BuildObjects()
 			20 + (m_nWndClientWidth / 10) * 3, m_nWndClientHeight / 5 - 10);
 		reinterpret_cast<UIBar*>(m_ppUILayer[4])->SetColorBrush(D2D1::ColorF::Blue, 1.0, 20, m_nWndClientHeight / 5 - m_nWndClientHeight / 22.5 - 10,
 			20 + (m_nWndClientWidth / 10) * 3, m_nWndClientHeight / 5 - 10);
-		reinterpret_cast<UIBar*>(m_ppUILayer[6])->SetBehindBrush(D2D1::ColorF::Black, 1.0, (m_nWndClientWidth / 2) - ((m_nWndClientWidth / 10) - 10), (m_nWndClientHeight / 6) - 20 - m_nWndClientHeight / 22.5,
+		reinterpret_cast<UIBar*>(m_ppUILayer[5])->SetBehindBrush(D2D1::ColorF::Black, 0.5, 0, m_nWndClientHeight - 20,
+			m_nWndClientWidth, m_nWndClientHeight);
+		reinterpret_cast<UIBar*>(m_ppUILayer[5])->SetColorBrush(D2D1::ColorF::Green, 1.0, 0, m_nWndClientHeight - 20,
+			m_nWndClientWidth, m_nWndClientHeight);
+		reinterpret_cast<UIBar*>(m_ppUILayer[8])->SetBehindBrush(D2D1::ColorF::Black, 1.0, (m_nWndClientWidth / 2) - ((m_nWndClientWidth / 10) - 10), (m_nWndClientHeight / 6) - 20 - m_nWndClientHeight / 22.5,
 			(m_nWndClientWidth / 2) + ((m_nWndClientWidth / 10) - 10), (m_nWndClientHeight / 6) - 20);
-		reinterpret_cast<UIBar*>(m_ppUILayer[6])->SetColorBrush(D2D1::ColorF::Red, 1.0, (m_nWndClientWidth / 2) - ((m_nWndClientWidth / 10) - 10), (m_nWndClientHeight / 6) - 20 - m_nWndClientHeight / 22.5,
+		reinterpret_cast<UIBar*>(m_ppUILayer[8])->SetColorBrush(D2D1::ColorF::Red, 1.0, (m_nWndClientWidth / 2) - ((m_nWndClientWidth / 10) - 10), (m_nWndClientHeight / 6) - 20 - m_nWndClientHeight / 22.5,
 			(m_nWndClientWidth / 2) + ((m_nWndClientWidth / 10) - 10), (m_nWndClientHeight / 6) - 20);
-		reinterpret_cast<UIBar*>(m_ppUILayer[8])->SetBehindBrush(D2D1::ColorF::Black, 1.0, (m_nWndClientWidth / 2) - (m_nWndClientWidth / 18) + (m_nWndClientWidth / 180), (m_nWndClientHeight / 6) - (m_nWndClientHeight / 12.5),
+		reinterpret_cast<UIBar*>(m_ppUILayer[10])->SetBehindBrush(D2D1::ColorF::Black, 1.0, (m_nWndClientWidth / 2) - (m_nWndClientWidth / 18) + (m_nWndClientWidth / 180), (m_nWndClientHeight / 6) - (m_nWndClientHeight / 12.5),
 			(m_nWndClientWidth) - 10, (m_nWndClientHeight / 6) - 10);
-		reinterpret_cast<UIBar*>(m_ppUILayer[8])->SetColorBrush(D2D1::ColorF::Red, 1.0, (m_nWndClientWidth / 2) - (m_nWndClientWidth / 18) + (m_nWndClientWidth / 180), (m_nWndClientHeight / 6) - (m_nWndClientHeight / 12.5),
+		reinterpret_cast<UIBar*>(m_ppUILayer[10])->SetColorBrush(D2D1::ColorF::Red, 1.0, (m_nWndClientWidth / 2) - (m_nWndClientWidth / 18) + (m_nWndClientWidth / 180), (m_nWndClientHeight / 6) - (m_nWndClientHeight / 12.5),
 			(m_nWndClientWidth)- 10, (m_nWndClientHeight / 6) - 10);
 
-		reinterpret_cast<UIBar*>(m_ppUILayer[10])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 10, (m_nWndClientHeight / 2) - (m_nWndClientHeight / 9) + (m_nWndClientHeight / 90),
+		reinterpret_cast<UIBar*>(m_ppUILayer[12])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 10, (m_nWndClientHeight / 2) - (m_nWndClientHeight / 9) + (m_nWndClientHeight / 90),
 			10 + (m_nWndClientWidth / 9 - 20), (m_nWndClientHeight / 2) - (m_nWndClientHeight / 9) + (m_nWndClientHeight / 90) + (m_nWndClientHeight / 22.5));
-		reinterpret_cast<UIBar*>(m_ppUILayer[10])->SetColorBrush(D2D1::ColorF::Red, 1.0, 10,  (m_nWndClientHeight / 2) - (m_nWndClientHeight / 9) + (m_nWndClientHeight / 90),
+		reinterpret_cast<UIBar*>(m_ppUILayer[12])->SetColorBrush(D2D1::ColorF::Red, 1.0, 10,  (m_nWndClientHeight / 2) - (m_nWndClientHeight / 9) + (m_nWndClientHeight / 90),
 			10 + (m_nWndClientWidth / 9 - 20), (m_nWndClientHeight / 2) - (m_nWndClientHeight / 9) + (m_nWndClientHeight / 90) + (m_nWndClientHeight / 22.5));
-		reinterpret_cast<UIBar*>(m_ppUILayer[11])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 10, (m_nWndClientHeight / 2) - (m_nWndClientHeight / 180) - (m_nWndClientHeight / 22.5),
+		reinterpret_cast<UIBar*>(m_ppUILayer[13])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 10, (m_nWndClientHeight / 2) - (m_nWndClientHeight / 180) - (m_nWndClientHeight / 22.5),
 			10 + (m_nWndClientWidth / 9 - 20), (m_nWndClientHeight / 2) - (m_nWndClientHeight / 180));
-		reinterpret_cast<UIBar*>(m_ppUILayer[11])->SetColorBrush(D2D1::ColorF::Red, 1.0, 10, (m_nWndClientHeight / 2) - (m_nWndClientHeight / 180) - (m_nWndClientHeight / 22.5),
+		reinterpret_cast<UIBar*>(m_ppUILayer[13])->SetColorBrush(D2D1::ColorF::Red, 1.0, 10, (m_nWndClientHeight / 2) - (m_nWndClientHeight / 180) - (m_nWndClientHeight / 22.5),
 			10 + (m_nWndClientWidth / 9 - 20), (m_nWndClientHeight / 2) - (m_nWndClientHeight / 180));
-		reinterpret_cast<UIBar*>(m_ppUILayer[12])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 10, (m_nWndClientHeight / 2) + (m_nWndClientHeight / 180),
+		reinterpret_cast<UIBar*>(m_ppUILayer[14])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 10, (m_nWndClientHeight / 2) + (m_nWndClientHeight / 180),
 			10 + (m_nWndClientWidth / 9 - 20), (m_nWndClientHeight / 2) + (m_nWndClientHeight / 180) + (m_nWndClientHeight / 22.5));
-		reinterpret_cast<UIBar*>(m_ppUILayer[12])->SetColorBrush(D2D1::ColorF::Red, 1.0, 10, (m_nWndClientHeight / 2) + (m_nWndClientHeight / 180),
+		reinterpret_cast<UIBar*>(m_ppUILayer[14])->SetColorBrush(D2D1::ColorF::Red, 1.0, 10, (m_nWndClientHeight / 2) + (m_nWndClientHeight / 180),
 			10 + (m_nWndClientWidth / 9 - 20), (m_nWndClientHeight / 2) + (m_nWndClientHeight / 180) + (m_nWndClientHeight / 22.5));
-		reinterpret_cast<UIBar*>(m_ppUILayer[13])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 10, (m_nWndClientHeight / 2) + (m_nWndClientHeight / 9) - (m_nWndClientHeight / 90) - (m_nWndClientHeight / 22.5),
+		reinterpret_cast<UIBar*>(m_ppUILayer[15])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 10, (m_nWndClientHeight / 2) + (m_nWndClientHeight / 9) - (m_nWndClientHeight / 90) - (m_nWndClientHeight / 22.5),
 			10 + (m_nWndClientWidth / 9 - 20), (m_nWndClientHeight / 2) + (m_nWndClientHeight / 9) - (m_nWndClientHeight / 90));
-		reinterpret_cast<UIBar*>(m_ppUILayer[13])->SetColorBrush(D2D1::ColorF::Red, 1.0, 10, (m_nWndClientHeight / 2) + (m_nWndClientHeight / 9) - (m_nWndClientHeight / 90) - (m_nWndClientHeight / 22.5),
+		reinterpret_cast<UIBar*>(m_ppUILayer[15])->SetColorBrush(D2D1::ColorF::Red, 1.0, 10, (m_nWndClientHeight / 2) + (m_nWndClientHeight / 9) - (m_nWndClientHeight / 90) - (m_nWndClientHeight / 22.5),
 			10 + (m_nWndClientWidth / 9 - 20), (m_nWndClientHeight / 2) + (m_nWndClientHeight / 9) - (m_nWndClientHeight / 90));
 	}
 
@@ -1258,7 +1274,6 @@ void CGameFramework::FrameAdvance()
 	for (int i = 0; i < UICOUNT; i++) {
 		switch (i) {
 		case 0: {
-
 			for (auto& m : g_msg) {
 				wchar_t* temp;
 				//wstring temp = wstring(m.begin(), m.end());
@@ -1270,11 +1285,11 @@ void CGameFramework::FrameAdvance()
 				Send_str += L"\n";
 				delete temp;
 			}
-			m_ppUILayer[i]->UpdateLabels(Send_str, 0, 2*(m_nWndClientHeight/3), m_nWndClientWidth / 3, m_nWndClientHeight - 40);
+			m_ppUILayer[i]->UpdateLabels(Send_str, 0, 2*(m_nWndClientHeight/3)-20, m_nWndClientWidth / 3, m_nWndClientHeight - 60);
 		}
 			  break;
 		case 1:
-			m_ppUILayer[i]->UpdateLabels(Chatting_Str, 0, m_nWndClientHeight - m_nWndClientHeight/22.5, m_nWndClientWidth/3, m_nWndClientHeight);
+			m_ppUILayer[i]->UpdateLabels(Chatting_Str, 0, m_nWndClientHeight - m_nWndClientHeight/22.5 - 20, m_nWndClientWidth/3, m_nWndClientHeight - 20);
 			break;
 
 		case 2:
@@ -1299,11 +1314,21 @@ void CGameFramework::FrameAdvance()
 			break;
 		}
 		case 5: {
+			m_ppUILayer[i]->UpdateLabels(L"Exp", 0, m_nWndClientHeight - 20,	// x0, y0
+				((float)m_pPlayer->m_exp / (100*(m_pPlayer->m_lv * m_pPlayer->m_lv) + 200* m_pPlayer->m_lv)) * m_nWndClientWidth , m_nWndClientHeight ); // x1, y1
+			break;
+		}
+		case 6: {
+			m_ppUILayer[i]->UpdateLabels(L"", 0, 0,	// x0, y0
+				m_nWndClientHeight / 5 - 2 * (m_nWndClientHeight / 22.5) - 20, m_nWndClientHeight / 5 - 2*(m_nWndClientHeight / 22.5) - 20); // x1, y1
+			break;
+		}
+		case 7: {
 			if (!Combat_On) break;
 			m_ppUILayer[i]->UpdateLabels(Combat_str, (m_nWndClientWidth / 2) - (m_nWndClientWidth/10), 0, (m_nWndClientWidth / 2) + (m_nWndClientWidth / 10), (m_nWndClientHeight / 6));
 			break;
 		}
-		case 6: {
+		case 8: {
 			if (!Combat_On) break;
 			wstring ang = L"HP : ";
 			ang.append(to_wstring((int)get_combat_id_hp()));
@@ -1313,13 +1338,13 @@ void CGameFramework::FrameAdvance()
 				2*((m_nWndClientWidth / 10) - 10) * ((get_combat_id_hp() / get_combat_id_max_hp())) + (m_nWndClientWidth / 2) - (m_nWndClientWidth / 10) + 10, (m_nWndClientHeight / 6) - 20);
 			break;
 		}
-		case 7: {
+		case 9: {
 			if (!InDungeon) break;
 
 			m_ppUILayer[i]->UpdateLabels(L"가이아", (m_nWndClientWidth / 2) - (m_nWndClientWidth / 18), 0, m_nWndClientWidth, (m_nWndClientHeight / 6));
 			break;
 		}
-		case 8: {
+		case 10: {
 			if (!InDungeon) break;
 			int hp_x = (int)get_combat_id_hp() / 100000;
 			float bar_percent = (((int)get_combat_id_hp() % 100000) + 1) / 100000.0f;
@@ -1368,7 +1393,7 @@ void CGameFramework::FrameAdvance()
 			break;
 		}
 
-		case 9: {
+		case 11: {
 			if (!InDungeon) break;
 			wstring party_info_str = L"파티원정보(DC : ";
 			party_info_str.append(to_wstring(indun_death_count));
@@ -1376,32 +1401,32 @@ void CGameFramework::FrameAdvance()
 			m_ppUILayer[i]->UpdateLabels(party_info_str, 0, (m_nWndClientHeight / 2) - (m_nWndClientHeight / 6), m_nWndClientWidth/9 , (m_nWndClientHeight / 2) + (m_nWndClientHeight / 9));
 			break;
 		}
-		case 10: {
+		case 12: {
 			if (!InDungeon) break;
 			m_ppUILayer[i]->UpdateLabels(party_name[0], 10, (m_nWndClientHeight / 2) - (m_nWndClientHeight / 9) + (m_nWndClientHeight / 90),
 				10 + (m_nWndClientWidth / 9 - 20) * ((float)get_hp_to_server(m_party_info->player_id[0]) / get_max_hp_to_server(m_party_info->player_id[0])), (m_nWndClientHeight / 2) - (m_nWndClientHeight / 9) + (m_nWndClientHeight / 90) + (m_nWndClientHeight / 22.5));
 			break;
 		}
-		case 11: {
+		case 13: {
 			if (!InDungeon) break;
 			m_ppUILayer[i]->UpdateLabels(party_name[1], 10, (m_nWndClientHeight / 2) - (m_nWndClientHeight / 180) - (m_nWndClientHeight / 22.5),
 				10 + (m_nWndClientWidth / 9 - 20) * ((float)get_hp_to_server(m_party_info->player_id[1]) / get_max_hp_to_server(m_party_info->player_id[1])), (m_nWndClientHeight / 2) - (m_nWndClientHeight / 180));
 			break;
 		}
-		case 12: {
+		case 14: {
 			if (!InDungeon) break;
 			m_ppUILayer[i]->UpdateLabels(party_name[2], 10, (m_nWndClientHeight / 2) + (m_nWndClientHeight / 180),
 				10 + (m_nWndClientWidth/9 - 20) * ((float)get_hp_to_server(m_party_info->player_id[2]) / get_max_hp_to_server(m_party_info->player_id[2])), (m_nWndClientHeight / 2) + (m_nWndClientHeight / 180) + (m_nWndClientHeight / 22.5));
 			break;
 		}
-		case 13: {
+		case 15: {
 			if (!InDungeon) break;
 			m_ppUILayer[i]->UpdateLabels(party_name[3], 10, (m_nWndClientHeight / 2) + (m_nWndClientHeight / 9) - (m_nWndClientHeight / 90) - (m_nWndClientHeight / 22.5),
 				10 + (m_nWndClientWidth / 9 - 20) * ((float)get_hp_to_server(m_party_info->player_id[3]) / get_max_hp_to_server(m_party_info->player_id[3])), (m_nWndClientHeight / 2) + (m_nWndClientHeight / 9) - (m_nWndClientHeight / 90));
 			break;
 		}
 
-		case 15: {
+		case 17: {
 			if (!PartyUI_On) break;
 			if (!party_info_on) {
 				reinterpret_cast<PartyUI*>(m_ppUILayer[i])->ResizeTextBlock(robby_cnt + 4);
@@ -1450,12 +1475,12 @@ void CGameFramework::FrameAdvance()
 
 			break;
 		}
-		case 16: {
+		case 18: {
 			if (!PartyInviteUI_ON) break;
 			reinterpret_cast<PartyInviteUI*>(m_ppUILayer[i])->UpdateLabels(Invite_Str);
 			break;
 		}
-		case 17: {
+		case 19: {
 			if (!InvitationCardUI_On) break;
 			wstring temp;
 			wchar_t* temp2 = get_user_name_to_server(InvitationUser);
@@ -1467,12 +1492,12 @@ void CGameFramework::FrameAdvance()
 			delete[]temp2;
 			break;
 		}
-		case 18: {
+		case 20: {
 			if (!AddAIUI_On) break;
 			reinterpret_cast<AddAIUI*>(m_ppUILayer[i])->UpdateLabels();
 			break;
 		}
-		case 19:
+		case 21:
 			if (!NoticeUI_On) break;
 			m_ppUILayer[i]->UpdateLabels(Notice_str, 0, 0, m_nWndClientWidth, m_nWndClientHeight/15);
 			break;
@@ -1480,19 +1505,19 @@ void CGameFramework::FrameAdvance()
 	}
 
 	for (int i = 0; i < UICOUNT; i++) {
-		if ((i == 5 || i == 6)) {
+		if ((i == 7 || i == 8)) {
 			if (!Combat_On) continue;
 		}
-		if (i >= 7 && i <= 13) {
+		if (i >= 9 && i <= 15) {
 			if (!InDungeon) continue;
 }
-		if (i == 15 && !PartyUI_On) {
+		if (i == 17 && !PartyUI_On) {
 			continue;
 		}
-		if (i == 16 && !PartyInviteUI_ON) continue;
-		if (i == 17 && !InvitationCardUI_On) continue;
-		if (i == 18 && !AddAIUI_On) continue;
-		if (i == 19 && !NoticeUI_On) continue;
+		if (i == 18 && !PartyInviteUI_ON) continue;
+		if (i == 19 && !InvitationCardUI_On) continue;
+		if (i == 20 && !AddAIUI_On) continue;
+		if (i == 21 && !NoticeUI_On) continue;
 		m_ppUILayer[i]->Render(m_nSwapChainBufferIndex);
 	}
 	LeaveCriticalSection(&UI_cs);
