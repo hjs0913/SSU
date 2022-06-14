@@ -383,11 +383,11 @@ void process_packet(unsigned char* p)
 		case J_TANKER: my_job_str = L"탱커"; break;
 		}
 
-		Info_str.append(L"Lv : ");
+		Info_str.append(L"\tLv : ");
 		Info_str.append(to_wstring(packet->level));
 		Info_str.append(L"  이름 : ");
 		Info_str.append(my_name);
-		Info_str.append(L"\n직업 : ");
+		Info_str.append(L"\n\t직업 : ");
 		Info_str.append(my_job_str);
 		Info_str.append(L"  속성 : ");
 		Info_str.append(my_element_str);
@@ -1278,6 +1278,7 @@ void get_basic_information(CPlayer* m_otherPlayer, int id)
 	m_otherPlayer->m_tribe = mPlayer[id]->m_tribe;
 	m_otherPlayer->m_spices = mPlayer[id]->m_spices;
 	m_otherPlayer->m_element = mPlayer[id]->m_element;
+	m_otherPlayer->m_exp = mPlayer[id]->m_exp;
 
 	if (mPlayer[id]->m_net_dead == true) {	// 사망 애니메이션 출력
 		if (!m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[6].m_bEnable) {

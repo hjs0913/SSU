@@ -247,12 +247,130 @@ void UIBar::SetColorBrush(D2D1::ColorF::Enum c, float a, UINT LeftTop_x, UINT Le
     m_pColorBrush->SetOpacity(a);
     Color_Bar = D2D1::RectF(LeftTop_x, LeftTop_y, RightBottom_x, RightBottom_y);
 }
+//-----------------------------------------
+UIBitmap::UIBitmap(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor) : UILayer(nFrame, pd3dDevice, pd3dCommandQueue, LayoutColor, TextColor)
+{
+    Setup(NULL);
+}
+UIBitmap::~UIBitmap()
+{
 
+}
+
+HRESULT UIBitmap::WICInit(IWICImagingFactory** factory)
+{
+    // COM 초기화
+    CoInitialize(0);
+
+    // 인터페이스 생성
+    return CoCreateInstance(
+        CLSID_WICImagingFactory,
+        0, CLSCTX_INPROC_SERVER,
+        IID_PPV_ARGS(factory)
+    );
+}
+
+HRESULT UIBitmap::D2DLoadBitmap(LPCWSTR fileName, ID2D1RenderTarget* target, IWICImagingFactory* factory, ID2D1Bitmap** bitmap)
+{
+    HRESULT hr;
+
+    // 디코더 생성
+    IWICBitmapDecoder* decoder = 0;
+    if(fileName == NULL)
+        hr = factory->CreateDecoderFromFilename(L"\Image/Metal.png", 0, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &decoder);
+    else
+        hr = factory->CreateDecoderFromFilename(fileName, 0, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &decoder);
+
+    if (FAILED(hr)) return hr;
+
+    // 프레임 얻기
+    IWICBitmapFrameDecode* frameDecode = 0;
+
+    // 0번 프레임을 읽어들임.
+    hr = decoder->GetFrame(0, &frameDecode);
+    if (FAILED(hr)) {
+        decoder->Release();
+        return hr;
+    }
+
+    // 컨버터 생성
+    IWICFormatConverter* converter = 0;
+    hr = factory->CreateFormatConverter(&converter);
+    if (FAILED(hr)) {
+        decoder->Release();
+        return hr;
+    }
+
+    // 컨버터 초기화
+    hr = converter->Initialize(frameDecode, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone,
+        0, 0.0, WICBitmapPaletteTypeCustom);
+
+    if (FAILED(hr)) {
+        decoder->Release();
+        frameDecode->Release();
+        converter->Release();
+        return hr;
+    }
+
+    // WIC 비트맵으로부터 D2D 비트맵 생성
+    hr = target->CreateBitmapFromWicBitmap(converter, 0, bitmap);
+
+    // 자원 해제
+    decoder->Release();
+    frameDecode->Release();
+    converter->Release();
+    return hr;
+}
+
+void UIBitmap::UpdateLabels(const std::wstring& strUIText, UINT LeftTop_x, UINT LeftTop_y, UINT RightBottom_x, UINT RightBottom_y)
+{
+    m_vTextBlocks[0] = { strUIText, D2D1::RectF(LeftTop_x, LeftTop_y, RightBottom_x, RightBottom_y), m_pdwTextFormat };
+}
+
+bool UIBitmap::Setup(LPCWSTR fileName)
+{
+    if (FAILED(WICInit(&imagingFactory)))
+    {
+        MessageBox(0, L"Imaging  Factory", 0, 0);
+        return false;
+    }
+    if (FAILED(D2DLoadBitmap(fileName, m_pd2dDeviceContext, imagingFactory, &bitmap)))
+        return false;
+
+    return true;
+}
+
+void UIBitmap::Render(UINT nFrame)
+{
+    /*if (Setup()) {
+        m_pd2dDeviceContext->SetTarget(m_vd2dRenderTargets[nFrame]);
+    }*/
+
+    ID3D11Resource* ppResources[] = { m_vWrappedRenderTargets[nFrame] };
+
+    m_pd2dDeviceContext->SetTarget(m_vd2dRenderTargets[nFrame]);
+
+    m_pd3d11On12Device->AcquireWrappedResources(ppResources, _countof(ppResources));
+
+    m_pd2dDeviceContext->BeginDraw();
+    m_pd2dDeviceContext->DrawBitmap(bitmap, m_vTextBlocks[0].d2dLayoutRect);
+    m_pd2dDeviceContext->EndDraw();
+
+    m_pd3d11On12Device->ReleaseWrappedResources(ppResources, _countof(ppResources));
+    m_pd3d11DeviceContext->Flush();
+}
+
+void UIBitmap::Clean()
+{
+    SafeRelease(bitmap);
+    SafeRelease(imagingFactory);
+    //  SafeRelease(m_pd2dDeviceContext);
+}
 
 //-----------------------------------------
 BuffUI::BuffUI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor) : UILayer(nFrame, pd3dDevice, pd3dCommandQueue, LayoutColor, TextColor)
 {
-
+    
 }
 
 BuffUI::~BuffUI() {}

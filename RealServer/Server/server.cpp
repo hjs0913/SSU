@@ -809,7 +809,7 @@ void process_packet(int client_id, unsigned char* p)
         //pl->set_job(J_DILLER);
         pl->set_lv(25);
         pl->set_element(E_WATER);
-
+        pl->set_exp(1000);
         pl->set_name(packet->name);
         pl->set_login_id(packet->id);
 
