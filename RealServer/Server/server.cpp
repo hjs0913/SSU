@@ -3752,7 +3752,7 @@ void do_timer()
                 reinterpret_cast<Player*>(players[temp.obj_id])->set_skill_active(temp.target_id, false);
                 continue;
             }
-            else if (temp.ev == EVENT_PARTNER_SKILL) {
+        /*    else if (temp.ev == EVENT_PARTNER_SKILL) {
                 // obj는 가이아의 넘버,  taget은 파트너 자신  
                 switch (reinterpret_cast<Player*>(dungeons[temp.obj_id]->get_party_palyer()[temp.target_id])->get_job())
                 {
@@ -3780,7 +3780,7 @@ void do_timer()
                 }
                 }
 
-            }
+            }*/
             else {
                 EXP_OVER* ex_over = new EXP_OVER;
                 ex_over->_comp_op = EVtoOP(temp.ev);
@@ -3839,7 +3839,7 @@ void do_timer()
                     reinterpret_cast<Player*>(players[ev.obj_id])->set_skill_active(ev.target_id, false);
                     continue;
                 }
-                else if (ev.ev == EVENT_PARTNER_SKILL) {
+                /*   else if (ev.ev == EVENT_PARTNER_SKILL) {
                     // obj는 가이아의 넘버,  taget은 파트너 자신  
                     switch (reinterpret_cast<Player*>(dungeons[ev.obj_id]->get_party_palyer()[ev.target_id])->get_job())
                     {
@@ -3867,7 +3867,7 @@ void do_timer()
                     }
                     }
 
-                }
+                }*/
 
                 ex_over->_comp_op = EVtoOP(ev.ev);
                 ex_over->_target = ev.target_id;
