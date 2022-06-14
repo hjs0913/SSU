@@ -3754,7 +3754,7 @@ void do_timer()
             }
             else if (temp.ev == EVENT_PARTNER_SKILL) {
                 // obj는 가이아의 넘버,  taget은 파트너 자신  
-                switch (dungeons[temp.obj_id]->get_party_palyer()[temp.target_id]->get_job())
+                switch (reinterpret_cast<Player*>(dungeons[temp.obj_id]->get_party_palyer()[temp.target_id])->get_job())
                 {
                 case J_DILLER: {
                     if (temp.obj_id != MAX_USER / GAIA_ROOM + 1) {
@@ -3841,7 +3841,7 @@ void do_timer()
                 }
                 else if (ev.ev == EVENT_PARTNER_SKILL) {
                     // obj는 가이아의 넘버,  taget은 파트너 자신  
-                    switch (dungeons[ev.obj_id]->get_party_palyer()[ev.target_id]->get_job())
+                    switch (reinterpret_cast<Player*>(dungeons[ev.obj_id]->get_party_palyer()[ev.target_id])->get_job())
                     {
                     case J_DILLER: {
                         if (ev.obj_id != MAX_USER / GAIA_ROOM + 1) {
