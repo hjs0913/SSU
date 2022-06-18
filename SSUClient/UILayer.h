@@ -12,7 +12,7 @@ using namespace D2D1;
 #define SafeRelease(p) { if(p) { (p)->Release(); (p)=NULL; } }
 
 extern int buff_ui_num[5];
-
+extern int skill_ui_num[3];
 extern clock_t start_buff_0;
 extern clock_t start_buff_1;
 extern clock_t start_buff_2;
@@ -115,7 +115,6 @@ class BuffUI : public UILayer
 {
 private:
     IWICImagingFactory* imagingFactory[5] = {};
-
     ID2D1Bitmap* bitmap[5] = {};
 
     D2D1_RECT_F buff_space0 = { 0.0f, FRAME_BUFFER_HEIGHT/5, 
@@ -135,6 +134,31 @@ private:
 public:
     BuffUI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor);
     ~BuffUI();
+    HRESULT WICInit(IWICImagingFactory** factory);
+    HRESULT D2DLoadBitmap(LPCWSTR fileName, ID2D1RenderTarget* target, IWICImagingFactory* factory, ID2D1Bitmap** bitmap);
+    virtual void UpdateLabels(const std::wstring& strUIText, UINT LeftTop_x, UINT LeftTop_y, UINT RightBottom_x, UINT RightBottom_y);
+    virtual void Render(UINT nFrame);
+    bool Setup();
+    void Display();
+    void Clean();
+};
+
+class SkillUI : public UILayer
+{
+private:
+    IWICImagingFactory* imagingFactory[3] = {};
+    ID2D1Bitmap* bitmap[3] = {};
+
+    //위치 조정해야해 
+    D2D1_RECT_F skill_space0 = { 0.0f, FRAME_BUFFER_HEIGHT / 5,
+        FRAME_BUFFER_WIDTH / 30, FRAME_BUFFER_HEIGHT / 5 + FRAME_BUFFER_WIDTH / 30 };
+    D2D1_RECT_F skill_space1 = { FRAME_BUFFER_WIDTH / 30 + 5, FRAME_BUFFER_HEIGHT / 5,
+        (FRAME_BUFFER_WIDTH / 30 + 5) * 1 + FRAME_BUFFER_WIDTH / 30, FRAME_BUFFER_HEIGHT / 5 + FRAME_BUFFER_WIDTH / 30 };
+    D2D1_RECT_F skill_space2 = { (FRAME_BUFFER_WIDTH / 30 + 5) * 2, FRAME_BUFFER_HEIGHT / 5,
+        (FRAME_BUFFER_WIDTH / 30 + 5) * 2 + FRAME_BUFFER_WIDTH / 30, FRAME_BUFFER_HEIGHT / 5 + FRAME_BUFFER_WIDTH / 30 };
+public:
+    SkillUI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor);
+    ~SkillUI();
     HRESULT WICInit(IWICImagingFactory** factory);
     HRESULT D2DLoadBitmap(LPCWSTR fileName, ID2D1RenderTarget* target, IWICImagingFactory* factory, ID2D1Bitmap** bitmap);
     virtual void UpdateLabels(const std::wstring& strUIText, UINT LeftTop_x, UINT LeftTop_y, UINT RightBottom_x, UINT RightBottom_y);

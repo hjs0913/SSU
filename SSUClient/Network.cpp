@@ -37,7 +37,7 @@ wstring party_name[GAIA_ROOM];
 CPattern m_gaiaPattern;
 int indun_death_count = 4;
 
-array<CPlayer*, MAX_USER+MAX_NPC+1> mPlayer;
+array<CPlayer*, MAX_USER + MAX_NPC + 1> mPlayer{};
 array<Party*, (MAX_USER / GAIA_ROOM)> m_party;
 vector<int> party_id_index_vector;
 Party* m_party_info;
