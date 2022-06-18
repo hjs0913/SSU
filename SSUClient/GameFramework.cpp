@@ -956,6 +956,9 @@ void CGameFramework::Create_OpenWorld_Object()
 	if (m_pScene) m_pScene->ReleaseUploadBuffers();
 	if (m_pPlayer) m_pPlayer->ReleaseUploadBuffers();
 
+	// 여기서 속성에 맞는 이미지 출력해주자
+	reinterpret_cast<UIBitmap*>(m_ppUILayer[6])->Setup(L"\Image/minju.png");
+
 	m_GameTimer.Reset();
 }
 
