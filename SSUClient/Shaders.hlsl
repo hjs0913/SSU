@@ -102,8 +102,9 @@ float4 PSStandard(VS_STANDARD_OUTPUT input) : SV_TARGET
 	{
 		normalW = normalize(input.normalW);
 	}
+	
 	float4 cIllumination = Lighting(input.positionW, normalW);
-	return(lerp(cColor, cIllumination, 0.0f));
+	return(lerp(cColor, cIllumination, 0.1f));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -242,4 +243,53 @@ float4 PSSkyBox(VS_SKYBOX_CUBEMAP_OUTPUT input) : SV_TARGET
 	float4 cColor = gtxtSkyCubeTexture.Sample(gssClamp, input.positionL);
 
 	return(cColor);
+}
+
+
+//--------------------------------------------------------------------------------
+//정점 조명을 사용
+#define _WITH_VERTEX_LIGHTING
+//정점 쉐이더의 입력 정점 구조
+struct VS_LIGHTING_INPUT
+{
+	float3 position : POSITION;
+	float3 normal : NORMAL;
+};
+//정점 쉐이더의 출력 정점 구조
+struct VS_LIGHTING_OUTPUT
+{
+	float4 position : SV_POSITION;
+	float3 positionW : POSITION;
+#ifdef _WITH_VERTEX_LIGHTING
+	float4 color : COLOR;
+#else
+	float3 normalW : NORMAL;
+#endif
+};
+
+//정점 쉐이더 함수
+VS_LIGHTING_OUTPUT VSLighting(VS_LIGHTING_INPUT input)
+{
+	VS_LIGHTING_OUTPUT output;
+	output.positionW = (float3)mul(float4(input.position, 1.0f), gmtxGameObject);
+	output.position = mul(mul(float4(output.positionW, 1.0f), gmtxView), gmtxProjection);
+	float3 normalW = mul(input.normal, (float3x3)gmtxGameObject);
+#ifdef _WITH_VERTEX_LIGHTING
+	output.color = Lighting(output.positionW, normalize(normalW));
+#else
+	output.normalW = normalW;
+#endif
+	return(output);
+}
+
+//픽셀 쉐이더 함수
+float4 PSLighting(VS_LIGHTING_OUTPUT input) : SV_TARGET
+{
+#ifdef _WITH_VERTEX_LIGHTING
+	return(input.color);
+#else
+	float3 normalW = normalize(input.normalW);
+	float4 color = Lighting(input.positionW, normalW);
+	return(color);
+#endif
 }

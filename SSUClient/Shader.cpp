@@ -242,6 +242,7 @@ D3D12_INPUT_LAYOUT_DESC CTerrainShader::CreateInputLayout()
 D3D12_SHADER_BYTECODE CTerrainShader::CreateVertexShader()
 {
 	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "VSTerrain", "vs_5_1", &m_pd3dVertexShaderBlob));
+
 }
 
 D3D12_SHADER_BYTECODE CTerrainShader::CreatePixelShader()
@@ -335,11 +336,13 @@ D3D12_INPUT_LAYOUT_DESC CStandardShader::CreateInputLayout()
 D3D12_SHADER_BYTECODE CStandardShader::CreateVertexShader()
 {
 	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "VSStandard", "vs_5_1", &m_pd3dVertexShaderBlob));
+	//return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "VSLighting", "vs_5_1", &m_pd3dVertexShaderBlob));
 }
 
 D3D12_SHADER_BYTECODE CStandardShader::CreatePixelShader()
 {
 	return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PSStandard", "ps_5_1", &m_pd3dPixelShaderBlob));
+	//return(CShader::CompileShaderFromFile(L"Shaders.hlsl", "PSLighting", "vs_5_1", &m_pd3dVertexShaderBlob));
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
