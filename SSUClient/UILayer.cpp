@@ -575,7 +575,13 @@ void BuffUI::Render(UINT nFrame)
 //skill_ui
 SkillUI::SkillUI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor) : UILayer(nFrame, pd3dDevice, pd3dCommandQueue, LayoutColor, TextColor)
 {
-
+    
+        m_fWidth = 0.0f;
+        m_fHeight = 0.0f;
+        m_vWrappedRenderTargets.resize(nFrame);
+        m_vd2dRenderTargets.resize(nFrame);
+        m_vTextBlocks.resize(1);
+        Initialize(pd3dDevice, pd3dCommandQueue, LayoutColor, TextColor);
 }
 SkillUI::~SkillUI() {}
 
@@ -810,6 +816,12 @@ void SkillUI::Render(UINT nFrame)
 
     m_pd2dDeviceContext->BeginDraw();
 
+    for (auto textBlock : m_vTextBlocks)
+    {
+        m_pd2dDeviceContext->FillRectangle(textBlock.d2dLayoutRect, m_pBrush);
+        m_pd2dDeviceContext->DrawRectangle(textBlock.d2dLayoutRect, m_pBrush);
+        m_pd2dDeviceContext->DrawText(textBlock.strText.c_str(), static_cast<UINT>(textBlock.strText.length()), textBlock.pdwFormat, textBlock.d2dLayoutRect, m_pd2dTextBrush);
+    }
     if (skill_ui_num[0] == 0) {
         m_pd2dDeviceContext->DrawBitmap(bitmap[0], skill_space0);
     }

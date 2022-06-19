@@ -809,7 +809,7 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[21] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::Black);
 
 		// Skill UI
-		m_ppUILayer[22] = new SkillUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::White);
+		m_ppUILayer[22] = new SkillUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::White, D2D1::ColorF::Black);
 
 		m_ppUILayer[0]->setAlpha(0.5, 1.0);
 		m_ppUILayer[1]->setAlpha(0.5, 1.0);
@@ -1293,22 +1293,22 @@ void CGameFramework::FrameAdvance()
 				Send_str += L"\n";
 				delete temp;
 			}
-			m_ppUILayer[i]->UpdateLabels(Send_str, 0, 2*(m_nWndClientHeight/3)-20, m_nWndClientWidth / 3, m_nWndClientHeight - 60);
+			m_ppUILayer[i]->UpdateLabels(Send_str, 0, 2 * (m_nWndClientHeight / 3) - 20, m_nWndClientWidth / 3, m_nWndClientHeight - 60);
 		}
 			  break;
 		case 1:
-			m_ppUILayer[i]->UpdateLabels(Chatting_Str, 0, m_nWndClientHeight - m_nWndClientHeight/22.5 - 20, m_nWndClientWidth/3, m_nWndClientHeight - 20);
+			m_ppUILayer[i]->UpdateLabels(Chatting_Str, 0, m_nWndClientHeight - m_nWndClientHeight / 22.5 - 20, m_nWndClientWidth / 3, m_nWndClientHeight - 20);
 			break;
 
 		case 2:
-			m_ppUILayer[i]->UpdateLabels(Info_str, 0, 0, (m_nWndClientWidth / 10) * 3 + 30, m_nWndClientHeight/5);
+			m_ppUILayer[i]->UpdateLabels(Info_str, 0, 0, (m_nWndClientWidth / 10) * 3 + 30, m_nWndClientHeight / 5);
 			break;
 		case 3: {
 			Hp_str.append(L" Hp : ");
 			Hp_str.append(to_wstring(m_pPlayer->m_hp));
 			Hp_str.append(L" / ");
 			Hp_str.append(to_wstring(m_pPlayer->m_max_hp));
-			m_ppUILayer[i]->UpdateLabels(Hp_str, 20, m_nWndClientHeight / 5 - 2*(m_nWndClientHeight / 22.5) - 20, // x0, y0
+			m_ppUILayer[i]->UpdateLabels(Hp_str, 20, m_nWndClientHeight / 5 - 2 * (m_nWndClientHeight / 22.5) - 20, // x0, y0
 				20 + ((float)m_pPlayer->m_hp / m_pPlayer->m_max_hp) * (m_nWndClientWidth / 10) * 3, m_nWndClientHeight / 5 - m_nWndClientHeight / 22.5 - 20);// x1, y1
 			break;
 		}
@@ -1317,23 +1317,23 @@ void CGameFramework::FrameAdvance()
 			Mp_str.append(to_wstring(m_pPlayer->m_mp));
 			Mp_str.append(L" / ");
 			Mp_str.append(to_wstring(m_pPlayer->m_max_mp));
-			m_ppUILayer[i]->UpdateLabels(Mp_str, 20, m_nWndClientHeight / 5 - m_nWndClientHeight/22.5 - 10,	// x0, y0
-				20 + ((float)m_pPlayer->m_mp / m_pPlayer->m_max_mp) * (m_nWndClientWidth / 10) * 3, m_nWndClientHeight / 5-10); // x1, y1
+			m_ppUILayer[i]->UpdateLabels(Mp_str, 20, m_nWndClientHeight / 5 - m_nWndClientHeight / 22.5 - 10,	// x0, y0
+				20 + ((float)m_pPlayer->m_mp / m_pPlayer->m_max_mp) * (m_nWndClientWidth / 10) * 3, m_nWndClientHeight / 5 - 10); // x1, y1
 			break;
 		}
 		case 5: {
 			m_ppUILayer[i]->UpdateLabels(L"Exp", 0, m_nWndClientHeight - 20,	// x0, y0
-				((float)m_pPlayer->m_exp / (100*(m_pPlayer->m_lv * m_pPlayer->m_lv) + 200* m_pPlayer->m_lv)) * m_nWndClientWidth , m_nWndClientHeight ); // x1, y1
+				((float)m_pPlayer->m_exp / (100 * (m_pPlayer->m_lv * m_pPlayer->m_lv) + 200 * m_pPlayer->m_lv)) * m_nWndClientWidth, m_nWndClientHeight); // x1, y1
 			break;
 		}
 		case 6: {
 			m_ppUILayer[i]->UpdateLabels(L"", 0, 0,	// x0, y0
-				m_nWndClientHeight / 5 - 2 * (m_nWndClientHeight / 22.5) - 20, m_nWndClientHeight / 5 - 2*(m_nWndClientHeight / 22.5) - 20); // x1, y1
+				m_nWndClientHeight / 5 - 2 * (m_nWndClientHeight / 22.5) - 20, m_nWndClientHeight / 5 - 2 * (m_nWndClientHeight / 22.5) - 20); // x1, y1
 			break;
 		}
 		case 7: {
 			if (!Combat_On) break;
-			m_ppUILayer[i]->UpdateLabels(Combat_str, (m_nWndClientWidth / 2) - (m_nWndClientWidth/10), 0, (m_nWndClientWidth / 2) + (m_nWndClientWidth / 10), (m_nWndClientHeight / 6));
+			m_ppUILayer[i]->UpdateLabels(Combat_str, (m_nWndClientWidth / 2) - (m_nWndClientWidth / 10), 0, (m_nWndClientWidth / 2) + (m_nWndClientWidth / 10), (m_nWndClientHeight / 6));
 			break;
 		}
 		case 8: {
@@ -1342,8 +1342,8 @@ void CGameFramework::FrameAdvance()
 			ang.append(to_wstring((int)get_combat_id_hp()));
 			ang.append(L"/");
 			ang.append(to_wstring((int)get_combat_id_max_hp()));
-			m_ppUILayer[i]->UpdateLabels(ang, (m_nWndClientWidth / 2) - (m_nWndClientWidth / 10)+10, (m_nWndClientHeight / 6) - 20 - m_nWndClientHeight / 22.5,
-				2*((m_nWndClientWidth / 10) - 10) * ((get_combat_id_hp() / get_combat_id_max_hp())) + (m_nWndClientWidth / 2) - (m_nWndClientWidth / 10) + 10, (m_nWndClientHeight / 6) - 20);
+			m_ppUILayer[i]->UpdateLabels(ang, (m_nWndClientWidth / 2) - (m_nWndClientWidth / 10) + 10, (m_nWndClientHeight / 6) - 20 - m_nWndClientHeight / 22.5,
+				2 * ((m_nWndClientWidth / 10) - 10) * ((get_combat_id_hp() / get_combat_id_max_hp())) + (m_nWndClientWidth / 2) - (m_nWndClientWidth / 10) + 10, (m_nWndClientHeight / 6) - 20);
 			break;
 		}
 		case 9: {
@@ -1392,12 +1392,12 @@ void CGameFramework::FrameAdvance()
 			if (hp_x == 0)  bc = D2D1::ColorF::Black;
 
 			reinterpret_cast<UIBar*>(m_ppUILayer[i])->SetBehindBrush(bc, 1.0, (m_nWndClientWidth / 2) - (m_nWndClientWidth / 18) + (m_nWndClientWidth / 180), (m_nWndClientHeight / 6) - (m_nWndClientHeight / 12.5),
-				(m_nWndClientWidth) -10, (m_nWndClientHeight / 6) - 10);
+				(m_nWndClientWidth)-10, (m_nWndClientHeight / 6) - 10);
 			reinterpret_cast<UIBar*>(m_ppUILayer[i])->SetColorBrush(fc, 1.0, (m_nWndClientWidth / 2) - (m_nWndClientWidth / 18) + (m_nWndClientWidth / 180), (m_nWndClientHeight / 6) - (m_nWndClientHeight / 12.5),
-				(m_nWndClientWidth) - 10, (m_nWndClientHeight / 6) - 10);
+				(m_nWndClientWidth)-10, (m_nWndClientHeight / 6) - 10);
 
 			m_ppUILayer[i]->UpdateLabels(ang, (m_nWndClientWidth / 2) - (m_nWndClientWidth / 18) + (m_nWndClientWidth / 180), (m_nWndClientHeight / 6) - (m_nWndClientHeight / 12.5),
-				(m_nWndClientWidth / 2) - (m_nWndClientWidth / 18) + (m_nWndClientWidth / 180) + (11*(m_nWndClientWidth/20) - 10) * bar_percent, (m_nWndClientHeight / 6) - 10);
+				(m_nWndClientWidth / 2) - (m_nWndClientWidth / 18) + (m_nWndClientWidth / 180) + (11 * (m_nWndClientWidth / 20) - 10) * bar_percent, (m_nWndClientHeight / 6) - 10);
 			break;
 		}
 
@@ -1406,7 +1406,7 @@ void CGameFramework::FrameAdvance()
 			wstring party_info_str = L"파티원정보(DC : ";
 			party_info_str.append(to_wstring(indun_death_count));
 			party_info_str.append(L")");
-			m_ppUILayer[i]->UpdateLabels(party_info_str, 0, (m_nWndClientHeight / 2) - (m_nWndClientHeight / 6), m_nWndClientWidth/9 , (m_nWndClientHeight / 2) + (m_nWndClientHeight / 9));
+			m_ppUILayer[i]->UpdateLabels(party_info_str, 0, (m_nWndClientHeight / 2) - (m_nWndClientHeight / 6), m_nWndClientWidth / 9, (m_nWndClientHeight / 2) + (m_nWndClientHeight / 9));
 			break;
 		}
 		case 12: {
@@ -1424,7 +1424,7 @@ void CGameFramework::FrameAdvance()
 		case 14: {
 			if (!InDungeon) break;
 			m_ppUILayer[i]->UpdateLabels(party_name[2], 10, (m_nWndClientHeight / 2) + (m_nWndClientHeight / 180),
-				10 + (m_nWndClientWidth/9 - 20) * ((float)get_hp_to_server(m_party_info->player_id[2]) / get_max_hp_to_server(m_party_info->player_id[2])), (m_nWndClientHeight / 2) + (m_nWndClientHeight / 180) + (m_nWndClientHeight / 22.5));
+				10 + (m_nWndClientWidth / 9 - 20) * ((float)get_hp_to_server(m_party_info->player_id[2]) / get_max_hp_to_server(m_party_info->player_id[2])), (m_nWndClientHeight / 2) + (m_nWndClientHeight / 180) + (m_nWndClientHeight / 22.5));
 			break;
 		}
 		case 15: {
@@ -1507,8 +1507,12 @@ void CGameFramework::FrameAdvance()
 		}
 		case 21:
 			if (!NoticeUI_On) break;
-			m_ppUILayer[i]->UpdateLabels(Notice_str, 0, 0, m_nWndClientWidth, m_nWndClientHeight/15);
+			m_ppUILayer[i]->UpdateLabels(Notice_str, 0, 0, m_nWndClientWidth, m_nWndClientHeight / 15);
 			break;
+		case 22:
+			m_ppUILayer[i]->UpdateLabels(L"SKILL",  FRAME_BUFFER_WIDTH / 2.8, FRAME_BUFFER_HEIGHT / 1.2,FRAME_BUFFER_WIDTH / 2.0 + 60, FRAME_BUFFER_HEIGHT / 1.2 + FRAME_BUFFER_WIDTH / 30);
+			break;
+
 		}
 	}
 
