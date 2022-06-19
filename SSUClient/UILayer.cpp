@@ -17,8 +17,11 @@ clock_t end_buff_2;
 clock_t end_buff_3;
 clock_t end_buff_4;
 
-
-
+bool first_skill_used = false;
+bool second_skill_used = false;
+bool third_skill_used = false;
+clock_t start_skill[3]; 
+clock_t end_skill[3];
 UILayer::UILayer(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor)
 {
     m_fWidth = 0.0f;
@@ -575,7 +578,6 @@ void BuffUI::Render(UINT nFrame)
 //skill_ui
 SkillUI::SkillUI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor) : UILayer(nFrame, pd3dDevice, pd3dCommandQueue, LayoutColor, TextColor)
 {
-    
         m_fWidth = 0.0f;
         m_fHeight = 0.0f;
         m_vWrappedRenderTargets.resize(nFrame);
@@ -804,10 +806,8 @@ void SkillUI::Render(UINT nFrame)
     for (int i = 0; i < 3; i++)
         skill_ui_num[i] = i;
 
-    if (Setup()) {
-        m_pd2dDeviceContext->SetTarget(m_vd2dRenderTargets[nFrame]);
-    }
 
+    Setup();
     ID3D11Resource* ppResources[] = { m_vWrappedRenderTargets[nFrame] };
 
     m_pd2dDeviceContext->SetTarget(m_vd2dRenderTargets[nFrame]);
@@ -816,12 +816,6 @@ void SkillUI::Render(UINT nFrame)
 
     m_pd2dDeviceContext->BeginDraw();
 
-    for (auto textBlock : m_vTextBlocks)
-    {
-        m_pd2dDeviceContext->FillRectangle(textBlock.d2dLayoutRect, m_pBrush);
-        m_pd2dDeviceContext->DrawRectangle(textBlock.d2dLayoutRect, m_pBrush);
-        m_pd2dDeviceContext->DrawText(textBlock.strText.c_str(), static_cast<UINT>(textBlock.strText.length()), textBlock.pdwFormat, textBlock.d2dLayoutRect, m_pd2dTextBrush);
-    }
     if (skill_ui_num[0] == 0) {
         m_pd2dDeviceContext->DrawBitmap(bitmap[0], skill_space0);
     }
@@ -832,29 +826,36 @@ void SkillUI::Render(UINT nFrame)
         m_pd2dDeviceContext->DrawBitmap(bitmap[2], skill_space2);
     }
 
+    if (first_skill_used == true) {
+        end_skill[0] = clock();
+        skill_cool_rect[0] = 60.0f - 6.0f * ((float)(end_skill[0] - start_skill[0]) / (float)CLOCKS_PER_SEC);
 
+        if ((float)(end_skill[0] - start_skill[0]) / (float)CLOCKS_PER_SEC >= 10.0f) {
+            skill_cool_rect[0] = (float)FRAME_BUFFER_WIDTH / 30.0f;
+            first_skill_used = false;
+        }
+    }
+    if (second_skill_used == true) {
+        end_skill[1] = clock();
+        skill_cool_rect[1] = 60.0f - 6.0f * ((float)(end_skill[1] - start_skill[1]) / (float)CLOCKS_PER_SEC);
+
+        if ((float)(end_skill[1] - start_skill[1]) / (float)CLOCKS_PER_SEC >= 10.0f) {
+            skill_cool_rect[1] = (float)FRAME_BUFFER_WIDTH / 30.0f;
+            second_skill_used = false;
+        }
+    }
+    if (third_skill_used == true) {
+        end_skill[2] = clock();
+        skill_cool_rect[2] = 60.0f - 6.0f * ((float)(end_skill[2] - start_skill[2]) / (float)CLOCKS_PER_SEC);
+
+        if ((float)(end_skill[2] - start_skill[2]) / (float)CLOCKS_PER_SEC >= 10.0f) {
+            skill_cool_rect[2] = (float)FRAME_BUFFER_WIDTH / 30.0f;
+            third_skill_used = false;
+        }
+    }
     m_pd2dDeviceContext->EndDraw();
 
     m_pd3d11On12Device->ReleaseWrappedResources(ppResources, _countof(ppResources));
     m_pd3d11DeviceContext->Flush();
-
-    //아래는 없애거나 수정 
-    /*
-    end_buff_0 = clock();
-    end_buff_1 = clock();
-    end_buff_2 = clock();
-    end_buff_3 = clock();
-    end_buff_4 = clock();
-
-    if ((end_buff_0 - start_buff_0) / CLOCKS_PER_SEC >= 3)
-        buff_ui_num[0] = -1;
-    if ((end_buff_1 - start_buff_1) / CLOCKS_PER_SEC >= 10)
-        buff_ui_num[1] = -1;
-    if ((end_buff_2 - start_buff_2) / CLOCKS_PER_SEC >= 3)
-        buff_ui_num[2] = -1;
-    if ((end_buff_3 - start_buff_3) / CLOCKS_PER_SEC >= 10)  //공격력 
-        buff_ui_num[3] = -1;
-    if ((end_buff_4 - start_buff_4) / CLOCKS_PER_SEC >= 5)  //공속 
-        buff_ui_num[4] = -1;
-        */
+    
 }

@@ -43,7 +43,7 @@ CCamera* m_pCamera;
 bool f4_picking_possible = false;
 bool f5_picking_possible = false;
 bool f6_picking_possible = false;
-
+float skill_cool_rect[] = { (FRAME_BUFFER_WIDTH) / 30.0f ,(FRAME_BUFFER_WIDTH) / 30.0f , (FRAME_BUFFER_WIDTH) / 30.0f };
 
 CGameFramework::CGameFramework()
 {
@@ -809,7 +809,14 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[21] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::Black);
 
 		// Skill UI
-		m_ppUILayer[22] = new SkillUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::White, D2D1::ColorF::Black);
+		m_ppUILayer[22] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::White, D2D1::ColorF::Black);
+		m_ppUILayer[23] = new SkillUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::White, D2D1::ColorF::Black);
+		// Skill Cooltime
+		m_ppUILayer[24] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Black, D2D1::ColorF::Black);
+		m_ppUILayer[25] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Black, D2D1::ColorF::Black);
+		m_ppUILayer[26] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Black, D2D1::ColorF::Black);
+
+
 
 		m_ppUILayer[0]->setAlpha(0.5, 1.0);
 		m_ppUILayer[1]->setAlpha(0.5, 1.0);
@@ -840,6 +847,10 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[21]->setAlpha(0.8, 1.0);
 
 		m_ppUILayer[22]->setAlpha(0.5, 1.0);
+		m_ppUILayer[23]->setAlpha(0.5, 1.0);
+		m_ppUILayer[24]->setAlpha(0.8, 0.0); //±Û¾¾ ¾øÀ½ 
+		m_ppUILayer[25]->setAlpha(0.8, 0.0); //±Û¾¾ ¾øÀ½ 
+		m_ppUILayer[26]->setAlpha(0.8, 0.0); //±Û¾¾ ¾øÀ½ 
 
 		m_ppUILayer[0]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_FAR);
@@ -891,6 +902,14 @@ void CGameFramework::BuildObjects()
 
 		m_ppUILayer[22]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[23]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[24]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[25]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[26]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 		// UIBar Setting
 		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, m_nWndClientHeight / 5 - 2*(m_nWndClientHeight / 22.5) - 20,
@@ -1074,8 +1093,11 @@ void CGameFramework::ProcessInput()
 			}
 
 			if (pKeysBuffer[VK_SPACE] & 0xF0) dwAttack |= 0x30;
+
 			if ((pKeysBuffer[VK_NUMPAD1] & 0xF0) || (pKeysBuffer['1'] & 0xF0)) {
 				//dwSkill |= 0x31;
+				first_skill_used = true;
+				start_skill[0] = clock();
 				send_skill_packet(0, 0);
 			}
 			//	if ((pKeysBuffer[VK_NUMPAD2] & 0xF0) || (pKeysBuffer['2'] & 0xF0)) {     //   2 
@@ -1085,9 +1107,22 @@ void CGameFramework::ProcessInput()
 			//		send_skill_packet(0, 2);
 			//	}
 			if (pKeysBuffer[VK_NUMPAD4] & 0xF0 || (pKeysBuffer['4'] & 0xF0)) {     //   4 
-				send_skill_packet(1, 0);
+				if (my_job != 2) {
+					second_skill_used = true;
+					start_skill[1] = clock();
+					send_skill_packet(1, 0);
+				
+				}
+				else {
+					first_skill_used = true;
+					start_skill[0] = clock();
+					send_skill_packet(1, 0);
+				}
+				
 			}
 			if (pKeysBuffer[VK_NUMPAD5] & 0xF0 || (pKeysBuffer['5'] & 0xF0)) {     //   5 
+				second_skill_used = true;
+				start_skill[1] = clock();
 				send_skill_packet(1, 1);
 				/*
 				if (pushCTRL && my_job == J_MAGICIAN) {
@@ -1115,12 +1150,24 @@ void CGameFramework::ProcessInput()
 			//	}
 
 			if (pKeysBuffer[VK_NUMPAD7] & 0xF0 || (pKeysBuffer['7'] & 0xF0)) {    // 7 
+				if (my_job != 3) {
+					third_skill_used = true;
+					start_skill[2] = clock();
+				}
+				else {
+					first_skill_used = true;
+					start_skill[0] = clock();
+				}
 				send_skill_packet(2, 0);
 			}
 			if (pKeysBuffer[VK_NUMPAD8] & 0xF0 || (pKeysBuffer['8'] & 0xF0)) {    // 8 
+				second_skill_used = true;
+				start_skill[1] = clock();
 				send_skill_packet(2, 1);
 			}
 			if (pKeysBuffer[VK_NUMPAD9] & 0xF0 || (pKeysBuffer['9'] & 0xF0)) {    // 9
+				third_skill_used = true;
+				start_skill[2] = clock();
 				send_skill_packet(2, 2);
 			}
 		}
@@ -1512,7 +1559,15 @@ void CGameFramework::FrameAdvance()
 		case 22:
 			m_ppUILayer[i]->UpdateLabels(L"SKILL",  FRAME_BUFFER_WIDTH / 2.8, FRAME_BUFFER_HEIGHT / 1.2,FRAME_BUFFER_WIDTH / 2.0 + 60, FRAME_BUFFER_HEIGHT / 1.2 + FRAME_BUFFER_WIDTH / 30);
 			break;
-
+		case 24:
+			m_ppUILayer[i]->UpdateLabels(L"", FRAME_BUFFER_WIDTH / 2.5, FRAME_BUFFER_HEIGHT / 1.2 + skill_cool_rect[0], FRAME_BUFFER_WIDTH / 2.5 + 60, FRAME_BUFFER_HEIGHT / 1.2 + FRAME_BUFFER_WIDTH / 30);
+			break;
+		case 25:
+			m_ppUILayer[i]->UpdateLabels(L"", FRAME_BUFFER_WIDTH / 2.26, FRAME_BUFFER_HEIGHT / 1.2 + skill_cool_rect[1], FRAME_BUFFER_WIDTH / 2.26 + 60, FRAME_BUFFER_HEIGHT / 1.2 + FRAME_BUFFER_WIDTH / 30);
+			break;
+		case 26:
+			m_ppUILayer[i]->UpdateLabels(L"", FRAME_BUFFER_WIDTH / 2.06, FRAME_BUFFER_HEIGHT / 1.2 + skill_cool_rect[2], FRAME_BUFFER_WIDTH / 2.06 + 60, FRAME_BUFFER_HEIGHT / 1.2 + FRAME_BUFFER_WIDTH / 30);
+			break;
 		}
 	}
 

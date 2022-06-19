@@ -24,7 +24,13 @@ extern clock_t end_buff_1;
 extern clock_t end_buff_2;
 extern clock_t end_buff_3;
 extern clock_t end_buff_4;
+extern float skill_cool_rect[3];
 
+extern bool first_skill_used;
+extern bool second_skill_used;
+extern bool third_skill_used;
+extern clock_t start_skill[3];
+extern clock_t end_skill[3];
 struct TextBlock
 {
     std::wstring        strText;
@@ -154,7 +160,7 @@ private:
         FRAME_BUFFER_WIDTH / 2.5 +60, FRAME_BUFFER_HEIGHT / 1.2 + FRAME_BUFFER_WIDTH / 30 };
     D2D1_RECT_F skill_space1 = { FRAME_BUFFER_WIDTH / 2.26, FRAME_BUFFER_HEIGHT / 1.2,
         FRAME_BUFFER_WIDTH / 2.26 + 60, FRAME_BUFFER_HEIGHT / 1.2 + FRAME_BUFFER_WIDTH / 30 };
-    D2D1_RECT_F skill_space2 = { FRAME_BUFFER_WIDTH / 2.06, FRAME_BUFFER_HEIGHT / 1.2,
+    D2D1_RECT_F skill_space2 = { FRAME_BUFFER_WIDTH / 2.06, FRAME_BUFFER_HEIGHT / 1.2 ,
           FRAME_BUFFER_WIDTH / 2.06 + 60, FRAME_BUFFER_HEIGHT / 1.2 + FRAME_BUFFER_WIDTH / 30 };
 public:
     SkillUI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor);
