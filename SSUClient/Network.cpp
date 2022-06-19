@@ -856,6 +856,20 @@ void process_packet(unsigned char* p)
 		mPlayer[packet->id]->m_mp = packet->mp;
 		break;
 	}
+	case SC_PACKET_MOVE_OPENWORLD: {
+		EnterCriticalSection(&IndunCheck_cs);
+		sc_packet_move_openworld* packet = reinterpret_cast<sc_packet_move_openworld*>(p);
+		PartyUI_On = false;
+		party_info_on = false;
+		PartyInviteUI_ON = false;
+		InvitationCardUI_On = false;
+		InDungeon = false;
+		my_position.x = packet->x;
+		my_position.y = packet->y;
+		my_position.z = packet->z;
+		LeaveCriticalSection(&IndunCheck_cs);
+		break;
+	}
 	case SC_PACKET_ANIMATION_ATTACK: {
 		sc_packet_animation_attack* packet = reinterpret_cast<sc_packet_animation_attack*>(p);
 		mPlayer[packet->id]->m_net_attack = true;

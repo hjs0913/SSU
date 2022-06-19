@@ -14,10 +14,6 @@ private:
 	int  player_death_count = 4;
 
 // 패턴 정보
-
-
-	
-
 	chrono::system_clock::time_point start_time;
 
 public:	
@@ -56,6 +52,7 @@ public:
 	void quit_palyer(Player* pl);
 
 	void game_start();
+	void game_victory();
 	void destroy_dungeon();
 
 	DUNGEON_STATE get_dun_st();
