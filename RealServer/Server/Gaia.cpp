@@ -170,9 +170,13 @@ void Gaia::game_start()
 	st = DUN_ST_START;
 	state_lock.unlock();
 
+	boss->state_lock.lock();
+	boss->set_state(ST_INDUN);
+	boss->state_lock.unlock();
+
 	boss->set_x(2037);
 	boss->set_z(2130);
-
+	boss->set_hp(10000);
 	for (int i = 0; i < GAIA_ROOM; i++) {
 		party[i]->set_x(party[0]->get_x() + 10 * i);
 		party[i]->set_z(party[0]->get_z());
@@ -194,20 +198,26 @@ void Gaia::game_start()
 void Gaia::game_victory()
 {
 	cout << "앙 기모띠" << endl;
-	for (int i = 0; i < GAIA_ROOM; i++) {
-		// 경험치 추가하기
-		party[i]->set_exp(party[i]->get_exp() + 2000);
-		send_status_change_packet(party[i]);
-		// 가이아 없애주기
+	boss->state_lock.lock();
+	if (boss->get_state() == ST_INDUN) {
+		boss->set_state(ST_DEAD);
+		boss->state_lock.unlock();
+		for (int i = 0; i < GAIA_ROOM; i++) {
+			// 경험치 추가하기
+			party[i]->set_exp(party[i]->get_exp() + 2000);
+			send_status_change_packet(party[i]);
+			// 가이아 없애주는 패킷 보내기
 
-		send_notice(party[i], "레이드 성공.. 5초후 오픈월드로 되돌아 갑니다", 2);
+			send_notice(party[i], "레이드 성공.. 5초후 오픈월드로 되돌아 갑니다", 2);
+		}
+		timer_event ev;
+		ev.obj_id = dungeon_id;
+		ev.start_time = chrono::system_clock::now() + 5s;
+		ev.ev = EVENT_FINISH_RAID;
+		ev.target_id = 0;
+		timer_queue.push(ev);
 	}
-	timer_event ev;
-	ev.obj_id = dungeon_id;
-	ev.start_time = chrono::system_clock::now() + 5s;
-	ev.ev = EVENT_FINISH_RAID;
-	ev.target_id = 0;
-	timer_queue.push(ev);
+	else boss->state_lock.unlock();
 }
 
 void Gaia::destroy_dungeon()
