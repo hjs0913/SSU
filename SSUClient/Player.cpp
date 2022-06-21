@@ -102,6 +102,7 @@ void CPlayer::Move(const XMFLOAT3& xmf3Shift, int dir, bool bUpdateVelocity)
 			break;
 		}
 
+		SetMaxVelocityXZ(150.0f);
 		m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, xmf3Shift);
 	}
 	else
@@ -397,18 +398,32 @@ CTerrainPlayer::CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLi
 		pAngrybotModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Bastard_Warrior.bin", NULL);
 		SetChild(pAngrybotModel->m_pModelRootObject, true);
 		anim_cnt = pAngrybotModel->m_pAnimationSets->m_nAnimationSets;
+		SetScale(XMFLOAT3(10.0f, 10.0f, 10.0f));
+
 		break;
 	}
 	case J_TANKER: {
 		pAngrybotModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Mighty_Warrior.bin", NULL);
 		SetChild(pAngrybotModel->m_pModelRootObject, true);
 		anim_cnt = pAngrybotModel->m_pAnimationSets->m_nAnimationSets;
+		SetScale(XMFLOAT3(10.0f, 10.0f, 10.0f));
+
 		break;
 	}
 	case J_SUPPORTER: {
 		pAngrybotModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Priestess.bin", NULL);
 		SetChild(pAngrybotModel->m_pModelRootObject, true);
 		anim_cnt = pAngrybotModel->m_pAnimationSets->m_nAnimationSets;
+		SetScale(XMFLOAT3(10.0f, 10.0f, 10.0f));
+
+		break;
+	}
+	case J_MAGICIAN: {
+		pAngrybotModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Wizard_Girl.bin", NULL);
+		SetChild(pAngrybotModel->m_pModelRootObject, true);
+		anim_cnt = pAngrybotModel->m_pAnimationSets->m_nAnimationSets;
+		SetScale(XMFLOAT3(12.0f, 12.0f, 12.0f));
+
 		break;
 	}
 	default: {
@@ -453,7 +468,7 @@ CTerrainPlayer::CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLi
 
 	CHeightMapTerrain *pTerrain = (CHeightMapTerrain *)pContext;
 	SetPosition(XMFLOAT3(3500.0f, pTerrain->GetHeight(3500.0f, 590.0f), 590.0f));
-	SetScale(XMFLOAT3(10.0f, 10.0f, 10.0f));
+	//SetScale(XMFLOAT3(10.0f, 10.0f, 10.0f));
 
 	if (pAngrybotModel) delete pAngrybotModel;
 }

@@ -1993,8 +1993,12 @@ void process_packet(int client_id, unsigned char* p)
         }
                        break;
         }
-        break;
+        for (int vl_id : my_vl) {
+            send_animation_skill(reinterpret_cast<Player*>(players[vl_id]), pl->get_id(), (int)packet->skill_num);
+        }
+        send_animation_skill(pl, pl->get_id(), (int)packet->skill_num);
     }
+    break;
     case CS_PACKET_LOOK: {
         pl->state_lock.lock();
         if (pl->get_state() == ST_DEAD || pl->get_state() == ST_FREE) {

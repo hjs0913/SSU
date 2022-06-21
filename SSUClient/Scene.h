@@ -8,6 +8,7 @@
 #include "Player.h"
 
 #define MAX_LIGHTS						16 
+#define MAX_MATERIAL					8
 
 #define POINT_LIGHT						1
 #define SPOT_LIGHT						2
@@ -125,16 +126,20 @@ public:
 
 	ID3D12Resource						*m_pd3dcbLights = NULL;
 	LIGHTS								*m_pcbMappedLights = NULL;
+	//-----------------------------------------
+	CMaterial* m_pMaterial = NULL;
+	ID3D12Resource* m_pd3dcbMaterials = NULL;
+	CMaterial* m_ppMaterials = NULL;
+	//-----------------------------------------
 
 	ID3D12Device						*m_pd3dDevice = NULL;
 
 	CLoadedModelInfo					*pBastardModel = NULL;
 	CLoadedModelInfo					*pTankerModel = NULL;
 	CLoadedModelInfo					*pSupporterModel = NULL;
+	CLoadedModelInfo					*pMagicianModel = NULL;
 
-	int									basterd_anim_cnt = 0;
-	int									tanker_anim_cnt = 0;
-	int									supporter_anim_cnt = 0;
+	int									player_anim_cnt = 0;
 
 	float circle_time = 0.0f;
 
