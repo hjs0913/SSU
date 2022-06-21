@@ -5,6 +5,7 @@
 using namespace std;
 
 int buff_ui_num[5] = { -1 };
+int skill_ui_num[3] = { 0,1,2 };
 clock_t start_buff_0;
 clock_t start_buff_1;
 clock_t start_buff_2;
@@ -16,6 +17,11 @@ clock_t end_buff_2;
 clock_t end_buff_3;
 clock_t end_buff_4;
 
+bool first_skill_used = false;
+bool second_skill_used = false;
+bool third_skill_used = false;
+clock_t start_skill[3]; 
+clock_t end_skill[3];
 UILayer::UILayer(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor)
 {
     m_fWidth = 0.0f;
@@ -487,6 +493,8 @@ bool BuffUI::Setup()
         if (FAILED(D2DLoadBitmap(L"\Image/전광석화.png", m_pd2dDeviceContext, imagingFactory[4], &bitmap[4])))
             return false;
     }
+
+
     return true;
 }
 
@@ -565,4 +573,289 @@ void BuffUI::Render(UINT nFrame)
         buff_ui_num[3] = -1;
     if ((end_buff_4 - start_buff_4) / CLOCKS_PER_SEC >= 5)  //공속 
         buff_ui_num[4] = -1;
+}
+//------------------------------
+//skill_ui
+SkillUI::SkillUI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor) : UILayer(nFrame, pd3dDevice, pd3dCommandQueue, LayoutColor, TextColor)
+{
+        m_fWidth = 0.0f;
+        m_fHeight = 0.0f;
+        m_vWrappedRenderTargets.resize(nFrame);
+        m_vd2dRenderTargets.resize(nFrame);
+        m_vTextBlocks.resize(1);
+        Initialize(pd3dDevice, pd3dCommandQueue, LayoutColor, TextColor);
+}
+SkillUI::~SkillUI() {}
+
+HRESULT SkillUI::WICInit(IWICImagingFactory** factory)
+{
+    // COM 초기화
+    CoInitialize(0);
+
+    // 인터페이스 생성
+    return CoCreateInstance(
+        CLSID_WICImagingFactory,
+        0, CLSCTX_INPROC_SERVER,
+        IID_PPV_ARGS(factory)
+    );
+}
+
+HRESULT SkillUI::D2DLoadBitmap(LPCWSTR fileName, ID2D1RenderTarget* target, IWICImagingFactory* factory, ID2D1Bitmap** bitmap)
+{
+    HRESULT hr;
+
+    // 디코더 생성
+    IWICBitmapDecoder* decoder = 0;
+    hr = factory->CreateDecoderFromFilename(fileName, 0, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &decoder);
+
+    if (FAILED(hr)) return hr;
+
+    // 프레임 얻기
+    IWICBitmapFrameDecode* frameDecode = 0;
+
+    // 0번 프레임을 읽어들임.
+    hr = decoder->GetFrame(0, &frameDecode);
+    if (FAILED(hr)) {
+        decoder->Release();
+        return hr;
+    }
+
+    // 컨버터 생성
+    IWICFormatConverter* converter = 0;
+    hr = factory->CreateFormatConverter(&converter);
+    if (FAILED(hr)) {
+        decoder->Release();
+        return hr;
+    }
+
+    // 컨버터 초기화
+    hr = converter->Initialize(frameDecode, GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone,
+        0, 0.0, WICBitmapPaletteTypeCustom);
+
+    if (FAILED(hr)) {
+        decoder->Release();
+        frameDecode->Release();
+        converter->Release();
+        return hr;
+    }
+
+    // WIC 비트맵으로부터 D2D 비트맵 생성
+    hr = target->CreateBitmapFromWicBitmap(converter, 0, bitmap);
+
+    // 자원 해제
+    decoder->Release();
+    frameDecode->Release();
+    converter->Release();
+    return hr;
+}
+
+bool SkillUI::Setup()
+{
+    //직업에 따라 다르게 셋업하는게 좋을듯??
+   
+    switch (my_job)
+    {
+    case J_DILLER:
+        if (skill_ui_num[0] == 0) {
+            if (FAILED(WICInit(&imagingFactory[0])))
+            {
+                MessageBox(0, L"Imaging  Factory", 0, 0);
+                return false;
+            }
+            if (FAILED(D2DLoadBitmap(L"\Image/스킬ui/전사1.png", m_pd2dDeviceContext, imagingFactory[0], &bitmap[0])))
+                return false;
+        }
+        if (skill_ui_num[1] == 1) {
+            if (FAILED(WICInit(&imagingFactory[1])))
+            {
+                MessageBox(0, L"Imaging  Factory", 0, 0);
+                return false;
+            }
+            if (FAILED(D2DLoadBitmap(L"\Image/스킬ui/전사2.png", m_pd2dDeviceContext, imagingFactory[1], &bitmap[1])))
+                return false;
+        }
+        if (skill_ui_num[2] == 2) {
+
+            if (FAILED(WICInit(&imagingFactory[2])))
+            {
+                MessageBox(0, L"Imaging  Factory", 0, 0);
+                return false;
+            }
+            if (FAILED(D2DLoadBitmap(L"\Image/스킬ui/전사3.png", m_pd2dDeviceContext, imagingFactory[2], &bitmap[2])))
+                return false;
+        }
+        break;
+    case J_TANKER:
+        if (skill_ui_num[0] == 0) {
+            if (FAILED(WICInit(&imagingFactory[0])))
+            {
+                MessageBox(0, L"Imaging  Factory", 0, 0);
+                return false;
+            }
+            if (FAILED(D2DLoadBitmap(L"\Image/스킬ui/탱커1.png", m_pd2dDeviceContext, imagingFactory[0], &bitmap[0])))
+                return false;
+        }
+
+        if (skill_ui_num[1] == 1) {
+            if (FAILED(WICInit(&imagingFactory[1])))
+            {
+                MessageBox(0, L"Imaging  Factory", 0, 0);
+                return false;
+            }
+            if (FAILED(D2DLoadBitmap(L"\Image/스킬ui/탱커2.png", m_pd2dDeviceContext, imagingFactory[1], &bitmap[1])))
+                return false;
+        }
+        if (skill_ui_num[2] == 2) {
+
+            if (FAILED(WICInit(&imagingFactory[2])))
+            {
+                MessageBox(0, L"Imaging  Factory", 0, 0);
+                return false;
+            }
+            if (FAILED(D2DLoadBitmap(L"\Image/스킬ui/탱커3.png", m_pd2dDeviceContext, imagingFactory[2], &bitmap[2])))
+                return false;
+        }
+        break;
+    case J_MAGICIAN:
+        if (skill_ui_num[0] == 0) {
+            if (FAILED(WICInit(&imagingFactory[0])))
+            {
+                MessageBox(0, L"Imaging  Factory", 0, 0);
+                return false;
+            }
+            if (FAILED(D2DLoadBitmap(L"\Image/스킬ui/마법사1.png", m_pd2dDeviceContext, imagingFactory[0], &bitmap[0])))
+                return false;
+        }
+        if (skill_ui_num[1] == 1) {
+            if (FAILED(WICInit(&imagingFactory[1])))
+            {
+                MessageBox(0, L"Imaging  Factory", 0, 0);
+                return false;
+            }
+            if (FAILED(D2DLoadBitmap(L"\Image/스킬ui/마법사2.png", m_pd2dDeviceContext, imagingFactory[1], &bitmap[1])))
+                return false;
+        }
+    //3은아직 
+        if (skill_ui_num[2] == 2) {
+
+            if (FAILED(WICInit(&imagingFactory[2])))
+            {
+                MessageBox(0, L"Imaging  Factory", 0, 0);
+                return false;
+            }
+            if (FAILED(D2DLoadBitmap(L"\Image/스킬ui/마법사3.png", m_pd2dDeviceContext, imagingFactory[2], &bitmap[2])))
+                return false;
+        }
+        break;
+    case J_SUPPORTER:
+        if (skill_ui_num[0] == 0) {
+            if (FAILED(WICInit(&imagingFactory[0])))
+            {
+                MessageBox(0, L"Imaging  Factory", 0, 0);
+                return false;
+            }
+            if (FAILED(D2DLoadBitmap(L"\Image/스킬ui/서포터1.png", m_pd2dDeviceContext, imagingFactory[0], &bitmap[0])))
+                return false;
+        }
+        if (skill_ui_num[1] == 1) {
+            if (FAILED(WICInit(&imagingFactory[1])))
+            {
+                MessageBox(0, L"Imaging  Factory", 0, 0);
+                return false;
+            }
+            if (FAILED(D2DLoadBitmap(L"\Image/스킬ui/서포터2.png", m_pd2dDeviceContext, imagingFactory[1], &bitmap[1])))
+                return false;
+        }
+        if (skill_ui_num[2] == 2) {
+
+            if (FAILED(WICInit(&imagingFactory[2])))
+            {
+                MessageBox(0, L"Imaging  Factory", 0, 0);
+                return false;
+            }
+            if (FAILED(D2DLoadBitmap(L"\Image/스킬ui/서포터3.png", m_pd2dDeviceContext, imagingFactory[2], &bitmap[2])))
+                return false;
+        }
+        break;
+    }
+
+    return true;
+}
+
+void SkillUI::Display()
+{
+    m_pd2dDeviceContext->BeginDraw();
+    m_pd2dDeviceContext->Clear();
+    m_pd2dDeviceContext->DrawBitmap(bitmap[0], D2D1::RectF(0.0f, 0.0f, 300.0f, 300.0f));
+};
+
+void SkillUI::Clean()
+{
+    SafeRelease(bitmap[0]);
+    SafeRelease(imagingFactory[0]);
+    //  SafeRelease(m_pd2dDeviceContext);
+}
+
+void SkillUI::UpdateLabels(const std::wstring& strUIText, UINT LeftTop_x, UINT LeftTop_y, UINT RightBottom_x, UINT RightBottom_y)
+{
+    m_vTextBlocks[0] = { strUIText, D2D1::RectF(LeftTop_x, LeftTop_y, RightBottom_x, RightBottom_y), m_pdwTextFormat };
+}
+
+void SkillUI::Render(UINT nFrame)
+{
+    for (int i = 0; i < 3; i++)
+        skill_ui_num[i] = i;
+
+
+    Setup();
+    ID3D11Resource* ppResources[] = { m_vWrappedRenderTargets[nFrame] };
+
+    m_pd2dDeviceContext->SetTarget(m_vd2dRenderTargets[nFrame]);
+
+    m_pd3d11On12Device->AcquireWrappedResources(ppResources, _countof(ppResources));
+
+    m_pd2dDeviceContext->BeginDraw();
+
+    if (skill_ui_num[0] == 0) {
+        m_pd2dDeviceContext->DrawBitmap(bitmap[0], skill_space0);
+    }
+    if (skill_ui_num[1] == 1) {
+        m_pd2dDeviceContext->DrawBitmap(bitmap[1], skill_space1);
+    }
+    if (skill_ui_num[2] == 2) {
+        m_pd2dDeviceContext->DrawBitmap(bitmap[2], skill_space2);
+    }
+
+    if (first_skill_used == true) {
+        end_skill[0] = clock();
+        skill_cool_rect[0] = 60.0f - 6.0f * ((float)(end_skill[0] - start_skill[0]) / (float)CLOCKS_PER_SEC);
+
+        if ((float)(end_skill[0] - start_skill[0]) / (float)CLOCKS_PER_SEC >= 10.0f) {
+            skill_cool_rect[0] = (float)FRAME_BUFFER_WIDTH / 30.0f;
+            first_skill_used = false;
+        }
+    }
+    if (second_skill_used == true) {
+        end_skill[1] = clock();
+        skill_cool_rect[1] = 60.0f - 6.0f * ((float)(end_skill[1] - start_skill[1]) / (float)CLOCKS_PER_SEC);
+
+        if ((float)(end_skill[1] - start_skill[1]) / (float)CLOCKS_PER_SEC >= 10.0f) {
+            skill_cool_rect[1] = (float)FRAME_BUFFER_WIDTH / 30.0f;
+            second_skill_used = false;
+        }
+    }
+    if (third_skill_used == true) {
+        end_skill[2] = clock();
+        skill_cool_rect[2] = 60.0f - 6.0f * ((float)(end_skill[2] - start_skill[2]) / (float)CLOCKS_PER_SEC);
+
+        if ((float)(end_skill[2] - start_skill[2]) / (float)CLOCKS_PER_SEC >= 10.0f) {
+            skill_cool_rect[2] = (float)FRAME_BUFFER_WIDTH / 30.0f;
+            third_skill_used = false;
+        }
+    }
+    m_pd2dDeviceContext->EndDraw();
+
+    m_pd3d11On12Device->ReleaseWrappedResources(ppResources, _countof(ppResources));
+    m_pd3d11DeviceContext->Flush();
+    
 }
