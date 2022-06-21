@@ -496,11 +496,11 @@ void process_packet(unsigned char* p)
 		case J_TANKER: my_job_str = L"攀目"; break;
 		}
 
-		Info_str.append(L"Lv : ");
+		Info_str.append(L"\tLv : ");
 		Info_str.append(to_wstring(packet->level));
 		Info_str.append(L"  捞抚 : ");
 		Info_str.append(my_name);
-		Info_str.append(L"\n流诀 : ");
+		Info_str.append(L"\n\t流诀 : ");
 		Info_str.append(my_job_str);
 		Info_str.append(L"  加己 : ");
 		Info_str.append(my_element_str);
