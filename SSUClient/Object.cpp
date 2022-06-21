@@ -1448,7 +1448,8 @@ CAngrybotObject::~CAngrybotObject()
 //
 CMonsterObject::CMonsterObject(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, ID3D12RootSignature *pd3dGraphicsRootSignature, CLoadedModelInfo *pModel, int nAnimationTracks)
 {
-	CLoadedModelInfo *pMonsterModel = pModel;
+	CLoadedModelInfo* pMonsterModel = new CLoadedModelInfo;
+	*pMonsterModel = *pModel;
 	if (!pMonsterModel) pMonsterModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/Beast_Wolf.bin", NULL);
 
 	SetChild(pMonsterModel->m_pModelRootObject, true);

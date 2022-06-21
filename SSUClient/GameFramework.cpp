@@ -43,7 +43,7 @@ CCamera* m_pCamera;
 bool f4_picking_possible = false;
 bool f5_picking_possible = false;
 bool f6_picking_possible = false;
-
+float skill_cool_rect[] = { (FRAME_BUFFER_WIDTH) / 30.0f ,(FRAME_BUFFER_WIDTH) / 30.0f , (FRAME_BUFFER_WIDTH) / 30.0f };
 
 CGameFramework::CGameFramework()
 {
@@ -808,6 +808,16 @@ void CGameFramework::BuildObjects()
 		// Notice AI
 		m_ppUILayer[21] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::Black);
 
+		// Skill UI
+		m_ppUILayer[22] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::White, D2D1::ColorF::Black);
+		m_ppUILayer[23] = new SkillUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::White, D2D1::ColorF::Black);
+		// Skill Cooltime
+		m_ppUILayer[24] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Black, D2D1::ColorF::Black);
+		m_ppUILayer[25] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Black, D2D1::ColorF::Black);
+		m_ppUILayer[26] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Black, D2D1::ColorF::Black);
+
+
+
 		m_ppUILayer[0]->setAlpha(0.5, 1.0);
 		m_ppUILayer[1]->setAlpha(0.5, 1.0);
 
@@ -835,6 +845,12 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[19]->setAlpha(1.0, 1.0);
 		m_ppUILayer[20]->setAlpha(1.0, 1.0);
 		m_ppUILayer[21]->setAlpha(0.8, 1.0);
+
+		m_ppUILayer[22]->setAlpha(0.5, 1.0);
+		m_ppUILayer[23]->setAlpha(0.5, 1.0);
+		m_ppUILayer[24]->setAlpha(0.8, 0.0); //글씨 없음 
+		m_ppUILayer[25]->setAlpha(0.8, 0.0); //글씨 없음 
+		m_ppUILayer[26]->setAlpha(0.8, 0.0); //글씨 없음 
 
 		m_ppUILayer[0]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_FAR);
@@ -882,6 +898,17 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[20]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		m_ppUILayer[21]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+		m_ppUILayer[22]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[23]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[24]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[25]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[26]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 		// UIBar Setting
@@ -1069,8 +1096,11 @@ void CGameFramework::ProcessInput()
 			}
 
 			if (pKeysBuffer[VK_SPACE] & 0xF0) dwAttack |= 0x30;
+
 			if ((pKeysBuffer[VK_NUMPAD1] & 0xF0) || (pKeysBuffer['1'] & 0xF0)) {
 				//dwSkill |= 0x31;
+				first_skill_used = true;
+				start_skill[0] = clock();
 				send_skill_packet(0, 0);
 			}
 			//	if ((pKeysBuffer[VK_NUMPAD2] & 0xF0) || (pKeysBuffer['2'] & 0xF0)) {     //   2 
@@ -1080,9 +1110,22 @@ void CGameFramework::ProcessInput()
 			//		send_skill_packet(0, 2);
 			//	}
 			if (pKeysBuffer[VK_NUMPAD4] & 0xF0 || (pKeysBuffer['4'] & 0xF0)) {     //   4 
-				send_skill_packet(1, 0);
+				if (my_job != 2) {
+					second_skill_used = true;
+					start_skill[1] = clock();
+					send_skill_packet(1, 0);
+				
+				}
+				else {
+					first_skill_used = true;
+					start_skill[0] = clock();
+					send_skill_packet(1, 0);
+				}
+				
 			}
 			if (pKeysBuffer[VK_NUMPAD5] & 0xF0 || (pKeysBuffer['5'] & 0xF0)) {     //   5 
+				second_skill_used = true;
+				start_skill[1] = clock();
 				send_skill_packet(1, 1);
 				/*
 				if (pushCTRL && my_job == J_MAGICIAN) {
@@ -1110,12 +1153,24 @@ void CGameFramework::ProcessInput()
 			//	}
 
 			if (pKeysBuffer[VK_NUMPAD7] & 0xF0 || (pKeysBuffer['7'] & 0xF0)) {    // 7 
+				if (my_job != 3) {
+					third_skill_used = true;
+					start_skill[2] = clock();
+				}
+				else {
+					first_skill_used = true;
+					start_skill[0] = clock();
+				}
 				send_skill_packet(2, 0);
 			}
 			if (pKeysBuffer[VK_NUMPAD8] & 0xF0 || (pKeysBuffer['8'] & 0xF0)) {    // 8 
+				second_skill_used = true;
+				start_skill[1] = clock();
 				send_skill_packet(2, 1);
 			}
 			if (pKeysBuffer[VK_NUMPAD9] & 0xF0 || (pKeysBuffer['9'] & 0xF0)) {    // 9
+				third_skill_used = true;
+				start_skill[2] = clock();
 				send_skill_packet(2, 2);
 			}
 		}
@@ -1288,22 +1343,22 @@ void CGameFramework::FrameAdvance()
 				Send_str += L"\n";
 				delete temp;
 			}
-			m_ppUILayer[i]->UpdateLabels(Send_str, 0, 2*(m_nWndClientHeight/3)-20, m_nWndClientWidth / 3, m_nWndClientHeight - 60);
+			m_ppUILayer[i]->UpdateLabels(Send_str, 0, 2 * (m_nWndClientHeight / 3) - 20, m_nWndClientWidth / 3, m_nWndClientHeight - 60);
 		}
 			  break;
 		case 1:
-			m_ppUILayer[i]->UpdateLabels(Chatting_Str, 0, m_nWndClientHeight - m_nWndClientHeight/22.5 - 20, m_nWndClientWidth/3, m_nWndClientHeight - 20);
+			m_ppUILayer[i]->UpdateLabels(Chatting_Str, 0, m_nWndClientHeight - m_nWndClientHeight / 22.5 - 20, m_nWndClientWidth / 3, m_nWndClientHeight - 20);
 			break;
 
 		case 2:
-			m_ppUILayer[i]->UpdateLabels(Info_str, 0, 0, (m_nWndClientWidth / 10) * 3 + 30, m_nWndClientHeight/5);
+			m_ppUILayer[i]->UpdateLabels(Info_str, 0, 0, (m_nWndClientWidth / 10) * 3 + 30, m_nWndClientHeight / 5);
 			break;
 		case 3: {
 			Hp_str.append(L" Hp : ");
 			Hp_str.append(to_wstring(m_pPlayer->m_hp));
 			Hp_str.append(L" / ");
 			Hp_str.append(to_wstring(m_pPlayer->m_max_hp));
-			m_ppUILayer[i]->UpdateLabels(Hp_str, 20, m_nWndClientHeight / 5 - 2*(m_nWndClientHeight / 22.5) - 20, // x0, y0
+			m_ppUILayer[i]->UpdateLabels(Hp_str, 20, m_nWndClientHeight / 5 - 2 * (m_nWndClientHeight / 22.5) - 20, // x0, y0
 				20 + ((float)m_pPlayer->m_hp / m_pPlayer->m_max_hp) * (m_nWndClientWidth / 10) * 3, m_nWndClientHeight / 5 - m_nWndClientHeight / 22.5 - 20);// x1, y1
 			break;
 		}
@@ -1312,23 +1367,23 @@ void CGameFramework::FrameAdvance()
 			Mp_str.append(to_wstring(m_pPlayer->m_mp));
 			Mp_str.append(L" / ");
 			Mp_str.append(to_wstring(m_pPlayer->m_max_mp));
-			m_ppUILayer[i]->UpdateLabels(Mp_str, 20, m_nWndClientHeight / 5 - m_nWndClientHeight/22.5 - 10,	// x0, y0
-				20 + ((float)m_pPlayer->m_mp / m_pPlayer->m_max_mp) * (m_nWndClientWidth / 10) * 3, m_nWndClientHeight / 5-10); // x1, y1
+			m_ppUILayer[i]->UpdateLabels(Mp_str, 20, m_nWndClientHeight / 5 - m_nWndClientHeight / 22.5 - 10,	// x0, y0
+				20 + ((float)m_pPlayer->m_mp / m_pPlayer->m_max_mp) * (m_nWndClientWidth / 10) * 3, m_nWndClientHeight / 5 - 10); // x1, y1
 			break;
 		}
 		case 5: {
 			m_ppUILayer[i]->UpdateLabels(L"Exp", 0, m_nWndClientHeight - 20,	// x0, y0
-				((float)m_pPlayer->m_exp / (100*(m_pPlayer->m_lv * m_pPlayer->m_lv) + 200* m_pPlayer->m_lv)) * m_nWndClientWidth , m_nWndClientHeight ); // x1, y1
+				((float)m_pPlayer->m_exp / (100 * (m_pPlayer->m_lv * m_pPlayer->m_lv) + 200 * m_pPlayer->m_lv)) * m_nWndClientWidth, m_nWndClientHeight); // x1, y1
 			break;
 		}
 		case 6: {
 			m_ppUILayer[i]->UpdateLabels(L"", 0, 0,	// x0, y0
-				m_nWndClientHeight / 5 - 2 * (m_nWndClientHeight / 22.5) - 20, m_nWndClientHeight / 5 - 2*(m_nWndClientHeight / 22.5) - 20); // x1, y1
+				m_nWndClientHeight / 5 - 2 * (m_nWndClientHeight / 22.5) - 20, m_nWndClientHeight / 5 - 2 * (m_nWndClientHeight / 22.5) - 20); // x1, y1
 			break;
 		}
 		case 7: {
 			if (!Combat_On) break;
-			m_ppUILayer[i]->UpdateLabels(Combat_str, (m_nWndClientWidth / 2) - (m_nWndClientWidth/10), 0, (m_nWndClientWidth / 2) + (m_nWndClientWidth / 10), (m_nWndClientHeight / 6));
+			m_ppUILayer[i]->UpdateLabels(Combat_str, (m_nWndClientWidth / 2) - (m_nWndClientWidth / 10), 0, (m_nWndClientWidth / 2) + (m_nWndClientWidth / 10), (m_nWndClientHeight / 6));
 			break;
 		}
 		case 8: {
@@ -1337,8 +1392,8 @@ void CGameFramework::FrameAdvance()
 			ang.append(to_wstring((int)get_combat_id_hp()));
 			ang.append(L"/");
 			ang.append(to_wstring((int)get_combat_id_max_hp()));
-			m_ppUILayer[i]->UpdateLabels(ang, (m_nWndClientWidth / 2) - (m_nWndClientWidth / 10)+10, (m_nWndClientHeight / 6) - 20 - m_nWndClientHeight / 22.5,
-				2*((m_nWndClientWidth / 10) - 10) * ((get_combat_id_hp() / get_combat_id_max_hp())) + (m_nWndClientWidth / 2) - (m_nWndClientWidth / 10) + 10, (m_nWndClientHeight / 6) - 20);
+			m_ppUILayer[i]->UpdateLabels(ang, (m_nWndClientWidth / 2) - (m_nWndClientWidth / 10) + 10, (m_nWndClientHeight / 6) - 20 - m_nWndClientHeight / 22.5,
+				2 * ((m_nWndClientWidth / 10) - 10) * ((get_combat_id_hp() / get_combat_id_max_hp())) + (m_nWndClientWidth / 2) - (m_nWndClientWidth / 10) + 10, (m_nWndClientHeight / 6) - 20);
 			break;
 		}
 		case 9: {
@@ -1387,12 +1442,12 @@ void CGameFramework::FrameAdvance()
 			if (hp_x == 0)  bc = D2D1::ColorF::Black;
 
 			reinterpret_cast<UIBar*>(m_ppUILayer[i])->SetBehindBrush(bc, 1.0, (m_nWndClientWidth / 2) - (m_nWndClientWidth / 18) + (m_nWndClientWidth / 180), (m_nWndClientHeight / 6) - (m_nWndClientHeight / 12.5),
-				(m_nWndClientWidth) -10, (m_nWndClientHeight / 6) - 10);
+				(m_nWndClientWidth)-10, (m_nWndClientHeight / 6) - 10);
 			reinterpret_cast<UIBar*>(m_ppUILayer[i])->SetColorBrush(fc, 1.0, (m_nWndClientWidth / 2) - (m_nWndClientWidth / 18) + (m_nWndClientWidth / 180), (m_nWndClientHeight / 6) - (m_nWndClientHeight / 12.5),
-				(m_nWndClientWidth) - 10, (m_nWndClientHeight / 6) - 10);
+				(m_nWndClientWidth)-10, (m_nWndClientHeight / 6) - 10);
 
 			m_ppUILayer[i]->UpdateLabels(ang, (m_nWndClientWidth / 2) - (m_nWndClientWidth / 18) + (m_nWndClientWidth / 180), (m_nWndClientHeight / 6) - (m_nWndClientHeight / 12.5),
-				(m_nWndClientWidth / 2) - (m_nWndClientWidth / 18) + (m_nWndClientWidth / 180) + (11*(m_nWndClientWidth/20) - 10) * bar_percent, (m_nWndClientHeight / 6) - 10);
+				(m_nWndClientWidth / 2) - (m_nWndClientWidth / 18) + (m_nWndClientWidth / 180) + (11 * (m_nWndClientWidth / 20) - 10) * bar_percent, (m_nWndClientHeight / 6) - 10);
 			break;
 		}
 
@@ -1401,7 +1456,7 @@ void CGameFramework::FrameAdvance()
 			wstring party_info_str = L"파티원정보(DC : ";
 			party_info_str.append(to_wstring(indun_death_count));
 			party_info_str.append(L")");
-			m_ppUILayer[i]->UpdateLabels(party_info_str, 0, (m_nWndClientHeight / 2) - (m_nWndClientHeight / 6), m_nWndClientWidth/9 , (m_nWndClientHeight / 2) + (m_nWndClientHeight / 9));
+			m_ppUILayer[i]->UpdateLabels(party_info_str, 0, (m_nWndClientHeight / 2) - (m_nWndClientHeight / 6), m_nWndClientWidth / 9, (m_nWndClientHeight / 2) + (m_nWndClientHeight / 9));
 			break;
 		}
 		case 12: {
@@ -1419,7 +1474,7 @@ void CGameFramework::FrameAdvance()
 		case 14: {
 			if (!InDungeon) break;
 			m_ppUILayer[i]->UpdateLabels(party_name[2], 10, (m_nWndClientHeight / 2) + (m_nWndClientHeight / 180),
-				10 + (m_nWndClientWidth/9 - 20) * ((float)get_hp_to_server(m_party_info->player_id[2]) / get_max_hp_to_server(m_party_info->player_id[2])), (m_nWndClientHeight / 2) + (m_nWndClientHeight / 180) + (m_nWndClientHeight / 22.5));
+				10 + (m_nWndClientWidth / 9 - 20) * ((float)get_hp_to_server(m_party_info->player_id[2]) / get_max_hp_to_server(m_party_info->player_id[2])), (m_nWndClientHeight / 2) + (m_nWndClientHeight / 180) + (m_nWndClientHeight / 22.5));
 			break;
 		}
 		case 15: {
@@ -1502,7 +1557,19 @@ void CGameFramework::FrameAdvance()
 		}
 		case 21:
 			if (!NoticeUI_On) break;
-			m_ppUILayer[i]->UpdateLabels(Notice_str, 0, 0, m_nWndClientWidth, m_nWndClientHeight/15);
+			m_ppUILayer[i]->UpdateLabels(Notice_str, 0, 0, m_nWndClientWidth, m_nWndClientHeight / 15);
+			break;
+		case 22:
+			m_ppUILayer[i]->UpdateLabels(L"SKILL",  FRAME_BUFFER_WIDTH / 2.8, FRAME_BUFFER_HEIGHT / 1.2,FRAME_BUFFER_WIDTH / 2.0 + 60, FRAME_BUFFER_HEIGHT / 1.2 + FRAME_BUFFER_WIDTH / 30);
+			break;
+		case 24:
+			m_ppUILayer[i]->UpdateLabels(L"", FRAME_BUFFER_WIDTH / 2.5, FRAME_BUFFER_HEIGHT / 1.2 + skill_cool_rect[0], FRAME_BUFFER_WIDTH / 2.5 + 60, FRAME_BUFFER_HEIGHT / 1.2 + FRAME_BUFFER_WIDTH / 30);
+			break;
+		case 25:
+			m_ppUILayer[i]->UpdateLabels(L"", FRAME_BUFFER_WIDTH / 2.26, FRAME_BUFFER_HEIGHT / 1.2 + skill_cool_rect[1], FRAME_BUFFER_WIDTH / 2.26 + 60, FRAME_BUFFER_HEIGHT / 1.2 + FRAME_BUFFER_WIDTH / 30);
+			break;
+		case 26:
+			m_ppUILayer[i]->UpdateLabels(L"", FRAME_BUFFER_WIDTH / 2.06, FRAME_BUFFER_HEIGHT / 1.2 + skill_cool_rect[2], FRAME_BUFFER_WIDTH / 2.06 + 60, FRAME_BUFFER_HEIGHT / 1.2 + FRAME_BUFFER_WIDTH / 30);
 			break;
 		}
 	}

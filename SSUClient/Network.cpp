@@ -37,7 +37,7 @@ wstring party_name[GAIA_ROOM];
 CPattern m_gaiaPattern;
 int indun_death_count = 4;
 
-array<CPlayer*, MAX_USER+MAX_NPC+1> mPlayer;
+array<CPlayer*, MAX_USER + MAX_NPC + 1> mPlayer{};
 array<Party*, (MAX_USER / GAIA_ROOM)> m_party;
 vector<int> party_id_index_vector;
 Party* m_party_info;
@@ -854,6 +854,20 @@ void process_packet(unsigned char* p)
 	case SC_PACKET_CHANGE_MP: {
 		sc_packet_change_mp* packet = reinterpret_cast<sc_packet_change_mp*>(p);
 		mPlayer[packet->id]->m_mp = packet->mp;
+		break;
+	}
+	case SC_PACKET_MOVE_OPENWORLD: {
+		EnterCriticalSection(&IndunCheck_cs);
+		sc_packet_move_openworld* packet = reinterpret_cast<sc_packet_move_openworld*>(p);
+		PartyUI_On = false;
+		party_info_on = false;
+		PartyInviteUI_ON = false;
+		InvitationCardUI_On = false;
+		InDungeon = false;
+		my_position.x = packet->x;
+		my_position.y = packet->y;
+		my_position.z = packet->z;
+		LeaveCriticalSection(&IndunCheck_cs);
 		break;
 	}
 	case SC_PACKET_ANIMATION_ATTACK: {

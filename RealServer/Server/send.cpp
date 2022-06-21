@@ -365,6 +365,7 @@ void send_party_room_destroy(Player* pl, int r_id)
     packet.size = sizeof(packet);
     packet.type = SC_PACKET_PARTY_ROOM_DESTROY;
     packet.room_id = r_id;
+    cout << r_id << endl;
     pl->do_send(sizeof(packet), &packet);
 }
 
@@ -375,6 +376,17 @@ void send_notice(Player* pl, const char* notice_str, int raid_notice)
     packet.type = SC_PACKET_NOTICE;
     strcpy_s(packet.message, notice_str);
     packet.raid_enter = raid_notice;
+    pl->do_send(sizeof(packet), &packet);
+}
+
+void send_move_openwrold(Player* pl)
+{
+    sc_packet_move_openworld packet;
+    packet.size = sizeof(packet);
+    packet.type = SC_PACKET_MOVE_OPENWORLD;
+    packet.x = pl->get_x();
+    packet.y = pl->get_y();
+    packet.z = pl->get_z();
     pl->do_send(sizeof(packet), &packet);
 }
 
