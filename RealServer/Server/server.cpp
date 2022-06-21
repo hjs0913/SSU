@@ -3105,8 +3105,10 @@ void worker()
             Player** party_players = dun->get_party_palyer();
             
             // 플레이어는 오픈 월드로 되돌리기
-            for (int i = 0; i < GAIA_ROOM; i++) {
+            int human_player = 0;
+            for (int i = 0; i < (GAIA_ROOM-human_player); i++) {
                 if (party_players[i]->get_tribe() == HUMAN) {
+                    cout << i << endl;
                     party_players[i]->join_dungeon_room == false;
                     // 원래는 DB에서 받아와야 하는 정보를 기본 정보로 대체
                     party_players[i]->set_x(3210);
@@ -3206,6 +3208,8 @@ void worker()
                     }
 
                     dun->quit_palyer(party_players[i]);
+                    i--;
+                    human_player++;
                 }
             }
 

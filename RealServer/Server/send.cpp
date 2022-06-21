@@ -365,7 +365,6 @@ void send_party_room_destroy(Player* pl, int r_id)
     packet.size = sizeof(packet);
     packet.type = SC_PACKET_PARTY_ROOM_DESTROY;
     packet.room_id = r_id;
-    cout << r_id << endl;
     pl->do_send(sizeof(packet), &packet);
 }
 

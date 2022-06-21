@@ -1318,15 +1318,6 @@ void CGameFramework::FrameAdvance()
 	else party_name_index = nullptr;
 
 	// 서버 연결X 용
-	/*Info_str = L"";
-	Info_str.append(L"Lv : ");
-	Info_str.append(L"50");
-	Info_str.append(L"  이름 : ");
-	Info_str.append(L"홍진선");
-	Info_str.append(L"\n직업 : ");
-	Info_str.append(L"전사");
-	Info_str.append(L"  속성 : ");
-	Info_str.append(L"무");*/
 
 	EnterCriticalSection(&UI_cs);
 	for (int i = 0; i < UICOUNT; i++) {

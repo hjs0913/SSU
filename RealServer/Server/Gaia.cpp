@@ -176,7 +176,10 @@ void Gaia::game_start()
 
 	boss->set_x(2037);
 	boss->set_z(2130);
-	boss->set_hp(10000);
+
+	// 게임 클리어시 오픈월드로 되돌아가는 상황 연출
+	//boss->set_hp(10000);
+
 	for (int i = 0; i < GAIA_ROOM; i++) {
 		party[i]->set_x(party[0]->get_x() + 10 * i);
 		party[i]->set_z(party[0]->get_z());
@@ -197,7 +200,6 @@ void Gaia::game_start()
 
 void Gaia::game_victory()
 {
-	cout << "앙 기모띠" << endl;
 	boss->state_lock.lock();
 	if (boss->get_state() == ST_INDUN) {
 		boss->set_state(ST_DEAD);
