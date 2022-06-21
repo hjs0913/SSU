@@ -321,10 +321,17 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 					gaia->boss->get_physical_defence()) / (1 + (gaia->boss->get_defence_factor() *
 						gaia->boss->get_physical_defence()));
 				float damage = give_damage * (1 - defence_damage);
-				gaia->boss->set_hp(gaia->boss->get_hp() - damage);
 
-				for (int i = 0; i < GAIA_ROOM; ++i) {
-					send_change_hp_packet(gaia->get_party_palyer()[i], gaia->boss);
+				if (gaia->boss->get_hp() > 0) {
+					gaia->boss->set_hp(gaia->boss->get_hp() - damage);
+
+					for (int i = 0; i < GAIA_ROOM; ++i) {
+						send_change_hp_packet(gaia->get_party_palyer()[i], gaia->boss);
+					}
+					if (gaia->boss->get_hp() < 0) {
+						gaia->boss->set_hp(0);
+						gaia->game_victory();
+					}
 				}
 
 				skill_check = true;
@@ -358,9 +365,15 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 					gaia->boss->get_magical_defence()) / (1 + (gaia->boss->get_defence_factor() *
 						gaia->boss->get_magical_defence()));
 				float damage = give_damage * (1 - defence_damage);
-				gaia->boss->set_hp(gaia->boss->get_hp() - damage);
-				for (int i = 0; i < GAIA_ROOM; ++i) {
-					send_change_hp_packet(gaia->get_party_palyer()[i], gaia->boss);
+				if (gaia->boss->get_hp() > 0) {
+					gaia->boss->set_hp(gaia->boss->get_hp() - damage);
+					for (int i = 0; i < GAIA_ROOM; ++i) {
+						send_change_hp_packet(gaia->get_party_palyer()[i], gaia->boss);
+					}
+					if (gaia->boss->get_hp() < 0) {
+						gaia->boss->set_hp(0);
+						gaia->game_victory();
+					}
 				}
 				skill_check = true;
 			}
@@ -420,12 +433,17 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 				float damage = give_damage * (1 - defence_damage);
 		
 				gaia->boss->set_pos(gaia->boss->get_x() + pa->get_look_x() * 40, gaia->boss->get_z() + pa->get_look_z() * 40);
-				gaia->boss->set_hp(gaia->boss->get_hp() - damage);
-				for (int i = 0; i < GAIA_ROOM; ++i) {
-					send_move_packet(gaia->get_party_palyer()[i], gaia->boss, 1);
-					send_change_hp_packet(gaia->get_party_palyer()[i], gaia->boss);
+				if (gaia->boss->get_hp() > 0) {
+					gaia->boss->set_hp(gaia->boss->get_hp() - damage);
+					for (int i = 0; i < GAIA_ROOM; ++i) {
+						send_move_packet(gaia->get_party_palyer()[i], gaia->boss, 1);
+						send_change_hp_packet(gaia->get_party_palyer()[i], gaia->boss);
+					}
+					if (gaia->boss->get_hp() < 0) {
+						gaia->boss->set_hp(0);
+						gaia->game_victory();
+					}
 				}
-
 				skill_check = true;
 			}
 			ev.obj_id = MAX_USER / GAIA_ROOM + 1;
@@ -505,15 +523,20 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 					gaia->boss->get_magical_defence()) / (1 + (gaia->boss->get_defence_factor() *
 						gaia->boss->get_magical_defence()));
 				float damage = give_damage * (1 - defence_damage);
-				gaia->boss->set_hp(gaia->boss->get_hp() - damage);
 
-			
-
-				for (int i = 0; i < GAIA_ROOM; ++i) {
-					send_move_packet(gaia->get_party_palyer()[i], gaia->boss, 1);
-					send_change_hp_packet(gaia->get_party_palyer()[i], gaia->boss);
-					send_change_hp_packet(gaia->get_party_palyer()[i], pa);
+				if (gaia->boss->get_hp() > 0) {
+					gaia->boss->set_hp(gaia->boss->get_hp() - damage);
+					for (int i = 0; i < GAIA_ROOM; ++i) {
+						send_move_packet(gaia->get_party_palyer()[i], gaia->boss, 1);
+						send_change_hp_packet(gaia->get_party_palyer()[i], gaia->boss);
+						send_change_hp_packet(gaia->get_party_palyer()[i], pa);
+					}
+					if (gaia->boss->get_hp() < 0) {
+						gaia->boss->set_hp(0);
+						gaia->game_victory();
+					}
 				}
+
 				skill_check = true;
 			}
 		
@@ -553,10 +576,17 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 					gaia->boss->get_magical_defence()) / (1 + (gaia->boss->get_defence_factor() *
 						gaia->boss->get_magical_defence()));
 				float damage = give_damage * (1 - defence_damage);
-				gaia->boss->set_hp(gaia->boss->get_hp() - damage);
+				if (gaia->boss->get_hp() > 0) {
+					gaia->boss->set_hp(gaia->boss->get_hp() - damage);
 
-				for (int i = 0; i < GAIA_ROOM; ++i)
-					send_play_effect_packet(gaia->get_party_palyer()[i], gaia->boss); // ÀÌÆåÆ® ÅÍÆ®¸± À§Ä¡ 
+					for (int i = 0; i < GAIA_ROOM; ++i)
+						send_play_effect_packet(gaia->get_party_palyer()[i], gaia->boss); // ÀÌÆåÆ® ÅÍÆ®¸± À§Ä¡ 
+					if (gaia->boss->get_hp() < 0) {
+						gaia->boss->set_hp(0);
+						gaia->game_victory();
+					}
+				}
+
 				skill_check = true;
 			}
 		
@@ -727,7 +757,11 @@ void Partner::attack_success(Partner* pa, Gaia* gaia, float atk_factor)
 		send_animation_attack(gaia->get_party_palyer()[i], pa->get_id());
 		send_change_hp_packet(gaia->get_party_palyer()[i], gaia->boss);
 	}
-	//hp°¡ 0ÀÌµÇ´Â°Ç Ã³¸® ¾ÈÇØ³ð 
+	//hp°¡ 0ÀÌµÇ´Â°Ç Ã³¸® ¾ÈÇØ³ð -> ÇÏ°íÀÖÀ½
+	if (gaia->boss->get_hp() < 0) {
+		gaia->boss->set_hp(0);
+		gaia->game_victory();
+	}
 }
 
 void Partner::partner_normal_attack(Partner* pa, Gaia* gaia)
