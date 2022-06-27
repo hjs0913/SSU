@@ -25,6 +25,7 @@ public:
     bool                join_dungeon_room;
     int                 indun_id;
     bool                attack_speed_up;
+    int                 indun_player_cnt;
 public:
     Player(int id);
 
