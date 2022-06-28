@@ -782,7 +782,7 @@ void process_packet(int client_id, unsigned char* p)
         }
         LeaveCriticalSection(&cs);
         */
-
+    
         // 중복 아이디 검사
 
         for (auto* p : players) {
@@ -805,6 +805,9 @@ void process_packet(int client_id, unsigned char* p)
             }
 
         }
+        //데이터 베이스 
+        Search_Id(pl, packet->id);
+
         // 원래는 DB에서 받아와야 하는 정보를 기본 정보로 대체
         pl->set_x(3210);
         pl->set_y(0);
@@ -4116,6 +4119,9 @@ void initialise_DUNGEON()
 
 int main()
 {
+    //db 연결 
+    Initialise_DB();
+
     setlocale(LC_ALL, "korean");
     wcout.imbue(locale("korean"));
     WSADATA WSAData;
