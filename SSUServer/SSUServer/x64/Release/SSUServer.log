@@ -1,0 +1,267 @@
+﻿  ObjectManager.cpp
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(120,31): warning C4553: '==': 식의 결과가 사용되지 않습니다. '='을(를) 의도했습니까?
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(132,29): error C3861: 'is_npc': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(132,35): warning C4805: '==': 연산에 'bool' 형식과 'unknown-type' 형식을 함께 사용하는 것은 안전하지 않습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(159,21): error C3861: 'is_npc': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(159,27): warning C4805: '==': 연산에 'bool' 형식과 'unknown-type' 형식을 함께 사용하는 것은 안전하지 않습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(220,17): error C3861: 'process_packet': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(245,26): error C3861: 'get_new_id': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(265,22): error C2065: 'g_s_socket': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(280,17): error C3861: 'return_npc_position': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(292,17): error C3861: 'return_npc_position': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(299,17): error C3861: 'do_npc_move': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(328,17): error C3861: 'attack_success': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(353,37): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(371,13): error C3861: 'player_revive': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(389,39): warning C4244: '인수': 'lua_Number'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(390,39): warning C4244: '인수': 'lua_Number'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(391,39): warning C4244: '인수': 'lua_Number'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(392,40): warning C4244: '인수': 'lua_Integer'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(399,30): error C3861: 'is_near': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(502,13): error C2065: 'Partner': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(502,22): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(502,44): error C2061: 구문 오류: 식별자 'Partner'
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(503,13): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(503,30): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(503,43): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(504,36): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(506,41): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(507,41): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(526,13): error C2065: 'Partner': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(526,22): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(526,44): error C2061: 구문 오류: 식별자 'Partner'
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(527,13): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(527,32): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(527,45): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(538,13): error C2065: 'Partner': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(538,22): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(538,44): error C2061: 구문 오류: 식별자 'Partner'
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(539,13): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(539,39): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(539,52): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(573,29): error C3861: 'is_npc': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(573,42): warning C4805: '==': 연산에 'unknown-type' 형식과 'bool' 형식을 함께 사용하는 것은 안전하지 않습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(605,57): warning C4553: '==': 식의 결과가 사용되지 않습니다. '='을(를) 의도했습니까?
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(610,48): warning C4552: '-': 식의 결과가 사용되지 않습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(626,37): error C3861: 'is_npc': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(626,43): warning C4805: '==': 연산에 'bool' 형식과 'unknown-type' 형식을 함께 사용하는 것은 안전하지 않습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(635,38): error C3861: 'is_near': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(656,38): error C3861: 'is_near': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(660,37): error C3861: 'is_npc': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(660,43): warning C4805: '==': 연산에 'bool' 형식과 'unknown-type' 형식을 함께 사용하는 것은 안전하지 않습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(661,33): error C3861: 'is_agro_near': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(670,37): error C3861: 'Activate_Npc_Move_Event': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(715,29): error C3861: 'is_npc': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\ObjectManager.cpp(715,35): warning C4805: '==': 연산에 'bool' 형식과 'unknown-type' 형식을 함께 사용하는 것은 안전하지 않습니다.
+  PacketManager.cpp
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(14,44): error C2065: 'players': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(33,24): error C2065: 'players': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(33,24): error C2672: 'begin': 일치하는 오버로드된 함수가 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(33,33): error C2893: 함수 템플릿 'unknown-type std::begin(_Container &)'을(를) 특수화하지 못했습니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xutility(1916): message : 'std::begin' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(33,33): message : 다음 템플릿 인수 사용:
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(33,33): message : '_Container=unknown-type'
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(33,33): error C2784: 'const _Elem *std::begin(std::initializer_list<_Elem>) noexcept': 'std::initializer_list<_Elem>'의 템플릿 인수를 'unknown-type'에서 추론할 수 없습니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\initializer_list(57): message : 'std::begin' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(33,24): error C2672: 'end': 일치하는 오버로드된 함수가 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(33,33): error C2893: 함수 템플릿 'unknown-type std::end(_Container &)'을(를) 특수화하지 못했습니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xutility(1926): message : 'std::end' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(33,33): message : 다음 템플릿 인수 사용:
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(33,33): message : '_Container=unknown-type'
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(33,33): error C2784: 'const _Elem *std::end(std::initializer_list<_Elem>) noexcept': 'std::initializer_list<_Elem>'의 템플릿 인수를 'unknown-type'에서 추론할 수 없습니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\initializer_list(63): message : 'std::end' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(33,33): error C3536: '<begin>$L0': 초기화되기 전에 사용할 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(33,33): error C3536: '<end>$L0': 초기화되기 전에 사용할 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(33,31): error C2100: 간접 참조가 잘못되었습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(33,31): error C3535: 'auto *'의 형식을 'int'에서 추론할 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(33,33): error C2440: '초기화 중': 'int'에서 'int *'(으)로 변환할 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(33,31): message : 정수 계열 형식에서 포인터 형식으로 변환하려면 reinterpret_cast, C 스타일 캐스트 또는 함수 스타일 캐스트가 필요합니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(65,22): warning C4552: '-': 식의 결과가 사용되지 않습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(71,30): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(72,30): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(82,51): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(83,50): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(84,53): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(85,52): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(87,42): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(94,41): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(96,52): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(97,51): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(98,53): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(99,51): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(101,42): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(111,51): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(112,51): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(113,53): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(114,52): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(116,42): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(125,51): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(126,50): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(127,53): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(128,52): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(130,42): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(142,43): error C2065: 'players': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(149,43): error C2065: 'players': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(159,28): error C2065: 'players': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(159,28): error C2672: 'begin': 일치하는 오버로드된 함수가 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(159,37): error C2893: 함수 템플릿 'unknown-type std::begin(_Container &)'을(를) 특수화하지 못했습니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xutility(1916): message : 'std::begin' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(159,37): message : 다음 템플릿 인수 사용:
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(159,37): message : '_Container=unknown-type'
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(159,37): error C2784: 'const _Elem *std::begin(std::initializer_list<_Elem>) noexcept': 'std::initializer_list<_Elem>'의 템플릿 인수를 'unknown-type'에서 추론할 수 없습니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\initializer_list(57): message : 'std::begin' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(159,28): error C2672: 'end': 일치하는 오버로드된 함수가 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(159,37): error C2893: 함수 템플릿 'unknown-type std::end(_Container &)'을(를) 특수화하지 못했습니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xutility(1926): message : 'std::end' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(159,37): message : 다음 템플릿 인수 사용:
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(159,37): message : '_Container=unknown-type'
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(159,37): error C2784: 'const _Elem *std::end(std::initializer_list<_Elem>) noexcept': 'std::initializer_list<_Elem>'의 템플릿 인수를 'unknown-type'에서 추론할 수 없습니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\initializer_list(63): message : 'std::end' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(159,37): error C3536: '<begin>$L1': 초기화되기 전에 사용할 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(159,37): error C3536: '<end>$L1': 초기화되기 전에 사용할 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(159,35): error C2100: 간접 참조가 잘못되었습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(162,25): error C3861: 'is_npc': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(162,31): warning C4805: '==': 연산에 'bool' 형식과 'unknown-type' 형식을 함께 사용하는 것은 안전하지 않습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(171,26): error C3861: 'is_near': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(174,67): warning C4312: 'reinterpret_cast': 'int'에서 더 큰 'Player *'(으)로의 변환입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(194,28): error C2065: 'players': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(194,28): error C2672: 'begin': 일치하는 오버로드된 함수가 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(194,37): error C2893: 함수 템플릿 'unknown-type std::begin(_Container &)'을(를) 특수화하지 못했습니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xutility(1916): message : 'std::begin' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(194,37): message : 다음 템플릿 인수 사용:
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(194,37): message : '_Container=unknown-type'
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(194,37): error C2784: 'const _Elem *std::begin(std::initializer_list<_Elem>) noexcept': 'std::initializer_list<_Elem>'의 템플릿 인수를 'unknown-type'에서 추론할 수 없습니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\initializer_list(57): message : 'std::begin' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(194,28): error C2672: 'end': 일치하는 오버로드된 함수가 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(194,37): error C2893: 함수 템플릿 'unknown-type std::end(_Container &)'을(를) 특수화하지 못했습니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xutility(1926): message : 'std::end' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(194,37): message : 다음 템플릿 인수 사용:
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(194,37): message : '_Container=unknown-type'
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(194,37): error C2784: 'const _Elem *std::end(std::initializer_list<_Elem>) noexcept': 'std::initializer_list<_Elem>'의 템플릿 인수를 'unknown-type'에서 추론할 수 없습니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\initializer_list(63): message : 'std::end' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(194,37): error C3536: '<begin>$L2': 초기화되기 전에 사용할 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(194,37): error C3536: '<end>$L2': 초기화되기 전에 사용할 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(194,35): error C2100: 간접 참조가 잘못되었습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(203,26): error C3861: 'is_near': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(207,25): error C3861: 'is_npc': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(207,31): warning C4805: '==': 연산에 'bool' 형식과 'unknown-type' 형식을 함께 사용하는 것은 안전하지 않습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(208,21): error C3861: 'is_agro_near': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(217,25): error C3861: 'Activate_Npc_Move_Event': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(226,45): error C2664: 'void send_put_object_packet(Player *,Npc *)': 인수 2을(를) 'int'에서 'Npc *'(으)로 변환할 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(226,40): message : 정수 계열 형식에서 포인터 형식으로 변환하려면 reinterpret_cast, C 스타일 캐스트 또는 함수 스타일 캐스트가 필요합니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\send.h(8,6): message : 'send_put_object_packet' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(239,25): error C2065: 'obstacles': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(239,25): error C2672: 'begin': 일치하는 오버로드된 함수가 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(239,36): error C2893: 함수 템플릿 'unknown-type std::begin(_Container &)'을(를) 특수화하지 못했습니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xutility(1916): message : 'std::begin' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(239,36): message : 다음 템플릿 인수 사용:
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(239,36): message : '_Container=unknown-type'
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(239,36): error C2784: 'const _Elem *std::begin(std::initializer_list<_Elem>) noexcept': 'std::initializer_list<_Elem>'의 템플릿 인수를 'unknown-type'에서 추론할 수 없습니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\initializer_list(57): message : 'std::begin' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(239,25): error C2672: 'end': 일치하는 오버로드된 함수가 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(239,36): error C2893: 함수 템플릿 'unknown-type std::end(_Container &)'을(를) 특수화하지 못했습니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xutility(1926): message : 'std::end' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(239,36): message : 다음 템플릿 인수 사용:
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(239,36): message : '_Container=unknown-type'
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(239,36): error C2784: 'const _Elem *std::end(std::initializer_list<_Elem>) noexcept': 'std::initializer_list<_Elem>'의 템플릿 인수를 'unknown-type'에서 추론할 수 없습니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\initializer_list(63): message : 'std::end' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(239,36): error C3536: '<begin>$L3': 초기화되기 전에 사용할 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(239,36): error C3536: '<end>$L3': 초기화되기 전에 사용할 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(239,34): error C2100: 간접 참조가 잘못되었습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(291,32): error C2065: 'players': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(291,32): error C2672: 'begin': 일치하는 오버로드된 함수가 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(291,41): error C2893: 함수 템플릿 'unknown-type std::begin(_Container &)'을(를) 특수화하지 못했습니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xutility(1916): message : 'std::begin' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(291,41): message : 다음 템플릿 인수 사용:
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(291,41): message : '_Container=unknown-type'
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(291,41): error C2784: 'const _Elem *std::begin(std::initializer_list<_Elem>) noexcept': 'std::initializer_list<_Elem>'의 템플릿 인수를 'unknown-type'에서 추론할 수 없습니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\initializer_list(57): message : 'std::begin' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(291,32): error C2672: 'end': 일치하는 오버로드된 함수가 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(291,41): error C2893: 함수 템플릿 'unknown-type std::end(_Container &)'을(를) 특수화하지 못했습니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xutility(1926): message : 'std::end' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(291,41): message : 다음 템플릿 인수 사용:
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(291,41): message : '_Container=unknown-type'
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(291,41): error C2784: 'const _Elem *std::end(std::initializer_list<_Elem>) noexcept': 'std::initializer_list<_Elem>'의 템플릿 인수를 'unknown-type'에서 추론할 수 없습니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\initializer_list(63): message : 'std::end' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(291,41): error C3536: '<begin>$L4': 초기화되기 전에 사용할 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(291,41): error C3536: '<end>$L4': 초기화되기 전에 사용할 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(291,39): error C2100: 간접 참조가 잘못되었습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(293,21): error C3861: 'is_npc': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(294,20): warning C4312: 'reinterpret_cast': 'int'에서 더 큰 'Player *'(으)로의 변환입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(296,69): warning C4312: 'reinterpret_cast': 'int'에서 더 큰 'Player *'(으)로의 변환입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(304,13): error C3861: 'check_move_alright': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(314,28): error C2065: 'players': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(314,28): error C2672: 'begin': 일치하는 오버로드된 함수가 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(314,37): error C2893: 함수 템플릿 'unknown-type std::begin(_Container &)'을(를) 특수화하지 못했습니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xutility(1916): message : 'std::begin' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(314,37): message : 다음 템플릿 인수 사용:
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(314,37): message : '_Container=unknown-type'
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(314,37): error C2784: 'const _Elem *std::begin(std::initializer_list<_Elem>) noexcept': 'std::initializer_list<_Elem>'의 템플릿 인수를 'unknown-type'에서 추론할 수 없습니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\initializer_list(57): message : 'std::begin' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(314,28): error C2672: 'end': 일치하는 오버로드된 함수가 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(314,37): error C2893: 함수 템플릿 'unknown-type std::end(_Container &)'을(를) 특수화하지 못했습니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xutility(1926): message : 'std::end' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(314,37): message : 다음 템플릿 인수 사용:
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(314,37): message : '_Container=unknown-type'
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(314,37): error C2784: 'const _Elem *std::end(std::initializer_list<_Elem>) noexcept': 'std::initializer_list<_Elem>'의 템플릿 인수를 'unknown-type'에서 추론할 수 없습니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\initializer_list(63): message : 'std::end' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(314,37): error C3536: '<begin>$L5': 초기화되기 전에 사용할 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(314,37): error C3536: '<end>$L5': 초기화되기 전에 사용할 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(314,35): error C2100: 간접 참조가 잘못되었습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(316,26): error C3861: 'is_near': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(321,25): error C3861: 'is_npc': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(321,31): warning C4805: '==': 연산에 'bool' 형식과 'unknown-type' 형식을 함께 사용하는 것은 안전하지 않습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(322,21): error C3861: 'is_agro_near': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(331,25): error C3861: 'Activate_Npc_Move_Event': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(351,44): error C2065: 'players': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(351,58): error C2660: 'send_put_object_packet': 함수는 1개의 인수를 사용하지 않습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\send.h(8,6): message : 'send_put_object_packet' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(354,29): error C3861: 'is_npc': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(354,35): warning C4805: '==': 연산에 'bool' 형식과 'unknown-type' 형식을 함께 사용하는 것은 안전하지 않습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(357,66): error C2065: 'players': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(372,29): error C3861: 'is_npc': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(372,35): warning C4805: '==': 연산에 'bool' 형식과 'unknown-type' 형식을 함께 사용하는 것은 안전하지 않습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(374,66): error C2065: 'players': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(393,47): error C2065: 'players': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(393,61): error C2660: 'send_remove_object_packet': 함수는 1개의 인수를 사용하지 않습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\send.h(10,6): message : 'send_remove_object_packet' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(395,29): error C3861: 'is_npc': 식별자를 찾을 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(395,35): warning C4805: '==': 연산에 'bool' 형식과 'unknown-type' 형식을 함께 사용하는 것은 안전하지 않습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(396,66): error C2065: 'players': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(409,25): error C2065: 'obstacles': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(409,25): error C2672: 'begin': 일치하는 오버로드된 함수가 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(409,36): error C2893: 함수 템플릿 'unknown-type std::begin(_Container &)'을(를) 특수화하지 못했습니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xutility(1916): message : 'std::begin' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(409,36): message : 다음 템플릿 인수 사용:
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(409,36): message : '_Container=unknown-type'
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(409,36): error C2784: 'const _Elem *std::begin(std::initializer_list<_Elem>) noexcept': 'std::initializer_list<_Elem>'의 템플릿 인수를 'unknown-type'에서 추론할 수 없습니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\initializer_list(57): message : 'std::begin' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(409,25): error C2672: 'end': 일치하는 오버로드된 함수가 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(409,36): error C2893: 함수 템플릿 'unknown-type std::end(_Container &)'을(를) 특수화하지 못했습니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xutility(1926): message : 'std::end' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(409,36): message : 다음 템플릿 인수 사용:
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(409,36): message : '_Container=unknown-type'
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(409,36): error C2784: 'const _Elem *std::end(std::initializer_list<_Elem>) noexcept': 'std::initializer_list<_Elem>'의 템플릿 인수를 'unknown-type'에서 추론할 수 없습니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\initializer_list(63): message : 'std::end' 선언을 참조하십시오.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(409,36): error C3536: '<begin>$L8': 초기화되기 전에 사용할 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(409,36): error C3536: '<end>$L8': 초기화되기 전에 사용할 수 없습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(409,34): error C2100: 간접 참조가 잘못되었습니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(414,36): error C2672: 'std::_Hash<std::_Uset_traits<_Kty,std::_Uhash_compare<_Kty,_Hasher,_Keyeq>,_Alloc,false>>::count': 일치하는 오버로드된 함수가 없습니다.
+          with
+          [
+              _Kty=int,
+              _Hasher=std::hash<int>,
+              _Keyeq=std::equal_to<int>,
+              _Alloc=std::allocator<int>
+          ]
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(430,32): error C2672: 'std::_Hash<std::_Uset_traits<_Kty,std::_Uhash_compare<_Kty,_Hasher,_Keyeq>,_Alloc,false>>::count': 일치하는 오버로드된 함수가 없습니다.
+          with
+          [
+              _Kty=int,
+              _Hasher=std::hash<int>,
+              _Keyeq=std::equal_to<int>,
+              _Alloc=std::allocator<int>
+          ]
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(470,17): error C2065: 'players': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\source\repos\SSUServer\SSUServer\PacketManager.cpp(470,16): fatal error C1003: 오류 수가 100개를 초과했습니다. 컴파일을 중지합니다.
+  SSUServer.cpp
