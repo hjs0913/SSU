@@ -59,9 +59,63 @@ void Initialise_DB()
 	}
 }
 
+bool Add_DB(char* login_id, char* password, Player* pl, char* nick_name, int job, int element)
+{
+	/*
+	char nick_name[10];
+	cout << "새로운 아이디 입니다. 닉네임을 입력하세요: " << endl;
+	cin >> nick_name;
+	int job;
+	cout << "직업을 선택하세요(전사:0, 탱커:1, 마법사:2, 서포터:3): " << endl;
+	cin >> job;
+	int element;
+	cout << "속성을 선택하세요(물:1, 강철:2, 바람:3, 불:4, 나무:5, 땅:6, 얼음:7 ): " << endl;
+	cin >> element;
+	*/
+	SQLRETURN retcode;
+
+	char temp[100];
+	//아이디, 패스워드,이름,x,y,z ,hp,레벨, exp, maxhp, job, mp, maxmp, element 
+	sprintf_s(temp, sizeof(temp), "EXEC Add_UserData %s, %s, %s, %d,%d,%d,%d,%d,%d,%d,%d ,%d,%d,%d",
+		login_id, password, nick_name, 0,0,0, 100,1,0,100, job, 100,100, element);
+
+	wchar_t* exec;
+	int strSize = MultiByteToWideChar(CP_ACP, 0, temp, -1, NULL, NULL);
+	exec = new WCHAR[strSize];
+	MultiByteToWideChar(CP_ACP, 0, temp, sizeof(temp) + 1, exec, strSize);
+
+
+	retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
+	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)exec, SQL_NTS);
+	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
+	{
+		SQLLEN* pcrow = new SQLLEN;
+		retcode = SQLRowCount(hstmt, pcrow);
+		if (retcode == SQL_ERROR || retcode == SQL_SUCCESS_WITH_INFO) {
+
+			HandleDiagnosticRecord(hstmt, SQL_HANDLE_STMT, retcode);
+		}
+		cout << "새 유저 정보를 DB에 추가했습니다." << endl;
+	
+	}
+	else {
+		HandleDiagnosticRecord(hstmt, SQL_HANDLE_STMT, retcode);
+		cout << "새 유저 정보를 DB에 추가하는데에 실패했습니다." << endl;
+		return false;
+	}
+	pl->set_login_id(login_id);
+	pl->set_name(nick_name);
+	pl->set_x(100);
+	pl->set_y(100);
+	pl->set_z(100);
+	pl->set_lv(1);
+	pl->set_job((JOB)job);
+	pl->set_element((ELEMENT)element);
+	return true;
+}
+
 bool Search_Id(Player* pl, char* login_id, char* password)
 {
-	cout << password << endl;
 	// cout << atoi(login_id) << endl;
 	SQLRETURN retcode;
 	SQLINTEGER c_id, c_password, c_hp, c_exp, c_maxhp, c_mp, c_maxmp = 0;
@@ -131,7 +185,12 @@ bool Search_Id(Player* pl, char* login_id, char* password)
 			delete exec;
 			return true;
 		}
-		else {   //없으면 만들어야지 
+		else {   //없으면 만들어야지  -> 여기 아직
+			SQLCancel(hstmt);
+			delete exec;
+			return false;
+		//	Add_DB(login_id, password, pl); //이거 하기전에 클라한테 로그인 실패했다고 하고 직업, 속성 입력 받아야해 
+				/*
 			SQLCancel(hstmt);
 			cout << "id 생성으로 간다" << endl;
 			// exec 다시 설정
@@ -151,6 +210,9 @@ bool Search_Id(Player* pl, char* login_id, char* password)
 					return false;
 				}
 				else {	// 생성이 되었으니 다시 읽자
+					Add_DB(login_id, password, pl);
+
+				
 					retcode = SQLExecDirect(hstmt, (SQLWCHAR*)exec, SQL_NTS);
 
 					if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
@@ -201,7 +263,7 @@ bool Search_Id(Player* pl, char* login_id, char* password)
 						}
 					}
 				}
-			}
+			}*/
 		}
 	}
 	else {
