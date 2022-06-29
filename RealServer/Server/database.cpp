@@ -61,18 +61,19 @@ void Initialise_DB()
 
 bool Search_Id(Player* pl, char* login_id, char* password)
 {
+	cout << password << endl;
 	// cout << atoi(login_id) << endl;
 	SQLRETURN retcode;
-	SQLINTEGER c_id, c_password, c_hp, c_exp, c_maxhp, c_mp, c_maxmp;
+	SQLINTEGER c_id, c_password, c_hp, c_exp, c_maxhp, c_mp, c_maxmp = 0;
 	SQLWCHAR c_name[MAX_NAME_SIZE];
-	SQLSMALLINT c_x, c_y, c_z, c_lv, c_job;
+	SQLSMALLINT c_x, c_y, c_z, c_lv, c_job, c_element;
 	SQLLEN cbP_name = 0, cbP_id = 0, cbP_password = 0, cbP_x = 0, cbP_y = 0, cbP_z = 0,
 		cbP_hp = 0, cbP_lv = 0, cbP_exp = 0, cbP_maxhp = 0, cbP_job = 0, 
-		cbP_mp = 0, cbP_maxmp = 0;
-	char temp[50];
-	wstring qu{};
-	sprintf_s(temp, sizeof(temp), "EXEC Search_Id %s, %s", login_id, password);
-
+		cbP_mp = 0, cbP_maxmp = 0, cbP_element = 0;
+	char temp[60];
+	
+	sprintf_s(temp, sizeof(temp), "EXEC Search_PLAYER %s, %s", login_id, password);
+	cout << temp << endl;
 	
 	//cout << exec << endl;
 	wchar_t* exec;
@@ -98,7 +99,7 @@ bool Search_Id(Player* pl, char* login_id, char* password)
 		retcode = SQLBindCol(hstmt, 11, SQL_C_SHORT, &c_job, 100, &cbP_job);
 		retcode = SQLBindCol(hstmt, 12, SQL_C_LONG, &c_mp, 100, &cbP_mp);
 		retcode = SQLBindCol(hstmt, 13, SQL_C_LONG, &c_maxmp, 100, &cbP_maxmp);
-
+		retcode = SQLBindCol(hstmt, 14, SQL_C_SHORT, &c_element, 100, &cbP_element);
 		// Fetch and print each row of data. On an error, display a message and exit.
 		retcode = SQLFetch(hstmt);
 		if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
@@ -121,9 +122,11 @@ bool Search_Id(Player* pl, char* login_id, char* password)
 			pl->set_job((JOB)c_job);
 			pl->set_mp(c_mp);
 			pl->set_maxmp(c_maxmp);
+			pl->set_element((ELEMENT)c_element);
 
-			cout << pl->get_id() << "," << pl->get_name() << "," << pl->get_x() << "," << pl->get_y() << ","
-				<< pl->get_hp() << "," << pl->get_lv() << "," << pl->get_exp() << "," << pl->get_maxhp() << pl->get_job() << endl;
+			cout << "ID: " << pl->get_id() << " 이름: " << pl->get_name() << " X: " << pl->get_x() <<" Y: " << pl->get_y() << " Z: " << pl->get_z() <<
+				" HP: " << pl->get_hp() << " LV: " << pl->get_lv() << " EXP: " << pl->get_exp() << " MP: " << pl->get_maxmp() <<" 직업: " << pl->get_job()
+				<< " 속성: " << pl->get_element() <<endl;
 			SQLCancel(hstmt);
 			delete exec;
 			return true;
@@ -164,7 +167,7 @@ bool Search_Id(Player* pl, char* login_id, char* password)
 						retcode = SQLBindCol(hstmt, 11, SQL_C_SHORT, &c_job, 100, &cbP_job);
 						retcode = SQLBindCol(hstmt, 12, SQL_C_LONG, &c_mp, 100, &cbP_mp);
 						retcode = SQLBindCol(hstmt, 13, SQL_C_LONG, &c_maxmp, 100, &cbP_maxmp);
-
+						retcode = SQLBindCol(hstmt, 14, SQL_C_SHORT, &c_element, 100, &cbP_element);
 						// Fetch and print each row of data. On an error, display a message and exit.
 						retcode = SQLFetch(hstmt);
 						if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
@@ -185,7 +188,7 @@ bool Search_Id(Player* pl, char* login_id, char* password)
 							pl->set_job((JOB)c_job);
 							pl->set_mp(c_mp);
 							pl->set_maxmp(c_maxmp);
-
+							pl->set_element((ELEMENT)c_element);
 							cout << pl->get_id() << endl;
 							SQLCancel(hstmt);
 							delete exec;
@@ -212,7 +215,7 @@ void Save_position(Player* pl)
 	SQLRETURN retcode;
 
 	char temp[100];
-	//여기도 패스워드, Z좌표, 직업,MP,MAXMP 를 추가로 넣어서 저장해야한다. 
+	//여기도 패스워드, Z좌표, 직업,MP,MAXMP, 속성 를 추가로 넣어서 저장해야한다. 
 	sprintf_s(temp, sizeof(temp), "EXEC save_player_info %d, %d, %d, %d, %d, %d, %d", 
 		pl->get_login_id(), pl->get_x(), pl->get_y(), pl->get_hp(),
 		pl->get_lv(), pl->get_exp(), pl->get_maxhp());

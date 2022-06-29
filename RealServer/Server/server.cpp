@@ -772,9 +772,9 @@ void process_packet(int client_id, unsigned char* p)
         cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(p);
         // pl->set_name(packet->name);
         // DB 연결
-        /*
+   /*  //여기 아래 고쳐야함 
         EnterCriticalSection(&cs);
-        if (!(Search_Id(pl, packet->name))) {
+        if (!(Search_Id(pl, packet->name, packet->password))) {
             send_login_fail_packet(pl, 0);   // 아이디 없음
             Disconnect(client_id);
             LeaveCriticalSection(&cs);
@@ -864,8 +864,7 @@ void process_packet(int client_id, unsigned char* p)
             pl->set_magical_defence(0.2 * lv * lv + 10 * lv);
             pl->set_basic_attack_factor(50.0f);
             pl->set_defence_factor(0.0002);
-            pl->set_element(E_WATER);
-
+  
             pl->set_origin_physical_attack(pl->get_physical_attack());
             pl->set_origin_magical_attack(pl->get_magical_attack());
             pl->set_origin_physical_defence(pl->get_physical_defence());
