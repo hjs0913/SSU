@@ -143,6 +143,7 @@
   <ItemGroup>
     <ClCompile Include="EXP_OVER.cpp" />
     <ClCompile Include="Gaia.cpp" />
+    <ClCompile Include="LuaFunction.cpp" />
     <ClCompile Include="Npc.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="Obstacle.cpp" />
@@ -173,6 +174,7 @@
     <ClInclude Include="include\lua.hpp" />
     <ClInclude Include="include\luaconf.h" />
     <ClInclude Include="include\lualib.h" />
+    <ClInclude Include="LuaFunction.h" />
     <ClInclude Include="Npc.h" />
     <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="Obstacle.h" />

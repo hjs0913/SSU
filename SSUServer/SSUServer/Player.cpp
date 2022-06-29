@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "send.h"
 
 Player::Player(int id) : Npc(id)
 {
@@ -76,4 +77,82 @@ void Player::set_socket(SOCKET c_socket)
 void Player::CloseSocketPlayer()
 {
     closesocket(_socket);
+}
+
+void Player::attack_success(Npc* target)
+{
+
+}
+
+void Player::revive()
+{
+    if (join_dungeon_room == true) {
+        dungeons[pl->indun_id]->state_lock.lock();
+        if (dungeons[pl->indun_id]->get_dun_st() == DUN_ST_START) {
+            dungeons[pl->indun_id]->state_lock.unlock();
+
+            pl->state_lock.lock();
+            if (pl->get_state() != ST_DEAD) {
+                pl->state_lock.unlock();
+                return;
+            }
+            pl->set_state(ST_INDUN);
+            pl->state_lock.unlock();
+
+            // 초기화
+            pl->set_hp(pl->get_maxhp());
+            pl->set_mp(pl->get_maxmp());
+            send_status_change_packet(pl);
+
+            // 시야처리
+            Player** partys = dungeons[pl->indun_id]->get_party_palyer();
+            for (int i = 0; i < 4; i++) {
+                if (partys[i]->get_tribe() != HUMAN) continue;
+                send_change_hp_packet(partys[i], pl);
+                send_revive_packet(partys[i], pl);
+            }
+
+            if (pl->get_tribe() == PARTNER) {
+                timer_event ev;
+                ev.obj_id = pl->get_id();
+                ev.start_time = chrono::system_clock::now() + 10s;
+                ev.ev = EVENT_PARTNER_MOVE;
+                ev.target_id = 1;
+                timer_queue.push(ev);
+
+                ev.obj_id = pl->get_id();
+                ev.start_time = chrono::system_clock::now() + 1s;
+                ev.ev = EVENT_PARTNER_NORMAL_ATTACK;
+                ev.target_id = 1;
+                timer_queue.push(ev);
+
+                ev.obj_id = pl->get_id();
+                ev.start_time = chrono::system_clock::now() + 3s;
+                ev.ev = EVENT_PARTNER_SKILL;
+                ev.target_id = 1;
+                timer_queue.push(ev);
+            }
+
+            return;
+        }
+        dungeons[pl->indun_id]->state_lock.unlock();
+    }
+
+    state_lock.lock();
+    if (_state != ST_DEAD) {
+        state_lock.unlock();
+        return;
+    }
+    _state = ST_INGAME;
+    state_lock.unlock();
+
+    // 플레이어 죽은 후 초기화 설정
+    _hp = _maxhp;
+    _x = 3210;
+    _y = 0;
+    _z = 940;
+    _exp = _exp / 2;
+    send_status_change_packet(this);
+
+    send_revive_packet(this, this);
 }

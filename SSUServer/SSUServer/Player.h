@@ -25,6 +25,11 @@ public:
     bool                join_dungeon_room;
     int                 indun_id;
     bool                attack_speed_up;
+
+private:
+    void return_npc_position() = delete;
+    void do_npc_move() = delete;
+
 public:
     Player(int id);
 
@@ -129,4 +134,7 @@ public:
     void accept_initialize();
     void set_socket(SOCKET c_socket);
     void CloseSocketPlayer();
+
+    virtual void attack_success(Npc* target);
+    virtual void revive();
 };

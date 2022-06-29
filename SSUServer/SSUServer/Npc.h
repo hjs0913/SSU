@@ -6,9 +6,6 @@ private:
 	MONSTER_SPECIES _mon_species;
 	int				_target_id;
 
-
-	int				API_get_x(lua_State* L);
-
 protected:
 	char	_name[MAX_NAME_SIZE];
 	int		_hp;
@@ -108,8 +105,13 @@ public:
 	bool get_element_cooltime();
 
 	// move
-	bool check_move_alright(int x, int z, bool monster, array<Obstacle, MAX_OBSTACLE> obs);
+	bool check_move_alright(int x, int z, bool monster, const array<Obstacle*, MAX_OBSTACLE>& obstacles);
 	pos non_a_star(int t_x, int t_z, int x, int z);
-	pos a_star(int t_x, int t_z, int x, int z, array<Obstacle, MAX_OBSTACLE> obs);
+	pos a_star(int t_x, int t_z, int x, int z, const array<Obstacle*, MAX_OBSTACLE>& obstacles);
 	int huristic(int t_x, int t_z, int x, int z);
+	void return_npc_position(const array<Obstacle*, MAX_OBSTACLE> &obstacles);
+	void do_npc_move(Npc* target, const array<Obstacle*, MAX_OBSTACLE>& obstacles);
+
+	virtual void attack_success(Npc* target);
+	virtual void revive();
 };

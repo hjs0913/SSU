@@ -1,4 +1,6 @@
 #include "Npc.h"
+#include "send.h"
+#include "LuaFunction.h"
 #include <queue>
 #include <random>
 
@@ -100,11 +102,9 @@ void Npc::Initialize_Lua(const char* f_lua)
 
 	lua_pop(L, 11);// eliminate set_uid from stack after call
 
-
-	// 나중에 어떻게 이용할 것인지 생각
-	/*lua_register(L, "API_get_x", API_get_x);
+	lua_register(L, "API_get_x", API_get_x);
 	lua_register(L, "API_get_y", API_get_y);
-	lua_register(L, "API_get_z", API_get_z);*/
+	lua_register(L, "API_get_z", API_get_z);
 }
 
 void Npc::set_pos(int x, int z)
@@ -374,14 +374,15 @@ bool Npc::get_element_cooltime()
 	return superposition;
 }
 
-bool Npc::check_move_alright(int x, int z, bool monster, array<Obstacle, MAX_OBSTACLE> obs)
+bool Npc::check_move_alright(int x, int z, bool monster, const array<Obstacle*, MAX_OBSTACLE>& obstacles)
 {
 	int size = 0;
 	if (monster) size = 15;
 	else size = 5;
 
-	for (auto& ob : obs) {
-		if ((ob.get_x() - size <= x && x <= ob.get_x() + size) && (ob.get_z() - size <= z && z <= ob.get_z() + size)) {
+	for (int i = 0; i < MAX_OBSTACLE; i++) {
+		if ((obstacles[i]->get_x() - size <= x && x <= obstacles[i]->get_x() + size) &&
+			(obstacles[i]->get_z() - size <= z && z <= obstacles[i]->get_z() + size)) {
 			return false;
 		}
 	}
@@ -424,7 +425,7 @@ pos Npc::non_a_star(int t_x, int t_z, int x, int z)
 }
 
 
-pos Npc::a_star(int t_x, int t_z, int x, int z,array<Obstacle, MAX_OBSTACLE> obs)
+pos Npc::a_star(int t_x, int t_z, int x, int z, const array<Obstacle*, MAX_OBSTACLE>& obstacles)
 {
 	vector<pos> mon_load;
 	// 쫒아가는 범위는 한 방향으로 60까지이다
@@ -458,7 +459,7 @@ pos Npc::a_star(int t_x, int t_z, int x, int z,array<Obstacle, MAX_OBSTACLE> obs
 			// 검색된게 있다면 검색을 해주지 않는다
 			if (scoreF[now.first + dirX[i]][now.second + dirZ[i]] != 0) continue;
 			// 장애물이랑 부딪히는지 확인
-			if (false == check_move_alright(x + (p.first - 12) * REAL_DISTANCE, z + (p.second - 12) * REAL_DISTANCE, true, obs)) continue;
+			if (false == check_move_alright(x + (p.first - 12) * REAL_DISTANCE, z + (p.second - 12) * REAL_DISTANCE, true, obstacles)) continue;
 
 			scoreG[now.first + dirX[i]][now.second + dirZ[i]] = scoreG[now.first][now.second] + cost[i];
 			scoreH[now.first + dirX[i]][now.second + dirZ[i]] = huristic(t_x, t_z, x + (p.first - 12) * REAL_DISTANCE, z + (p.second - 12) * REAL_DISTANCE);
@@ -500,29 +501,285 @@ pos Npc::a_star(int t_x, int t_z, int x, int z,array<Obstacle, MAX_OBSTACLE> obs
 }
 
 
-//int Npc::API_get_x(lua_State* L)
-//{
-//	int x =_x;
-//	lua_pushnumber(L, x);
-//	return 1;
-//}
-//
-//int API_get_y(lua_State* L)
-//{
-//	int user_id =
-//		(int)lua_tointeger(L, -1);
-//	lua_pop(L, 2);
-//	int y = players[user_id]->get_y();
-//	lua_pushnumber(L, y);
-//	return 1;
-//}
-//
-//int API_get_z(lua_State* L)
-//{
-//	int user_id =
-//		(int)lua_tointeger(L, -1);
-//	lua_pop(L, 2);
-//	int z = players[user_id]->get_z();
-//	lua_pushnumber(L, z);
-//	return 1;
-//}
+void Npc::attack_success(Npc* target)
+{
+	// 현재 물리 공격에 대해서만 생각한다
+	float give_damage = _physical_attack * _basic_attack_factor;
+	float defence_damage = (target->get_defence_factor() *
+		target->get_physical_defence()) / (1 + (target->get_defence_factor() *
+			target->get_physical_defence()));
+	float damage = give_damage * (1 - defence_damage);
+	int target_hp = target->get_hp() - damage;
+
+	if (target_hp <= 0) target_hp = 0;
+	target->set_hp(target_hp);
+
+	if (target->get_element_cooltime() == false) {
+		switch (_element)
+		{
+		case E_WATER:
+			if (target->get_element() == E_FULLMETAL || target->get_element() == E_FIRE
+				|| target->get_element() == E_EARTH) {
+				target->set_magical_attack(target->get_magical_attack() / 10 * 9);
+				target->set_element_cooltime(true);
+			}
+
+			break;
+		case E_FULLMETAL:
+			if (target->get_element() == E_ICE || target->get_element() == E_TREE
+				|| target->get_element() == E_WIND) {
+				_physical_defence += _physical_defence / 10;
+				target->set_element_cooltime(true);
+			}
+			break;
+		case E_WIND:
+			if (target->get_element() == E_WATER || target->get_element() == E_EARTH
+				|| target->get_element() == E_FIRE) {
+				// Npc에는 없는 속성
+				// reinterpret_cast<Player*>(p)->attack_speed_up = true;
+				
+				//공속  상승 , 쿨타임 감소 
+				target->set_element_cooltime(true);
+			}
+			break;
+		case E_FIRE:
+			if (target->get_element() == E_ICE || target->get_element() == E_TREE
+				|| target->get_element() == E_FULLMETAL) {
+				//10초 공격력 10프로의 화상 피해 
+				target->set_element_cooltime(true);
+			}
+			break;
+		case E_TREE:
+			if (target->get_element() == E_EARTH || target->get_element() == E_WATER
+				|| target->get_element() == E_WIND) {
+				target->set_physical_attack(target->get_physical_attack() / 10 * 9);
+				target->set_element_cooltime(true);
+			}
+			break;
+		case E_EARTH:
+			if (target->get_element() == E_ICE || target->get_element() == E_FULLMETAL
+				|| target->get_element() == E_FIRE) {
+				_magical_defence += _magical_defence / 10;
+				target->set_element_cooltime(true);
+			}
+			break;
+		case E_ICE:
+			if (target->get_element() == E_TREE || target->get_element() == E_WATER
+				|| target->get_element() == E_WIND) {
+				//동결 and  10초동안 공속, 시전속도, 이동속도 10프로감소 
+				target->set_element_cooltime(true);
+			}
+			break;
+		default:
+			break;
+		}
+		if (target->get_element_cooltime() == true) {
+			timer_event ev;
+			ev.obj_id = _id;
+			ev.start_time = chrono::system_clock::now() + 10s;  //쿨타임
+			ev.ev = EVENT_ELEMENT_COOLTIME;;
+			ev.target_id = target->get_id();
+			timer_queue.push(ev);
+		}
+	}
+
+	if (target_hp <= 0) {
+		target->state_lock.lock();
+		if (target->get_state() != ST_INGAME) {
+			target->state_lock.unlock();
+			return;
+		}
+		target->set_state(ST_DEAD);
+		target->state_lock.unlock();
+		
+		_active = false;
+		// 죽은것이 플레이어라면 죽었다는 패킷을 보내준다
+		send_dead_packet(reinterpret_cast<Player*>(target), this, target);
+		send_notice(reinterpret_cast<Player*>(target), "사망했습니다. 10초 후 부활합니다", 1);
+
+		// 3초후 부활하며 부활과 동시에 위치 좌표를 수정해준다
+		timer_event ev;
+		ev.obj_id = target->get_id();
+		ev.start_time = chrono::system_clock::now() + 10s;
+		ev.ev = EVENT_PLAYER_REVIVE;
+		ev.target_id = 0;
+		timer_queue.push(ev);
+	}
+	else  {
+		// 플레이어가 공격을 당한 것이므로 hp정보가 바뀌었으므로 그것을 보내주자
+		// send_status_change_packet(reinterpret_cast<Player*>(players[target]));
+
+		// 플레이어의 ViewList에 있는 플레이어들에게 보내주자
+		send_change_hp_packet(reinterpret_cast<Player*>(target), target);
+
+		// hp가 깎이였으므로 hp자동회복을 해주도록 하자
+		if (reinterpret_cast<Player*>(target)->_auto_hp == false) {
+			timer_event ev;
+			ev.obj_id = target->get_id();
+			ev.start_time = chrono::system_clock::now() + 5s;
+			ev.ev = EVENT_AUTO_PLAYER_HP;
+			ev.target_id = 0;
+			timer_queue.push(ev);
+			reinterpret_cast<Player*>(target)->_auto_hp = true;
+		}
+
+		// npc공격이면 타이머 큐에 다시 넣어주자
+		timer_event ev;
+		ev.obj_id = _id;
+		ev.start_time = chrono::system_clock::now() + 3s;
+		ev.ev = EVENT_NPC_ATTACK;
+		ev.target_id = target->get_id();
+		timer_queue.push(ev);
+	}
+}
+
+void Npc::return_npc_position(const array<Obstacle*, MAX_OBSTACLE>& obstacles)
+{
+	// 여기서는 이동만 시킨다
+	_target_id = -1;
+
+	if (_active == true) {
+		return;
+	}
+
+	// 원래 자리로 돌아가자
+	lua_lock.lock();
+	lua_getglobal(L, "return_my_position");
+	int error = lua_pcall(L, 0, 3, 0);
+	if (error != 0) {
+		lua_lock.unlock();
+		cout << "LUA_RETURN_MY_POSITION ERROR" << endl;
+		return;
+	}
+
+	float my_x = lua_tointeger(L, -3);
+	float my_y = lua_tointeger(L, -2);
+	float my_z = lua_tointeger(L, -1);
+	lua_pop(L, 3);
+	lua_lock.unlock();
+	
+	int now_x = _x;
+	int now_y = _y;
+	int now_z = _z;
+	bool my_pos_fail = true;
+
+	pos mv = a_star(my_x, my_z, now_x, now_z, obstacles);
+
+	if (abs(mv.first - my_x) <= 10 && abs(mv.second - my_z) <= 10) {
+		now_x = my_x;
+		now_z = my_z;
+		my_pos_fail = false;
+	}
+	else {
+		now_x = mv.first;
+		now_z = mv.second;
+	}
+
+	_look_x = now_x - _x;
+	_look_z = now_z - _z;
+
+	_x = now_x;
+	_z = now_z;
+
+	if (my_pos_fail) {    // 더 움직여야돼
+		timer_event ev;
+		ev.obj_id = _id;
+		ev.start_time = chrono::system_clock::now() + 1s;
+		ev.ev = EVENT_NPC_MOVE;
+		ev.target_id = -1;
+		timer_queue.push(ev);
+	}
+}
+
+void Npc::do_npc_move(Npc* target, const array<Obstacle*, MAX_OBSTACLE>& obstacles)
+{
+	lua_lock.lock();
+	lua_getglobal(L, "event_npc_move");
+	lua_pushnumber(L, target->get_id());
+	int error = lua_pcall(L, 1, 1, 0);
+	if (error != 0) {
+		cout << "LUA_NPC_MOVE ERROR" << endl;
+	}
+	// bool값도 리턴을 해주자 
+	// true면 쫒아간다 
+	bool m = lua_toboolean(L, -1);
+	lua_pop(L, 1);
+	lua_lock.unlock();
+	if (!m) {
+		_active = false;
+		return_npc_position(obstacles);
+		return;
+	}
+
+	int x = _x;
+	int z = _z;
+
+	int t_x = target->get_x();
+	int t_z = target->get_z();
+
+	// 움직일 필요가 없다
+	if ((t_x >= x - 8 && t_x <= x + 8) && (t_z >= z - 8 && t_z <= z + 8)) {
+		state_lock.lock();
+		if (_state != ST_INGAME) {
+			state_lock.unlock();
+			return;
+		}
+		state_lock.unlock();
+
+		timer_event ev;
+		ev.obj_id = _id;
+		ev.start_time = chrono::system_clock::now() + 1s;
+		ev.ev = EVENT_NPC_MOVE;
+		ev.target_id = target->get_id();  //target
+		timer_queue.push(ev);
+		return;
+	}
+
+	// A*알고리즘
+	pos mv = a_star(t_x, t_z, x, z, obstacles);
+	x = mv.first;
+	z = mv.second;
+
+	_look_x = x - _x;
+	_look_z = z - _z;
+
+	_x = x;
+	_z = z;
+
+	state_lock.lock();
+	if (_state != ST_INGAME) {
+		state_lock.unlock();
+		return;
+	}
+	state_lock.unlock();
+
+	timer_event ev;
+	ev.obj_id = _id;
+	ev.start_time = chrono::system_clock::now() + 1s;
+	ev.ev = EVENT_NPC_MOVE;
+	ev.target_id = target->get_id();
+	timer_queue.push(ev);
+}
+
+void Npc::revive()
+{
+	// 상태 바꿔주고
+	state_lock.lock();
+	_state = ST_INGAME;
+	state_lock.unlock();
+
+	// NPC의 정보 가져오기
+	lua_lock.lock();
+	lua_getglobal(L, "monster_revive");
+	int error = lua_pcall(L, 0, 4, 0);
+	if (error != 0) {
+		cout << "초기화 오류" << endl;
+	}
+
+	_x = lua_tonumber(L, -4);
+	_y = lua_tonumber(L, -3);
+	_z = lua_tonumber(L, -2);
+	_hp = lua_tointeger(L, -1);
+	lua_pop(L, 5);
+	lua_lock.unlock();
+}

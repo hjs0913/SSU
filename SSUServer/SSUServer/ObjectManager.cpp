@@ -279,7 +279,8 @@ void ObjectManager::worker()
             players[client_id]->state_lock.unlock();
             // 제자리로 돌아가는 것인가
             if (exp_over->_target == -1) {
-                return_npc_position(client_id);
+                players[client_id]->return_npc_position(obstacles);
+                m_SectorManager->player_move(players[client_id]); // 섹터 변경시 상태확인
                 delete exp_over;
                 break;
             }
@@ -291,14 +292,18 @@ void ObjectManager::worker()
             if (players[target_id]->get_state() != ST_INGAME) {
                 players[target_id]->state_lock.unlock();
                 players[client_id]->set_active(false);
-                return_npc_position(client_id);
+                players[client_id]->return_npc_position(obstacles);
+                m_SectorManager->player_move(players[client_id]); // 섹터 변경시 상태확인
                 delete exp_over;
                 break;
             }
             players[target_id]->state_lock.unlock();
 
-            if (players[client_id]->get_target_id() != -1)
-                do_npc_move(client_id, exp_over->_target);
+            // 타겟이 살아 있음(쫒아간다)
+            if (players[client_id]->get_target_id() != -1) {
+                players[client_id]->do_npc_move(players[exp_over->_target], obstacles);
+                m_SectorManager->player_move(players[client_id]); // 섹터 변경시 상태확인
+            }
             delete exp_over;
 
             break;
@@ -327,7 +332,9 @@ void ObjectManager::worker()
             if (m) {
                 // 공격처리
                 send_animation_attack(reinterpret_cast<Player*>(players[exp_over->_target]), client_id);
-                attack_success(players[client_id], players[exp_over->_target], players[client_id]->get_basic_attack_factor());
+                players[client_id]->attack_success(players[exp_over->_target]);
+                // 죽었다면 섹터에서 제거해 주어야 함
+                // target의 피 변화량을 주위 사람들에게 보내주어야함
             }
             else {
                 if (players[client_id]->get_active()) {
@@ -370,48 +377,14 @@ void ObjectManager::worker()
             break;
         }
         case OP_PLAYER_REVIVE: {
-            player_revive(client_id);
+            reinterpret_cast<Player*>(players[client_id])->revive();
+            // 섹터 처리
             delete exp_over;
             break;
         }
         case OP_NPC_REVIVE: {
-            // 상태 바꿔주고
-            players[client_id]->state_lock.lock();
-            players[client_id]->set_state(ST_INGAME);
-            players[client_id]->state_lock.unlock();
-            // NPC의 정보 가져오기
-            players[client_id]->lua_lock.lock();
-            lua_State* L = players[client_id]->L;
-            lua_getglobal(L, "monster_revive");
-            int error = lua_pcall(L, 0, 4, 0);
-            if (error != 0) {
-                cout << "초기화 오류" << endl;
-            }
-
-            players[client_id]->set_x(lua_tonumber(L, -4));
-            players[client_id]->set_y(lua_tonumber(L, -3));
-            players[client_id]->set_z(lua_tonumber(L, -2));
-            players[client_id]->set_hp(lua_tointeger(L, -1));
-            lua_pop(L, 5);
-            players[client_id]->lua_lock.unlock();
-            // 부활하는 NPC주변 얘들에게 보이게 해주자
-            unordered_set <int> nearlist;
-            for (auto& other : players) {
-                // if (other._id == client_id) continue;
-                if (false == is_near(players[client_id]->get_id(), other->get_id()))
-                    continue;
-                if (ST_INGAME != other->get_state())
-                    continue;
-                if (other->get_tribe() != HUMAN) break;
-                nearlist.insert(other->get_id());
-            }
-            for (auto other : nearlist) {
-                Player* other_player = reinterpret_cast<Player*>(players[other]);
-                other_player->vl.lock();
-                other_player->viewlist.insert(client_id);
-                other_player->vl.unlock();
-                send_put_object_packet(other_player, players[client_id]);
-            }
+            players[client_id]->revive();
+            // 섹터 처리
             delete exp_over;
             break;
         }
@@ -660,7 +633,9 @@ void ObjectManager::worker()
 
                         // 스크립트와 함께 추가된 부분
                         if (true == is_npc(other->get_id())) {	// 시야에 npc가 있다면 
-                            if (is_agro_near(client_id, other->get_id())) {
+                            // 현재 어그로 몬스터 없음
+
+                            /*if (is_agro_near(client_id, other->get_id())) {
                                 if (other->get_active() == false) {
                                     other->set_active(true);
                                     timer_event ev;
@@ -671,7 +646,7 @@ void ObjectManager::worker()
                                     timer_queue.push(ev);
                                     Activate_Npc_Move_Event(other->get_id(), party_players[i]->get_id());
                                 }
-                            }
+                            }*/
                         }
 
                         party_players[i]->vl.lock();
@@ -681,24 +656,24 @@ void ObjectManager::worker()
                         send_put_object_packet(party_players[i], other);
                     }
                     // 장애물 정보
-                    for (auto& ob : obstacles) {
-                        if (RANGE < abs(party_players[i]->get_x() - ob.get_x())) continue;
-                        if (RANGE < abs(party_players[i]->get_z() - ob.get_z())) continue;
+                    for (auto ob : obstacles) {
+                        if (RANGE < abs(party_players[i]->get_x() - ob->get_x())) continue;
+                        if (RANGE < abs(party_players[i]->get_z() - ob->get_z())) continue;
 
                         party_players[i]->ob_vl.lock();
                         party_players[i]->ob_viewlist.clear();
-                        party_players[i]->ob_viewlist.insert(ob.get_id());
+                        party_players[i]->ob_viewlist.insert(ob->get_id());
                         party_players[i]->ob_vl.unlock();
 
                         sc_packet_put_object packet;
-                        packet.id = ob.get_id();
+                        packet.id = ob->get_id();
                         strcpy_s(packet.name, "");
-                        packet.object_type = ob.get_tribe();
+                        packet.object_type = ob->get_tribe();
                         packet.size = sizeof(packet);
                         packet.type = SC_PACKET_PUT_OBJECT;
-                        packet.x = ob.get_x();
-                        packet.y = ob.get_y();
-                        packet.z = ob.get_z();
+                        packet.x = ob->get_x();
+                        packet.y = ob->get_y();
+                        packet.z = ob->get_z();
                         party_players[i]->do_send(sizeof(packet), &packet);
                     }
 
@@ -739,11 +714,6 @@ void ObjectManager::worker()
         }
     }
 }
-// 너무 긴것
-// OP_FINISH_RAID
-// 
-
-
 
 void ObjectManager::set_packetManager(PacketManager* packetManager)
 {
@@ -763,4 +733,11 @@ int ObjectManager::get_new_id()
     }
     cout << "Maximum Number of Clients Overflow!!\n";
     return -1;
+}
+
+bool ObjectManager::is_near(int a, int b)
+{
+    if (RANGE < abs(players[a]->get_x() - players[b]->get_x())) return false;
+    if (RANGE < abs(players[a]->get_z() - players[b]->get_z())) return false;
+    return true;
 }

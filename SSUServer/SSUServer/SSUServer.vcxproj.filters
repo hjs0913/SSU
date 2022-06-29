@@ -52,6 +52,9 @@
     <Filter Include="NetWork\SendFunction">
       <UniqueIdentifier>{e5644b8a-ddd2-4f44-af98-0839bbbd50aa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Lua_Script\LuaFunction">
+      <UniqueIdentifier>{19f260d4-6efd-43e8-a93c-d739e0c8e66e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Partner.cpp">
@@ -95,6 +98,9 @@
     </ClCompile>
     <ClCompile Include="send.cpp">
       <Filter>NetWork\SendFunction</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaFunction.cpp">
+      <Filter>Lua_Script\LuaFunction</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -180,6 +186,9 @@
     </ClInclude>
     <ClInclude Include="send.h">
       <Filter>NetWork\SendFunction</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaFunction.h">
+      <Filter>Lua_Script\LuaFunction</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

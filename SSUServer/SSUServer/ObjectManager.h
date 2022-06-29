@@ -1,7 +1,6 @@
 #pragma once
 #include "protocol.h"
-#include "Player.h"
-#include "Gaia.h"
+#include "Partner.h"
 #include "SectorManager.h"
 #include "SocketManager.h"
 #include <array>
@@ -34,6 +33,6 @@ public:
 
 	int get_new_id();
 	bool is_npc(int id) { return (id >= NPC_ID_START) && (id <= NPC_ID_END);}
-
+	bool is_near(int a, int b);
 };
 
