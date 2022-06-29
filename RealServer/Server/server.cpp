@@ -761,7 +761,7 @@ bool isInsideTriangle(Coord a, Coord b, Coord c, Coord n)
     return true;
 
 }
-
+bool login = false;
 void process_packet(int client_id, unsigned char* p)
 {
 
@@ -772,7 +772,7 @@ void process_packet(int client_id, unsigned char* p)
         cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(p);
         // pl->set_name(packet->name);
         // DB 연결
-   /*  //여기 아래 고쳐야함 
+   /*  //여기 아래 고쳐야함
         EnterCriticalSection(&cs);
         if (!(Search_Id(pl, packet->name, packet->password))) {
             send_login_fail_packet(pl, 0);   // 아이디 없음
@@ -782,7 +782,7 @@ void process_packet(int client_id, unsigned char* p)
         }
         LeaveCriticalSection(&cs);
         */
-    
+
         // 중복 아이디 검사
 
         for (auto* p : players) {
@@ -807,7 +807,20 @@ void process_packet(int client_id, unsigned char* p)
         }
         pl->set_login_id(packet->id);
         //데이터 베이스 
-        Search_Id(pl, packet->id, packet->password);
+   
+            login = Search_Id(pl, packet->id, packet->password);
+            
+            if (login == false) {
+                send_login_fail_packet(pl, 2);
+                //  if (Add_DB(packet->id, packet->password, pl, packet->nickname, packet->job, packet->element) == true) {
+                 //     pl->set_login_id(packet->id);
+                 //     login = true;
+                 // }
+                //  else
+                //      send_login_fail_packet(pl, 1);
+            }
+        
+    
 
         // 원래는 DB에서 받아와야 하는 정보를 기본 정보로 대체
         /*
@@ -929,8 +942,8 @@ void process_packet(int client_id, unsigned char* p)
                 reinterpret_cast<Player*>(players[client_id])->_auto_hp = true;
             }
         }
-
-        send_login_ok_packet(pl);
+        if(login == true)
+         send_login_ok_packet(pl);
         pl->state_lock.lock();
         pl->set_state(ST_INGAME);
         pl->state_lock.unlock();
@@ -2552,6 +2565,269 @@ void process_packet(int client_id, unsigned char* p)
         }
         else
             break;
+    }
+    case CS_PACKET_RE_LOGIN: {
+        cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(p);
+
+
+        // 중복 아이디 검사
+
+        for (auto* p : players) {
+            if (p->get_tribe() != HUMAN) break;
+            if (p->get_state() == ST_FREE) continue;
+            if (p->get_id() == client_id) continue;
+            if (strcmp(packet->id, "admin") == 0) break;
+
+            if (strcmp(reinterpret_cast<Player*>(p)->get_login_id(), packet->id) == 0) {
+                cout << "중복된 아이디 접속 확인" << endl;
+                send_login_fail_packet(pl, 1);   // 중복 로그인
+                Disconnect(client_id);
+                return;
+            }
+            if (strcmp(reinterpret_cast<Player*>(p)->get_name(), packet->name) == 0) {
+                cout << "중복된 닉네임 접속 확인" << endl;
+                send_login_fail_packet(pl, 1);   // 중복 로그인
+                Disconnect(client_id);
+                return;
+            }
+
+        }
+        pl->set_login_id(packet->id);
+        //데이터 베이스 
+
+        login = Add_DB(packet->id, packet->password, pl, packet->nickname, packet->job, packet->element);
+        if(login == false)
+            send_login_fail_packet(pl, 1);
+
+        // 원래는 DB에서 받아와야 하는 정보를 기본 정보로 대체
+        /*
+        pl->set_x(3210);
+        pl->set_y(0);
+        pl->set_z(940);
+        pl->set_job(static_cast<JOB>(packet->job));
+        //pl->set_job(J_DILLER);
+        pl->set_lv(25);
+        pl->set_element(E_WATER);
+        pl->set_exp(1000);
+        pl->set_name(packet->name);
+        pl->set_login_id(packet->id);
+
+        pl->indun_id - 1;
+        pl->join_dungeon_room = false;*/
+
+
+        // Stress Test용
+        if (strcmp(packet->id, "admin") == 0) {
+            pl->set_x(rand() % 4000);
+            pl->set_z(rand() % 4000);
+        }
+
+        switch (pl->get_job()) {
+        case J_DILLER: {
+            int lv = pl->get_lv();
+            pl->set_maxhp(20 * lv * lv + 80 * lv);
+            pl->set_hp(pl->get_maxhp());
+            pl->set_maxmp(10 * lv * lv + 50 * lv);
+            pl->set_mp(pl->get_maxmp());
+            pl->set_physical_attack(0.3 * lv * lv + 10 * lv);
+            pl->set_magical_attack(0.1 * lv * lv + 5 * lv);
+            pl->set_physical_defence(0.24 * lv * lv + 10 * lv);
+            pl->set_magical_defence(0.17 * lv * lv + 10 * lv);
+            pl->set_basic_attack_factor(50.0f);
+            pl->set_defence_factor(0.0002);
+
+            pl->set_origin_physical_attack(pl->get_physical_attack());
+            pl->set_origin_magical_attack(pl->get_magical_attack());
+            pl->set_origin_physical_defence(pl->get_physical_defence());
+            pl->set_origin_magical_defence(pl->get_magical_defence());
+
+            break;
+        }
+        case J_TANKER: {
+            int lv = pl->get_lv();
+            pl->set_maxhp(22 * lv * lv + 80 * lv);
+            pl->set_hp(pl->get_maxhp());
+            pl->set_maxmp(8.5 * lv * lv + 50 * lv);
+            pl->set_mp(pl->get_maxmp());
+            pl->set_physical_attack(0.25 * lv * lv + 10 * lv);
+            pl->set_magical_attack(0.08 * lv * lv + 5 * lv);
+            pl->set_physical_defence(0.27 * lv * lv + 10 * lv);
+            pl->set_magical_defence(0.2 * lv * lv + 10 * lv);
+            pl->set_basic_attack_factor(50.0f);
+            pl->set_defence_factor(0.0002);
+
+            pl->set_origin_physical_attack(pl->get_physical_attack());
+            pl->set_origin_magical_attack(pl->get_magical_attack());
+            pl->set_origin_physical_defence(pl->get_physical_defence());
+            pl->set_origin_magical_defence(pl->get_magical_defence());
+            break;
+        }
+        case J_SUPPORTER: {
+            int lv = pl->get_lv();
+            pl->set_maxhp(18 * lv * lv + 70 * lv);
+            pl->set_hp(pl->get_maxhp());
+            pl->set_maxmp(15 * lv * lv + 60 * lv);
+            pl->set_mp(pl->get_maxmp());
+            pl->set_physical_attack(0.1 * lv * lv + 5 * lv);
+            pl->set_magical_attack(0.25 * lv * lv + 8 * lv);
+            pl->set_physical_defence(0.17 * lv * lv + 10 * lv);
+            pl->set_magical_defence(0.24 * lv * lv + 10 * lv);
+            pl->set_basic_attack_factor(50.0f);
+            pl->set_defence_factor(0.0002);
+
+            pl->set_origin_physical_attack(pl->get_physical_attack());
+            pl->set_origin_magical_attack(pl->get_magical_attack());
+            pl->set_origin_physical_defence(pl->get_physical_defence());
+            pl->set_origin_magical_defence(pl->get_magical_defence());
+            break;
+        }
+        case J_MAGICIAN: {
+            int lv = pl->get_lv();
+            pl->set_maxhp(16 * lv * lv + 70 * lv);
+            pl->set_hp(pl->get_maxhp());
+            pl->set_maxmp(17 * lv * lv + 60 * lv);
+            pl->set_mp(pl->get_maxmp());
+            pl->set_physical_attack(0.1 * lv * lv + 5 * lv);
+            pl->set_magical_attack(0.3 * lv * lv + 10 * lv);
+            pl->set_physical_defence(0.17 * lv * lv + 10 * lv);
+            pl->set_magical_defence(0.24 * lv * lv + 10 * lv);
+            pl->set_basic_attack_factor(50.0f);
+            pl->set_defence_factor(0.0002);
+
+            pl->set_origin_physical_attack(pl->get_physical_attack());
+            pl->set_origin_magical_attack(pl->get_magical_attack());
+            pl->set_origin_physical_defence(pl->get_physical_defence());
+            pl->set_origin_magical_defence(pl->get_magical_defence());
+            break;
+        }
+        default: {
+            break;
+        }
+        }
+        // -- DB 대체 끝 --
+
+        // Hp회복
+        if (pl->get_hp() < pl->get_maxhp()) {
+            // hp가 깎이였으므로 hp자동회복을 해주도록 하자
+            if (reinterpret_cast<Player*>(players[client_id])->_auto_hp == false) {
+                timer_event ev;
+                ev.obj_id = client_id;
+                ev.start_time = chrono::system_clock::now() + 5s;
+                ev.ev = EVENT_AUTO_PLAYER_HP;
+                ev.target_id = 0;
+                timer_queue.push(ev);
+                reinterpret_cast<Player*>(players[client_id])->_auto_hp = true;
+            }
+        }
+        if (login == true)
+            send_login_ok_packet(pl);
+        pl->state_lock.lock();
+        pl->set_state(ST_INGAME);
+        pl->state_lock.unlock();
+
+        // 새로 접속한 정보를 다른이에게 보내줌
+        for (auto& other : players) {
+            if (other->get_id() == client_id) continue;   // 나다
+
+            if (true == is_npc(other->get_id())) break;
+
+            other->state_lock.lock();
+            if (ST_INGAME != other->get_state()) {
+                other->state_lock.unlock();
+                continue;
+            }
+            other->state_lock.unlock();
+
+            if (false == is_near(other->get_id(), client_id)) continue;
+
+            // 여기는 플레이어 처리
+            Player* other_player = reinterpret_cast<Player*>(other);
+            other_player->vl.lock();
+            other_player->viewlist.insert(client_id);
+            other_player->vl.unlock();
+
+            send_put_object_packet(other_player, pl);
+
+            /*sc_packet_put_object packet;
+            packet.id = client_id;
+            strcpy_s(packet.name, pl->get_name());
+            packet.object_type = pl->get_tribe();
+            packet.size = sizeof(packet);
+            packet.type = SC_PACKET_PUT_OBJECT;
+            packet.x = pl->get_x();
+            packet.y = pl->get_y();
+            packet.z = pl->get_z();
+            other_player->do_send(sizeof(packet), &packet);*/
+        }
+        // 새로 접속한 플레이어에게 기존 정보를 보내중
+        pl->viewlist.clear();
+        for (auto& other : players) {
+            if (other->get_id() == client_id) continue;
+            other->state_lock.lock();
+            if (ST_INGAME != other->get_state()) {
+                other->state_lock.unlock();
+                continue;
+            }
+            other->state_lock.unlock();
+
+            if (false == is_near(other->get_id(), client_id))
+                continue;
+
+            // 스크립트와 함께 추가된 부분
+            if (true == is_npc(other->get_id())) {	// 시야에 npc가 있다면 
+                if (is_agro_near(client_id, other->get_id())) {
+                    if (other->get_active() == false) {
+                        other->set_active(true);
+                        timer_event ev;
+                        ev.obj_id = other->get_id();
+                        ev.start_time = chrono::system_clock::now() + 1s;
+                        ev.ev = EVENT_NPC_ATTACK;
+                        ev.target_id = client_id;
+                        timer_queue.push(ev);
+                        Activate_Npc_Move_Event(other->get_id(), pl->get_id());
+                    }
+                }
+            }
+
+            pl->vl.lock();
+            pl->viewlist.insert(other->get_id());
+            pl->vl.unlock();
+
+            send_put_object_packet(pl, other);
+            /*sc_packet_put_object packet;
+            packet.id = other->get_id();
+            strcpy_s(packet.name, other->get_name());
+            packet.object_type = other->get_tribe();
+            packet.size = sizeof(packet);
+            packet.type = SC_PACKET_PUT_OBJECT;
+            packet.x = other->get_x();
+            packet.y = other->get_y();
+            packet.z = other->get_z();
+            pl->do_send(sizeof(packet), &packet);*/
+        }
+        // 장애물 정보
+        for (auto& ob : obstacles) {
+            if (RANGE < abs(pl->get_x() - ob.get_x())) continue;
+            if (RANGE < abs(pl->get_z() - ob.get_z())) continue;
+
+            pl->ob_vl.lock();
+            pl->ob_viewlist.clear();
+            pl->ob_viewlist.insert(ob.get_id());
+            pl->ob_vl.unlock();
+
+            //send_put_object_packet(pl, ob);
+            sc_packet_put_object packet;
+            packet.id = ob.get_id();
+            strcpy_s(packet.name, "");
+            packet.object_type = ob.get_tribe();
+            packet.size = sizeof(packet);
+            packet.type = SC_PACKET_PUT_OBJECT;
+            packet.x = ob.get_x();
+            packet.y = ob.get_y();
+            packet.z = ob.get_z();
+            pl->do_send(sizeof(packet), &packet);
+        }
+        break;
     }
     default:
         break;

@@ -77,6 +77,7 @@ const char CS_PACKET_PARTY_ROOM_QUIT_REQUEST = 18;
 const char CS_PACKET_PARTY_INVITE = 19;
 const char CS_PACKET_PARTY_INVITATION_REPLY = 20;
 const char CS_PACKET_PARTY_ADD_PARTNER = 21;
+const char CS_PACKET_RE_LOGIN = 22;
 
 
 const char SC_PACKET_LOGIN_OK = 1;
@@ -139,6 +140,8 @@ struct cs_packet_login {
 	char	name[MAX_NAME_SIZE];
 	char	job;
 	char    password[MAX_NAME_SIZE];
+	char	nickname[MAX_NAME_SIZE];
+	char	element;
 };
 
 struct cs_packet_move {
@@ -259,7 +262,6 @@ struct cs_packet_party_add_partner {
 	unsigned char room_id;
 	unsigned char job;
 };
-
 
 //---------------------------------------------
 struct sc_packet_login_ok {
