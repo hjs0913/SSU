@@ -138,6 +138,7 @@ struct cs_packet_login {
 	char	id[MAX_NAME_SIZE];
 	char	name[MAX_NAME_SIZE];
 	char	job;
+	char    password[MAX_NAME_SIZE];
 };
 
 struct cs_packet_move {

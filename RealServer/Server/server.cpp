@@ -806,9 +806,10 @@ void process_packet(int client_id, unsigned char* p)
 
         }
         //데이터 베이스 
-        Search_Id(pl, packet->id);
+        Search_Id(pl, packet->id, packet->password);
 
         // 원래는 DB에서 받아와야 하는 정보를 기본 정보로 대체
+        /*
         pl->set_x(3210);
         pl->set_y(0);
         pl->set_z(940);
@@ -821,7 +822,7 @@ void process_packet(int client_id, unsigned char* p)
         pl->set_login_id(packet->id);
 
         pl->indun_id - 1;
-        pl->join_dungeon_room = false;
+        pl->join_dungeon_room = false;*/
 
 
         // Stress Test용

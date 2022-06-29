@@ -59,18 +59,21 @@ void Initialise_DB()
 	}
 }
 
-bool Search_Id(Player* pl, char* login_id)
+bool Search_Id(Player* pl, char* login_id, char* password)
 {
 	// cout << atoi(login_id) << endl;
 	SQLRETURN retcode;
-	SQLINTEGER c_id, c_hp, c_exp, c_maxhp, c_mp, c_maxmp;
+	SQLINTEGER c_id, c_password, c_hp, c_exp, c_maxhp, c_mp, c_maxmp;
 	SQLWCHAR c_name[MAX_NAME_SIZE];
 	SQLSMALLINT c_x, c_y, c_z, c_lv, c_job;
-	SQLLEN cbP_name = 0, cbP_id = 0, cbP_x = 0, cbP_y = 0, cbP_z = 0,
+	SQLLEN cbP_name = 0, cbP_id = 0, cbP_password = 0, cbP_x = 0, cbP_y = 0, cbP_z = 0,
 		cbP_hp = 0, cbP_lv = 0, cbP_exp = 0, cbP_maxhp = 0, cbP_job = 0, 
 		cbP_mp = 0, cbP_maxmp = 0;
 	char temp[50];
-	sprintf_s(temp, sizeof(temp), "EXEC search_player %s", login_id);
+	wstring qu{};
+	sprintf_s(temp, sizeof(temp), "EXEC Search_Id %s, %s", login_id, password);
+
+	
 	//cout << exec << endl;
 	wchar_t* exec;
 	int strSize = MultiByteToWideChar(CP_ACP, 0, temp, -1, NULL, NULL);
@@ -83,17 +86,18 @@ bool Search_Id(Player* pl, char* login_id)
 
 	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {  //있는  ID면 불러오고 
 		retcode = SQLBindCol(hstmt, 1, SQL_C_LONG, &c_id, 100, &cbP_id);
-		retcode = SQLBindCol(hstmt, 2, SQL_C_WCHAR, c_name, MAX_NAME_SIZE, &cbP_name);
-		retcode = SQLBindCol(hstmt, 3, SQL_C_SHORT, &c_x, 100, &cbP_x);
-		retcode = SQLBindCol(hstmt, 4, SQL_C_SHORT, &c_y, 100, &cbP_y);
-		retcode = SQLBindCol(hstmt, 5, SQL_C_SHORT, &c_z, 100, &cbP_z);
-		retcode = SQLBindCol(hstmt, 6, SQL_C_LONG, &c_hp, 100, &cbP_hp);
-		retcode = SQLBindCol(hstmt, 7, SQL_C_SHORT, &c_lv, 100, &cbP_lv);
-		retcode = SQLBindCol(hstmt, 8, SQL_C_LONG, &c_exp, 100, &cbP_exp);
-		retcode = SQLBindCol(hstmt, 9, SQL_C_LONG, &c_maxhp, 100, &cbP_maxhp);
-		retcode = SQLBindCol(hstmt, 10, SQL_C_SHORT, &c_job, 100, &cbP_job);
-		retcode = SQLBindCol(hstmt, 11, SQL_C_LONG, &c_mp, 100, &cbP_mp);
-		retcode = SQLBindCol(hstmt, 12, SQL_C_LONG, &c_maxmp, 100, &cbP_maxmp);
+		retcode = SQLBindCol(hstmt, 2, SQL_C_LONG, &c_password, 100, &cbP_password);
+		retcode = SQLBindCol(hstmt, 3, SQL_C_WCHAR, c_name, MAX_NAME_SIZE, &cbP_name);
+		retcode = SQLBindCol(hstmt, 4, SQL_C_SHORT, &c_x, 100, &cbP_x);
+		retcode = SQLBindCol(hstmt, 5, SQL_C_SHORT, &c_y, 100, &cbP_y);
+		retcode = SQLBindCol(hstmt, 6, SQL_C_SHORT, &c_z, 100, &cbP_z);
+		retcode = SQLBindCol(hstmt, 7, SQL_C_LONG, &c_hp, 100, &cbP_hp);
+		retcode = SQLBindCol(hstmt, 8, SQL_C_SHORT, &c_lv, 100, &cbP_lv);
+		retcode = SQLBindCol(hstmt, 9, SQL_C_LONG, &c_exp, 100, &cbP_exp);
+		retcode = SQLBindCol(hstmt, 10, SQL_C_LONG, &c_maxhp, 100, &cbP_maxhp);
+		retcode = SQLBindCol(hstmt, 11, SQL_C_SHORT, &c_job, 100, &cbP_job);
+		retcode = SQLBindCol(hstmt, 12, SQL_C_LONG, &c_mp, 100, &cbP_mp);
+		retcode = SQLBindCol(hstmt, 13, SQL_C_LONG, &c_maxmp, 100, &cbP_maxmp);
 
 		// Fetch and print each row of data. On an error, display a message and exit.
 		retcode = SQLFetch(hstmt);
@@ -148,17 +152,18 @@ bool Search_Id(Player* pl, char* login_id)
 
 					if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
 						retcode = SQLBindCol(hstmt, 1, SQL_C_LONG, &c_id, 100, &cbP_id);
-						retcode = SQLBindCol(hstmt, 2, SQL_C_WCHAR, c_name, MAX_NAME_SIZE, &cbP_name);
-						retcode = SQLBindCol(hstmt, 3, SQL_C_SHORT, &c_x, 100, &cbP_x);
-						retcode = SQLBindCol(hstmt, 4, SQL_C_SHORT, &c_y, 100, &cbP_y);
-						retcode = SQLBindCol(hstmt, 5, SQL_C_SHORT, &c_z, 100, &cbP_z);
-						retcode = SQLBindCol(hstmt, 6, SQL_C_LONG, &c_hp, 100, &cbP_hp);
-						retcode = SQLBindCol(hstmt, 7, SQL_C_SHORT, &c_lv, 100, &cbP_lv);
-						retcode = SQLBindCol(hstmt, 8, SQL_C_LONG, &c_exp, 100, &cbP_exp);
-						retcode = SQLBindCol(hstmt, 9, SQL_C_LONG, &c_maxhp, 100, &cbP_maxhp);
-						retcode = SQLBindCol(hstmt, 10, SQL_C_SHORT, &c_job, 100, &cbP_job);
-						retcode = SQLBindCol(hstmt, 11, SQL_C_LONG, &c_mp, 100, &cbP_mp);
-						retcode = SQLBindCol(hstmt, 12, SQL_C_LONG, &c_maxmp, 100, &cbP_maxmp);
+						retcode = SQLBindCol(hstmt, 2, SQL_C_LONG, &c_password, 100, &cbP_password);
+						retcode = SQLBindCol(hstmt, 3, SQL_C_WCHAR, c_name, MAX_NAME_SIZE, &cbP_name);
+						retcode = SQLBindCol(hstmt, 4, SQL_C_SHORT, &c_x, 100, &cbP_x);
+						retcode = SQLBindCol(hstmt, 5, SQL_C_SHORT, &c_y, 100, &cbP_y);
+						retcode = SQLBindCol(hstmt, 6, SQL_C_SHORT, &c_z, 100, &cbP_z);
+						retcode = SQLBindCol(hstmt, 7, SQL_C_LONG, &c_hp, 100, &cbP_hp);
+						retcode = SQLBindCol(hstmt, 8, SQL_C_SHORT, &c_lv, 100, &cbP_lv);
+						retcode = SQLBindCol(hstmt, 9, SQL_C_LONG, &c_exp, 100, &cbP_exp);
+						retcode = SQLBindCol(hstmt, 10, SQL_C_LONG, &c_maxhp, 100, &cbP_maxhp);
+						retcode = SQLBindCol(hstmt, 11, SQL_C_SHORT, &c_job, 100, &cbP_job);
+						retcode = SQLBindCol(hstmt, 12, SQL_C_LONG, &c_mp, 100, &cbP_mp);
+						retcode = SQLBindCol(hstmt, 13, SQL_C_LONG, &c_maxmp, 100, &cbP_maxmp);
 
 						// Fetch and print each row of data. On an error, display a message and exit.
 						retcode = SQLFetch(hstmt);

@@ -108,14 +108,15 @@ void err_quit(const char* msg)
 	exit(1);
 }
 
-void send_login_packet(char* id, char* name, int job)
+void send_login_packet(char* id, char* password)
 {
 	cs_packet_login packet;
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET_LOGIN;
-	packet.job = job;
+	//packet.job = job;
+	strcpy_s(packet.password, password);
 	strcpy_s(packet.id, id);
-	strcpy_s(packet.name, name);
+	//strcpy_s(packet.name, name);
 	do_send(sizeof(packet), &packet);
 }
 
@@ -989,15 +990,15 @@ int netInit()
 
 	char pl_id[MAX_NAME_SIZE];
 	char pl_name[MAX_NAME_SIZE];
+	char pl_password[MAX_NAME_SIZE];
 	int pl_job = 0;
 	cout << "ID를 입력하세요 : ";
 	cin >> pl_id;
-	cout << "이름을 입력하세요 : ";
-	cin >> pl_name;
-	cout << "직업을 고르세요(0 : 딜러, 1 : 탱커, 2 : 마법사, 3: 서포터) : ";
-	cin >> pl_job;
-	if (!(0 <= pl_job && pl_job <= 3)) pl_job = 0;
-	send_login_packet(pl_id, pl_name, pl_job);
+	cout << "패스워드를 입력하세요 : ";
+	cin >> pl_password;
+
+	//if (!(0 <= pl_job && pl_job <= 3)) pl_job = 0;
+	send_login_packet(pl_id, pl_password);
 
 	do_recv();
 }
