@@ -442,3 +442,40 @@ pos Npc::a_star(int t_x, int t_z, int x, int z,array<Obstacle, MAX_OBSTACLE> obs
 
 	return pos(x, z);
 }
+
+
+float Npc::get_origin_physical_attack()
+{
+	return _origin_physical_attack;
+}
+float Npc::get_origin_magical_attack()
+{
+	return _origin_magical_attack;
+}
+float Npc::get_origin_physical_defence()
+{
+	return _origin_physical_defence;
+}
+float Npc::get_origin_magical_defence()
+{
+	return _origin_magical_defence;
+}
+void Npc::set_origin_physical_attack(float physical_attack)
+{
+	_origin_physical_attack = physical_attack;
+}
+
+void Npc::set_origin_magical_attack(float magical_attack)
+{
+	_origin_magical_attack = magical_attack;
+}
+
+void Npc::set_origin_physical_defence(float physical_defence)
+{
+	_origin_physical_defence = physical_defence;
+}
+
+void Npc::set_origin_magical_defence(float magical_defence)
+{
+	_origin_magical_defence = magical_defence;
+}

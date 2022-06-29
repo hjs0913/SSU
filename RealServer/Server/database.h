@@ -6,6 +6,6 @@
 
 void	HandleDiagnosticRecord(SQLHANDLE hHandle, SQLSMALLINT hType, RETCODE RetCode);
 void	Initialise_DB();
-bool	Search_Id(Player* pl, char* login_id);
+bool	Search_Id(Player* pl, char* login_id, char* password);
 void	Save_position(Player* pl);
 void	Disconnect_DB();

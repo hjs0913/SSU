@@ -772,9 +772,9 @@ void process_packet(int client_id, unsigned char* p)
         cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(p);
         // pl->set_name(packet->name);
         // DB 연결
-        /*
+   /*  //여기 아래 고쳐야함 
         EnterCriticalSection(&cs);
-        if (!(Search_Id(pl, packet->name))) {
+        if (!(Search_Id(pl, packet->name, packet->password))) {
             send_login_fail_packet(pl, 0);   // 아이디 없음
             Disconnect(client_id);
             LeaveCriticalSection(&cs);
@@ -782,7 +782,7 @@ void process_packet(int client_id, unsigned char* p)
         }
         LeaveCriticalSection(&cs);
         */
-
+    
         // 중복 아이디 검사
 
         for (auto* p : players) {
@@ -805,7 +805,11 @@ void process_packet(int client_id, unsigned char* p)
             }
 
         }
+        //데이터 베이스 
+        Search_Id(pl, packet->id, packet->password);
+
         // 원래는 DB에서 받아와야 하는 정보를 기본 정보로 대체
+        /*
         pl->set_x(3210);
         pl->set_y(0);
         pl->set_z(940);
@@ -818,7 +822,7 @@ void process_packet(int client_id, unsigned char* p)
         pl->set_login_id(packet->id);
 
         pl->indun_id - 1;
-        pl->join_dungeon_room = false;
+        pl->join_dungeon_room = false;*/
 
 
         // Stress Test용
@@ -840,6 +844,12 @@ void process_packet(int client_id, unsigned char* p)
             pl->set_magical_defence(0.17 * lv * lv + 10 * lv);
             pl->set_basic_attack_factor(50.0f);
             pl->set_defence_factor(0.0002);
+
+            pl->set_origin_physical_attack(pl->get_physical_attack());
+            pl->set_origin_magical_attack(pl->get_magical_attack());
+            pl->set_origin_physical_defence(pl->get_physical_defence());
+            pl->set_origin_magical_defence(pl->get_magical_defence());
+
             break;
         }
         case J_TANKER: {
@@ -854,7 +864,11 @@ void process_packet(int client_id, unsigned char* p)
             pl->set_magical_defence(0.2 * lv * lv + 10 * lv);
             pl->set_basic_attack_factor(50.0f);
             pl->set_defence_factor(0.0002);
-            pl->set_element(E_WATER);
+  
+            pl->set_origin_physical_attack(pl->get_physical_attack());
+            pl->set_origin_magical_attack(pl->get_magical_attack());
+            pl->set_origin_physical_defence(pl->get_physical_defence());
+            pl->set_origin_magical_defence(pl->get_magical_defence());
             break;
         }
         case J_SUPPORTER: {
@@ -869,6 +883,11 @@ void process_packet(int client_id, unsigned char* p)
             pl->set_magical_defence(0.24 * lv * lv + 10 * lv);
             pl->set_basic_attack_factor(50.0f);
             pl->set_defence_factor(0.0002);
+
+            pl->set_origin_physical_attack(pl->get_physical_attack());
+            pl->set_origin_magical_attack(pl->get_magical_attack());
+            pl->set_origin_physical_defence(pl->get_physical_defence());
+            pl->set_origin_magical_defence(pl->get_magical_defence());
             break;
         }
         case J_MAGICIAN: {
@@ -883,6 +902,11 @@ void process_packet(int client_id, unsigned char* p)
             pl->set_magical_defence(0.24 * lv * lv + 10 * lv);
             pl->set_basic_attack_factor(50.0f);
             pl->set_defence_factor(0.0002);
+
+            pl->set_origin_physical_attack(pl->get_physical_attack());
+            pl->set_origin_magical_attack(pl->get_magical_attack());
+            pl->set_origin_physical_defence(pl->get_physical_defence());
+            pl->set_origin_magical_defence(pl->get_magical_defence());
             break;
         }
         default: {
@@ -2503,6 +2527,14 @@ void process_packet(int client_id, unsigned char* p)
             partner->set_basic_attack_factor(50.0f);
             partner->set_defence_factor(0.0002);
             partner->set_element(E_WATER);
+
+            partner->set_origin_physical_attack(partner->get_physical_attack());
+            partner->set_origin_magical_attack(partner->get_magical_attack());
+            partner->set_origin_physical_defence(partner->get_physical_defence());
+            partner->set_origin_magical_defence(partner->get_magical_defence());
+
+            partner->indun_player_cnt = dun->player_cnt + dun->partner_cnt;
+           // dun->player_cnt++;
             //  여기까지 클라에서 패킷 받으면, 새 player id 생성 후 정보 초기화  
 
             // join dungeon party
@@ -3940,36 +3972,35 @@ void do_timer()
                 }
                 reinterpret_cast<Player*>(players[temp.obj_id])->set_skill_active(temp.target_id, false);
                 continue;
-            }
-        /*    else if (temp.ev == EVENT_PARTNER_SKILL) {
-                // obj는 가이아의 넘버,  taget은 파트너 자신  
-                switch (reinterpret_cast<Player*>(dungeons[temp.obj_id]->get_party_palyer()[temp.target_id])->get_job())
+            }  
+            else if (temp.ev == EVENT_PARTNER_SKILL) {
+    
+                int indun_id = reinterpret_cast<Player*>(players[temp.target_id])->get_indun_id();  //바꿔야함!
+         
+                switch (dungeons[indun_id]->get_party_palyer()[temp.obj_id]->get_job())
                 {
                 case J_DILLER: {
-                    if (temp.obj_id != MAX_USER / GAIA_ROOM + 1) {
-                        dungeons[temp.obj_id]->get_party_palyer()[temp.target_id]->set_physical_attack(0.3 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 10 * players[temp.obj_id]->get_lv());
-                        dungeons[temp.obj_id]->get_party_palyer()[temp.target_id]->set_magical_attack(0.1 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 5 * players[temp.obj_id]->get_lv());
-                    }
+                        for (int i = 0; i < GAIA_ROOM; ++i) {
+                            dungeons[indun_id]->get_party_palyer()[i]->set_physical_attack(dungeons[indun_id]->get_party_palyer()[i]->get_origin_physical_attack());
+                            dungeons[indun_id]->get_party_palyer()[i]->set_magical_attack(dungeons[indun_id]->get_party_palyer()[i]->get_origin_magical_attack());
+                        }
                     break;
                 }
                 case J_TANKER: {
-                    if (temp.obj_id != MAX_USER / GAIA_ROOM + 1) {
-                        dungeons[temp.obj_id]->get_party_palyer()[temp.target_id]->set_physical_defence(0.27 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 10 * players[temp.obj_id]->get_lv());
-                        dungeons[temp.obj_id]->get_party_palyer()[temp.target_id]->set_magical_defence(0.2 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 10 * players[temp.obj_id]->get_lv());
-                    }
-                    break;
-                }
-                case J_SUPPORTER: {   
-                    if (temp.target_id == MAX_USER / GAIA_ROOM + 1) {
                         for (int i = 0; i < GAIA_ROOM; ++i) {
-                            dungeons[temp.obj_id]->get_party_palyer()[i]->attack_speed_up = false;
-                        }
-                    }
+                            dungeons[indun_id]->get_party_palyer()[i]->set_physical_defence(dungeons[indun_id]->get_party_palyer()[i]->get_origin_physical_defence());
+                            dungeons[indun_id]->get_party_palyer()[i]->set_magical_defence(dungeons[indun_id]->get_party_palyer()[i]->get_origin_magical_defence());
+                        }        
+                    break;
+                }
+                case J_SUPPORTER: {         
+                    for (int i = 0; i < GAIA_ROOM; ++i) {
+                        dungeons[indun_id]->get_party_palyer()[i]->attack_speed_up = false;
+                    }    
                     break;
                 }
                 }
-
-            }*/
+            }
             else {
                 EXP_OVER* ex_over = new EXP_OVER;
                 ex_over->_comp_op = EVtoOP(temp.ev);
@@ -4028,35 +4059,36 @@ void do_timer()
                     reinterpret_cast<Player*>(players[ev.obj_id])->set_skill_active(ev.target_id, false);
                     continue;
                 }
-                /*   else if (ev.ev == EVENT_PARTNER_SKILL) {
-                    // obj는 가이아의 넘버,  taget은 파트너 자신  
-                    switch (reinterpret_cast<Player*>(dungeons[ev.obj_id]->get_party_palyer()[ev.target_id])->get_job())
+                else if (ev.ev == EVENT_PARTNER_SKILL) {
+
+                    int indun_id = reinterpret_cast<Player*>(players[ev.target_id])->get_indun_id();  //바꿔야함
+           
+                    switch (dungeons[indun_id]->get_party_palyer()[ev.obj_id]->get_job())
                     {
                     case J_DILLER: {
-                        if (ev.obj_id != MAX_USER / GAIA_ROOM + 1) {
-                            dungeons[ev.obj_id]->get_party_palyer()[ev.target_id]->set_physical_attack(0.3 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 10 * players[ev.obj_id]->get_lv());
-                            dungeons[ev.obj_id]->get_party_palyer()[ev.target_id]->set_magical_attack(0.1 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 5 * players[ev.obj_id]->get_lv());
+                        for (int i = 0; i < GAIA_ROOM; ++i) {
+                            dungeons[indun_id]->get_party_palyer()[i]->set_physical_attack(dungeons[indun_id]->get_party_palyer()[i]->get_origin_physical_attack());
+                            dungeons[indun_id]->get_party_palyer()[i]->set_magical_attack(dungeons[indun_id]->get_party_palyer()[i]->get_origin_magical_attack());
                         }
                         break;
                     }
                     case J_TANKER: {
-                        if (ev.obj_id != MAX_USER / GAIA_ROOM + 1) {
-                            dungeons[ev.obj_id]->get_party_palyer()[ev.target_id]->set_physical_defence(0.27 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 10 * players[ev.obj_id]->get_lv());
-                            dungeons[ev.obj_id]->get_party_palyer()[ev.target_id]->set_magical_defence(0.2 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 10 * players[ev.obj_id]->get_lv());
-                        }
+                            for (int i = 0; i < GAIA_ROOM; ++i) {
+                                dungeons[indun_id]->get_party_palyer()[i]->set_physical_defence(dungeons[indun_id]->get_party_palyer()[i]->get_origin_physical_defence());
+                                dungeons[indun_id]->get_party_palyer()[i]->set_magical_defence(dungeons[indun_id]->get_party_palyer()[i]->get_origin_magical_defence());
+                            }
+
                         break;
                     }
-                    case J_SUPPORTER: {   // 대상이 여러명일 때는 어떻게 다시 초기화할까 
-                        if (ev.target_id == MAX_USER / GAIA_ROOM + 1) {
-                            for (int i = 0; i < GAIA_ROOM; ++i) {
-                                dungeons[ev.obj_id]->get_party_palyer()[i]->attack_speed_up = false;
-                            }
-                           }
+                    case J_SUPPORTER: {
+                        for (int i = 0; i < GAIA_ROOM; ++i) {
+                            dungeons[indun_id]->get_party_palyer()[i]->attack_speed_up = false;
+                        }
                         break;
                     }
                     }
 
-                }*/
+                }
 
                 ex_over->_comp_op = EVtoOP(ev.ev);
                 ex_over->_target = ev.target_id;
@@ -4087,6 +4119,9 @@ void initialise_DUNGEON()
 
 int main()
 {
+    //db 연결 
+    Initialise_DB();
+
     setlocale(LC_ALL, "korean");
     wcout.imbue(locale("korean"));
     WSADATA WSAData;
