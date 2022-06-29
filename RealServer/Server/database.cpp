@@ -213,12 +213,13 @@ bool Search_Id(Player* pl, char* login_id, char* password)
 void Save_position(Player* pl)
 {
 	SQLRETURN retcode;
-
+	cout << pl->get_login_id() << endl;
 	char temp[100];
 	//여기도 패스워드, Z좌표, 직업,MP,MAXMP, 속성 를 추가로 넣어서 저장해야한다. 
-	sprintf_s(temp, sizeof(temp), "EXEC save_player_info %d, %d, %d, %d, %d, %d, %d", 
-		pl->get_login_id(), pl->get_x(), pl->get_y(), pl->get_hp(),
-		pl->get_lv(), pl->get_exp(), pl->get_maxhp());
+	sprintf_s(temp, sizeof(temp), "EXEC save_player_info %s, %d, %d, %d, %d, %d, %d, %d, %d, %d", 
+	pl->get_login_id(), (int)pl->get_x(), (int)pl->get_y(), (int)pl->get_z(), pl->get_hp(),
+	pl->get_lv(), pl->get_exp(), pl->get_maxhp(), pl->get_mp(), pl->get_maxmp() );  //	pl->get_login_id()
+	cout << temp << endl;
 	wchar_t* exec;
 	int strSize = MultiByteToWideChar(CP_ACP, 0, temp, -1, NULL, NULL);
 	exec = new WCHAR[strSize];
@@ -234,10 +235,12 @@ void Save_position(Player* pl)
 
 			HandleDiagnosticRecord(hstmt, SQL_HANDLE_STMT, retcode);
 		}
+		cout << "DB 저장완료" << endl;
 	}
 	else {
 		HandleDiagnosticRecord(hstmt, SQL_HANDLE_STMT, retcode);
 	}
+	
 	//SQLCancel(hstmt);
 }
 
