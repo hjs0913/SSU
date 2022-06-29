@@ -805,6 +805,7 @@ void process_packet(int client_id, unsigned char* p)
             }
 
         }
+        pl->set_login_id(packet->id);
         //데이터 베이스 
         Search_Id(pl, packet->id, packet->password);
 
@@ -2734,9 +2735,15 @@ void worker()
         BOOL ret = GetQueuedCompletionStatus(g_h_iocp, &num_byte, (PULONG_PTR)&iocp_key, &p_over, INFINITE);
         int client_id = static_cast<int>(iocp_key);
         EXP_OVER* exp_over = reinterpret_cast<EXP_OVER*>(p_over);
+
+        Player* pl = reinterpret_cast<Player*>(players[client_id]);
+        int remain_data = num_byte + pl->get_prev_size();
+        unsigned char* packet_start = exp_over->_net_buf;
+        int packet_size = packet_start[0];
         if (FALSE == ret) {
             int err_no = WSAGetLastError();
             error_display(err_no);
+            Save_position(pl);// 차라리 disconnect 함수에 넣자 
             Disconnect(client_id);
             if (exp_over->_comp_op == OP_SEND)
                 delete exp_over;
@@ -2744,17 +2751,13 @@ void worker()
         }
 
         switch (exp_over->_comp_op) {
+          
         case OP_RECV: {
             if (num_byte == 0) {
+                Save_position(pl);
                 Disconnect(client_id);
                 continue;
             }
-
-            Player* pl = reinterpret_cast<Player*>(players[client_id]);
-            int remain_data = num_byte + pl->get_prev_size();
-            unsigned char* packet_start = exp_over->_net_buf;
-            int packet_size = packet_start[0];
-
             while (packet_size <= remain_data) {
                 process_packet(client_id, packet_start);
                 remain_data -= packet_size;
@@ -2774,6 +2777,7 @@ void worker()
         }
         case OP_SEND: {
             if (num_byte != exp_over->_wsa_buf.len) {
+                Save_position(pl);
                 Disconnect(client_id);
             }
             delete exp_over;
@@ -4190,13 +4194,15 @@ int main()
     timer_thread.join();
     for (auto& pl : players) {
         if (pl->get_tribe() != HUMAN) break;
-        if (ST_INGAME == pl->get_state())
+        if (ST_INGAME == pl->get_state()) {
+            Save_position(reinterpret_cast<Player*>(pl));
             Disconnect(pl->get_id());
+        }
     }
     closesocket(g_s_socket);
     DeleteCriticalSection(&cs);
     WSACleanup();
 
     // DB 연결
-    // Disconnect_DB();
+     Disconnect_DB();
 }
