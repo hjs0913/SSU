@@ -1,5 +1,4 @@
-﻿  EXP_OVER.cpp
-  Gaia.cpp
+﻿  Gaia.cpp
 C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(48,15): warning C4244: '인수': 'lua_Integer'에서 'short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(52,15): warning C4244: '인수': 'lua_Integer'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(53,18): warning C4244: '인수': 'lua_Integer'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
@@ -266,10 +265,6 @@ C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(112,7): warning C4244: '=
 C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(113,7): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(328,71): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(331,72): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(384,8): error C2065: 'obs': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(384,44): error C2065: 'obs': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(385,5): error C2065: 'obs': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(385,41): error C2065: 'obs': 선언되지 않은 식별자입니다.
 C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(397,12): warning C4244: '초기화 중': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(404,12): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(405,12): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
@@ -288,28 +283,21 @@ C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(669,11): warning C4244: '
 C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(670,11): warning C4244: '=': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(681,7): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(682,7): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(710,23): error C2660: 'Npc::return_npc_position': 함수는 0개의 인수를 사용하지 않습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(636,11): message : 'Npc::return_npc_position' 선언을 참조하십시오.
 C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(714,8): warning C4244: '초기화 중': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(715,8): warning C4244: '초기화 중': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(717,10): warning C4244: '초기화 중': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(718,10): warning C4244: '초기화 중': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(739,34): error C2065: 'obstacles': 선언되지 않은 식별자입니다.
 C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(746,7): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(747,7): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(779,7): warning C4244: '=': 'lua_Number'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(780,7): warning C4244: '=': 'lua_Number'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(781,7): warning C4244: '=': 'lua_Number'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(782,8): warning C4244: '=': 'lua_Integer'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
   ObjectManager.cpp
 C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\ObjectManager.cpp(122,31): warning C4553: '==': 식의 결과가 사용되지 않습니다. '='을(를) 의도했습니까?
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\ObjectManager.cpp(295,57): error C2660: 'Npc::return_npc_position': 함수는 0개의 인수를 사용하지 않습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.h(112,7): message : 'Npc::return_npc_position' 선언을 참조하십시오.
 C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\ObjectManager.cpp(362,37): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\ObjectManager.cpp(380,13): error C3861: 'player_revive': 식별자를 찾을 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\ObjectManager.cpp(399,39): warning C4244: '인수': 'lua_Number'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\ObjectManager.cpp(400,39): warning C4244: '인수': 'lua_Number'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\ObjectManager.cpp(401,39): warning C4244: '인수': 'lua_Number'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\ObjectManager.cpp(402,40): warning C4244: '인수': 'lua_Integer'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\ObjectManager.cpp(615,57): warning C4553: '==': 식의 결과가 사용되지 않습니다. '='을(를) 의도했습니까?
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\ObjectManager.cpp(620,48): warning C4552: '-': 식의 결과가 사용되지 않습니다.
-  Obstacle.cpp
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\ObjectManager.cpp(580,57): warning C4553: '==': 식의 결과가 사용되지 않습니다. '='을(를) 의도했습니까?
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\ObjectManager.cpp(585,48): warning C4552: '-': 식의 결과가 사용되지 않습니다.
   PacketManager.cpp
 C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(14,44): error C2065: 'players': 선언되지 않은 식별자입니다.
 C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(33,24): error C2065: 'players': 선언되지 않은 식별자입니다.
@@ -773,7 +761,32 @@ C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.2
               _Ty2=int
           ]
   Player.cpp
-  Sector.cpp
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(90,9): error C2065: 'dungeons': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(90,18): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(91,13): error C2065: 'dungeons': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(91,22): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(92,13): error C2065: 'dungeons': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(92,22): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(94,13): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(95,17): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(96,17): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(99,13): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(100,13): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(103,13): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(103,24): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(104,13): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(104,24): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(105,39): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(108,31): error C2065: 'dungeons': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(108,40): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(111,50): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(112,47): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(115,17): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(117,29): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(123,29): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(129,29): error C2065: 'pl': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(138,9): error C2065: 'dungeons': 선언되지 않은 식별자입니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(138,18): error C2065: 'pl': 선언되지 않은 식별자입니다.
   SectorManager.cpp
 C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\SectorManager.cpp(12,54): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\SectorManager.cpp(12,42): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
@@ -781,8 +794,6 @@ C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\SectorManager.cpp(18,54): warning
 C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\SectorManager.cpp(18,42): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
   send.cpp
 C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\send.cpp(308,50): warning C4244: '=': 'short'에서 'unsigned char'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-  SkillBuf.cpp
-  SocketManager.cpp
   SSUServer.cpp
 C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\SSUServer.cpp(31,72): error C2664: 'ObjectManager::ObjectManager(SectorManager *,MainSocketManager *)': 인수 2을(를) 'HANDLE *'에서 'MainSocketManager *'(으)로 변환할 수 없습니다.
 C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\SSUServer.cpp(31,70): message : 가리킨 형식이 관련이 없습니다. 변환하려면 reinterpret_cast, C 스타일 캐스트 또는 함수 스타일 캐스트가 필요합니다.
