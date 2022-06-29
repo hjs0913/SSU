@@ -61,17 +61,6 @@ void Initialise_DB()
 
 bool Add_DB(char* login_id, char* password, Player* pl, char* nick_name, int job, int element)
 {
-	/*
-	char nick_name[10];
-	cout << "새로운 아이디 입니다. 닉네임을 입력하세요: " << endl;
-	cin >> nick_name;
-	int job;
-	cout << "직업을 선택하세요(전사:0, 탱커:1, 마법사:2, 서포터:3): " << endl;
-	cin >> job;
-	int element;
-	cout << "속성을 선택하세요(물:1, 강철:2, 바람:3, 불:4, 나무:5, 땅:6, 얼음:7 ): " << endl;
-	cin >> element;
-	*/
 	SQLRETURN retcode;
 
 	char temp[100];
@@ -312,35 +301,4 @@ void Disconnect_DB()
 	SQLDisconnect(hdbc);
 	SQLFreeHandle(SQL_HANDLE_DBC, hdbc);
 	SQLFreeHandle(SQL_HANDLE_ENV, henv);
-}
-
-
-//추가 
-void Update_DB(wstring id, short posX, short posY, short level, int exp, short HP) //인자를 player로 하고  저것들 외에 다른 스탯들도 업데이트하자 
-{
-	wstring qu{};
-	SQLRETURN retcode;
-	qu += L"EXEC update_DB ";
-	qu += id;
-	qu += L", ";
-	qu += to_wstring(posX);
-	qu += L", ";
-	qu += to_wstring(posY);
-	qu += L", ";
-	qu += to_wstring(level);
-	qu += L", ";
-	qu += to_wstring(exp);
-	qu += L", ";
-	qu += to_wstring(HP);
-
-	retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
-	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)qu.c_str(), SQL_NTS);
-	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
-	{
-		cout << "update 완료!" << endl;
-
-	}
-	else
-		cout << "update 실패" << endl;
-
 }
