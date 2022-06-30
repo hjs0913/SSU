@@ -1097,85 +1097,91 @@ void CGameFramework::ProcessInput()
 
 			if (pKeysBuffer[VK_SPACE] & 0xF0) dwAttack |= 0x30;
 
-			if ((pKeysBuffer[VK_NUMPAD1] & 0xF0) || (pKeysBuffer['1'] & 0xF0)) {
-				switch (my_job)
-				{
-				case J_DILLER:
-					first_skill_used = true;
-					start_skill[0] = clock();
-					send_skill_packet(0, 0);
-					break;
-				case J_TANKER:
-					first_skill_used = true;
-					start_skill[0] = clock();
-					send_skill_packet(0, 0);
-					break;
-				case J_MAGICIAN:
-					first_skill_used = true;
-					start_skill[0] = clock();
-					send_skill_packet(1, 0);
-					break;
-				case J_SUPPORTER:
-					first_skill_used = true;
-					start_skill[0] = clock();
-					send_skill_packet(2, 0);
-					break;
-				default:
-					break;
-				}
-			}
-			if ((pKeysBuffer[VK_NUMPAD2] & 0xF0) || (pKeysBuffer['2'] & 0xF0)) {     //
-				switch (my_job)
-				{
-				case J_DILLER:
-					second_skill_used = true;
-					start_skill[1] = clock();
-					send_skill_packet(1, 0);
-					break;
-				case J_TANKER:
-					second_skill_used = true;
-					start_skill[1] = clock();
-					send_skill_packet(1, 0);
-					break;
-				case J_MAGICIAN:
-					second_skill_used = true;
-					start_skill[1] = clock();
-					send_skill_packet(1, 1);
-					break;
-				case J_SUPPORTER:
-					second_skill_used = true;
-					start_skill[1] = clock();
-					send_skill_packet(2, 1);
-					break;
-				default:
-					break;
-				}
-			}
-			if ((pKeysBuffer[VK_NUMPAD3] & 0xF0) || (pKeysBuffer['3'] & 0xF0)) {     //   3
-				switch (my_job)
-				{
-				case J_DILLER:
-					third_skill_used = true;
-					start_skill[2] = clock();
-					send_skill_packet(2, 0);
-					break;
-				case J_TANKER:
-					third_skill_used = true;
-					start_skill[2] = clock();
-					send_skill_packet(2, 0);
-					break;
-				case J_MAGICIAN: //추후 스킬 하나 추가 
-					break;
-				case J_SUPPORTER:
-					third_skill_used = true;
-					start_skill[2] = clock();
-					send_skill_packet(2, 2);
-					break;
-				default:
-					break;
-				}
-			}
 
+			if (first_skill_used == false) {
+				if ((pKeysBuffer[VK_NUMPAD1] & 0xF0) || (pKeysBuffer['1'] & 0xF0)) {
+					switch (my_job)
+					{
+					case J_DILLER:
+						first_skill_used = true;
+						start_skill[0] = clock();
+						send_skill_packet(0, 0);
+						break;
+					case J_TANKER:
+						first_skill_used = true;
+						start_skill[0] = clock();
+						send_skill_packet(0, 0);
+						break;
+					case J_MAGICIAN:
+						first_skill_used = true;
+						start_skill[0] = clock();
+						send_skill_packet(1, 0);
+						break;
+					case J_SUPPORTER:
+						first_skill_used = true;
+						start_skill[0] = clock();
+						send_skill_packet(2, 0);
+						break;
+					default:
+						break;
+					}
+				}
+			}
+			if (second_skill_used == false) {
+				if ((pKeysBuffer[VK_NUMPAD2] & 0xF0) || (pKeysBuffer['2'] & 0xF0)) {     //
+					switch (my_job)
+					{
+					case J_DILLER:
+						second_skill_used = true;
+						start_skill[1] = clock();
+						send_skill_packet(1, 0);
+						break;
+					case J_TANKER:
+						second_skill_used = true;
+						start_skill[1] = clock();
+						send_skill_packet(1, 0);
+						break;
+					case J_MAGICIAN:
+						second_skill_used = true;
+						start_skill[1] = clock();
+						send_skill_packet(1, 1);
+						break;
+					case J_SUPPORTER:
+						second_skill_used = true;
+						start_skill[1] = clock();
+						send_skill_packet(2, 1);
+						break;
+					default:
+						break;
+					}
+				}
+			}
+			if (third_skill_used == false) {
+				if ((pKeysBuffer[VK_NUMPAD3] & 0xF0) || (pKeysBuffer['3'] & 0xF0)) {     //   3
+					switch (my_job)
+					{
+					case J_DILLER:
+						third_skill_used = true;
+						start_skill[2] = clock();
+						send_skill_packet(2, 0);
+						break;
+					case J_TANKER:
+						third_skill_used = true;
+						start_skill[2] = clock();
+						send_skill_packet(2, 0);
+						break;
+					case J_MAGICIAN: //추후 스킬 하나 추가 
+						break;
+					case J_SUPPORTER:
+						third_skill_used = true;
+						start_skill[2] = clock();
+						send_skill_packet(2, 2);
+						break;
+					default:
+						break;
+					}
+				}
+			}
 			/* //마법사 추후 수정
 			if (pKeysBuffer[VK_NUMPAD5] & 0xF0 || (pKeysBuffer['5'] & 0xF0)) {     //   5
 				second_skill_used = true;

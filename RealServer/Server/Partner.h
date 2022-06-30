@@ -26,11 +26,11 @@ protected:
 
 
 
-    int     party_id;	//서버(파티)에서의 파티원 id
+
 public:
     bool    start_game;
     bool    join_dungeon_room;
-
+    int     party_id;	//서버(파티)에서의 파티원 id
     Partner(int id);
 
     ~Partner();
@@ -42,6 +42,6 @@ public:
 
     bool check_inside(pos a, pos b, pos c, pos n);
     bool isInsideTriangle(pos a, pos b, pos c, pos n);
-
+    int get_party_id();
 
 };

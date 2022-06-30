@@ -16,6 +16,12 @@ protected:
 	float	_magical_attack;
 	float	_physical_defence;
 	float	_magical_defence;
+
+	float	_origin_physical_attack;
+	float	_origin_magical_attack;
+	float	_origin_physical_defence;
+	float	_origin_magical_defence;
+
 	float	_basic_attack_factor;
 	float	_defence_factor;
 	ELEMENT	_element;
@@ -106,4 +112,15 @@ public:
 	pos non_a_star(int t_x, int t_z, int x, int z);
 	pos a_star(int t_x, int t_z, int x, int z, array<Obstacle, MAX_OBSTACLE> obs);
 	int huristic(int t_x, int t_z, int x, int z);
+
+	//origin
+	void set_origin_physical_attack(float physical_attack);
+	void set_origin_magical_attack(float magical_attack);
+	void set_origin_physical_defence(float physical_defence);
+	void set_origin_magical_defence(float magical_defence);
+
+	float get_origin_physical_attack();
+	float get_origin_magical_attack();
+	float get_origin_physical_defence();
+	float get_origin_magical_defence();
 };

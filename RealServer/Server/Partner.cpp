@@ -16,13 +16,19 @@ Partner::Partner(int d_id) : Player(d_id)
 	float dis = 0.0;
 	int nearest_num = 0;
 	move_once = false;
-	
+	party_id = 0;
 }
 
 Partner::~Partner()
 {
 	
 }
+int Partner::get_party_id()
+{
+	return party_id;
+}
+
+
 
 bool Partner::check_inside(pos a, pos b, pos c, pos n)
 {
@@ -337,12 +343,13 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 				skill_check = true;
 			}
 
-			ev.obj_id = MAX_USER / GAIA_ROOM + 1;
+			ev.obj_id = indun_player_cnt;
 			ev.start_time = chrono::system_clock::now() + 3s;
 			ev.ev = EVENT_PARTNER_SKILL;
-			ev.target_id = gaia->get_dungeon_id();
+			ev.target_id = pa->_id;
 			timer_queue.push(ev);
 			running_pattern = false;
+
 			break;
 		}
 		case 1: {
@@ -377,10 +384,10 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 				}
 				skill_check = true;
 			}
-			ev.obj_id = MAX_USER / GAIA_ROOM + 1;
+			ev.obj_id = indun_player_cnt;
 			ev.start_time = chrono::system_clock::now() + 3s;  //ÄðÅ¸ÀÓ
 			ev.ev = EVENT_PARTNER_SKILL;
-			ev.target_id = gaia->get_dungeon_id();
+			ev.target_id = pa->_id;
 			timer_queue.push(ev);
 			running_pattern = false;
 			break;
@@ -393,10 +400,10 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			pa->set_magical_attack(0.2 * pa->get_lv() * pa->get_lv() + 5 * pa->get_lv());
 			//send_status_change_packet(pl);
 
-			ev.obj_id = gaia->get_dungeon_id();
+			ev.obj_id = indun_player_cnt;
 			ev.start_time = chrono::system_clock::now() + 3s;  //ÄðÅ¸ÀÓ
 			ev.ev = EVENT_PARTNER_SKILL;
-			ev.target_id = pa->get_id();
+			ev.target_id = pa->_id;
 			timer_queue.push(ev);
 			running_pattern = false;
 			// skill_check = true;
@@ -446,10 +453,10 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 				}
 				skill_check = true;
 			}
-			ev.obj_id = MAX_USER / GAIA_ROOM + 1;
+			ev.obj_id = indun_player_cnt;
 			ev.start_time = chrono::system_clock::now() + 3s;  //ÄðÅ¸ÀÓ
 			ev.ev = EVENT_PARTNER_SKILL;
-			ev.target_id = gaia->get_dungeon_id();
+			ev.target_id = pa->_id;
 			timer_queue.push(ev);
 			running_pattern = false;
 			break;
@@ -466,10 +473,10 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 				//send_status_change_packet(pl);
 			} 
 		
-			ev.obj_id = MAX_USER / GAIA_ROOM + 1;      // ÇØÁ¦´Â ³ªÁß¿¡ ´Ù½Ã 
+			ev.obj_id = indun_player_cnt;     
 			ev.start_time = chrono::system_clock::now() + 7s;
 			ev.ev = EVENT_PARTNER_SKILL;
-			ev.target_id = pa->get_id();
+			ev.target_id = pa->_id;
 			timer_queue.push(ev);
 			running_pattern = false;
 			break;
@@ -482,11 +489,11 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			pa->set_magical_defence(0.4 * pa->get_lv() * pa->get_lv() + 10 * pa->get_lv());
 			//send_status_change_packet(pl);
 			
-		            // ÇØÁ¦´Â ³ªÁß¿¡ ´Ù½Ã 
-			ev.obj_id = gaia->get_dungeon_id();
+		
+			ev.obj_id = indun_player_cnt;
 			ev.start_time = chrono::system_clock::now() + 10s;  //ÄðÅ¸ÀÓ
 			ev.ev = EVENT_PARTNER_SKILL;
-			ev.target_id = pa->get_id();
+			ev.target_id = 2;
 			timer_queue.push(ev);
 			running_pattern = false;
 			//skill_check = true;
@@ -540,10 +547,10 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 				skill_check = true;
 			}
 		
-			ev.obj_id = pa->get_id();
+			ev.obj_id = indun_player_cnt;
 			ev.start_time = chrono::system_clock::now() + 5s;
 			ev.ev = EVENT_PARTNER_SKILL;
-			ev.target_id = gaia->get_dungeon_id();
+			ev.target_id = pa->_id;
 			timer_queue.push(ev);
 			running_pattern = false;
 			break;
@@ -590,10 +597,10 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 				skill_check = true;
 			}
 		
-			ev.obj_id = pa->get_id();
+			ev.obj_id = indun_player_cnt;
 			ev.start_time = chrono::system_clock::now() + 10s;
 			ev.ev = EVENT_PARTNER_SKILL;
-			ev.target_id = gaia->get_dungeon_id();
+			ev.target_id = pa->_id;
 			timer_queue.push(ev);	
 			running_pattern = false;
 			break;
@@ -620,7 +627,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 				ev.obj_id = pa->get_id();
 				ev.start_time = chrono::system_clock::now() + 5s;  //ÄðÅ¸ÀÓ
 				ev.ev = EVENT_PARTNER_SKILL;
-				ev.target_id = 0;
+				ev.target_id = pa->_id;
 				timer_queue.push(ev);
 				running_pattern = false;
 				return;
@@ -653,10 +660,10 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			}
 			skill_check = true;
 
-			ev.obj_id = pa->get_id();
+			ev.obj_id = indun_player_cnt;
 			ev.start_time = chrono::system_clock::now() + 5s;  //ÄðÅ¸ÀÓ
 			ev.ev = EVENT_PARTNER_SKILL;
-			ev.target_id = gaia->get_party_palyer()[target_player]->get_id();
+			ev.target_id = pa->_id;
 			timer_queue.push(ev);
 			running_pattern = false;
 			break;
@@ -669,7 +676,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 				ev.obj_id = pa->get_id();
 				ev.start_time = chrono::system_clock::now() + 5s;  //ÄðÅ¸ÀÓ
 				ev.ev = EVENT_PARTNER_SKILL;
-				ev.target_id = 0;
+				ev.target_id = pa->_id;
 				timer_queue.push(ev);
 				running_pattern = false;
 				return;
@@ -703,7 +710,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			ev.obj_id = pa->get_id();
 			ev.start_time = chrono::system_clock::now() + 5s;  //ÄðÅ¸ÀÓ
 			ev.ev = EVENT_PARTNER_SKILL;
-			ev.target_id = gaia->get_party_palyer()[target_player]->get_id();
+			ev.target_id = pa->_id;
 			timer_queue.push(ev);
 			running_pattern = false;
 			break;
@@ -721,7 +728,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			ev.obj_id = gaia->get_dungeon_id();
 			ev.start_time = chrono::system_clock::now() + 5s;  //ÄðÅ¸ÀÓ
 			ev.ev = EVENT_PARTNER_SKILL;   // ÆÄÆ®³Ê (¹öÇÁ) ½ºÅ³ ÀÌº¥Æ®¸¦ µû·Î ¸¸µéÁö »ý°¢ÇØº¸ÀÚ 
-			ev.target_id = MAX_USER / GAIA_ROOM + 1;  // ÀÏ´Ü ÀÌ°É·Î ±¸ºÐ 
+			ev.target_id = pa->_id;
 			timer_queue.push(ev);
 			running_pattern = false;
 			break;
