@@ -1110,7 +1110,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
     case CS_PACKET_RAID_RANDER_OK: {
         Gaia* dun = m_ObjectManger->get_dungeon(pl->indun_id);
         dun->player_rander_ok++;
-
+        cout << dun->player_rander_ok << endl;
         if (dun->player_rander_ok == GAIA_ROOM - dun->partner_cnt) {
             dun->start_game = true;
 

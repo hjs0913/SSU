@@ -758,10 +758,8 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 		if (mPlayer[i - 33]->GetUse() == true && m_ppHierarchicalGameObjects[i]->GetPosition().x == 0.f) {
 			switch (mPlayer[i-33]->m_job) {
 			case J_DILLER: {
-				cout << pBastardModel << endl;
 				//delete m_ppHierarchicalGameObjects[i];
 				m_ppHierarchicalGameObjects[i] = nullptr;
-				cout << pBastardModel << endl;
 				m_ppHierarchicalGameObjects[i] = new CMonsterObject(m_pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pBastardModel, player_anim_cnt);
 				m_ppHierarchicalGameObjects[i]->SetPosition(3550.0f, m_pTerrain->GetHeight(3550.0f, 650.0f), 650.0f);
 				m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
