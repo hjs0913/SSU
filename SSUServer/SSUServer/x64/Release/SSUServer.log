@@ -1,164 +1,146 @@
 ﻿  Gaia.cpp
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(48,15): warning C4244: '인수': 'lua_Integer'에서 'short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(52,15): warning C4244: '인수': 'lua_Integer'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(53,18): warning C4244: '인수': 'lua_Integer'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(55,28): warning C4244: '인수': 'lua_Number'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(56,27): warning C4244: '인수': 'lua_Number'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(57,29): warning C4244: '인수': 'lua_Number'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(58,28): warning C4244: '인수': 'lua_Number'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(59,32): warning C4244: '인수': 'lua_Integer'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(60,27): warning C4244: '인수': 'lua_Number'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(75,14): warning C4156: 'delete' 배열 형식을 사용하지 않고 배열 식을 삭제했습니다. 배열 형식이 대체됩니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(75,14): warning C4154: 배열 식을 삭제했습니다. 포인터로 변환이 제공됩니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(257,15): warning C4244: '인수': 'lua_Integer'에서 'short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(261,15): warning C4244: '인수': 'lua_Integer'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(262,18): warning C4244: '인수': 'lua_Integer'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(264,28): warning C4244: '인수': 'lua_Number'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(265,27): warning C4244: '인수': 'lua_Number'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(266,29): warning C4244: '인수': 'lua_Number'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(267,28): warning C4244: '인수': 'lua_Number'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(268,32): warning C4244: '인수': 'lua_Integer'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(269,27): warning C4244: '인수': 'lua_Number'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(314,108): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(314,93): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(314,78): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(314,51): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(318,16): warning C4244: '인수': '_Ty1'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(44,14): warning C4156: 'delete' 배열 형식을 사용하지 않고 배열 식을 삭제했습니다. 배열 형식이 대체됩니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(44,14): warning C4154: 배열 식을 삭제했습니다. 포인터로 변환이 제공됩니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(258,108): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(258,93): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(258,78): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(258,51): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(262,16): warning C4244: '인수': '_Ty1'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
               _Ty1=int
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(319,16): warning C4244: '인수': '_Ty2'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(263,16): warning C4244: '인수': '_Ty2'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
               _Ty2=int
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(355,49): warning C4244: '=': 'float'에서 '_Ty1'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(299,49): warning C4244: '=': 'float'에서 '_Ty1'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
               _Ty1=int
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(356,50): warning C4244: '=': 'float'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(300,50): warning C4244: '=': 'float'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
               _Ty2=int
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(358,49): warning C4244: '=': 'float'에서 '_Ty1'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(302,49): warning C4244: '=': 'float'에서 '_Ty1'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
               _Ty1=int
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(359,50): warning C4244: '=': 'float'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(303,50): warning C4244: '=': 'float'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
               _Ty2=int
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(361,49): warning C4244: '=': 'float'에서 '_Ty1'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(305,49): warning C4244: '=': 'float'에서 '_Ty1'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
               _Ty1=int
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(362,50): warning C4244: '=': 'float'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(306,50): warning C4244: '=': 'float'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
               _Ty2=int
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(364,49): warning C4244: '=': 'float'에서 '_Ty1'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(308,49): warning C4244: '=': 'float'에서 '_Ty1'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
               _Ty1=int
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(365,50): warning C4244: '=': 'float'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(309,50): warning C4244: '=': 'float'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
               _Ty2=int
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(765,46): warning C4244: '-=': 'float'에서 '_Ty1'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(709,46): warning C4244: '-=': 'float'에서 '_Ty1'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
               _Ty1=int
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(766,47): warning C4244: '-=': 'float'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(710,47): warning C4244: '-=': 'float'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
               _Ty2=int
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(769,47): warning C4244: '-=': 'float'에서 '_Ty1'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(713,47): warning C4244: '-=': 'float'에서 '_Ty1'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
               _Ty1=int
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(770,48): warning C4244: '-=': 'float'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(714,48): warning C4244: '-=': 'float'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
               _Ty2=int
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(777,46): warning C4244: '+=': 'float'에서 '_Ty1'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(721,46): warning C4244: '+=': 'float'에서 '_Ty1'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
               _Ty1=int
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(778,47): warning C4244: '-=': 'float'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(722,47): warning C4244: '-=': 'float'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
               _Ty2=int
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(782,47): warning C4244: '+=': 'float'에서 '_Ty1'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(726,47): warning C4244: '+=': 'float'에서 '_Ty1'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
               _Ty1=int
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(783,48): warning C4244: '-=': 'float'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(727,48): warning C4244: '-=': 'float'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
               _Ty2=int
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(789,46): warning C4244: '+=': 'float'에서 '_Ty1'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(733,46): warning C4244: '+=': 'float'에서 '_Ty1'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
               _Ty1=int
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(790,47): warning C4244: '+=': 'float'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(734,47): warning C4244: '+=': 'float'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
               _Ty2=int
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(793,47): warning C4244: '+=': 'float'에서 '_Ty1'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(737,47): warning C4244: '+=': 'float'에서 '_Ty1'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
               _Ty1=int
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(794,48): warning C4244: '+=': 'float'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(738,48): warning C4244: '+=': 'float'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
               _Ty2=int
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(800,46): warning C4244: '-=': 'float'에서 '_Ty1'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(744,46): warning C4244: '-=': 'float'에서 '_Ty1'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
               _Ty1=int
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(801,47): warning C4244: '+=': 'float'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(745,47): warning C4244: '+=': 'float'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
               _Ty2=int
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(804,47): warning C4244: '-=': 'float'에서 '_Ty1'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(748,47): warning C4244: '-=': 'float'에서 '_Ty1'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
               _Ty1=int
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(805,48): warning C4244: '+=': 'float'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(749,48): warning C4244: '+=': 'float'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
               _Ty2=int
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(863,59): warning C4244: '+=': 'float'에서 '_Ty1'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(807,59): warning C4244: '+=': 'float'에서 '_Ty1'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
               _Ty1=int
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(864,60): warning C4244: '+=': 'float'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(808,60): warning C4244: '+=': 'float'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
           with
           [
               _Ty2=int
@@ -172,13 +154,13 @@ C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.2
           [
               _Ty1=int
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(517): message : 컴파일되는 함수 템플릿 인스턴스화 'std::pair<int,int>::pair<float,float,0>(_Other1 &&,_Other2 &&) noexcept'에 대한 참조를 확인하세요.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(461): message : 컴파일되는 함수 템플릿 인스턴스화 'std::pair<int,int>::pair<float,float,0>(_Other1 &&,_Other2 &&) noexcept'에 대한 참조를 확인하세요.
           with
           [
               _Other1=float,
               _Other2=float
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(517): message : 컴파일되는 함수 템플릿 인스턴스화 'std::pair<int,int>::pair<float,float,0>(_Other1 &&,_Other2 &&) noexcept'에 대한 참조를 확인하세요.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(461): message : 컴파일되는 함수 템플릿 인스턴스화 'std::pair<int,int>::pair<float,float,0>(_Other1 &&,_Other2 &&) noexcept'에 대한 참조를 확인하세요.
           with
           [
               _Other1=float,
@@ -202,13 +184,13 @@ C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.2
           [
               _Ty1=int
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(834): message : 컴파일되는 함수 템플릿 인스턴스화 'std::pair<int,int>::pair<double,double,0>(_Other1 &&,_Other2 &&) noexcept'에 대한 참조를 확인하세요.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(778): message : 컴파일되는 함수 템플릿 인스턴스화 'std::pair<int,int>::pair<double,double,0>(_Other1 &&,_Other2 &&) noexcept'에 대한 참조를 확인하세요.
           with
           [
               _Other1=double,
               _Other2=double
           ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(834): message : 컴파일되는 함수 템플릿 인스턴스화 'std::pair<int,int>::pair<double,double,0>(_Other1 &&,_Other2 &&) noexcept'에 대한 참조를 확인하세요.
+C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Gaia.cpp(778): message : 컴파일되는 함수 템플릿 인스턴스화 'std::pair<int,int>::pair<double,double,0>(_Other1 &&,_Other2 &&) noexcept'에 대한 참조를 확인하세요.
           with
           [
               _Other1=double,
@@ -223,578 +205,9 @@ C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.2
           [
               _Ty2=int
           ]
-  LuaFunction.cpp
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\LuaFunction.cpp(8,10): error C2065: 'players': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\LuaFunction.cpp(18,10): error C2065: 'players': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\LuaFunction.cpp(28,10): error C2065: 'players': 선언되지 않은 식별자입니다.
-  Npc.cpp
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(36,14): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(37,14): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(76,60): warning C4244: '인수': 'lua_Integer'에서 '_Ty'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(76,38): warning C4244: '인수': 'lua_Integer'에서 '_Ty'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(77,60): warning C4244: '인수': 'lua_Integer'에서 '_Ty'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(77,38): warning C4244: '인수': 'lua_Integer'에서 '_Ty'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(81,12): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(82,12): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(92,8): warning C4244: '=': 'lua_Integer'에서 'short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(94,8): warning C4244: '=': 'lua_Integer'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(95,11): warning C4244: '=': 'lua_Integer'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(96,21): warning C4244: '=': 'lua_Number'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(97,20): warning C4244: '=': 'lua_Number'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(98,22): warning C4244: '=': 'lua_Number'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(99,21): warning C4244: '=': 'lua_Number'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(100,25): warning C4244: '=': 'lua_Integer'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(101,20): warning C4244: '=': 'lua_Number'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(112,7): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(113,7): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(328,71): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(331,72): warning C4244: '=': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(397,12): warning C4244: '초기화 중': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(404,12): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(405,12): warning C4244: '초기화 중': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(415,13): warning C4244: '초기화 중': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(416,13): warning C4244: '초기화 중': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(512,16): warning C4244: '초기화 중': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(655,13): warning C4244: '초기화 중': 'lua_Integer'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(656,13): warning C4244: '초기화 중': 'lua_Integer'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(657,13): warning C4244: '초기화 중': 'lua_Integer'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(661,12): warning C4244: '초기화 중': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(662,12): warning C4244: '초기화 중': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(663,12): warning C4244: '초기화 중': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(666,24): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(666,18): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(669,11): warning C4244: '=': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(670,11): warning C4244: '=': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(681,7): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(682,7): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(714,8): warning C4244: '초기화 중': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(715,8): warning C4244: '초기화 중': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(717,10): warning C4244: '초기화 중': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(718,10): warning C4244: '초기화 중': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(746,7): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(747,7): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(779,7): warning C4244: '=': 'lua_Number'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(780,7): warning C4244: '=': 'lua_Number'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(781,7): warning C4244: '=': 'lua_Number'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Npc.cpp(782,8): warning C4244: '=': 'lua_Integer'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-  ObjectManager.cpp
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\ObjectManager.cpp(122,31): warning C4553: '==': 식의 결과가 사용되지 않습니다. '='을(를) 의도했습니까?
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\ObjectManager.cpp(362,37): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\ObjectManager.cpp(580,57): warning C4553: '==': 식의 결과가 사용되지 않습니다. '='을(를) 의도했습니까?
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\ObjectManager.cpp(585,48): warning C4552: '-': 식의 결과가 사용되지 않습니다.
-  PacketManager.cpp
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(14,44): error C2065: 'players': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(33,24): error C2065: 'players': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(33,24): error C2672: 'begin': 일치하는 오버로드된 함수가 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(33,33): error C2893: 함수 템플릿 'unknown-type std::begin(_Container &)'을(를) 특수화하지 못했습니다.
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xutility(1916): message : 'std::begin' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(33,33): message : 다음 템플릿 인수 사용:
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(33,33): message : '_Container=unknown-type'
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(33,33): error C2784: 'const _Elem *std::begin(std::initializer_list<_Elem>) noexcept': 'std::initializer_list<_Elem>'의 템플릿 인수를 'unknown-type'에서 추론할 수 없습니다.
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\initializer_list(57): message : 'std::begin' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(33,24): error C2672: 'end': 일치하는 오버로드된 함수가 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(33,33): error C2893: 함수 템플릿 'unknown-type std::end(_Container &)'을(를) 특수화하지 못했습니다.
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xutility(1926): message : 'std::end' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(33,33): message : 다음 템플릿 인수 사용:
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(33,33): message : '_Container=unknown-type'
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(33,33): error C2784: 'const _Elem *std::end(std::initializer_list<_Elem>) noexcept': 'std::initializer_list<_Elem>'의 템플릿 인수를 'unknown-type'에서 추론할 수 없습니다.
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\initializer_list(63): message : 'std::end' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(33,33): error C3536: '<begin>$L0': 초기화되기 전에 사용할 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(33,33): error C3536: '<end>$L0': 초기화되기 전에 사용할 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(33,31): error C2100: 간접 참조가 잘못되었습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(33,31): error C3535: 'auto *'의 형식을 'int'에서 추론할 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(33,33): error C2440: '초기화 중': 'int'에서 'int *'(으)로 변환할 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(33,31): message : 정수 계열 형식에서 포인터 형식으로 변환하려면 reinterpret_cast, C 스타일 캐스트 또는 함수 스타일 캐스트가 필요합니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(65,22): warning C4552: '-': 식의 결과가 사용되지 않습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(71,30): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(72,30): warning C4244: '인수': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(82,51): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(83,50): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(84,53): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(85,52): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(87,42): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(94,41): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(96,52): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(97,51): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(98,53): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(99,51): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(101,42): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(111,51): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(112,51): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(113,53): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(114,52): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(116,42): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(125,51): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(126,50): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(127,53): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(128,52): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(130,42): warning C4305: '인수': 'double'에서 'float'(으)로 잘립니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(142,43): error C2065: 'players': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(149,43): error C2065: 'players': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(159,28): error C2065: 'players': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(159,28): error C2672: 'begin': 일치하는 오버로드된 함수가 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(159,37): error C2893: 함수 템플릿 'unknown-type std::begin(_Container &)'을(를) 특수화하지 못했습니다.
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xutility(1916): message : 'std::begin' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(159,37): message : 다음 템플릿 인수 사용:
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(159,37): message : '_Container=unknown-type'
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(159,37): error C2784: 'const _Elem *std::begin(std::initializer_list<_Elem>) noexcept': 'std::initializer_list<_Elem>'의 템플릿 인수를 'unknown-type'에서 추론할 수 없습니다.
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\initializer_list(57): message : 'std::begin' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(159,28): error C2672: 'end': 일치하는 오버로드된 함수가 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(159,37): error C2893: 함수 템플릿 'unknown-type std::end(_Container &)'을(를) 특수화하지 못했습니다.
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xutility(1926): message : 'std::end' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(159,37): message : 다음 템플릿 인수 사용:
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(159,37): message : '_Container=unknown-type'
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(159,37): error C2784: 'const _Elem *std::end(std::initializer_list<_Elem>) noexcept': 'std::initializer_list<_Elem>'의 템플릿 인수를 'unknown-type'에서 추론할 수 없습니다.
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\initializer_list(63): message : 'std::end' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(159,37): error C3536: '<begin>$L1': 초기화되기 전에 사용할 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(159,37): error C3536: '<end>$L1': 초기화되기 전에 사용할 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(159,35): error C2100: 간접 참조가 잘못되었습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(162,25): error C3861: 'is_npc': 식별자를 찾을 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(162,31): warning C4805: '==': 연산에 'bool' 형식과 'unknown-type' 형식을 함께 사용하는 것은 안전하지 않습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(171,26): error C3861: 'is_near': 식별자를 찾을 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(174,67): warning C4312: 'reinterpret_cast': 'int'에서 더 큰 'Player *'(으)로의 변환입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(194,28): error C2065: 'players': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(194,28): error C2672: 'begin': 일치하는 오버로드된 함수가 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(194,37): error C2893: 함수 템플릿 'unknown-type std::begin(_Container &)'을(를) 특수화하지 못했습니다.
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xutility(1916): message : 'std::begin' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(194,37): message : 다음 템플릿 인수 사용:
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(194,37): message : '_Container=unknown-type'
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(194,37): error C2784: 'const _Elem *std::begin(std::initializer_list<_Elem>) noexcept': 'std::initializer_list<_Elem>'의 템플릿 인수를 'unknown-type'에서 추론할 수 없습니다.
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\initializer_list(57): message : 'std::begin' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(194,28): error C2672: 'end': 일치하는 오버로드된 함수가 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(194,37): error C2893: 함수 템플릿 'unknown-type std::end(_Container &)'을(를) 특수화하지 못했습니다.
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xutility(1926): message : 'std::end' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(194,37): message : 다음 템플릿 인수 사용:
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(194,37): message : '_Container=unknown-type'
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(194,37): error C2784: 'const _Elem *std::end(std::initializer_list<_Elem>) noexcept': 'std::initializer_list<_Elem>'의 템플릿 인수를 'unknown-type'에서 추론할 수 없습니다.
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\initializer_list(63): message : 'std::end' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(194,37): error C3536: '<begin>$L2': 초기화되기 전에 사용할 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(194,37): error C3536: '<end>$L2': 초기화되기 전에 사용할 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(194,35): error C2100: 간접 참조가 잘못되었습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(203,26): error C3861: 'is_near': 식별자를 찾을 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(207,25): error C3861: 'is_npc': 식별자를 찾을 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(207,31): warning C4805: '==': 연산에 'bool' 형식과 'unknown-type' 형식을 함께 사용하는 것은 안전하지 않습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(208,21): error C3861: 'is_agro_near': 식별자를 찾을 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(217,25): error C3861: 'Activate_Npc_Move_Event': 식별자를 찾을 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(226,45): error C2664: 'void send_put_object_packet(Player *,Npc *)': 인수 2을(를) 'int'에서 'Npc *'(으)로 변환할 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(226,40): message : 정수 계열 형식에서 포인터 형식으로 변환하려면 reinterpret_cast, C 스타일 캐스트 또는 함수 스타일 캐스트가 필요합니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\send.h(8,6): message : 'send_put_object_packet' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(239,25): error C2065: 'obstacles': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(239,25): error C2672: 'begin': 일치하는 오버로드된 함수가 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(239,36): error C2893: 함수 템플릿 'unknown-type std::begin(_Container &)'을(를) 특수화하지 못했습니다.
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xutility(1916): message : 'std::begin' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(239,36): message : 다음 템플릿 인수 사용:
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(239,36): message : '_Container=unknown-type'
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(239,36): error C2784: 'const _Elem *std::begin(std::initializer_list<_Elem>) noexcept': 'std::initializer_list<_Elem>'의 템플릿 인수를 'unknown-type'에서 추론할 수 없습니다.
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\initializer_list(57): message : 'std::begin' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(239,25): error C2672: 'end': 일치하는 오버로드된 함수가 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(239,36): error C2893: 함수 템플릿 'unknown-type std::end(_Container &)'을(를) 특수화하지 못했습니다.
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xutility(1926): message : 'std::end' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(239,36): message : 다음 템플릿 인수 사용:
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(239,36): message : '_Container=unknown-type'
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(239,36): error C2784: 'const _Elem *std::end(std::initializer_list<_Elem>) noexcept': 'std::initializer_list<_Elem>'의 템플릿 인수를 'unknown-type'에서 추론할 수 없습니다.
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\initializer_list(63): message : 'std::end' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(239,36): error C3536: '<begin>$L3': 초기화되기 전에 사용할 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(239,36): error C3536: '<end>$L3': 초기화되기 전에 사용할 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(239,34): error C2100: 간접 참조가 잘못되었습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(291,32): error C2065: 'players': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(291,32): error C2672: 'begin': 일치하는 오버로드된 함수가 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(291,41): error C2893: 함수 템플릿 'unknown-type std::begin(_Container &)'을(를) 특수화하지 못했습니다.
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xutility(1916): message : 'std::begin' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(291,41): message : 다음 템플릿 인수 사용:
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(291,41): message : '_Container=unknown-type'
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(291,41): error C2784: 'const _Elem *std::begin(std::initializer_list<_Elem>) noexcept': 'std::initializer_list<_Elem>'의 템플릿 인수를 'unknown-type'에서 추론할 수 없습니다.
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\initializer_list(57): message : 'std::begin' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(291,32): error C2672: 'end': 일치하는 오버로드된 함수가 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(291,41): error C2893: 함수 템플릿 'unknown-type std::end(_Container &)'을(를) 특수화하지 못했습니다.
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xutility(1926): message : 'std::end' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(291,41): message : 다음 템플릿 인수 사용:
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(291,41): message : '_Container=unknown-type'
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(291,41): error C2784: 'const _Elem *std::end(std::initializer_list<_Elem>) noexcept': 'std::initializer_list<_Elem>'의 템플릿 인수를 'unknown-type'에서 추론할 수 없습니다.
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\initializer_list(63): message : 'std::end' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(291,41): error C3536: '<begin>$L4': 초기화되기 전에 사용할 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(291,41): error C3536: '<end>$L4': 초기화되기 전에 사용할 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(291,39): error C2100: 간접 참조가 잘못되었습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(293,21): error C3861: 'is_npc': 식별자를 찾을 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(294,20): warning C4312: 'reinterpret_cast': 'int'에서 더 큰 'Player *'(으)로의 변환입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(296,69): warning C4312: 'reinterpret_cast': 'int'에서 더 큰 'Player *'(으)로의 변환입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(304,13): error C3861: 'check_move_alright': 식별자를 찾을 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(314,28): error C2065: 'players': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(314,28): error C2672: 'begin': 일치하는 오버로드된 함수가 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(314,37): error C2893: 함수 템플릿 'unknown-type std::begin(_Container &)'을(를) 특수화하지 못했습니다.
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xutility(1916): message : 'std::begin' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(314,37): message : 다음 템플릿 인수 사용:
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(314,37): message : '_Container=unknown-type'
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(314,37): error C2784: 'const _Elem *std::begin(std::initializer_list<_Elem>) noexcept': 'std::initializer_list<_Elem>'의 템플릿 인수를 'unknown-type'에서 추론할 수 없습니다.
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\initializer_list(57): message : 'std::begin' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(314,28): error C2672: 'end': 일치하는 오버로드된 함수가 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(314,37): error C2893: 함수 템플릿 'unknown-type std::end(_Container &)'을(를) 특수화하지 못했습니다.
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xutility(1926): message : 'std::end' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(314,37): message : 다음 템플릿 인수 사용:
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(314,37): message : '_Container=unknown-type'
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(314,37): error C2784: 'const _Elem *std::end(std::initializer_list<_Elem>) noexcept': 'std::initializer_list<_Elem>'의 템플릿 인수를 'unknown-type'에서 추론할 수 없습니다.
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\initializer_list(63): message : 'std::end' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(314,37): error C3536: '<begin>$L5': 초기화되기 전에 사용할 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(314,37): error C3536: '<end>$L5': 초기화되기 전에 사용할 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(314,35): error C2100: 간접 참조가 잘못되었습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(316,26): error C3861: 'is_near': 식별자를 찾을 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(321,25): error C3861: 'is_npc': 식별자를 찾을 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(321,31): warning C4805: '==': 연산에 'bool' 형식과 'unknown-type' 형식을 함께 사용하는 것은 안전하지 않습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(322,21): error C3861: 'is_agro_near': 식별자를 찾을 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(331,25): error C3861: 'Activate_Npc_Move_Event': 식별자를 찾을 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(351,44): error C2065: 'players': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(351,58): error C2660: 'send_put_object_packet': 함수는 1개의 인수를 사용하지 않습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\send.h(8,6): message : 'send_put_object_packet' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(354,29): error C3861: 'is_npc': 식별자를 찾을 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(354,35): warning C4805: '==': 연산에 'bool' 형식과 'unknown-type' 형식을 함께 사용하는 것은 안전하지 않습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(357,66): error C2065: 'players': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(372,29): error C3861: 'is_npc': 식별자를 찾을 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(372,35): warning C4805: '==': 연산에 'bool' 형식과 'unknown-type' 형식을 함께 사용하는 것은 안전하지 않습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(374,66): error C2065: 'players': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(393,47): error C2065: 'players': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(393,61): error C2660: 'send_remove_object_packet': 함수는 1개의 인수를 사용하지 않습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\send.h(10,6): message : 'send_remove_object_packet' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(395,29): error C3861: 'is_npc': 식별자를 찾을 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(395,35): warning C4805: '==': 연산에 'bool' 형식과 'unknown-type' 형식을 함께 사용하는 것은 안전하지 않습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(396,66): error C2065: 'players': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(409,25): error C2065: 'obstacles': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(409,25): error C2672: 'begin': 일치하는 오버로드된 함수가 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(409,36): error C2893: 함수 템플릿 'unknown-type std::begin(_Container &)'을(를) 특수화하지 못했습니다.
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xutility(1916): message : 'std::begin' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(409,36): message : 다음 템플릿 인수 사용:
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(409,36): message : '_Container=unknown-type'
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(409,36): error C2784: 'const _Elem *std::begin(std::initializer_list<_Elem>) noexcept': 'std::initializer_list<_Elem>'의 템플릿 인수를 'unknown-type'에서 추론할 수 없습니다.
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\initializer_list(57): message : 'std::begin' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(409,25): error C2672: 'end': 일치하는 오버로드된 함수가 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(409,36): error C2893: 함수 템플릿 'unknown-type std::end(_Container &)'을(를) 특수화하지 못했습니다.
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\xutility(1926): message : 'std::end' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(409,36): message : 다음 템플릿 인수 사용:
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(409,36): message : '_Container=unknown-type'
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(409,36): error C2784: 'const _Elem *std::end(std::initializer_list<_Elem>) noexcept': 'std::initializer_list<_Elem>'의 템플릿 인수를 'unknown-type'에서 추론할 수 없습니다.
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\initializer_list(63): message : 'std::end' 선언을 참조하십시오.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(409,36): error C3536: '<begin>$L8': 초기화되기 전에 사용할 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(409,36): error C3536: '<end>$L8': 초기화되기 전에 사용할 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(409,34): error C2100: 간접 참조가 잘못되었습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(414,36): error C2672: 'std::_Hash<std::_Uset_traits<_Kty,std::_Uhash_compare<_Kty,_Hasher,_Keyeq>,_Alloc,false>>::count': 일치하는 오버로드된 함수가 없습니다.
-          with
-          [
-              _Kty=int,
-              _Hasher=std::hash<int>,
-              _Keyeq=std::equal_to<int>,
-              _Alloc=std::allocator<int>
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(430,32): error C2672: 'std::_Hash<std::_Uset_traits<_Kty,std::_Uhash_compare<_Kty,_Hasher,_Keyeq>,_Alloc,false>>::count': 일치하는 오버로드된 함수가 없습니다.
-          with
-          [
-              _Kty=int,
-              _Hasher=std::hash<int>,
-              _Keyeq=std::equal_to<int>,
-              _Alloc=std::allocator<int>
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(470,17): error C2065: 'players': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\PacketManager.cpp(470,16): fatal error C1003: 오류 수가 100개를 초과했습니다. 컴파일을 중지합니다.
-  Partner.cpp
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(58,92): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(58,79): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(58,66): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(58,45): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(59,16): warning C4244: '인수': '_Ty1'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty1=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(60,16): warning C4244: '인수': '_Ty2'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty2=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(77,149): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(77,136): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(78,19): warning C4244: '인수': '_Ty1'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty1=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(79,19): warning C4244: '인수': '_Ty2'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty2=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(95,147): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(95,134): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(96,20): warning C4244: '인수': '_Ty1'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty1=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(97,20): warning C4244: '인수': '_Ty2'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty2=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(101,167): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(101,154): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(101,111): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(101,52): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(102,19): warning C4244: '인수': '_Ty1'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty1=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(103,19): warning C4244: '인수': '_Ty2'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty2=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(114,92): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(114,79): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(114,66): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(114,45): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(115,16): warning C4244: '인수': '_Ty1'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty1=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(116,16): warning C4244: '인수': '_Ty2'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty2=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(133,149): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(133,136): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(134,19): warning C4244: '인수': '_Ty1'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty1=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(135,19): warning C4244: '인수': '_Ty2'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty2=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(152,146): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(152,133): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(154,19): warning C4244: '인수': '_Ty1'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty1=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(155,19): warning C4244: '인수': '_Ty2'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty2=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(159,167): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(159,154): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(159,111): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(159,52): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(160,19): warning C4244: '인수': '_Ty1'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty1=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(161,19): warning C4244: '인수': '_Ty2'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty2=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(172,158): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(172,145): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(172,102): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(172,48): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(173,16): warning C4244: '인수': '_Ty1'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty1=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(174,16): warning C4244: '인수': '_Ty2'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty2=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(191,149): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(191,136): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(192,19): warning C4244: '인수': '_Ty1'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty1=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(193,19): warning C4244: '인수': '_Ty2'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty2=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(210,146): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(210,133): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(212,19): warning C4244: '인수': '_Ty1'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty1=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(213,19): warning C4244: '인수': '_Ty2'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty2=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(218,167): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(218,154): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(218,111): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(218,52): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(219,19): warning C4244: '인수': '_Ty1'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty1=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(220,19): warning C4244: '인수': '_Ty2'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty2=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(231,158): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(231,145): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(231,102): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(231,48): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(232,16): warning C4244: '인수': '_Ty1'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty1=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(233,16): warning C4244: '인수': '_Ty2'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty2=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(250,149): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(250,136): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(251,19): warning C4244: '인수': '_Ty1'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty1=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(252,19): warning C4244: '인수': '_Ty2'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty2=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(269,146): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(269,133): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(271,19): warning C4244: '인수': '_Ty1'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty1=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(272,19): warning C4244: '인수': '_Ty2'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty2=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(277,167): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(277,154): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(277,111): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(277,52): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(278,19): warning C4244: '인수': '_Ty1'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty1=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(279,19): warning C4244: '인수': '_Ty2'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty2=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(326,46): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(369,46): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(392,62): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(393,61): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(435,90): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(435,45): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(437,46): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(481,64): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(482,62): warning C4244: '인수': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(528,46): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(580,46): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(753,16): warning C4244: '초기화 중': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\utility(193,16): warning C4244: '초기화 중': '_Ty'에서 '_Ty1'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty=float
-          ]
-          and
-          [
-              _Ty1=int
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(350): message : 컴파일되는 함수 템플릿 인스턴스화 'std::pair<int,int>::pair<float,float,0>(_Other1 &&,_Other2 &&) noexcept'에 대한 참조를 확인하세요.
-          with
-          [
-              _Other1=float,
-              _Other2=float
-          ]
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Partner.cpp(350): message : 컴파일되는 함수 템플릿 인스턴스화 'std::pair<int,int>::pair<float,float,0>(_Other1 &&,_Other2 &&) noexcept'에 대한 참조를 확인하세요.
-          with
-          [
-              _Other1=float,
-              _Other2=float
-          ]
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\utility(193,54): warning C4244: '초기화 중': '_Ty'에서 '_Ty2'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-          with
-          [
-              _Ty=float
-          ]
-          and
-          [
-              _Ty2=int
-          ]
-  Player.cpp
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(90,9): error C2065: 'dungeons': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(90,18): error C2065: 'pl': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(91,13): error C2065: 'dungeons': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(91,22): error C2065: 'pl': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(92,13): error C2065: 'dungeons': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(92,22): error C2065: 'pl': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(94,13): error C2065: 'pl': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(95,17): error C2065: 'pl': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(96,17): error C2065: 'pl': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(99,13): error C2065: 'pl': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(100,13): error C2065: 'pl': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(103,13): error C2065: 'pl': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(103,24): error C2065: 'pl': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(104,13): error C2065: 'pl': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(104,24): error C2065: 'pl': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(105,39): error C2065: 'pl': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(108,31): error C2065: 'dungeons': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(108,40): error C2065: 'pl': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(111,50): error C2065: 'pl': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(112,47): error C2065: 'pl': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(115,17): error C2065: 'pl': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(117,29): error C2065: 'pl': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(123,29): error C2065: 'pl': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(129,29): error C2065: 'pl': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(138,9): error C2065: 'dungeons': 선언되지 않은 식별자입니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\Player.cpp(138,18): error C2065: 'pl': 선언되지 않은 식별자입니다.
-  SectorManager.cpp
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\SectorManager.cpp(12,54): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\SectorManager.cpp(12,42): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\SectorManager.cpp(18,54): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\SectorManager.cpp(18,42): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-  send.cpp
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\send.cpp(308,50): warning C4244: '=': 'short'에서 'unsigned char'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-  SSUServer.cpp
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\SSUServer.cpp(31,72): error C2664: 'ObjectManager::ObjectManager(SectorManager *,MainSocketManager *)': 인수 2을(를) 'HANDLE *'에서 'MainSocketManager *'(으)로 변환할 수 없습니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\SSUServer.cpp(31,70): message : 가리킨 형식이 관련이 없습니다. 변환하려면 reinterpret_cast, C 스타일 캐스트 또는 함수 스타일 캐스트가 필요합니다.
-C:\Users\ASIAS\Desktop\SSU\SSUServer\SSUServer\ObjectManager.h(23,2): message : 'ObjectManager::ObjectManager' 선언을 참조하십시오.
+LINK : warning LNK4098: 'LIBCMT' defaultlib가 다른 라이브러리와 충돌합니다. /NODEFAULTLIB:library를 사용하십시오.
+  코드를 생성하고 있습니다.
+  Previous IPDB and IOBJ mismatch, fall back to full compilation.
+  All 1055 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  코드를 생성했습니다.
+  SSUServer.vcxproj -> C:\Users\ASIAS\Desktop\SSU\SSUServer\x64\Release\SSUServer.exe
