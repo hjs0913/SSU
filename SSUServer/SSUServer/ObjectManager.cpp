@@ -3,6 +3,8 @@
 #include "PacketManager.h"
 #include <fstream>
 
+ObjectManager* static_ObjectManager::objManager = nullptr;
+
 ObjectManager::ObjectManager(SectorManager* sectorManager, MainSocketManager* socket)
 {
     m_SectorManager = sectorManager;
@@ -18,6 +20,8 @@ ObjectManager::ObjectManager(SectorManager* sectorManager, MainSocketManager* so
     Initialize_Obstacle();
 
     Initialize_Dungeons();
+
+    m_SectorManager->set_players_object(players);
 }
 
 void ObjectManager::Initialize_Npc()
@@ -25,42 +29,42 @@ void ObjectManager::Initialize_Npc()
     const int interval = 30;
     int npc_num = 0;
 
-    for (int i = NPC_ID_START; i < NPC_ID_START + 30; i++) {
+    for (int i = NPC_ID_START + interval*npc_num; i < NPC_ID_START + +interval * (npc_num+1); i++) {
         players[i] = new Npc(i);
         players[i]->Initialize_Lua("fallen_flog.lua");
-        m_SectorManager->player_accept(players[i]);
+        m_SectorManager->player_put(players[i]);
     }
-
-    for (int i = NPC_ID_START; i < NPC_ID_START + 30; i++) {
+    npc_num++;
+    for (int i = NPC_ID_START + interval * npc_num; i < NPC_ID_START + +interval * (npc_num + 1); i++) {
         players[i] = new Npc(i);
         players[i]->Initialize_Lua("fallen_chicken.lua");
-        m_SectorManager->player_accept(players[i]);
+        m_SectorManager->player_put(players[i]);
     }
-
-    for (int i = NPC_ID_START; i < NPC_ID_START + 30; i++) {
+    npc_num++;
+    for (int i = NPC_ID_START + interval * npc_num; i < NPC_ID_START + +interval * (npc_num + 1); i++) {
         players[i] = new Npc(i);
         players[i]->Initialize_Lua("fallen_rabbit.lua");
-        m_SectorManager->player_accept(players[i]);
+        m_SectorManager->player_put(players[i]);
     }
-
-    for (int i = NPC_ID_START; i < NPC_ID_START + 30; i++) {
+    npc_num++;
+    for (int i = NPC_ID_START + interval * npc_num; i < NPC_ID_START + +interval * (npc_num + 1); i++) {
         players[i] = new Npc(i);
         players[i]->Initialize_Lua("fallen_monkey.lua");
-        m_SectorManager->player_accept(players[i]);
+        m_SectorManager->player_put(players[i]);
     }
-
-    for (int i = NPC_ID_START; i < NPC_ID_START + 30; i++) {
+    npc_num++;
+    for (int i = NPC_ID_START + interval * npc_num; i < NPC_ID_START + +interval * (npc_num + 1); i++) {
         players[i] = new Npc(i);
         players[i]->Initialize_Lua("wolf_boss.lua");
-        m_SectorManager->player_accept(players[i]);
+        m_SectorManager->player_put(players[i]);
     }
-
-    for (int i = NPC_ID_START; i < NPC_ID_START + 30; i++) {
+    npc_num++;
+    for (int i = NPC_ID_START + interval * npc_num; i < NPC_ID_START + +interval * (npc_num + 1); i++) {
         players[i] = new Npc(i);
         players[i]->Initialize_Lua("fallen_tiger.lua");
-        m_SectorManager->player_accept(players[i]);
+        m_SectorManager->player_put(players[i]);
     }
-
+    npc_num++;
     cout << "NPC 초기화 완료" << endl;
 }
 
@@ -219,7 +223,7 @@ void ObjectManager::worker()
             int packet_size = packet_start[0];
 
             while (packet_size <= remain_data) {
-                m_PacketManager->process_packet(client_id, packet_start);
+                m_PacketManager->process_packet(pl, packet_start);
                 remain_data -= packet_size;
                 packet_start += packet_size;
                 if (remain_data > 0) packet_size = packet_start[0];
@@ -318,36 +322,21 @@ void ObjectManager::worker()
             }
             players[client_id]->state_lock.unlock();
 
-            players[client_id]->lua_lock.lock();
-            lua_State* L = players[client_id]->L;
-            lua_getglobal(L, "attack_range");
-            lua_pushnumber(L, exp_over->_target);
-            int error = lua_pcall(L, 1, 1, 0);
-            if (error != 0) {
-                cout << "LUA ATTACK RANGE ERROR" << endl;
-            }
-            bool m = false;
-            m = lua_toboolean(L, -1);
-            lua_pop(L, 1);
-            if (m) {
-                // 공격처리
-                send_animation_attack(reinterpret_cast<Player*>(players[exp_over->_target]), client_id);
-                players[client_id]->attack_success(players[exp_over->_target]);
+            if (players[client_id]->npc_attack_validation(players[exp_over->_target])) {
+                // 공격 성공
+
                 // 죽었다면 섹터에서 제거해 주어야 함
-                // target의 피 변화량을 주위 사람들에게 보내주어야함
-            }
-            else {
-                if (players[client_id]->get_active()) {
-                    // 공격은 실패했지만 계속(그렇지만 1초후) 공격시도
-                    timer_event ev;
-                    ev.obj_id = client_id;
-                    ev.start_time = chrono::system_clock::now() + 1s;
-                    ev.ev = EVENT_NPC_ATTACK;
-                    ev.target_id = exp_over->_target;
-                    timer_queue.push(ev);
+                players[exp_over->_target]->state_lock.lock();
+                if (players[exp_over->_target]->get_state() == ST_DEAD) {
+                    players[exp_over->_target]->state_lock.unlock();
+                    m_SectorManager->player_erase(players[exp_over->_target]);
                 }
+                else {  // target의 피 변화량을 주위 사람들에게 보내주어야함
+                    players[exp_over->_target]->state_lock.unlock();
+
+                }
+
             }
-            players[client_id]->lua_lock.unlock();
             delete exp_over;
             break;
         }
@@ -377,8 +366,14 @@ void ObjectManager::worker()
             break;
         }
         case OP_PLAYER_REVIVE: {
-            reinterpret_cast<Player*>(players[client_id])->revive();
-            // 섹터 처리
+            if (reinterpret_cast<Player*>(players[client_id])->join_dungeon_room) {
+                int indun_id = reinterpret_cast<Player*>(players[client_id])->get_indun_id();
+                reinterpret_cast<Player*>(players[client_id])->revive_indun(dungeons[indun_id]);
+            }
+            else {
+                reinterpret_cast<Player*>(players[client_id])->revive();
+                // 섹터 처리
+            }
             delete exp_over;
             break;
         }
@@ -718,6 +713,8 @@ void ObjectManager::worker()
 void ObjectManager::set_packetManager(PacketManager* packetManager)
 {
     m_PacketManager = packetManager;
+    m_PacketManager->set_players_object(players);
+    cout << players[0] << endl;
 }
 
 int ObjectManager::get_new_id()
@@ -740,4 +737,51 @@ bool ObjectManager::is_near(int a, int b)
     if (RANGE < abs(players[a]->get_x() - players[b]->get_x())) return false;
     if (RANGE < abs(players[a]->get_z() - players[b]->get_z())) return false;
     return true;
+}
+
+bool ObjectManager::check_move_alright(int x, int z, bool monster)
+{
+    int size = 0;
+    if (monster) size = 15;
+    else size = 5;
+
+
+    for (auto ob : obstacles) {
+        if ((ob->get_x() - size <= x && x <= ob->get_x() + size) && 
+            (ob->get_z() - size <= z && z <= ob->get_z() + size)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+Npc* ObjectManager::get_player(int c_id)
+{
+    return players[c_id];
+}
+
+Gaia* ObjectManager::get_dungeon(int d_id)
+{
+    return dungeons[d_id];
+}
+
+array<Gaia*, MAX_DUNGEONS>& ObjectManager::get_dungeons()
+{
+    return dungeons;
+}
+
+
+ObjectManager* static_ObjectManager::get_objManger()
+{
+    return objManager;
+}
+void* static_ObjectManager::set_objManger(ObjectManager* om)
+{
+    objManager = om;
+    return 0;
+}
+
+Npc* static_ObjectManager::get_player(int c_id)
+{
+    return objManager->get_player(c_id);
 }

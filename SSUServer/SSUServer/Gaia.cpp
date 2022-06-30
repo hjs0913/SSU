@@ -31,38 +31,7 @@ Gaia::Gaia(int d_id)
 
 	// Boss Npc Intialize	
 	boss = new Npc(dungeon_id);
-	boss->set_tribe(BOSS);
-	boss->state_lock.lock();
-	boss->set_state(ST_FREE);
-	boss->state_lock.unlock();
-	boss->set_id(1180);
-
-	lua_State* L = boss->L = luaL_newstate();
-	luaL_openlibs(L);
-	int error = luaL_loadfile(L, "Raid_Gaia.lua") || lua_pcall(L, 0, 0, 0);
-	lua_getglobal(L, "set_uid");
-	lua_pushnumber(L, dungeon_id);
-	error = lua_pcall(L, 1, 10, 0);
-
-	boss->set_element(static_cast<ELEMENT>(lua_tointeger(L, -10)));
-	boss->set_lv(lua_tointeger(L, -9));
-
-	boss->set_name(lua_tostring(L, -8));
-
-	boss->set_hp(lua_tointeger(L, -7));
-	boss->set_maxhp(lua_tointeger(L, -7));
-
-	boss->set_physical_attack(lua_tonumber(L, -6));
-	boss->set_magical_attack(lua_tonumber(L, -5));
-	boss->set_physical_defence(lua_tonumber(L, -4));
-	boss->set_magical_defence(lua_tonumber(L, -3));
-	boss->set_basic_attack_factor(lua_tointeger(L, -2));
-	boss->set_defence_factor(lua_tonumber(L, -1));
-
-	lua_pop(L, 11);// eliminate set_uid from stack after call
-
-	boss->set_x(310);
-	boss->set_x(110);
+	boss->Initialize_Lua_Boss("Raid_Gaia.lua", d_id);
 
 	// 나중에 어떻게 이용할 것인지 생각
 	// lua_register
@@ -243,35 +212,10 @@ void Gaia::destroy_dungeon()
 	player_death_count = 4;
 
 	// Boss Npc Intialize	
-	boss->state_lock.lock();
-	boss->set_state(ST_FREE);
-	boss->state_lock.unlock();
-	boss->set_id(GAIA_ID);
-
 	// 루아를 이용한 초기화
-	lua_State* L = boss->L;
-	lua_getglobal(L, "set_uid");
-	lua_pushnumber(L, dungeon_id);
-	int error = lua_pcall(L, 1, 10, 0);
-	boss->set_element(static_cast<ELEMENT>(lua_tointeger(L, -10)));
-	boss->set_lv(lua_tointeger(L, -9));
+	boss->Initialize_Boss(dungeon_id);
 
-	boss->set_name(lua_tostring(L, -8));
 
-	boss->set_hp(lua_tointeger(L, -7));
-	boss->set_maxhp(lua_tointeger(L, -7));
-
-	boss->set_physical_attack(lua_tonumber(L, -6));
-	boss->set_magical_attack(lua_tonumber(L, -5));
-	boss->set_physical_defence(lua_tonumber(L, -4));
-	boss->set_magical_defence(lua_tonumber(L, -3));
-	boss->set_basic_attack_factor(lua_tointeger(L, -2));
-	boss->set_defence_factor(lua_tonumber(L, -1));
-
-	lua_pop(L, 11);// eliminate set_uid from stack after call
-
-	boss->set_x(310);
-	boss->set_x(110);
 
 	for (int i = 0; i < GAIA_ROOM; i++) {
 		party_id[i] = -1;

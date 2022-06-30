@@ -2,6 +2,9 @@
 #include "EXP_OVER.h"
 #include "Npc.h"
 #include "SkillBuf.h"
+
+class Gaia;
+
 class Player : public Npc
 {
 private:
@@ -135,6 +138,14 @@ public:
     void set_socket(SOCKET c_socket);
     void CloseSocketPlayer();
 
-    virtual void attack_success(Npc* target);
+    // 공격
+    virtual void attack_dead_judge(Npc* target);	// 죽었는지 아닌지 판정
+    virtual void attack_element_judge(Npc* target);	// 공격에 대한 속성 판정
+    virtual void basic_attack_success(Npc* target);	// 일반공격 데미지 계산
+    virtual void phisical_skill_success(Npc* target, float skill_factor);	// 물리스킬 데미지 계산
+    virtual void magical_skill_success(Npc* target, float skill_factor);	// 마법스킬 데미지 계산
+
+    // 부활
     virtual void revive();
+    void revive_indun(Gaia* g);
 };

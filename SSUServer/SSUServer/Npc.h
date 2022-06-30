@@ -5,7 +5,8 @@ class Npc : public Obstacle
 private:
 	MONSTER_SPECIES _mon_species;
 	int				_target_id;
-
+	lua_State*		L;
+	mutex	lua_lock;
 protected:
 	char	_name[MAX_NAME_SIZE];
 	int		_hp;
@@ -33,19 +34,17 @@ protected:
 
 public:
 	mutex	state_lock;
-	mutex	lua_lock;
-
 
 	mutex		        vl;
 	unordered_set<int>	viewlist;
-
-	lua_State* L;
 
 	Npc(int id);
 	Npc(int id, const char* name);
 	~Npc();
 
 	void Initialize_Lua(const char* f_lua);
+	void Initialize_Lua_Boss(const char* f_lua, int dungeon_id);
+	void Initialize_Boss(int dungeon_id);
 
 	void set_pos(int x, int z);
 	void set_state(STATE s);
@@ -109,9 +108,18 @@ public:
 	pos non_a_star(int t_x, int t_z, int x, int z);
 	pos a_star(int t_x, int t_z, int x, int z, const array<Obstacle*, MAX_OBSTACLE>& obstacles);
 	int huristic(int t_x, int t_z, int x, int z);
+	void push_npc_move_event();
 	void return_npc_position(const array<Obstacle*, MAX_OBSTACLE> &obstacles);
 	void do_npc_move(Npc* target, const array<Obstacle*, MAX_OBSTACLE>& obstacles);
 
-	virtual void attack_success(Npc* target);
+	// attack
+	bool npc_attack_validation(Npc* target);
+	virtual void attack_dead_judge(Npc* target);	// 죽었는지 아닌지 판정
+	virtual void attack_element_judge(Npc* target);	// 공격에 대한 속성 판정
+	virtual void basic_attack_success(Npc* target);	// 일반공격 데미지 계산
+	virtual void phisical_skill_success(Npc* target, float skill_factor);	// 물리스킬 데미지 계산
+	virtual void magical_skill_success(Npc* target, float skill_factor);	// 마법스킬 데미지 계산
+
+
 	virtual void revive();
 };

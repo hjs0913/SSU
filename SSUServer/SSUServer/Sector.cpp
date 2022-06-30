@@ -14,3 +14,8 @@ void Sector::erase_player(int player_id)
 {
 	players_id.erase(std::find(players_id.begin(), players_id.end(), player_id));
 }
+
+std::vector<int> Sector::get_players()
+{
+	return players_id;
+}

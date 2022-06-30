@@ -28,10 +28,12 @@ int main()
 
     // 초기화 실행
     SectorManager m_SectorManager;
-    ObjectManager m_ObjectManager(&m_SectorManager, s_socket.get_iocp());
-    PacketManager m_PacketManager(&m_ObjectManager, s_socket.get_iocp());
+    ObjectManager m_ObjectManager(&m_SectorManager, &s_socket);
+    PacketManager m_PacketManager(&m_ObjectManager, &m_SectorManager, s_socket.get_iocp());
    
+    m_ObjectManager.set_packetManager(&m_PacketManager);
 
+    static_ObjectManager::set_objManger(&m_ObjectManager);
 
     // 멀티 쓰레드 생성
     vector <thread> worker_threads;

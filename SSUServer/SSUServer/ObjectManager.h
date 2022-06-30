@@ -9,7 +9,7 @@ class PacketManager;
 
 class ObjectManager
 {
-public:
+private:
 	array <Npc*, MAX_USER + MAX_NPC> players;
 	array <Obstacle*, MAX_OBSTACLE> obstacles;
 	array <Gaia*, MAX_DUNGEONS> dungeons;
@@ -34,5 +34,24 @@ public:
 	int get_new_id();
 	bool is_npc(int id) { return (id >= NPC_ID_START) && (id <= NPC_ID_END);}
 	bool is_near(int a, int b);
+	bool check_move_alright(int x, int z, bool monster);
+
+	Npc* get_player(int c_id);
+	Gaia* get_dungeon(int d_id);
+	array<Gaia*, MAX_DUNGEONS>& get_dungeons();
 };
 
+class static_ObjectManager
+{
+private:
+	static ObjectManager* objManager;
+
+public:
+	static_ObjectManager() {};
+	~static_ObjectManager() {};
+
+	static void* set_objManger(ObjectManager* om);
+	static ObjectManager* get_objManger();
+
+	static Npc* get_player(int c_id);
+};

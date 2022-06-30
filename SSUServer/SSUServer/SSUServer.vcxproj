@@ -141,9 +141,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Diller.cpp" />
     <ClCompile Include="EXP_OVER.cpp" />
     <ClCompile Include="Gaia.cpp" />
     <ClCompile Include="LuaFunction.cpp" />
+    <ClCompile Include="Magician.cpp" />
     <ClCompile Include="Npc.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="Obstacle.cpp" />
@@ -156,6 +158,8 @@
     <ClCompile Include="SkillBuf.cpp" />
     <ClCompile Include="SocketManager.cpp" />
     <ClCompile Include="SSUServer.cpp" />
+    <ClCompile Include="Supporter.cpp" />
+    <ClCompile Include="Tanker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="fallen_chicken.lua" />
@@ -167,6 +171,8 @@
     <None Include="wolf_boss.lua" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AllJobHeader.h" />
+    <ClInclude Include="Diller.h" />
     <ClInclude Include="EXP_OVER.h" />
     <ClInclude Include="Gaia.h" />
     <ClInclude Include="include\lauxlib.h" />
@@ -175,6 +181,7 @@
     <ClInclude Include="include\luaconf.h" />
     <ClInclude Include="include\lualib.h" />
     <ClInclude Include="LuaFunction.h" />
+    <ClInclude Include="Magician.h" />
     <ClInclude Include="Npc.h" />
     <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="Obstacle.h" />
@@ -188,6 +195,8 @@
     <ClInclude Include="SkillBuf.h" />
     <ClInclude Include="SocketManager.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Supporter.h" />
+    <ClInclude Include="Tanker.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

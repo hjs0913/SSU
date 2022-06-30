@@ -19,9 +19,6 @@
     <Filter Include="ObjectClass\Npc">
       <UniqueIdentifier>{76370a4c-24f2-4096-9ec7-af9711102804}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ObjectClass\Partner">
-      <UniqueIdentifier>{00b1465b-59dd-48a3-9970-ac2c5f6afb42}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ObjectClass\Obstacle">
       <UniqueIdentifier>{d4317113-52b4-4593-a84d-dbe4c381b96b}</UniqueIdentifier>
     </Filter>
@@ -54,6 +51,24 @@
     </Filter>
     <Filter Include="Lua_Script\LuaFunction">
       <UniqueIdentifier>{19f260d4-6efd-43e8-a93c-d739e0c8e66e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="JobFunction">
+      <UniqueIdentifier>{9e0e689b-7059-4f04-a797-fc0b5bedd084}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="JobFunction\Diller">
+      <UniqueIdentifier>{234c07b5-5302-448f-91d6-64a517f5e07e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="JobFunction\Tanker">
+      <UniqueIdentifier>{2b02b8c2-fffa-44e7-ae46-dab2f07747ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="JobFunction\Supporter">
+      <UniqueIdentifier>{ed5c8ed2-0f8c-43af-8bdc-413bfc0be336}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="JobFunction\Magician">
+      <UniqueIdentifier>{22f7b872-6040-4c6d-bf75-6b8cd0238b4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ObjectClass\Partner">
+      <UniqueIdentifier>{00b1465b-59dd-48a3-9970-ac2c5f6afb42}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -101,6 +116,18 @@
     </ClCompile>
     <ClCompile Include="LuaFunction.cpp">
       <Filter>Lua_Script\LuaFunction</Filter>
+    </ClCompile>
+    <ClCompile Include="Diller.cpp">
+      <Filter>JobFunction\Diller</Filter>
+    </ClCompile>
+    <ClCompile Include="Magician.cpp">
+      <Filter>JobFunction\Magician</Filter>
+    </ClCompile>
+    <ClCompile Include="Tanker.cpp">
+      <Filter>JobFunction\Tanker</Filter>
+    </ClCompile>
+    <ClCompile Include="Supporter.cpp">
+      <Filter>JobFunction\Supporter</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -189,6 +216,21 @@
     </ClInclude>
     <ClInclude Include="LuaFunction.h">
       <Filter>Lua_Script\LuaFunction</Filter>
+    </ClInclude>
+    <ClInclude Include="AllJobHeader.h">
+      <Filter>JobFunction</Filter>
+    </ClInclude>
+    <ClInclude Include="Diller.h">
+      <Filter>JobFunction\Diller</Filter>
+    </ClInclude>
+    <ClInclude Include="Magician.h">
+      <Filter>JobFunction\Magician</Filter>
+    </ClInclude>
+    <ClInclude Include="Tanker.h">
+      <Filter>JobFunction\Tanker</Filter>
+    </ClInclude>
+    <ClInclude Include="Supporter.h">
+      <Filter>JobFunction\Supporter</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

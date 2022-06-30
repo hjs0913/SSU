@@ -1,17 +1,25 @@
 #include "PacketManager.h"
 #include "send.h"
+#include "AllJobHeader.h"
 
-PacketManager::PacketManager(ObjectManager* objectManager, HANDLE* iocp)
+PacketManager::PacketManager(ObjectManager* objectManager, SectorManager* sectorManager, HANDLE* iocp)
 {
 	m_ObjectManger = objectManager;
+    m_SectorManager = sectorManager;
     h_iocp = iocp;
 }
 
-void PacketManager::process_packet(int client_id, unsigned char* p)
+void PacketManager::set_players_object(array <Npc*, MAX_USER + MAX_NPC>& pls)
+{
+    players = pls;
+    cout << players[0] << endl;
+}
+
+void PacketManager::process_packet(Player* pl, unsigned char* p)
 {
 
     unsigned char packet_type = p[1];
-    Player* pl = reinterpret_cast<Player*>(players[client_id]);
+    int client_id = pl->get_id();
     switch (packet_type) {
     case CS_PACKET_LOGIN: {
         cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(p);
@@ -30,7 +38,7 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
 
         // 중복 아이디 검사
 
-        for (auto* p : players) {
+        for (const auto& p : players) {
             if (p->get_tribe() != HUMAN) break;
             if (p->get_state() == ST_FREE) continue;
             if (p->get_id() == client_id) continue;
@@ -74,60 +82,19 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
 
         switch (pl->get_job()) {
         case J_DILLER: {
-            int lv = pl->get_lv();
-            pl->set_maxhp(20 * lv * lv + 80 * lv);
-            pl->set_hp(pl->get_maxhp());
-            pl->set_maxmp(10 * lv * lv + 50 * lv);
-            pl->set_mp(pl->get_maxmp());
-            pl->set_physical_attack(0.3 * lv * lv + 10 * lv);
-            pl->set_magical_attack(0.1 * lv * lv + 5 * lv);
-            pl->set_physical_defence(0.24 * lv * lv + 10 * lv);
-            pl->set_magical_defence(0.17 * lv * lv + 10 * lv);
-            pl->set_basic_attack_factor(50.0f);
-            pl->set_defence_factor(0.0002);
+            Diller::Initialize(pl);
             break;
         }
         case J_TANKER: {
-            int lv = pl->get_lv();
-            pl->set_maxhp(22 * lv * lv + 80 * lv);
-            pl->set_hp(pl->get_maxhp());
-            pl->set_maxmp(8.5 * lv * lv + 50 * lv);
-            pl->set_mp(pl->get_maxmp());
-            pl->set_physical_attack(0.25 * lv * lv + 10 * lv);
-            pl->set_magical_attack(0.08 * lv * lv + 5 * lv);
-            pl->set_physical_defence(0.27 * lv * lv + 10 * lv);
-            pl->set_magical_defence(0.2 * lv * lv + 10 * lv);
-            pl->set_basic_attack_factor(50.0f);
-            pl->set_defence_factor(0.0002);
-            pl->set_element(E_WATER);
+            Tanker::Initialize(pl);
             break;
         }
         case J_SUPPORTER: {
-            int lv = pl->get_lv();
-            pl->set_maxhp(18 * lv * lv + 70 * lv);
-            pl->set_hp(pl->get_maxhp());
-            pl->set_maxmp(15 * lv * lv + 60 * lv);
-            pl->set_mp(pl->get_maxmp());
-            pl->set_physical_attack(0.1 * lv * lv + 5 * lv);
-            pl->set_magical_attack(0.25 * lv * lv + 8 * lv);
-            pl->set_physical_defence(0.17 * lv * lv + 10 * lv);
-            pl->set_magical_defence(0.24 * lv * lv + 10 * lv);
-            pl->set_basic_attack_factor(50.0f);
-            pl->set_defence_factor(0.0002);
+            Supporter::Initialize(pl);
             break;
         }
         case J_MAGICIAN: {
-            int lv = pl->get_lv();
-            pl->set_maxhp(16 * lv * lv + 70 * lv);
-            pl->set_hp(pl->get_maxhp());
-            pl->set_maxmp(17 * lv * lv + 60 * lv);
-            pl->set_mp(pl->get_maxmp());
-            pl->set_physical_attack(0.1 * lv * lv + 5 * lv);
-            pl->set_magical_attack(0.3 * lv * lv + 10 * lv);
-            pl->set_physical_defence(0.17 * lv * lv + 10 * lv);
-            pl->set_magical_defence(0.24 * lv * lv + 10 * lv);
-            pl->set_basic_attack_factor(50.0f);
-            pl->set_defence_factor(0.0002);
+            Magician::Initialize(pl);
             break;
         }
         default: {
@@ -139,14 +106,14 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
         // Hp회복
         if (pl->get_hp() < pl->get_maxhp()) {
             // hp가 깎이였으므로 hp자동회복을 해주도록 하자
-            if (reinterpret_cast<Player*>(players[client_id])->_auto_hp == false) {
+            if (pl->_auto_hp == false) {
                 timer_event ev;
                 ev.obj_id = client_id;
                 ev.start_time = chrono::system_clock::now() + 5s;
                 ev.ev = EVENT_AUTO_PLAYER_HP;
                 ev.target_id = 0;
                 timer_queue.push(ev);
-                reinterpret_cast<Player*>(players[client_id])->_auto_hp = true;
+                pl->_auto_hp = true;
             }
         }
 
@@ -155,111 +122,10 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
         pl->set_state(ST_INGAME);
         pl->state_lock.unlock();
 
-        // 새로 접속한 정보를 다른이에게 보내줌
-        for (auto& other : players) {
-            if (other->get_id() == client_id) continue;   // 나다
+        m_SectorManager->player_put(pl);
 
-            if (true == is_npc(other->get_id())) break;
-
-            other->state_lock.lock();
-            if (ST_INGAME != other->get_state()) {
-                other->state_lock.unlock();
-                continue;
-            }
-            other->state_lock.unlock();
-
-            if (false == is_near(other->get_id(), client_id)) continue;
-
-            // 여기는 플레이어 처리
-            Player* other_player = reinterpret_cast<Player*>(other);
-            other_player->vl.lock();
-            other_player->viewlist.insert(client_id);
-            other_player->vl.unlock();
-
-            send_put_object_packet(other_player, pl);
-
-            /*sc_packet_put_object packet;
-            packet.id = client_id;
-            strcpy_s(packet.name, pl->get_name());
-            packet.object_type = pl->get_tribe();
-            packet.size = sizeof(packet);
-            packet.type = SC_PACKET_PUT_OBJECT;
-            packet.x = pl->get_x();
-            packet.y = pl->get_y();
-            packet.z = pl->get_z();
-            other_player->do_send(sizeof(packet), &packet);*/
-        }
-        // 새로 접속한 플레이어에게 기존 정보를 보내중
-        pl->viewlist.clear();
-        for (auto& other : players) {
-            if (other->get_id() == client_id) continue;
-            other->state_lock.lock();
-            if (ST_INGAME != other->get_state()) {
-                other->state_lock.unlock();
-                continue;
-            }
-            other->state_lock.unlock();
-
-            if (false == is_near(other->get_id(), client_id))
-                continue;
-
-            // 스크립트와 함께 추가된 부분
-            if (true == is_npc(other->get_id())) {	// 시야에 npc가 있다면 
-                if (is_agro_near(client_id, other->get_id())) {
-                    if (other->get_active() == false) {
-                        other->set_active(true);
-                        timer_event ev;
-                        ev.obj_id = other->get_id();
-                        ev.start_time = chrono::system_clock::now() + 1s;
-                        ev.ev = EVENT_NPC_ATTACK;
-                        ev.target_id = client_id;
-                        timer_queue.push(ev);
-                        Activate_Npc_Move_Event(other->get_id(), pl->get_id());
-                    }
-                }
-            }
-
-            pl->vl.lock();
-            pl->viewlist.insert(other->get_id());
-            pl->vl.unlock();
-
-            send_put_object_packet(pl, other);
-            /*sc_packet_put_object packet;
-            packet.id = other->get_id();
-            strcpy_s(packet.name, other->get_name());
-            packet.object_type = other->get_tribe();
-            packet.size = sizeof(packet);
-            packet.type = SC_PACKET_PUT_OBJECT;
-            packet.x = other->get_x();
-            packet.y = other->get_y();
-            packet.z = other->get_z();
-            pl->do_send(sizeof(packet), &packet);*/
-        }
-        // 장애물 정보
-        for (auto& ob : obstacles) {
-            if (RANGE < abs(pl->get_x() - ob.get_x())) continue;
-            if (RANGE < abs(pl->get_z() - ob.get_z())) continue;
-
-            pl->ob_vl.lock();
-            pl->ob_viewlist.clear();
-            pl->ob_viewlist.insert(ob.get_id());
-            pl->ob_vl.unlock();
-
-            //send_put_object_packet(pl, ob);
-            sc_packet_put_object packet;
-            packet.id = ob.get_id();
-            strcpy_s(packet.name, "");
-            packet.object_type = ob.get_tribe();
-            packet.size = sizeof(packet);
-            packet.type = SC_PACKET_PUT_OBJECT;
-            packet.x = ob.get_x();
-            packet.y = ob.get_y();
-            packet.z = ob.get_z();
-            pl->do_send(sizeof(packet), &packet);
-        }
         break;
     }
-
     case CS_PACKET_MOVE: {
         cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(p);
         // pl.last_move_time = packet->move_time;
@@ -288,20 +154,13 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
             unordered_set <int> my_vl{ pl->viewlist };
             pl->vl.unlock();
             send_move_packet(pl, pl, 1);
-            for (auto& other : players) {
-                if (other->get_state() != ST_INDUN) continue;
-                if (is_npc(other->get_id())) break;
-                if (reinterpret_cast<Player*>(other)->indun_id == pl->indun_id) {
-                    if (other->get_id() == pl->get_id()) continue;
-                    send_move_packet(reinterpret_cast<Player*>(other), pl, 1);
-                }
-            }
+            m_SectorManager->player_move(pl);
             break;
         }
 
 
         // 유효성 검사
-        if (check_move_alright(x, z, false) == false) {
+        if (m_ObjectManger->check_move_alright(x, z, false) == false) {
             // 올바르지 않을경우 위치를 수정을 해주어야 한다
             send_move_packet(pl, pl, 0);
             break;
@@ -310,142 +169,8 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
         pl->set_x(x);
         pl->set_y(y);
         pl->set_z(z);
-        unordered_set <int> nearlist;
-        for (auto& other : players) {
-            // if (other._id == client_id) continue;
-            if (false == is_near(client_id, other->get_id()))
-                continue;
-            if (ST_INGAME != other->get_state())
-                continue;
-            //스크립트 추가
-            if (true == is_npc(other->get_id())) {
-                if (is_agro_near(client_id, other->get_id())) {
-                    if (other->get_active() == false) {
-                        other->set_active(true);
-                        timer_event ev;
-                        ev.obj_id = other->get_id();
-                        ev.start_time = chrono::system_clock::now() + 1s;
-                        ev.ev = EVENT_NPC_ATTACK;
-                        ev.target_id = client_id;
-                        timer_queue.push(ev);
-                        Activate_Npc_Move_Event(other->get_id(), pl->get_id());
-                    }
-                }
-            }
-            nearlist.insert(other->get_id());
-        }
-        nearlist.erase(client_id);  // 내 아이디는 무조건 들어가니 그것을 지워주자
 
-        send_move_packet(pl, pl, 1); // 내 자신의 움직임을 먼저 보내주자
-
-        pl->vl.lock();
-        unordered_set <int> my_vl{ pl->viewlist };
-        pl->vl.unlock();
-
-        // 새로시야에 들어온 플레이어 처리
-        for (auto other : nearlist) {
-            if (0 == my_vl.count(other)) {   // 원래 없던 플레이어/npc
-                pl->vl.lock();
-                pl->viewlist.insert(other);
-                pl->vl.unlock();
-                send_put_object_packet(pl, players[other]);
-
-                // 스크립트 추가
-                if (true == is_npc(other)) break;
-
-                // 여기는 플레이어 처리이다.
-                Player* other_player = reinterpret_cast<Player*>(players[other]);
-                other_player->vl.lock();
-                if (0 == other_player->viewlist.count(pl->get_id())) {
-                    other_player->viewlist.insert(pl->get_id());
-                    other_player->vl.unlock();
-                    send_put_object_packet(other_player, pl);
-
-                }
-                else {
-                    other_player->vl.unlock();
-                    send_move_packet(other_player, pl, 1);
-                }
-            }
-            // 계속 시야에 존재하는 플레이어 처리
-            else {
-                if (true == is_npc(other)) continue;   // 원래 있던 npc는 npc_move에서 처리
-
-                Player* other_player = reinterpret_cast<Player*>(players[other]);
-                other_player->vl.lock();
-                if (0 == other_player->viewlist.count(pl->get_id())) {
-                    other_player->viewlist.insert(pl->get_id());
-                    other_player->vl.unlock();
-                    send_put_object_packet(other_player, pl);
-                }
-                else {
-                    other_player->vl.unlock();
-                    send_move_packet(other_player, pl, 1);
-                }
-            }
-        }
-        // 시야에서 사라진 플레이어 처리
-        for (auto other : my_vl) {
-            if (0 == nearlist.count(other)) {
-                pl->vl.lock();
-                pl->viewlist.erase(other);
-                pl->vl.unlock();
-                send_remove_object_packet(pl, players[other]);
-
-                if (true == is_npc(other)) continue;
-                Player* other_player = reinterpret_cast<Player*>(players[other]);
-                other_player->vl.lock();
-                if (0 != other_player->viewlist.count(pl->get_id())) {
-                    other_player->viewlist.erase(pl->get_id());
-                    other_player->vl.unlock();
-                    send_remove_object_packet(other_player, pl);
-                }
-                else other_player->vl.unlock();
-            }
-        }
-        // 새로 생긴 장애물이 존재 가능
-        // 장애물 정보
-
-        for (auto& ob : obstacles) {
-            if ((RANGE < abs(pl->get_x() - ob.get_x())) &&
-                (RANGE < abs(pl->get_z() - ob.get_z()))) {
-                // 범위 벗어난거임(존재하던게 있으면 없애자)
-                pl->ob_vl.lock();
-                if (pl->ob_viewlist.count(ob.get_id()) != 0) {
-                    pl->ob_viewlist.erase(ob.get_id());
-                    pl->ob_vl.unlock();
-                    sc_packet_remove_object packet;
-                    packet.size = sizeof(packet);
-                    packet.type = SC_PACKET_REMOVE_OBJECT;
-                    packet.id = ob.get_id();
-                    packet.object_type = ob.get_tribe();
-                    pl->do_send(sizeof(packet), &packet);
-                    continue;
-                }
-                pl->ob_vl.unlock();
-                continue;
-            }
-            // 이미 존재하는가
-            pl->ob_vl.lock();
-            if (pl->ob_viewlist.count(ob.get_id()) != 0) {
-                pl->ob_vl.unlock();
-                continue;
-            }
-            pl->ob_viewlist.insert(ob.get_id());
-            pl->ob_vl.unlock();
-
-            sc_packet_put_object packet;
-            packet.id = ob.get_id();
-            strcpy_s(packet.name, "");
-            packet.object_type = ob.get_tribe();
-            packet.size = sizeof(packet);
-            packet.type = SC_PACKET_PUT_OBJECT;
-            packet.x = ob.get_x();
-            packet.y = ob.get_y();
-            packet.z = ob.get_z();
-            //pl->do_send(sizeof(packet), &packet);
-            pl->do_send(sizeof(packet), &packet);
-        }
+        m_SectorManager->player_move(pl);
         break;
     }
     case CS_PACKET_ATTACK: {
@@ -467,8 +192,8 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
         unordered_set <int> my_vl{ pl->viewlist };
         pl->vl.unlock();
         for (auto vl_id : my_vl) {
-            if (players[vl_id]->get_tribe() == HUMAN) {
-                send_animation_attack(reinterpret_cast<Player*>(players[vl_id]), pl->get_id());
+            if (m_ObjectManger->get_player(vl_id)->get_tribe() == HUMAN) {
+                send_animation_attack(reinterpret_cast<Player*>(m_ObjectManger->get_player(vl_id)), pl->get_id());
             }
         }
 
@@ -489,23 +214,24 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
         }
 
         if (pl->join_dungeon_room) {
-            int indun = pl->indun_id;
-            Npc* bos = dungeons[indun]->boss;
+            //int indun_id = pl->indun_id;
+            Gaia* indun = m_ObjectManger->get_dungeon(pl->indun_id);
+            Npc* bos = indun->boss;
             if (bos->get_x() >= pl->get_x() - 20 && bos->get_x() <= pl->get_x() + 20) {
                 if (bos->get_z() >= pl->get_z() - 20 && bos->get_z() <= pl->get_z() + 20) {
                     // 일단 고정값으로 제거해 주자
                     //bos->set_hp(bos->get_hp() - 130000);
                     if (bos->get_hp() > 0) {
-                        attack_success(pl, bos, pl->get_basic_attack_factor());
+                        pl->basic_attack_success(bos);
 
-                        Player** ps = dungeons[indun]->get_party_palyer();
+                        Player** ps = indun->get_party_palyer();
                         for (int i = 0; i < GAIA_ROOM; i++) {
                             send_change_hp_packet(ps[i], bos);
                         }
 
                         if (bos->get_hp() < 0) {
                             bos->set_hp(0);
-                            dungeons[indun]->game_victory();
+                            indun->game_victory();
                         }
                     }
 
@@ -515,26 +241,27 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
         }
 
         for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
-            players[i]->state_lock.lock();
-            if (players[i]->get_state() != ST_INGAME) {
-                players[i]->state_lock.unlock();
+            Npc* n = m_ObjectManger->get_player(i);
+            n->state_lock.lock();
+            if (n->get_state() != ST_INGAME) {
+                n->state_lock.unlock();
                 continue;
             }
-            players[i]->state_lock.unlock();
-            if (players[i]->get_x() >= pl->get_x() - 20 && players[i]->get_x() <= pl->get_x() + 20) {
-                if (players[i]->get_z() >= pl->get_z() - 20 && players[i]->get_z() <= pl->get_z() + 20) {
-                    attack_success(pl, players[i], pl->get_basic_attack_factor());    // 데미지 계산
+            n->state_lock.unlock();
+            if (n->get_x() >= pl->get_x() - 20 && n->get_x() <= pl->get_x() + 20) {
+                if (n->get_z() >= pl->get_z() - 20 && n->get_z() <= pl->get_z() + 20) {
+                    pl->basic_attack_success(n);
                     // 몬스터의 자동공격을 넣어주자
-                    players[i]->set_target_id(pl->get_id());
-                    if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
-                        players[i]->set_active(true);
+                    n->set_target_id(pl->get_id());
+                    if (n->get_active() == false && n->get_tribe() == MONSTER) {
+                        n->set_active(true);
                         ev.obj_id = i;
                         ev.start_time = chrono::system_clock::now() + 1s;
                         ev.ev = EVENT_NPC_ATTACK;
-                        ev.target_id = players[i]->get_target_id();
+                        ev.target_id = n->get_target_id();
                         timer_queue.push(ev);
                         // 몬스터의 이동도 넣어주자
-                        Activate_Npc_Move_Event(i, players[i]->get_target_id());
+                        n->push_npc_move_event();
                     }
                 }
             }
@@ -546,42 +273,28 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
         char c_temp[MAX_CHAT_SIZE];
         sprintf_s(c_temp, MAX_CHAT_SIZE, "%s : %s", pl->get_name(), packet->message);
         if (pl->join_dungeon_room) {
-            if (dungeons[pl->get_indun_id()]->get_dun_st() == DUN_ST_START) {
+            if (m_ObjectManger->get_dungeon(pl->get_indun_id())->get_dun_st() == DUN_ST_START) {
                 Player** vl_pl;
-                vl_pl = dungeons[pl->indun_id]->get_party_palyer();
+                vl_pl = m_ObjectManger->get_dungeon(pl->get_indun_id())->get_party_palyer();
                 for (int i = 0; i < GAIA_ROOM; i++) {
                     if (vl_pl[i]->get_state() == ST_INGAME || vl_pl[i]->get_state() == ST_INDUN) {
                         send_chat_packet(vl_pl[i], client_id, c_temp);
                     }
                     else break;
                 }
-            }
-            else {
-                for (auto& s_pl : players) {
-                    s_pl->state_lock.lock();
-                    if (s_pl->get_state() != ST_INGAME) {
-                        s_pl->state_lock.unlock();
-                        continue;
-                    }
-                    s_pl->state_lock.unlock();
-                    if (s_pl->get_tribe() == MONSTER) break;
-                    send_chat_packet(reinterpret_cast<Player*>(s_pl), client_id, c_temp);
-
-                }
+                break;
             }
         }
-        else {
-            for (auto& s_pl : players) {
-                s_pl->state_lock.lock();
-                if (s_pl->get_state() != ST_INGAME) {
-                    s_pl->state_lock.unlock();
-                    continue;
-                }
-                s_pl->state_lock.unlock();
-                if (s_pl->get_tribe() == MONSTER) break;
-                send_chat_packet(reinterpret_cast<Player*>(s_pl), client_id, c_temp);
 
+        for (auto& s_pl : players) {
+            s_pl->state_lock.lock();
+            if (s_pl->get_state() != ST_INGAME) {
+                s_pl->state_lock.unlock();
+                continue;
             }
+            s_pl->state_lock.unlock();
+            if (s_pl->get_tribe() == MONSTER) break;
+            send_chat_packet(reinterpret_cast<Player*>(s_pl), client_id, c_temp);
         }
         break;
     }
@@ -600,7 +313,8 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
         packet.move_time = pl->last_move_time;
         break;
     }
-    case CS_PACKET_SKILL: {
+    case CS_PACKET_SKILL: { break; }
+    /* {
 
         if (pl->get_mp() - 1000 < 0)  //mp없으면 안됨 
             return;
@@ -628,16 +342,13 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
                 switch ((int)packet->skill_num)
                 {
                 case 0: { //물리 공격스킬 중 0번 스킬 -> 십자공격 어택 
-                    timer_event ev;
-                    ev.obj_id = client_id;
-                    ev.start_time = chrono::system_clock::now() + 3s;  //쿨타임
-                    ev.ev = EVENT_SKILL_COOLTIME;
-                    ev.target_id = 0;
-                    timer_queue.push(ev);
+                    skill_cooltime(client_id, chrono::system_clock::now() + 3s, 0);
 
                     pl->set_mp(pl->get_mp() - 1000);
                     send_status_change_packet(pl);
                     if (!pl->join_dungeon_room) {
+
+
                         for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
                             players[i]->state_lock.lock();
                             if (players[i]->get_state() != ST_INGAME) {
@@ -698,13 +409,7 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
                 switch ((int)packet->skill_num)
                 {
                 case 0:  //물리 공격스킬 중 0번 스킬 -> 십자공격 어택 
-                    timer_event ev;
-                    ev.obj_id = client_id;
-                    ev.start_time = chrono::system_clock::now() + 3s;  //쿨타임
-                    ev.ev = EVENT_SKILL_COOLTIME;
-                    ev.target_id = 1;
-                    timer_queue.push(ev);
-
+                    skill_cooltime(client_id, chrono::system_clock::now() + 3s, 1);
 
                     Coord a = { pl->get_x(), pl->get_z() };    //플레이어 기준 전방 삼각형 범위 
                     Coord b = { pl->get_x() - pl->get_right_x() * 40 + pl->get_look_x() * 100,
@@ -776,12 +481,7 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
                 switch ((int)packet->skill_num)
                 {
                 case 0:
-                    timer_event ev;
-                    ev.obj_id = client_id;
-                    ev.start_time = chrono::system_clock::now() + 10s;  //쿨타임
-                    ev.ev = EVENT_SKILL_COOLTIME;
-                    ev.target_id = 2;
-                    timer_queue.push(ev);
+                    skill_cooltime(client_id, chrono::system_clock::now() + 10s, 2);
 
                     pl->set_mp(pl->get_mp() - 1000);
                     send_buff_ui_packet(pl, 3); //ui
@@ -805,12 +505,7 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
                 switch ((int)packet->skill_num)
                 {
                 case 0:  //밀어내기 
-                    timer_event ev;
-                    ev.obj_id = client_id;
-                    ev.start_time = chrono::system_clock::now() + 3s;  //쿨타임
-                    ev.ev = EVENT_SKILL_COOLTIME;
-                    ev.target_id = 0;
-                    timer_queue.push(ev);
+                    skill_cooltime(client_id, chrono::system_clock::now() + 3s, 0);
 
 
                     pl->set_mp(pl->get_mp() - 1000);
@@ -880,12 +575,7 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
                 switch ((int)packet->skill_num)
                 {
                 case 0:   //어그로
-                    timer_event ev;
-                    ev.obj_id = client_id;
-                    ev.start_time = chrono::system_clock::now() + 3s;  //쿨타임
-                    ev.ev = EVENT_SKILL_COOLTIME;
-                    ev.target_id = 1;
-                    timer_queue.push(ev);
+                    skill_cooltime(client_id, chrono::system_clock::now() + 3s, 1);
 
                     pl->set_mp(pl->get_mp() - 1000);
                     send_status_change_packet(pl);
@@ -932,12 +622,7 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
                 switch ((int)packet->skill_num)
                 {
                 case 0:
-                    timer_event ev;
-                    ev.obj_id = client_id;
-                    ev.start_time = chrono::system_clock::now() + 10s;  //쿨타임
-                    ev.ev = EVENT_SKILL_COOLTIME;
-                    ev.target_id = 2;
-                    timer_queue.push(ev);
+                    skill_cooltime(client_id, chrono::system_clock::now() + 10s, 2);
 
                     pl->set_mp(pl->get_mp() - 1000);
                     send_buff_ui_packet(pl, 1);
@@ -962,12 +647,7 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
                 switch (packet->skill_num)
                 {
                 case 0: {// 사각형 내부 범위 플레이어 hp 회복  
-                    timer_event ev;
-                    ev.obj_id = client_id;
-                    ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
-                    ev.ev = EVENT_SKILL_COOLTIME;
-                    ev.target_id = 2;
-                    timer_queue.push(ev);
+                    skill_cooltime(client_id, chrono::system_clock::now() + 5s, 2);
 
                     pl->set_mp(pl->get_mp() - 1000);
                     send_status_change_packet(pl);
@@ -1017,12 +697,7 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
                     break;
                 }
                 case 1: {  //mp회복 
-                    timer_event ev;
-                    ev.obj_id = client_id;
-                    ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
-                    ev.ev = EVENT_SKILL_COOLTIME;
-                    ev.target_id = 2;
-                    timer_queue.push(ev);
+                    skill_cooltime(client_id, chrono::system_clock::now() + 5s, 2);
 
                     pl->set_mp(pl->get_mp() - 1000);
                     send_status_change_packet(pl);
@@ -1073,12 +748,7 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
                 }
 
                 case 2: {//공속 
-                    timer_event ev;
-                    ev.obj_id = client_id;
-                    ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
-                    ev.ev = EVENT_SKILL_COOLTIME;
-                    ev.target_id = 2;
-                    timer_queue.push(ev);
+                    skill_cooltime(client_id, chrono::system_clock::now() + 5s, 2);
 
                     pl->set_mp(pl->get_mp() - 1000);
                     send_status_change_packet(pl);
@@ -1116,12 +786,7 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
             break;
         }
         case J_MAGICIAN: {
-            timer_event ev;
-            ev.obj_id = client_id;
-            ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
-            ev.ev = EVENT_SKILL_COOLTIME;
-            ev.target_id = 1;
-            timer_queue.push(ev);
+            skill_cooltime(client_id, chrono::system_clock::now() + 5s, 1);
             switch ((int)packet->skill_type)
             {
             case 0:
@@ -1237,14 +902,14 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
             }
             break;
         }
-                       break;
+        break;
         }
         for (int vl_id : my_vl) {
             send_animation_skill(reinterpret_cast<Player*>(players[vl_id]), pl->get_id(), (int)packet->skill_num);
         }
         send_animation_skill(pl, pl->get_id(), (int)packet->skill_num);
-    }
-                        break;
+        break;
+    } */
     case CS_PACKET_LOOK: {
         pl->state_lock.lock();
         if (pl->get_state() == ST_DEAD || pl->get_state() == ST_FREE) {
@@ -1264,9 +929,9 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
 
         for (auto i : my_vl) {
             // Npc
-            if (is_npc(i) == true) continue;
+            if (m_ObjectManger->is_npc(i) == true) continue;
             // Player
-            send_look_packet(reinterpret_cast<Player*>(players[i]), pl);
+            send_look_packet(reinterpret_cast<Player*>(m_ObjectManger->get_player(i)), pl);
         }
         break;
     }
@@ -1276,60 +941,19 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
 
         switch (pl->get_job()) {
         case J_DILLER: {
-            int lv = pl->get_lv();
-            pl->set_maxhp(20 * lv * lv + 80 * lv);
-            pl->set_hp(pl->get_maxhp());
-            pl->set_maxmp(10 * lv * lv + 50 * lv);
-            pl->set_mp(pl->get_maxmp());
-            pl->set_physical_attack(0.3 * lv * lv + 10 * lv);
-            pl->set_magical_attack(0.1 * lv * lv + 5 * lv);
-            pl->set_physical_defence(0.24 * lv * lv + 10 * lv);
-            pl->set_magical_defence(0.17 * lv * lv + 10 * lv);
-            pl->set_basic_attack_factor(50.0f);
-            pl->set_defence_factor(0.0002);
+            Diller::Initialize(pl);
             break;
         }
         case J_TANKER: {
-            int lv = pl->get_lv();
-            pl->set_maxhp(22 * lv * lv + 80 * lv);
-            pl->set_hp(pl->get_maxhp());
-            pl->set_maxmp(8.5 * lv * lv + 50 * lv);
-            pl->set_mp(pl->get_maxmp());
-            pl->set_physical_attack(0.25 * lv * lv + 10 * lv);
-            pl->set_magical_attack(0.08 * lv * lv + 5 * lv);
-            pl->set_physical_defence(0.27 * lv * lv + 10 * lv);
-            pl->set_magical_defence(0.2 * lv * lv + 10 * lv);
-            pl->set_basic_attack_factor(50.0f);
-            pl->set_defence_factor(0.0002);
-            pl->set_element(E_WATER);
+            Tanker::Initialize(pl);
             break;
         }
         case J_SUPPORTER: {
-            int lv = pl->get_lv();
-            pl->set_maxhp(18 * lv * lv + 70 * lv);
-            pl->set_hp(pl->get_maxhp());
-            pl->set_maxmp(15 * lv * lv + 60 * lv);
-            pl->set_mp(pl->get_maxmp());
-            pl->set_physical_attack(0.1 * lv * lv + 5 * lv);
-            pl->set_magical_attack(0.25 * lv * lv + 8 * lv);
-            pl->set_physical_defence(0.17 * lv * lv + 10 * lv);
-            pl->set_magical_defence(0.24 * lv * lv + 10 * lv);
-            pl->set_basic_attack_factor(50.0f);
-            pl->set_defence_factor(0.0002);
+            Supporter::Initialize(pl);
             break;
         }
         case J_MAGICIAN: {
-            int lv = pl->get_lv();
-            pl->set_maxhp(16 * lv * lv + 70 * lv);
-            pl->set_hp(pl->get_maxhp());
-            pl->set_maxmp(17 * lv * lv + 60 * lv);
-            pl->set_mp(pl->get_maxmp());
-            pl->set_physical_attack(0.1 * lv * lv + 5 * lv);
-            pl->set_magical_attack(0.3 * lv * lv + 10 * lv);
-            pl->set_physical_defence(0.17 * lv * lv + 10 * lv);
-            pl->set_magical_defence(0.24 * lv * lv + 10 * lv);
-            pl->set_basic_attack_factor(50.0f);
-            pl->set_defence_factor(0.0002);
+            Magician::Initialize(pl);
             break;
         }
         }
@@ -1435,7 +1059,7 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
     }
     case CS_PACKET_PARTY_ROOM: {
         // 현재 활성화 되었는 던전의 정보들을 보낸다
-        for (auto& dun : dungeons) {
+        for (auto& dun : m_ObjectManger->get_dungeons()) {
             dun->state_lock.lock();
             if (dun->get_dun_st() == DUN_ST_ROBBY) {
                 // 던전의 정보들을 보내준다
@@ -1455,7 +1079,7 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
         }
         pl->state_lock.unlock();
 
-        for (auto& dun : dungeons) {
+        for (auto& dun : m_ObjectManger->get_dungeons()) {
             // join dungeon party
             dun->state_lock.lock();
             if (dun->get_dun_st() == DUN_ST_FREE) {
@@ -1478,18 +1102,20 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
     }
     case CS_PACKET_PARTY_ROOM_INFO_REQUEST: {
         int r_id = reinterpret_cast<cs_packet_party_room_info_request*>(p)->room_id;
-        send_party_room_info_packet(pl, dungeons[r_id]->get_party_palyer(),
-            dungeons[r_id]->player_cnt, dungeons[r_id]->get_dungeon_id());
+        Gaia* dun = m_ObjectManger->get_dungeon(r_id);
+        send_party_room_info_packet(pl, dun->get_party_palyer(),
+            dun->player_cnt, dun->get_dungeon_id());
         break;
     }
     case CS_PACKET_RAID_RANDER_OK: {
-        dungeons[pl->indun_id]->player_rander_ok++;
+        Gaia* dun = m_ObjectManger->get_dungeon(pl->indun_id);
+        dun->player_rander_ok++;
 
-        if (dungeons[pl->indun_id]->player_rander_ok == GAIA_ROOM - dungeons[pl->indun_id]->partner_cnt) {
-            dungeons[pl->indun_id]->start_game = true;
+        if (dun->player_rander_ok == GAIA_ROOM - dun->partner_cnt) {
+            dun->start_game = true;
 
             // Ai움직이기 시작
-            Player** party_players = dungeons[pl->indun_id]->get_party_palyer();
+            Player** party_players = dun->get_party_palyer();
 
             // 레이드 위치 수정
             for (int i = 0; i < GAIA_ROOM; i++) {
@@ -1503,14 +1129,14 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
 
             // BOSS NPC Timer Start
             timer_event ev;
-            ev.obj_id = dungeons[pl->indun_id]->get_dungeon_id();
+            ev.obj_id = dun->get_dungeon_id();
             ev.start_time = chrono::system_clock::now() + 1s;
             ev.ev = EVENT_BOSS_MOVE;
             ev.target_id = -1;
             timer_queue.push(ev);
 
             ZeroMemory(&ev, sizeof(ev));
-            ev.obj_id = dungeons[pl->indun_id]->get_dungeon_id();
+            ev.obj_id = dun->get_dungeon_id();
             ev.start_time = chrono::system_clock::now() + 3s;
             ev.ev = EVENT_BOSS_ATTACK;
             ev.target_id = -1;
@@ -1551,7 +1177,7 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
         }
         pl->state_lock.unlock();
 
-        Gaia* dun = dungeons[r_id];
+        Gaia* dun = m_ObjectManger->get_dungeon(r_id);
 
         // join dungeon party
         dun->state_lock.lock();
@@ -1571,7 +1197,7 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
         dun->join_player(pl);
 
         // 이 방에 대한 정보를 보내준다
-        for (auto& dun : dungeons) {
+        for (auto& dun : m_ObjectManger->get_dungeons()) {
             dun->state_lock.lock();
             if (dun->get_dun_st() == DUN_ST_ROBBY) {
                 // 던전의 정보들을 보내준다
@@ -1591,7 +1217,7 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
     }
     case CS_PACKET_PARTY_ROOM_QUIT_REQUEST: {
         int r_id = (int)reinterpret_cast<cs_packet_party_room_quit_request*>(p)->room_id;
-        Gaia* dun = dungeons[r_id];
+        Gaia* dun = m_ObjectManger->get_dungeon(r_id);
         dun->quit_palyer(pl);
         // 나갔다는 정보를 player에게 보내준다
         send_party_room_quit_ok_packet(pl);
@@ -1601,7 +1227,7 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
         if (dun->player_cnt - dun->partner_cnt == 0) {
             // 아무도 없다는 뜻
             for (auto& pls : players) {
-                if (true == is_npc(pls->get_id())) break;
+                if (true == m_ObjectManger->is_npc(pls->get_id())) break;
                 pls->state_lock.lock();
                 if (ST_INGAME != pls->get_state()) {
                     pls->state_lock.unlock();
@@ -1663,7 +1289,7 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
         cs_packet_party_invitation_reply* packet = reinterpret_cast<cs_packet_party_invitation_reply*>(p);
         int r_id = (int)packet->room_id;
         if ((int)packet->accept == 1) {
-            Gaia* dun = dungeons[r_id];
+            Gaia* dun = m_ObjectManger->get_dungeon(r_id);
 
             // join dungeon party
             dun->state_lock.lock();
@@ -1683,7 +1309,7 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
             dun->join_player(pl);
 
             // 이 방에 대한 정보를 보내준다
-            for (auto& duns : dungeons) {
+            for (auto& duns : m_ObjectManger->get_dungeons()) {
                 duns->state_lock.lock();
                 if (duns->get_dun_st() == DUN_ST_ROBBY) {
                     // 던전의 정보들을 보내준다
@@ -1709,11 +1335,11 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
     case CS_PACKET_PARTY_ADD_PARTNER: {
         cs_packet_party_add_partner* packet = reinterpret_cast<cs_packet_party_add_partner*>(p);
         int r_id = (int)reinterpret_cast<cs_packet_party_add_partner*>(p)->room_id;
-        Gaia* dun = dungeons[r_id];
+        Gaia* dun = m_ObjectManger->get_dungeon(r_id);
 
         if (dun->player_cnt < GAIA_ROOM) {  // 제한 인원수 보다 적을 때만 추가 가능하도록 하자 
 
-            int new_id = get_new_id();
+            int new_id = m_ObjectManger->get_new_id();
             if (-1 == new_id) {
                 cout << "Maxmum user overflow.Accept aborted.\n";
             }
@@ -1769,4 +1395,14 @@ void PacketManager::process_packet(int client_id, unsigned char* p)
     default:
         break;
     }
+}
+
+void PacketManager::skill_cooltime(int client_id, chrono::system_clock::time_point t, int skill_id)
+{
+    timer_event ev;
+    ev.obj_id = client_id;
+    ev.start_time = t;  //쿨타임
+    ev.ev = EVENT_SKILL_COOLTIME;
+    ev.target_id = skill_id;
+    timer_queue.push(ev);
 }

@@ -61,10 +61,9 @@ Npc::~Npc()
 
 void Npc::Initialize_Lua(const char* f_lua)
 {
-	lua_State* L =  luaL_newstate();
+	L =  luaL_newstate();
 	luaL_openlibs(L);
-	int error = luaL_loadfile(L,f_lua) ||
-		lua_pcall(L, 0, 0, 0);
+	int error = luaL_loadfile(L,f_lua) || lua_pcall(L, 0, 0, 0);
 
 	if (error != 0) {
 		cout << "초기화 오류" << endl;
@@ -105,6 +104,53 @@ void Npc::Initialize_Lua(const char* f_lua)
 	lua_register(L, "API_get_x", API_get_x);
 	lua_register(L, "API_get_y", API_get_y);
 	lua_register(L, "API_get_z", API_get_z);
+}
+
+void Npc::Initialize_Lua_Boss(const char* f_lua, int dungeon_id)
+{
+	_tribe = BOSS;
+
+	L = luaL_newstate();
+	luaL_openlibs(L);
+	int error = luaL_loadfile(L, f_lua) || lua_pcall(L, 0, 0, 0);
+
+	if (error != 0) {
+		cout << "초기화 오류" << endl;
+	}
+
+	Initialize_Boss(dungeon_id);
+}
+
+void Npc::Initialize_Boss(int dungeon_id)
+{
+	lua_getglobal(L, "set_uid");
+	lua_pushnumber(L, dungeon_id);
+	int error = lua_pcall(L, 1, 10, 0);
+
+	set_element(static_cast<ELEMENT>(lua_tointeger(L, -10)));
+	set_lv(lua_tointeger(L, -9));
+
+	set_name(lua_tostring(L, -8));
+
+	set_hp(lua_tointeger(L, -7));
+	set_maxhp(lua_tointeger(L, -7));
+
+	set_physical_attack(lua_tonumber(L, -6));
+	set_magical_attack(lua_tonumber(L, -5));
+	set_physical_defence(lua_tonumber(L, -4));
+	set_magical_defence(lua_tonumber(L, -3));
+	set_basic_attack_factor(lua_tointeger(L, -2));
+	set_defence_factor(lua_tonumber(L, -1));
+
+	lua_pop(L, 11);// eliminate set_uid from stack after call
+
+	state_lock.lock();
+	set_state(ST_FREE);
+	state_lock.unlock();
+	set_id(GAIA_ID);
+
+	_x = 310;
+	_z = 110;
 }
 
 void Npc::set_pos(int x, int z)
@@ -500,20 +546,94 @@ pos Npc::a_star(int t_x, int t_z, int x, int z, const array<Obstacle*, MAX_OBSTA
 	return pos(x, z);
 }
 
-
-void Npc::attack_success(Npc* target)
+bool Npc::npc_attack_validation(Npc* target)
 {
-	// 현재 물리 공격에 대해서만 생각한다
-	float give_damage = _physical_attack * _basic_attack_factor;
-	float defence_damage = (target->get_defence_factor() *
-		target->get_physical_defence()) / (1 + (target->get_defence_factor() *
-			target->get_physical_defence()));
-	float damage = give_damage * (1 - defence_damage);
-	int target_hp = target->get_hp() - damage;
+	lua_lock.lock();
+	lua_getglobal(L, "attack_range");
+	lua_pushnumber(L, target->get_id());
+	int error = lua_pcall(L, 1, 1, 0);
+	if (error != 0) {
+		cout << "LUA ATTACK RANGE ERROR" << endl;
+	}
+	bool m = false;
+	m = lua_toboolean(L, -1);
+	lua_pop(L, 1);
+	lua_lock.unlock();
+	if (m) {
+		// 공격처리
+		send_animation_attack(reinterpret_cast<Player*>(target), _id);
+		basic_attack_success(target);
+		return true;
+	}
+	else {
+		if (_active) {
+			// 공격은 실패했지만 계속(그렇지만 1초후) 공격시도
+			timer_event ev;
+			ev.obj_id = _id;
+			ev.start_time = chrono::system_clock::now() + 1s;
+			ev.ev = EVENT_NPC_ATTACK;
+			ev.target_id = target->get_id();
+			timer_queue.push(ev);
+		}
+		return false;
+	}
+}
 
-	if (target_hp <= 0) target_hp = 0;
-	target->set_hp(target_hp);
+void Npc::attack_dead_judge(Npc* target)
+{
+	int target_hp = target->get_hp();
+	if (target_hp <= 0) {
+		target->state_lock.lock();
+		if (target->get_state() != ST_INGAME) {
+			target->state_lock.unlock();
+			return;
+		}
+		target->set_state(ST_DEAD);
+		target->state_lock.unlock();
 
+		_active = false;
+		// 죽은것이 플레이어라면 죽었다는 패킷을 보내준다
+		send_dead_packet(reinterpret_cast<Player*>(target), this, target);
+		send_notice(reinterpret_cast<Player*>(target), "사망했습니다. 10초 후 부활합니다", 1);
+
+		// 3초후 부활하며 부활과 동시에 위치 좌표를 수정해준다
+		timer_event ev;
+		ev.obj_id = target->get_id();
+		ev.start_time = chrono::system_clock::now() + 10s;
+		ev.ev = EVENT_PLAYER_REVIVE;
+		ev.target_id = 0;
+		timer_queue.push(ev);
+	}
+	else {
+		// 플레이어가 공격을 당한 것이므로 hp정보가 바뀌었으므로 그것을 보내주자
+		// send_status_change_packet(reinterpret_cast<Player*>(players[target]));
+
+		// 플레이어의 ViewList에 있는 플레이어들에게 보내주자
+		send_change_hp_packet(reinterpret_cast<Player*>(target), target);
+
+		// hp가 깎이였으므로 hp자동회복을 해주도록 하자
+		if (reinterpret_cast<Player*>(target)->_auto_hp == false) {
+			timer_event ev;
+			ev.obj_id = target->get_id();
+			ev.start_time = chrono::system_clock::now() + 5s;
+			ev.ev = EVENT_AUTO_PLAYER_HP;
+			ev.target_id = 0;
+			timer_queue.push(ev);
+			reinterpret_cast<Player*>(target)->_auto_hp = true;
+		}
+
+		// npc공격이면 타이머 큐에 다시 넣어주자
+		timer_event ev;
+		ev.obj_id = _id;
+		ev.start_time = chrono::system_clock::now() + 3s;
+		ev.ev = EVENT_NPC_ATTACK;
+		ev.target_id = target->get_id();
+		timer_queue.push(ev);
+	}
+}
+
+void Npc::attack_element_judge(Npc* target)
+{
 	if (target->get_element_cooltime() == false) {
 		switch (_element)
 		{
@@ -537,7 +657,7 @@ void Npc::attack_success(Npc* target)
 				|| target->get_element() == E_FIRE) {
 				// Npc에는 없는 속성
 				// reinterpret_cast<Player*>(p)->attack_speed_up = true;
-				
+
 				//공속  상승 , 쿨타임 감소 
 				target->set_element_cooltime(true);
 			}
@@ -582,56 +702,60 @@ void Npc::attack_success(Npc* target)
 			timer_queue.push(ev);
 		}
 	}
-
-	if (target_hp <= 0) {
-		target->state_lock.lock();
-		if (target->get_state() != ST_INGAME) {
-			target->state_lock.unlock();
-			return;
-		}
-		target->set_state(ST_DEAD);
-		target->state_lock.unlock();
-		
-		_active = false;
-		// 죽은것이 플레이어라면 죽었다는 패킷을 보내준다
-		send_dead_packet(reinterpret_cast<Player*>(target), this, target);
-		send_notice(reinterpret_cast<Player*>(target), "사망했습니다. 10초 후 부활합니다", 1);
-
-		// 3초후 부활하며 부활과 동시에 위치 좌표를 수정해준다
-		timer_event ev;
-		ev.obj_id = target->get_id();
-		ev.start_time = chrono::system_clock::now() + 10s;
-		ev.ev = EVENT_PLAYER_REVIVE;
-		ev.target_id = 0;
-		timer_queue.push(ev);
-	}
-	else  {
-		// 플레이어가 공격을 당한 것이므로 hp정보가 바뀌었으므로 그것을 보내주자
-		// send_status_change_packet(reinterpret_cast<Player*>(players[target]));
-
-		// 플레이어의 ViewList에 있는 플레이어들에게 보내주자
-		send_change_hp_packet(reinterpret_cast<Player*>(target), target);
-
-		// hp가 깎이였으므로 hp자동회복을 해주도록 하자
-		if (reinterpret_cast<Player*>(target)->_auto_hp == false) {
-			timer_event ev;
-			ev.obj_id = target->get_id();
-			ev.start_time = chrono::system_clock::now() + 5s;
-			ev.ev = EVENT_AUTO_PLAYER_HP;
-			ev.target_id = 0;
-			timer_queue.push(ev);
-			reinterpret_cast<Player*>(target)->_auto_hp = true;
-		}
-
-		// npc공격이면 타이머 큐에 다시 넣어주자
-		timer_event ev;
-		ev.obj_id = _id;
-		ev.start_time = chrono::system_clock::now() + 3s;
-		ev.ev = EVENT_NPC_ATTACK;
-		ev.target_id = target->get_id();
-		timer_queue.push(ev);
-	}
 }
+
+void Npc::basic_attack_success(Npc* target)
+{
+	// 현재 물리 공격에 대해서만 생각한다
+	float give_damage = _physical_attack * _basic_attack_factor;
+	float defence_damage = (target->get_defence_factor() *
+		target->get_physical_defence()) / (1 + (target->get_defence_factor() *
+			target->get_physical_defence()));
+	float damage = give_damage * (1 - defence_damage);
+	int target_hp = target->get_hp() - damage;
+
+	if (target_hp <= 0) target_hp = 0;
+	target->set_hp(target_hp);
+
+	attack_element_judge(target);
+
+	attack_dead_judge(target);
+}
+
+void Npc::phisical_skill_success(Npc* target, float skill_factor)
+{
+	float give_damage = _physical_attack * skill_factor;
+	float defence_damage = (target->get_defence_factor() *
+		target->get_physical_defence()) / (1 + (target->get_defence_factor() *
+			target->get_physical_defence()));
+	float damage = give_damage * (1 - defence_damage);
+	int target_hp = target->get_hp() - damage;
+
+	if (target_hp <= 0) target_hp = 0;
+	target->set_hp(target_hp);
+
+	attack_element_judge(target);
+
+	attack_dead_judge(target);
+}
+
+void Npc::magical_skill_success(Npc* target, float skill_factor)
+{
+	float give_damage = _magical_attack * skill_factor;
+	float defence_damage = (target->get_defence_factor() *
+		target->get_magical_defence()) / (1 + (target->get_defence_factor() *
+			target->get_magical_defence()));
+	float damage = give_damage * (1 - defence_damage);
+	int target_hp = target->get_hp() - damage;
+
+	if (target_hp <= 0) target_hp = 0;
+	target->set_hp(target_hp);
+
+	attack_element_judge(target);
+
+	attack_dead_judge(target);
+}
+
 
 void Npc::return_npc_position(const array<Obstacle*, MAX_OBSTACLE>& obstacles)
 {
@@ -681,14 +805,17 @@ void Npc::return_npc_position(const array<Obstacle*, MAX_OBSTACLE>& obstacles)
 	_x = now_x;
 	_z = now_z;
 
-	if (my_pos_fail) {    // 더 움직여야돼
-		timer_event ev;
-		ev.obj_id = _id;
-		ev.start_time = chrono::system_clock::now() + 1s;
-		ev.ev = EVENT_NPC_MOVE;
-		ev.target_id = -1;
-		timer_queue.push(ev);
-	}
+	if (my_pos_fail) push_npc_move_event(); // 더 움직여야돼
+}
+
+void Npc::push_npc_move_event()
+{
+	timer_event ev;
+	ev.obj_id = _id;
+	ev.start_time = chrono::system_clock::now() + 1s;
+	ev.ev = EVENT_NPC_MOVE;
+	ev.target_id = _target_id;
+	timer_queue.push(ev);
 }
 
 void Npc::do_npc_move(Npc* target, const array<Obstacle*, MAX_OBSTACLE>& obstacles)
@@ -717,6 +844,8 @@ void Npc::do_npc_move(Npc* target, const array<Obstacle*, MAX_OBSTACLE>& obstacl
 	int t_x = target->get_x();
 	int t_z = target->get_z();
 
+	_target_id = target->get_id();
+
 	// 움직일 필요가 없다
 	if ((t_x >= x - 8 && t_x <= x + 8) && (t_z >= z - 8 && t_z <= z + 8)) {
 		state_lock.lock();
@@ -726,12 +855,7 @@ void Npc::do_npc_move(Npc* target, const array<Obstacle*, MAX_OBSTACLE>& obstacl
 		}
 		state_lock.unlock();
 
-		timer_event ev;
-		ev.obj_id = _id;
-		ev.start_time = chrono::system_clock::now() + 1s;
-		ev.ev = EVENT_NPC_MOVE;
-		ev.target_id = target->get_id();  //target
-		timer_queue.push(ev);
+		push_npc_move_event();
 		return;
 	}
 
@@ -753,12 +877,7 @@ void Npc::do_npc_move(Npc* target, const array<Obstacle*, MAX_OBSTACLE>& obstacl
 	}
 	state_lock.unlock();
 
-	timer_event ev;
-	ev.obj_id = _id;
-	ev.start_time = chrono::system_clock::now() + 1s;
-	ev.ev = EVENT_NPC_MOVE;
-	ev.target_id = target->get_id();
-	timer_queue.push(ev);
+	push_npc_move_event();
 }
 
 void Npc::revive()

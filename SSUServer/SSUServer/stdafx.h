@@ -42,6 +42,12 @@ struct timer_event {
 
 };
 
+struct Coord
+{
+    float x;
+    float z;
+};
+
 extern concurrency::concurrent_priority_queue<timer_event> timer_queue;
 
 
