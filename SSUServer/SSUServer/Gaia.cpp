@@ -1,5 +1,6 @@
 #include "Gaia.h"
 #include "send.h"
+#include "TimerManager.h"
 #include <random>
 #include <ctime>
 
@@ -71,13 +72,12 @@ void Gaia::join_player(Player* pl)
 	// game start
 	if (player_cnt == GAIA_ROOM) {
 		// 여기에 인원이 꽉찼으면 5초후 게임을 시작하는 타이머를 돌려주자
-
 		timer_event ev;
 		ev.obj_id = dungeon_id;
 		ev.start_time = chrono::system_clock::now() + 5s;
 		ev.ev = EVENT_GAMESTART_TIMER;
 		ev.target_id = dungeon_id;
-		timer_queue.push(ev);
+		TimerManager::timer_queue.push(ev);
 
 		start_time = ev.start_time;
 
@@ -186,7 +186,7 @@ void Gaia::game_victory()
 		ev.start_time = chrono::system_clock::now() + 5s;
 		ev.ev = EVENT_FINISH_RAID;
 		ev.target_id = 0;
-		timer_queue.push(ev);
+		TimerManager::timer_queue.push(ev);
 	}
 	else boss->state_lock.unlock();
 }
@@ -317,14 +317,14 @@ void Gaia::boss_attack()
 		ev.start_time = chrono::system_clock::now() + 2s;
 		ev.ev = EVENT_GAIA_PATTERN;
 		ev.target_id = 0;
-		timer_queue.push(ev);
+		TimerManager::timer_queue.push(ev);
 
 		//
 		ev.obj_id = dungeon_id;
 		ev.start_time = chrono::system_clock::now() + 10s;
 		ev.ev = EVENT_BOSS_ATTACK;
 		ev.target_id = -1;
-		timer_queue.push(ev);
+		TimerManager::timer_queue.push(ev);
 		break;
 	}
 	case 1: { //파도3개 
@@ -431,13 +431,13 @@ void Gaia::boss_attack()
 		ev.start_time = chrono::system_clock::now() + 500ms;
 		ev.ev = EVENT_GAIA_PATTERN;
 		ev.target_id = 1;
-		timer_queue.push(ev);
+		TimerManager::timer_queue.push(ev);
 		//
 		ev.obj_id = dungeon_id;
 		ev.start_time = chrono::system_clock::now() + 13s;
 		ev.ev = EVENT_BOSS_ATTACK;
 		ev.target_id = -1;
-		timer_queue.push(ev);
+		TimerManager::timer_queue.push(ev);
 		break;
 	}
 	case 2: {
@@ -445,7 +445,7 @@ void Gaia::boss_attack()
 		ev.start_time = chrono::system_clock::now() + 1s;
 		ev.ev = EVENT_BOSS_ATTACK;
 		ev.target_id = -1;
-		timer_queue.push(ev);
+		TimerManager::timer_queue.push(ev);
 		break;
 	}
 	case 3: {
@@ -453,7 +453,7 @@ void Gaia::boss_attack()
 		ev.start_time = chrono::system_clock::now() + 1s;
 		ev.ev = EVENT_BOSS_ATTACK;
 		ev.target_id = -1;
-		timer_queue.push(ev);
+		TimerManager::timer_queue.push(ev);
 		break;
 	}
 	case 4: {//참격 1개 
@@ -468,13 +468,13 @@ void Gaia::boss_attack()
 		ev.start_time = chrono::system_clock::now() + 100ms;
 		ev.ev = EVENT_GAIA_PATTERN;
 		ev.target_id = 4;
-		timer_queue.push(ev);
+		TimerManager::timer_queue.push(ev);
 		//
 		ev.obj_id = dungeon_id;
 		ev.start_time = chrono::system_clock::now() + 10s;
 		ev.ev = EVENT_BOSS_ATTACK;
 		ev.target_id = -1;
-		timer_queue.push(ev);
+		TimerManager::timer_queue.push(ev);
 		break;
 	}
 	default:
@@ -519,7 +519,7 @@ void Gaia::player_death(Player* p)
 		ev.start_time = chrono::system_clock::now() + 5s;
 		ev.ev = EVENT_PLAYER_REVIVE;
 		ev.target_id = 0;
-		timer_queue.push(ev);
+		TimerManager::timer_queue.push(ev);
 	}
 	else {
 		p->state_lock.lock();
@@ -552,7 +552,7 @@ void Gaia::player_death(Player* p)
 			ev.start_time = chrono::system_clock::now() + 5s;
 			ev.ev = EVENT_FINISH_RAID;
 			ev.target_id = 0;
-			timer_queue.push(ev);
+			TimerManager::timer_queue.push(ev);
 		}
 
 	}
@@ -763,7 +763,7 @@ void Gaia::pattern_active(int pattern)
 			ev.start_time = chrono::system_clock::now() + 500ms;
 			ev.ev = EVENT_GAIA_PATTERN;
 			ev.target_id = 1;
-			timer_queue.push(ev);
+			TimerManager::timer_queue.push(ev);
 		}
 		else {
 			pattern_two_count = 0;
@@ -815,7 +815,7 @@ void Gaia::pattern_active(int pattern)
 			ev.start_time = chrono::system_clock::now() + 100ms;
 			ev.ev = EVENT_GAIA_PATTERN;
 			ev.target_id = 4;
-			timer_queue.push(ev);
+			TimerManager::timer_queue.push(ev);
 		}
 		else {
 			pattern_five_count = 0;

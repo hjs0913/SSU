@@ -1,6 +1,7 @@
 #include "ObjectManager.h"
 #include "send.h"
 #include "PacketManager.h"
+#include "TimerManager.h"
 #include <fstream>
 
 ObjectManager* static_ObjectManager::objManager = nullptr;
@@ -359,7 +360,7 @@ void ObjectManager::worker()
                 ev.start_time = chrono::system_clock::now() + 5s;
                 ev.ev = EVENT_AUTO_PLAYER_HP;
                 ev.target_id = 0;
-                timer_queue.push(ev);
+                TimerManager::timer_queue.push(ev);
             }
             send_change_hp_packet(pl, pl);
             //send_status_change_packet(pl);
@@ -435,7 +436,7 @@ void ObjectManager::worker()
             ev.start_time = chrono::system_clock::now() + 500ms;
             ev.ev = EVENT_BOSS_MOVE;
             ev.target_id = -1;
-            timer_queue.push(ev);
+            TimerManager::timer_queue.push(ev);
             delete exp_over;
             break;
         }
@@ -482,7 +483,7 @@ void ObjectManager::worker()
             ev.start_time = chrono::system_clock::now() + 500ms;
             ev.ev = EVENT_PARTNER_MOVE;
             ev.target_id = -1;
-            timer_queue.push(ev);
+            TimerManager::timer_queue.push(ev);
             delete exp_over;
             break;
         }
@@ -493,10 +494,38 @@ void ObjectManager::worker()
                 break;
             }
             players[client_id]->state_lock.unlock();
-            Partner* pl = reinterpret_cast<Partner*>(players[client_id]);
-            pl->partner_attack(pl, dungeons[pl->get_indun_id()]);
-            delete exp_over;
-            break;
+
+            int indun_id = reinterpret_cast<Player*>(players[exp_over->_target])->get_indun_id();  //바꿔야함!
+
+            switch (dungeons[indun_id]->get_party_palyer()[client_id]->get_job())
+            {
+            case J_DILLER: {
+                for (int i = 0; i < GAIA_ROOM; ++i) {
+                    dungeons[indun_id]->get_party_palyer()[i]->set_physical_attack(dungeons[indun_id]->get_party_palyer()[i]->get_origin_physical_attack());
+                    dungeons[indun_id]->get_party_palyer()[i]->set_magical_attack(dungeons[indun_id]->get_party_palyer()[i]->get_origin_magical_attack());
+                }
+                break;
+            }
+            case J_TANKER: {
+                for (int i = 0; i < GAIA_ROOM; ++i) {
+                    dungeons[indun_id]->get_party_palyer()[i]->set_physical_defence(dungeons[indun_id]->get_party_palyer()[i]->get_origin_physical_defence());
+                    dungeons[indun_id]->get_party_palyer()[i]->set_magical_defence(dungeons[indun_id]->get_party_palyer()[i]->get_origin_magical_defence());
+                }
+                break;
+            }
+            case J_SUPPORTER: {
+                for (int i = 0; i < GAIA_ROOM; ++i) {
+                    dungeons[indun_id]->get_party_palyer()[i]->attack_speed_up = false;
+                }
+                break;
+            }
+            case J_MAGICIAN: {
+                Partner* pl = reinterpret_cast<Partner*>(players[client_id]);
+                pl->partner_attack(pl, dungeons[pl->get_indun_id()]);
+                delete exp_over;
+                break;
+            }
+            }
         }
         case OP_PARTNER_NORMAL_ATTACK: {
             players[client_id]->state_lock.lock();
@@ -513,11 +542,12 @@ void ObjectManager::worker()
             ev.start_time = chrono::system_clock::now() + 1s;
             ev.ev = EVENT_PARTNER_NORMAL_ATTACK;
             ev.target_id = 1;
-            timer_queue.push(ev);
+            TimerManager::timer_queue.push(ev);
             delete exp_over;
             break;
         }
         case OP_GAMESTART_TIMER: {
+            cout << "들어오는가" << endl;
             Gaia* dun = dungeons[exp_over->_target];
             dun->game_start();
             dun->state_lock.lock();
@@ -706,7 +736,50 @@ void ObjectManager::worker()
 
             break;
         }
+        case OP_PLAYER_ATTACK: {
+            reinterpret_cast<Player*>(players[client_id])->set_attack_active(false);
+            break;
         }
+        case OP_SKILL_COOLTIME: {
+            if (exp_over->_target == 2) {  // 전사 BUFF
+                switch (reinterpret_cast<Player*>(players[client_id])->get_job())
+                {
+                case J_DILLER: {
+                    players[client_id]->set_physical_attack(0.3 * players[client_id]->get_lv() * players[client_id]->get_lv() + 10 * players[client_id]->get_lv());
+                    players[client_id]->set_magical_attack(0.1 * players[client_id]->get_lv() * players[client_id]->get_lv() + 5 * players[client_id]->get_lv());
+                    break;
+                }
+                case J_TANKER: {
+                    players[client_id]->set_physical_defence(0.27 * players[client_id]->get_lv() * players[client_id]->get_lv() + 10 * players[client_id]->get_lv());
+                    players[client_id]->set_magical_defence(0.2 * players[client_id]->get_lv() * players[client_id]->get_lv() + 10 * players[client_id]->get_lv());
+                    break;
+                }
+                case J_MAGICIAN: {  //없음 
+
+                    break;
+                }
+                case J_SUPPORTER: {   // 대상이 여러명일 때는 어떻게 다시 초기화할까 
+                    if (dungeons[client_id]->start_game == false) {
+                        for (int i = 0; i < MAX_USER; ++i) {
+                            reinterpret_cast<Player*>(players[i])->attack_speed_up = false;
+                        }
+                    }
+                    else {
+                        for (int i = 0; i < GAIA_ROOM; ++i) {
+                            dungeons[client_id]->get_party_palyer()[i]->attack_speed_up = false;
+                        }
+                    }
+                    break;
+                }
+                }
+                // 일단 이것을 넣으면 안돌아감(이유 모름)
+                //send_status_change_packet(reinterpret_cast<Player*>(players[ev.obj_id]));
+            }
+            reinterpret_cast<Player*>(players[client_id])->set_skill_active(exp_over->_target, false);
+            break;
+        }
+        }
+
     }
 }
 

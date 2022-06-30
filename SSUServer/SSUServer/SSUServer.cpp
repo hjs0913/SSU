@@ -3,8 +3,7 @@
 #include "ObjectManager.h"
 #include "SectorManager.h"
 #include "PacketManager.h"
-
-concurrency::concurrent_priority_queue<timer_event> timer_queue;
+#include "TimerManager.h"
 
 int main()
 {
@@ -30,20 +29,20 @@ int main()
     SectorManager m_SectorManager;
     ObjectManager m_ObjectManager(&m_SectorManager, &s_socket);
     PacketManager m_PacketManager(&m_ObjectManager, &m_SectorManager, s_socket.get_iocp());
-   
     m_ObjectManager.set_packetManager(&m_PacketManager);
+    TimerManager m_TimerManager(s_socket.get_iocp());
 
     static_ObjectManager::set_objManger(&m_ObjectManager);
 
     // 멀티 쓰레드 생성
     vector <thread> worker_threads;
-    //thread timer_thread{ do_timer };
+    thread timer_thread{ &TimerManager::do_timer, m_TimerManager };
     for (int i = 0; i < 16; ++i)
         worker_threads.emplace_back(std::thread(&ObjectManager::worker, m_ObjectManager));
+
     for (auto& th : worker_threads)
         th.join();
-
-    //timer_thread.join();
+    timer_thread.join();
 
 
     // 종료

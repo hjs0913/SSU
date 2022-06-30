@@ -116,10 +116,10 @@ void send_login_packet(char* id, char* password)
 	cs_packet_login packet;
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET_LOGIN;
-	//packet.job = job;
+	packet.job = 0;
 	strcpy_s(packet.password, password);
 	strcpy_s(packet.id, id);
-	//strcpy_s(packet.name, name);
+	strcpy_s(packet.name, "temp");
 	do_send(sizeof(packet), &packet);
 }
 

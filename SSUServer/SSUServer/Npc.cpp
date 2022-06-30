@@ -1,6 +1,7 @@
 #include "Npc.h"
 #include "send.h"
 #include "LuaFunction.h"
+#include "TimerManager.h"
 #include <queue>
 #include <random>
 
@@ -364,6 +365,43 @@ MONSTER_SPECIES Npc::get_mon_spices()
 	return _mon_species;
 }
 
+//origin
+float Npc::get_origin_physical_attack()
+{
+	return _origin_physical_attack;
+}
+float Npc::get_origin_magical_attack()
+{
+	return _origin_magical_attack;
+}
+float Npc::get_origin_physical_defence()
+{
+	return _origin_physical_defence;
+}
+float Npc::get_origin_magical_defence()
+{
+	return _origin_magical_defence;
+}
+void Npc::set_origin_physical_attack(float physical_attack)
+{
+	_origin_physical_attack = physical_attack;
+}
+
+void Npc::set_origin_magical_attack(float magical_attack)
+{
+	_origin_magical_attack = magical_attack;
+}
+
+void Npc::set_origin_physical_defence(float physical_defence)
+{
+	_origin_physical_defence = physical_defence;
+}
+
+void Npc::set_origin_magical_defence(float magical_defence)
+{
+	_origin_magical_defence = magical_defence;
+}
+
 //skill
 void Npc::set_skill_factor(int skill_type, int skill_num)
 {
@@ -573,7 +611,7 @@ bool Npc::npc_attack_validation(Npc* target)
 			ev.start_time = chrono::system_clock::now() + 1s;
 			ev.ev = EVENT_NPC_ATTACK;
 			ev.target_id = target->get_id();
-			timer_queue.push(ev);
+			TimerManager::timer_queue.push(ev);
 		}
 		return false;
 	}
@@ -602,7 +640,7 @@ void Npc::attack_dead_judge(Npc* target)
 		ev.start_time = chrono::system_clock::now() + 10s;
 		ev.ev = EVENT_PLAYER_REVIVE;
 		ev.target_id = 0;
-		timer_queue.push(ev);
+		TimerManager::timer_queue.push(ev);
 	}
 	else {
 		// 플레이어가 공격을 당한 것이므로 hp정보가 바뀌었으므로 그것을 보내주자
@@ -618,7 +656,7 @@ void Npc::attack_dead_judge(Npc* target)
 			ev.start_time = chrono::system_clock::now() + 5s;
 			ev.ev = EVENT_AUTO_PLAYER_HP;
 			ev.target_id = 0;
-			timer_queue.push(ev);
+			TimerManager::timer_queue.push(ev);
 			reinterpret_cast<Player*>(target)->_auto_hp = true;
 		}
 
@@ -628,7 +666,7 @@ void Npc::attack_dead_judge(Npc* target)
 		ev.start_time = chrono::system_clock::now() + 3s;
 		ev.ev = EVENT_NPC_ATTACK;
 		ev.target_id = target->get_id();
-		timer_queue.push(ev);
+		TimerManager::timer_queue.push(ev);
 	}
 }
 
@@ -699,7 +737,7 @@ void Npc::attack_element_judge(Npc* target)
 			ev.start_time = chrono::system_clock::now() + 10s;  //쿨타임
 			ev.ev = EVENT_ELEMENT_COOLTIME;;
 			ev.target_id = target->get_id();
-			timer_queue.push(ev);
+			TimerManager::timer_queue.push(ev);
 		}
 	}
 }
@@ -815,7 +853,7 @@ void Npc::push_npc_move_event()
 	ev.start_time = chrono::system_clock::now() + 1s;
 	ev.ev = EVENT_NPC_MOVE;
 	ev.target_id = _target_id;
-	timer_queue.push(ev);
+	TimerManager::timer_queue.push(ev);
 }
 
 void Npc::do_npc_move(Npc* target, const array<Obstacle*, MAX_OBSTACLE>& obstacles)

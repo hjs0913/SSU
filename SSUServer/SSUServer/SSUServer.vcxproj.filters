@@ -70,6 +70,9 @@
     <Filter Include="ObjectClass\Partner">
       <UniqueIdentifier>{00b1465b-59dd-48a3-9970-ac2c5f6afb42}</UniqueIdentifier>
     </Filter>
+    <Filter Include="NetWork\TimerManager">
+      <UniqueIdentifier>{a6f41331-e5ee-43c0-8a90-d2a65c0a810a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Partner.cpp">
@@ -128,6 +131,9 @@
     </ClCompile>
     <ClCompile Include="Supporter.cpp">
       <Filter>JobFunction\Supporter</Filter>
+    </ClCompile>
+    <ClCompile Include="TimerManager.cpp">
+      <Filter>NetWork\TimerManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -231,6 +237,9 @@
     </ClInclude>
     <ClInclude Include="Supporter.h">
       <Filter>JobFunction\Supporter</Filter>
+    </ClInclude>
+    <ClInclude Include="TimerManager.h">
+      <Filter>NetWork\TimerManager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -18,6 +18,12 @@ protected:
 	float	_magical_attack;
 	float	_physical_defence;
 	float	_magical_defence;
+
+	float	_origin_physical_attack;
+	float	_origin_magical_attack;
+	float	_origin_physical_defence;
+	float	_origin_magical_defence;
+
 	float	_basic_attack_factor;
 	float	_defence_factor;
 	ELEMENT	_element;
@@ -95,6 +101,17 @@ public:
 	float get_right_y();
 	float get_right_z();
 	MONSTER_SPECIES get_mon_spices();
+
+	//origin
+	void set_origin_physical_attack(float physical_attack);
+	void set_origin_magical_attack(float magical_attack);
+	void set_origin_physical_defence(float physical_defence);
+	void set_origin_magical_defence(float magical_defence);
+
+	float get_origin_physical_attack();
+	float get_origin_magical_attack();
+	float get_origin_physical_defence();
+	float get_origin_magical_defence();
 
 	//skill
 	void set_skill_factor(int skill_type, int skill_num);

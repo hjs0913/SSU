@@ -160,6 +160,7 @@
     <ClCompile Include="SSUServer.cpp" />
     <ClCompile Include="Supporter.cpp" />
     <ClCompile Include="Tanker.cpp" />
+    <ClCompile Include="TimerManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="fallen_chicken.lua" />
@@ -197,6 +198,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Supporter.h" />
     <ClInclude Include="Tanker.h" />
+    <ClInclude Include="TimerManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

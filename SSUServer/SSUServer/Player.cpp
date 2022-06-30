@@ -1,6 +1,7 @@
 #include "Player.h"
 #include "send.h"
 #include "Gaia.h"
+#include "TimerManager.h"
 
 Player::Player(int id) : Npc(id)
 {
@@ -98,7 +99,7 @@ void Player::attack_dead_judge(Npc* target)
 		ev.start_time = chrono::system_clock::now() + 30s;
 		ev.ev = EVENT_NPC_REVIVE;
 		ev.target_id = 0;
-		timer_queue.push(ev);
+		TimerManager::timer_queue.push(ev);
 
 		// 플레이어에게 경험치 제공, 그리고 바뀐 경험치와 레벨을 보내주자
 		int get_exp = target->get_lv() * target->get_lv() * 2;
@@ -216,7 +217,7 @@ void Player::attack_element_judge(Npc* target)
 			ev.start_time = chrono::system_clock::now() + 10s;  //쿨타임
 			ev.ev = EVENT_ELEMENT_COOLTIME;;
 			ev.target_id = target->get_id();
-			timer_queue.push(ev);
+			TimerManager::timer_queue.push(ev);
 		}
 	}
 }
@@ -327,19 +328,19 @@ void Player::revive_indun(Gaia* dun)
             ev.start_time = chrono::system_clock::now() + 10s;
             ev.ev = EVENT_PARTNER_MOVE;
             ev.target_id = 1;
-            timer_queue.push(ev);
+			TimerManager::timer_queue.push(ev);
 
             ev.obj_id = _id;
             ev.start_time = chrono::system_clock::now() + 1s;
             ev.ev = EVENT_PARTNER_NORMAL_ATTACK;
             ev.target_id = 1;
-            timer_queue.push(ev);
+			TimerManager::timer_queue.push(ev);
 
             ev.obj_id = _id;
             ev.start_time = chrono::system_clock::now() + 3s;
             ev.ev = EVENT_PARTNER_SKILL;
             ev.target_id = 1;
-            timer_queue.push(ev);
+			TimerManager::timer_queue.push(ev);
         }
 
         return;

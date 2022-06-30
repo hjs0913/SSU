@@ -26,6 +26,37 @@ void SectorManager::player_put(Npc* p)
 	// 새로 들어온 섹터와 관련이 있는 플레이어에게 put send를 한다
 
 	// 새로 들어온 사람에게 put 해준다
+	switch (sector_id) {
+	case 0: {	// 0, 1, 8, 9
+		break;
+	}
+	case 7: {	// 6, 7, 14, 15
+		break;
+	}
+	case 56: {	// 48, 49, 56, 57
+		break;
+	}
+	case 63: {	// 54, 55, 62, 63
+		break;
+	}
+	default: {
+		if (sector_id / 8 == 0) {
+
+		}
+		else if (sector_id / 8 == 7) {
+
+		}
+		else if (sector_id % 8 == 0) {
+
+		}
+		else if (sector_id % 8 == 7) {
+
+		}
+		else {
+
+		}
+	}
+	}
 	send_put_packet_sector_player(p, sector_id);
 
 	// 기존의 사람에게 새로 들어온 사람을 put해준다
@@ -74,6 +105,11 @@ int SectorManager::check_sector_id(int p_x, int p_z)
 
 void SectorManager::send_put_packet_sector_player(Npc* p, int sector_id)
 {
+
+
+
+
+
 	// 장애물 처리
 
 	// 자기 자신

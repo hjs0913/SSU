@@ -1,6 +1,7 @@
 #include "PacketManager.h"
 #include "send.h"
 #include "AllJobHeader.h"
+#include "TimerManager.h"
 
 PacketManager::PacketManager(ObjectManager* objectManager, SectorManager* sectorManager, HANDLE* iocp)
 {
@@ -112,7 +113,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 ev.start_time = chrono::system_clock::now() + 5s;
                 ev.ev = EVENT_AUTO_PLAYER_HP;
                 ev.target_id = 0;
-                timer_queue.push(ev);
+                TimerManager::timer_queue.push(ev);
                 pl->_auto_hp = true;
             }
         }
@@ -203,14 +204,14 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
             ev.start_time = chrono::system_clock::now() + 1s;
             ev.ev = EVENT_PLAYER_ATTACK;
             ev.target_id = client_id;
-            timer_queue.push(ev);
+            TimerManager::timer_queue.push(ev);
         }
         else {
             ev.obj_id = client_id;
             ev.start_time = chrono::system_clock::now() + 50ms;
             ev.ev = EVENT_PLAYER_ATTACK;
             ev.target_id = client_id;
-            timer_queue.push(ev);
+            TimerManager::timer_queue.push(ev);
         }
 
         if (pl->join_dungeon_room) {
@@ -259,7 +260,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                         ev.start_time = chrono::system_clock::now() + 1s;
                         ev.ev = EVENT_NPC_ATTACK;
                         ev.target_id = n->get_target_id();
-                        timer_queue.push(ev);
+                        TimerManager::timer_queue.push(ev);
                         // 몬스터의 이동도 넣어주자
                         n->push_npc_move_event();
                     }
@@ -989,7 +990,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
                 ev.ev = EVENT_SKILL_COOLTIME;
                 ev.target_id = 0; // packet->target;
-                timer_queue.push(ev);
+                TimerManager::timer_queue.push(ev);
 
 
                 pl->set_mp(pl->get_mp() - 1000);
@@ -1015,7 +1016,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
                 ev.ev = EVENT_SKILL_COOLTIME;
                 ev.target_id = 1; //packet->target;
-                timer_queue.push(ev);
+                TimerManager::timer_queue.push(ev);
 
                 pl->set_mp(pl->get_mp() - 1000);
                 send_status_change_packet(pl);
@@ -1039,7 +1040,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
                 ev.ev = EVENT_SKILL_COOLTIME;
                 ev.target_id = 2;// packet->target;
-                timer_queue.push(ev);
+                TimerManager::timer_queue.push(ev);
 
                 pl->set_mp(pl->get_mp() - 1000);
                 send_status_change_packet(pl);
@@ -1133,14 +1134,14 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
             ev.start_time = chrono::system_clock::now() + 1s;
             ev.ev = EVENT_BOSS_MOVE;
             ev.target_id = -1;
-            timer_queue.push(ev);
+            TimerManager::timer_queue.push(ev);
 
             ZeroMemory(&ev, sizeof(ev));
             ev.obj_id = dun->get_dungeon_id();
             ev.start_time = chrono::system_clock::now() + 3s;
             ev.ev = EVENT_BOSS_ATTACK;
             ev.target_id = -1;
-            timer_queue.push(ev);
+            TimerManager::timer_queue.push(ev);
 
             for (int i = 0; i < GAIA_ROOM; i++) {
                 if (party_players[i]->get_tribe() == PARTNER) {
@@ -1148,19 +1149,19 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                     ev.start_time = chrono::system_clock::now() + 1s;
                     ev.ev = EVENT_PARTNER_MOVE;
                     ev.target_id = 1;
-                    timer_queue.push(ev);
+                    TimerManager::timer_queue.push(ev);
 
                     ev.obj_id = party_players[i]->get_id();
                     ev.start_time = chrono::system_clock::now() + 1s;
                     ev.ev = EVENT_PARTNER_NORMAL_ATTACK;
                     ev.target_id = 1;
-                    timer_queue.push(ev);
+                    TimerManager::timer_queue.push(ev);
 
                     ev.obj_id = party_players[i]->get_id();
                     ev.start_time = chrono::system_clock::now() + 3s;
                     ev.ev = EVENT_PARTNER_SKILL;
                     ev.target_id = 1;
-                    timer_queue.push(ev);
+                    TimerManager::timer_queue.push(ev);
                 }
             }
 
@@ -1404,5 +1405,5 @@ void PacketManager::skill_cooltime(int client_id, chrono::system_clock::time_poi
     ev.start_time = t;  //쿨타임
     ev.ev = EVENT_SKILL_COOLTIME;
     ev.target_id = skill_id;
-    timer_queue.push(ev);
+    TimerManager::timer_queue.push(ev);
 }
