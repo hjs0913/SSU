@@ -521,10 +521,11 @@ void ObjectManager::worker()
             case J_MAGICIAN: {
                 Partner* pl = reinterpret_cast<Partner*>(players[client_id]);
                 pl->partner_attack(pl, dungeons[pl->get_indun_id()]);
-                delete exp_over;
                 break;
             }
             }
+            delete exp_over;
+            break;
         }
         case OP_PARTNER_NORMAL_ATTACK: {
             players[client_id]->state_lock.lock();
@@ -841,7 +842,7 @@ array<Gaia*, MAX_DUNGEONS>& ObjectManager::get_dungeons()
     return dungeons;
 }
 
-
+// static_objectmanagr
 ObjectManager* static_ObjectManager::get_objManger()
 {
     return objManager;

@@ -73,6 +73,9 @@
     <Filter Include="NetWork\TimerManager">
       <UniqueIdentifier>{a6f41331-e5ee-43c0-8a90-d2a65c0a810a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="NetWork\EXP_OVER">
+      <UniqueIdentifier>{f301979e-4daa-4f13-8953-0793676031d9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Partner.cpp">
@@ -86,9 +89,6 @@
     </ClCompile>
     <ClCompile Include="Obstacle.cpp">
       <Filter>ObjectClass\Obstacle</Filter>
-    </ClCompile>
-    <ClCompile Include="EXP_OVER.cpp">
-      <Filter>NetWork</Filter>
     </ClCompile>
     <ClCompile Include="SocketManager.cpp">
       <Filter>NetWork</Filter>
@@ -135,6 +135,9 @@
     <ClCompile Include="TimerManager.cpp">
       <Filter>NetWork\TimerManager</Filter>
     </ClCompile>
+    <ClCompile Include="EXP_OVER.cpp">
+      <Filter>NetWork\EXP_OVER</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="fallen_chicken.lua">
@@ -171,9 +174,6 @@
     </ClInclude>
     <ClInclude Include="Npc.h">
       <Filter>ObjectClass\Npc</Filter>
-    </ClInclude>
-    <ClInclude Include="EXP_OVER.h">
-      <Filter>NetWork</Filter>
     </ClInclude>
     <ClInclude Include="protocol.h">
       <Filter>NetWork</Filter>
@@ -240,6 +240,9 @@
     </ClInclude>
     <ClInclude Include="TimerManager.h">
       <Filter>NetWork\TimerManager</Filter>
+    </ClInclude>
+    <ClInclude Include="EXP_OVER.h">
+      <Filter>NetWork\EXP_OVER</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

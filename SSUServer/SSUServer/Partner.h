@@ -43,5 +43,5 @@ public:
     bool check_inside(pos a, pos b, pos c, pos n);
     bool isInsideTriangle(pos a, pos b, pos c, pos n);
 
-
+    int get_party_id();
 };

@@ -3,6 +3,28 @@
 #include "AllJobHeader.h"
 #include "TimerManager.h"
 
+bool check_inside(Coord a, Coord b, Coord c, Coord n) {
+    Coord A, B, C;
+    A.x = b.x - a.x;
+    A.z = b.z - a.z;
+    B.x = c.x - a.x;
+    B.z = c.z - a.z;
+    C.x = n.x - a.x;
+    C.z = n.z - a.z;
+
+    if ((A.x * B.z - A.z * B.x) * (A.x * C.z - A.z * C.x) < 0)
+        return false;
+    return true;
+}
+
+bool isInsideTriangle(Coord a, Coord b, Coord c, Coord n)
+{
+    if (!check_inside(a, b, c, n)) return false;
+    if (!check_inside(b, c, a, n)) return false;
+    if (!check_inside(c, a, b, n)) return false;
+    return true;
+}
+
 PacketManager::PacketManager(ObjectManager* objectManager, SectorManager* sectorManager, HANDLE* iocp)
 {
 	m_ObjectManger = objectManager;
@@ -324,9 +346,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
         packet.move_time = pl->last_move_time;
         break;
     }
-    case CS_PACKET_SKILL: { break; }
-    /* {
-
+    case CS_PACKET_SKILL:{
         if (pl->get_mp() - 1000 < 0)  //mp없으면 안됨 
             return;
         pl->state_lock.lock();
@@ -354,12 +374,9 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 {
                 case 0: { //물리 공격스킬 중 0번 스킬 -> 십자공격 어택 
                     skill_cooltime(client_id, chrono::system_clock::now() + 3s, 0);
-
                     pl->set_mp(pl->get_mp() - 1000);
                     send_status_change_packet(pl);
                     if (!pl->join_dungeon_room) {
-
-
                         for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
                             players[i]->state_lock.lock();
                             if (players[i]->get_state() != ST_INGAME) {
@@ -371,7 +388,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
 
                             if ((players[i]->get_x() >= pl->get_x() - 10 && players[i]->get_x() <= pl->get_x() + 10) && (players[i]->get_z() >= pl->get_z() - 10 && players[i]->get_z() <= pl->get_z() + 10)) {
                                 pl->set_skill_factor(packet->skill_type, packet->skill_num);
-                                physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
+                                pl->phisical_skill_success(players[i], pl->get_skill_factor(packet->skill_type, packet->skill_num));
                                 players[i]->set_target_id(pl->get_id());
                                 //send_status_change_packet(pl);
                                 if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
@@ -381,16 +398,17 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                     ev.start_time = chrono::system_clock::now() + 1s;
                                     ev.ev = EVENT_NPC_ATTACK;
                                     ev.target_id = players[i]->get_target_id();
-                                    timer_queue.push(ev);
+                                    TimerManager::timer_queue.push(ev);
 
-                                    Activate_Npc_Move_Event(i, pl->get_id());
+                                    players[i]->push_npc_move_event();
                                 }
                             }
                         }
                     }
                     else {
                         int indun_id = pl->get_indun_id();
-                        Npc* bos = dungeons[indun_id]->boss;
+                        Gaia* indun = m_ObjectManger->get_dungeon(indun_id);
+                        Npc* bos = indun->boss;
                         if ((bos->get_x() >= pl->get_x() - 10 && bos->get_x() <= pl->get_x() + 10) && (bos->get_z() >= pl->get_z() - 10 && bos->get_z() <= pl->get_z() + 10)) {
                             pl->set_skill_factor(0, 0);
                             float give_damage = pl->get_physical_attack() * pl->get_skill_factor(0, 0);
@@ -403,11 +421,11 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                 // physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
                                 //send_status_change_packet(pl);
                                 for (int i = 0; i < GAIA_ROOM; ++i) {
-                                    send_change_hp_packet(dungeons[client_id]->get_party_palyer()[i], dungeons[client_id]->boss);
+                                    send_change_hp_packet(indun->get_party_palyer()[i], indun->boss);
                                 }
                                 if (bos->get_hp() < 0) {
                                     bos->set_hp(0);
-                                    dungeons[indun_id]->game_victory();
+                                    indun->game_victory();
                                 }
                             }
                         }
@@ -443,7 +461,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
 
                             if (isInsideTriangle(a, b, c, n)) {
                                 pl->set_skill_factor(packet->skill_type, packet->skill_num);
-                                magical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
+                                pl->magical_skill_success(players[i], pl->get_skill_factor(packet->skill_type, packet->skill_num));
                                 players[i]->set_target_id(pl->get_id());
                                 //send_status_change_packet(pl);
                                 if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
@@ -453,15 +471,16 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                     ev.start_time = chrono::system_clock::now() + 1s;
                                     ev.ev = EVENT_NPC_ATTACK;
                                     ev.target_id = players[i]->get_target_id();
-                                    timer_queue.push(ev);
-                                    Activate_Npc_Move_Event(i, pl->get_id());
+                                    TimerManager::timer_queue.push(ev);
+                                    players[i]->push_npc_move_event();
                                 }
                             }
                         }
                     }
                     else {
                         int indun_id = pl->get_indun_id();
-                        Npc* bos = dungeons[indun_id]->boss;
+                        Gaia* indun = m_ObjectManger->get_dungeon(indun_id);
+                        Npc* bos = indun->boss;
                         Coord n = { bos->get_x(), bos->get_z() };
 
                         if (isInsideTriangle(a, b, c, n)) {
@@ -475,11 +494,11 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                 bos->set_hp(bos->get_hp() - damage);
                                 //send_status_change_packet(pl);
                                 for (int i = 0; i < GAIA_ROOM; ++i) {
-                                    send_change_hp_packet(dungeons[client_id]->get_party_palyer()[i], dungeons[client_id]->boss);
+                                    send_change_hp_packet(indun->get_party_palyer()[i], indun->boss);
                                 }
                                 if (bos->get_hp() < 0) {
                                     bos->set_hp(0);
-                                    dungeons[indun_id]->game_victory();
+                                    indun->game_victory();
                                 }
                             }
                         }
@@ -533,7 +552,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
 
                             if ((players[i]->get_x() >= pl->get_x() - 15 && players[i]->get_x() <= pl->get_x() + 15) && (players[i]->get_z() >= pl->get_z() - 15 && players[i]->get_z() <= pl->get_z() + 15)) {
                                 pl->set_skill_factor(packet->skill_type, packet->skill_num);
-                                physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
+                                pl->phisical_skill_success(players[i], pl->get_skill_factor(packet->skill_type, packet->skill_num));
 
                                 players[i]->set_pos(players[i]->get_x() + pl->get_look_x() * 40, players[i]->get_z() + pl->get_look_z() * 40);
                                 send_move_packet(pl, players[i], 1);  //나중에 수정필요 
@@ -546,16 +565,16 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                     ev.start_time = chrono::system_clock::now() + 3s;
                                     ev.ev = EVENT_NPC_ATTACK;
                                     ev.target_id = players[i]->get_target_id();
-                                    timer_queue.push(ev);
-
-                                    Activate_Npc_Move_Event(i, pl->get_id());
+                                    TimerManager::timer_queue.push(ev);
+                                    players[i]->push_npc_move_event();
                                 }
                             }
                         }
                     }
                     else {
                         int indun_id = pl->get_indun_id();
-                        Npc* bos = dungeons[indun_id]->boss;
+                        Gaia* indun = m_ObjectManger->get_dungeon(indun_id);
+                        Npc* bos = indun->boss;
                         if ((bos->get_x() >= pl->get_x() - 15 && bos->get_x() <= pl->get_x() + 15) &&
                             (bos->get_z() >= pl->get_z() - 15 && bos->get_z() <= pl->get_z() + 15)) {
                             pl->set_skill_factor(0, 0);
@@ -565,16 +584,16 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                     bos->get_physical_defence()));
                             float damage = give_damage * (1 - defence_damage);
                             if (bos->get_hp() > 0) {
-                                bos->set_pos(dungeons[client_id]->boss->get_x() + pl->get_look_x() * 100, dungeons[client_id]->boss->get_z() + pl->get_look_z() * 100);
-                                bos->set_hp(dungeons[client_id]->boss->get_hp() - damage);
+                                bos->set_pos(indun->boss->get_x() + pl->get_look_x() * 100, indun->boss->get_z() + pl->get_look_z() * 100);
+                                bos->set_hp(indun->boss->get_hp() - damage);
                                 //send_move_packet(pl, dungeons[client_id]->boss, 1);  //나중에 수정필요 
                                 for (int i = 0; i < GAIA_ROOM; ++i) {
-                                    send_change_hp_packet(dungeons[client_id]->get_party_palyer()[i], dungeons[client_id]->boss);
+                                    send_change_hp_packet(indun->get_party_palyer()[i], indun->boss);
                                 }
                                 send_status_change_packet(pl);
                                 if (bos->get_hp() < 0) {
                                     bos->set_hp(0);
-                                    dungeons[indun_id]->game_victory();
+                                    indun->game_victory();
                                 }
                             }
                         }
@@ -612,18 +631,19 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                     ev.start_time = chrono::system_clock::now() + 1s;
                                     ev.ev = EVENT_NPC_ATTACK;
                                     ev.target_id = client_id;
-                                    timer_queue.push(ev);
-                                    Activate_Npc_Move_Event(i, pl->get_id());
+                                    TimerManager::timer_queue.push(ev);
+                                    players[i]->push_npc_move_event();
                                 }
                             }
                         }
                     }
                     else {
                         int indun_id = pl->get_indun_id();
-                        if ((dungeons[indun_id]->get_x() >= pl->get_x() - 40 && dungeons[indun_id]->get_x() <= pl->get_x() + 40) &&
-                            (dungeons[indun_id]->get_z() >= pl->get_z() - 40 && dungeons[indun_id]->get_z() <= pl->get_z() + 40)) {
+                        Gaia* indun = m_ObjectManger->get_dungeon(indun_id);
+                        if ((indun->get_x() >= pl->get_x() - 40 && indun->get_x() <= pl->get_x() + 40) &&
+                            (indun->get_z() >= pl->get_z() - 40 && indun->get_z() <= pl->get_z() + 40)) {
                             pl->set_skill_factor((int)packet->skill_type, (int)packet->skill_num);
-                            dungeons[indun_id]->target_id = pl->get_indun_id();
+                            indun->target_id = pl->get_indun_id();
                         }
                     }
                     break;
@@ -680,29 +700,30 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                     }
                     else {
                         int indun_id = pl->get_indun_id();
+                        Gaia* indun = m_ObjectManger->get_dungeon(indun_id);
                         int tmp_hp = 0;
                         int target_player = 0;
                         for (int i = 0; i < GAIA_ROOM; i++) {
                             if (i == 0) {
                                 target_player = i;
-                                tmp_hp = dungeons[indun_id]->get_party_palyer()[i]->get_hp();
+                                tmp_hp = indun->get_party_palyer()[i]->get_hp();
                             }
                             else {
-                                if (tmp_hp > dungeons[indun_id]->get_party_palyer()[i]->get_hp()) {
+                                if (tmp_hp > indun->get_party_palyer()[i]->get_hp()) {
                                     target_player = i;
-                                    tmp_hp = dungeons[indun_id]->get_party_palyer()[i]->get_hp();
+                                    tmp_hp = indun->get_party_palyer()[i]->get_hp();
                                 }
                             }
                         }
                         pl->set_mp(pl->get_mp() - 1000);
                         send_status_change_packet(pl);
-                        send_buff_ui_packet(dungeons[indun_id]->get_party_palyer()[target_player], 2); //ui
-                        dungeons[indun_id]->get_party_palyer()[target_player]->set_hp(dungeons[indun_id]->get_party_palyer()[target_player]->get_hp() + dungeons[indun_id]->get_party_palyer()[target_player]->get_maxhp() / 10);
-                        if (dungeons[indun_id]->get_party_palyer()[target_player]->get_hp() > dungeons[indun_id]->get_party_palyer()[target_player]->get_maxhp())
-                            dungeons[indun_id]->get_party_palyer()[target_player]->set_hp(dungeons[indun_id]->get_party_palyer()[target_player]->get_maxhp());
+                        send_buff_ui_packet(indun->get_party_palyer()[target_player], 2); //ui
+                        indun->get_party_palyer()[target_player]->set_hp(indun->get_party_palyer()[target_player]->get_hp() + indun->get_party_palyer()[target_player]->get_maxhp() / 10);
+                        if (indun->get_party_palyer()[target_player]->get_hp() > indun->get_party_palyer()[target_player]->get_maxhp())
+                            indun->get_party_palyer()[target_player]->set_hp(indun->get_party_palyer()[target_player]->get_maxhp());
 
                         for (int i = 0; i < GAIA_ROOM; ++i) {
-                            send_change_hp_packet(dungeons[indun_id]->get_party_palyer()[i], dungeons[indun_id]->get_party_palyer()[target_player]);
+                            send_change_hp_packet(indun->get_party_palyer()[i], indun->get_party_palyer()[target_player]);
                         }
                     }
                     break;
@@ -731,28 +752,29 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                     }
                     else {
                         int indun_id = pl->get_indun_id();
+                        Gaia* indun = m_ObjectManger->get_dungeon(indun_id);
                         int tmp_mp = 0;
                         int target_player = 0;
                         for (int i = 0; i < GAIA_ROOM; i++) {
                             if (i == 0) {
                                 target_player = i;
-                                tmp_mp = dungeons[indun_id]->get_party_palyer()[i]->get_mp();
+                                tmp_mp = indun->get_party_palyer()[i]->get_mp();
                             }
                             else {
-                                if (tmp_mp > dungeons[indun_id]->get_party_palyer()[i]->get_mp()) {
+                                if (tmp_mp > indun->get_party_palyer()[i]->get_mp()) {
                                     target_player = i;
-                                    tmp_mp = dungeons[indun_id]->get_party_palyer()[i]->get_mp();
+                                    tmp_mp = indun->get_party_palyer()[i]->get_mp();
                                 }
                             }
                         }
                         pl->set_mp(pl->get_mp() - 1000);
                         send_status_change_packet(pl);
-                        send_buff_ui_packet(dungeons[indun_id]->get_party_palyer()[target_player], 0); //ui
-                        dungeons[indun_id]->get_party_palyer()[target_player]->set_mp(dungeons[indun_id]->get_party_palyer()[target_player]->get_mp() + dungeons[indun_id]->get_party_palyer()[target_player]->get_maxmp() / 10);
-                        if (dungeons[indun_id]->get_party_palyer()[target_player]->get_mp() > dungeons[indun_id]->get_party_palyer()[target_player]->get_maxmp())
-                            dungeons[indun_id]->get_party_palyer()[target_player]->set_mp(dungeons[indun_id]->get_party_palyer()[target_player]->get_maxmp());
+                        send_buff_ui_packet(indun->get_party_palyer()[target_player], 0); //ui
+                        indun->get_party_palyer()[target_player]->set_mp(indun->get_party_palyer()[target_player]->get_mp() + indun->get_party_palyer()[target_player]->get_maxmp() / 10);
+                        if (indun->get_party_palyer()[target_player]->get_mp() > indun->get_party_palyer()[target_player]->get_maxmp())
+                            indun->get_party_palyer()[target_player]->set_mp(indun->get_party_palyer()[target_player]->get_maxmp());
                         for (int i = 0; i < GAIA_ROOM; ++i) {
-                            send_change_mp_packet(dungeons[indun_id]->get_party_palyer()[i], dungeons[indun_id]->get_party_palyer()[target_player]);
+                            send_change_mp_packet(indun->get_party_palyer()[i], indun->get_party_palyer()[target_player]);
                         }
                     }
                     break;
@@ -779,9 +801,10 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                         }
                     }
                     else {
+                        Gaia* indun = m_ObjectManger->get_dungeon(pl->get_indun_id());
                         for (int i = 0; i < GAIA_ROOM; ++i) {
-                            dungeons[pl->get_indun_id()]->get_party_palyer()[i]->attack_speed_up = true;
-                            send_buff_ui_packet(dungeons[pl->get_indun_id()]->get_party_palyer()[i], 4);
+                            indun->get_party_palyer()[i]->attack_speed_up = true;
+                            send_buff_ui_packet(indun->get_party_palyer()[i], 4);
                         }
                     }
                     break;
@@ -829,7 +852,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
 
 
                             pl->set_skill_factor((int)packet->skill_type, (int)packet->skill_num);
-                            magical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor((int)packet->skill_type, (int)packet->skill_num));
+                            pl->magical_skill_success(players[i], pl->get_skill_factor((int)packet->skill_type, (int)packet->skill_num));
                             players[i]->set_target_id(pl->get_id());
                             send_status_change_packet(pl);
                             send_status_change_packet(reinterpret_cast<Player*>(players[i]));
@@ -840,9 +863,8 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                 ev.start_time = chrono::system_clock::now() + 1s;
                                 ev.ev = EVENT_NPC_ATTACK;
                                 ev.target_id = players[i]->get_target_id();
-                                timer_queue.push(ev);
-
-                                Activate_Npc_Move_Event(i, pl->get_id());
+                                TimerManager::timer_queue.push(ev);
+                                players[i]->push_npc_move_event();
                             }
                         }
                     }
@@ -886,7 +908,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
 
                             pl->set_skill_factor((int)packet->skill_type, (int)packet->skill_num);
                             players[i]->set_target_id(pl->get_id());
-                            magical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor((int)packet->skill_type, (int)packet->skill_num));
+                            pl->magical_skill_success(players[i], pl->get_skill_factor((int)packet->skill_type, (int)packet->skill_num));
                             send_play_effect_packet(pl, players[i]); // 이펙트 터트릴 위치 
 
 
@@ -898,9 +920,8 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                 ev.start_time = chrono::system_clock::now() + 1s;
                                 ev.ev = EVENT_NPC_ATTACK;
                                 ev.target_id = players[i]->get_target_id();
-                                timer_queue.push(ev);
-
-                                Activate_Npc_Move_Event(i, pl->get_id());
+                                TimerManager::timer_queue.push(ev);
+                                players[i]->push_npc_move_event();
                             }
 
                         }
@@ -920,7 +941,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
         }
         send_animation_skill(pl, pl->get_id(), (int)packet->skill_num);
         break;
-    } */
+    }
     case CS_PACKET_LOOK: {
         pl->state_lock.lock();
         if (pl->get_state() == ST_DEAD || pl->get_state() == ST_FREE) {
@@ -1386,6 +1407,12 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
             partner->set_basic_attack_factor(50.0f);
             partner->set_defence_factor(0.0002);
             partner->set_element(E_WATER);
+
+            partner->set_origin_physical_attack(partner->get_physical_attack());
+            partner->set_origin_magical_attack(partner->get_magical_attack());
+            partner->set_origin_physical_defence(partner->get_physical_defence());
+            partner->set_origin_magical_defence(partner->get_magical_defence());
+
             //  여기까지 클라에서 패킷 받으면, 새 player id 생성 후 정보 초기화  
 
             // join dungeon party
@@ -1417,3 +1444,5 @@ void PacketManager::skill_cooltime(int client_id, chrono::system_clock::time_poi
     ev.target_id = skill_id;
     TimerManager::timer_queue.push(ev);
 }
+
+

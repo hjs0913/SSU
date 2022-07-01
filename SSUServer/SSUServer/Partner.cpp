@@ -18,6 +18,8 @@ Partner::Partner(int d_id) : Player(d_id)
 	int nearest_num = 0;
 	move_once = false;
 	
+	party_id = 0;
+
 }
 
 Partner::~Partner()
@@ -39,6 +41,7 @@ bool Partner::check_inside(pos a, pos b, pos c, pos n)
 		return false;
 	return true;
 }
+
 bool Partner::isInsideTriangle(pos a, pos b, pos c, pos n)
 {
 	if (!check_inside(a, b, c, n)) return false;
@@ -784,4 +787,9 @@ void Partner::partner_normal_attack(Partner* pa, Gaia* gaia)
 			}
 		}
 	}
+}
+
+int Partner::get_party_id()
+{
+	return party_id;
 }

@@ -13,6 +13,12 @@ void Supporter::Initialize(Player* pl)
     pl->set_magical_defence(0.24 * lv * lv + 10 * lv);
     pl->set_basic_attack_factor(50.0f);
     pl->set_defence_factor(0.0002);
+
+    pl->set_origin_physical_attack(pl->get_physical_attack());
+    pl->set_origin_magical_attack(pl->get_magical_attack());
+    pl->set_origin_physical_defence(pl->get_physical_defence());
+    pl->set_origin_magical_defence(pl->get_magical_defence());
+
 }
 
 void Supporter::first_skill(Player* pl, Npc* target)
