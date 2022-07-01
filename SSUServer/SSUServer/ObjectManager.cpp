@@ -12,6 +12,8 @@ ObjectManager::ObjectManager(SectorManager* sectorManager, MainSocketManager* so
     s_socket = socket->get_socket();
     h_iocp =  socket->get_iocp();
 
+    static_ObjectManager::set_objManger(this);
+
     for (int i = 0; i < MAX_USER; ++i) {
         players[i] = new Player(i);
     }
@@ -23,6 +25,10 @@ ObjectManager::ObjectManager(SectorManager* sectorManager, MainSocketManager* so
     Initialize_Dungeons();
 
     m_SectorManager->set_players_object(players);
+
+    for (int i = NPC_ID_START; i < NPC_ID_END; i++) {
+        m_SectorManager->player_put(players[i]);
+    }
 }
 
 void ObjectManager::Initialize_Npc()
@@ -30,40 +36,34 @@ void ObjectManager::Initialize_Npc()
     const int interval = 30;
     int npc_num = 0;
 
-    for (int i = NPC_ID_START + interval*npc_num; i < NPC_ID_START + +interval * (npc_num+1); i++) {
+    for (int i = NPC_ID_START + interval*npc_num; i < NPC_ID_START + interval * (npc_num+1); i++) {
         players[i] = new Npc(i);
         players[i]->Initialize_Lua("fallen_flog.lua");
-        m_SectorManager->player_put(players[i]);
     }
     npc_num++;
-    for (int i = NPC_ID_START + interval * npc_num; i < NPC_ID_START + +interval * (npc_num + 1); i++) {
+    for (int i = NPC_ID_START + interval * npc_num; i < NPC_ID_START + interval * (npc_num + 1); i++) {
         players[i] = new Npc(i);
         players[i]->Initialize_Lua("fallen_chicken.lua");
-        m_SectorManager->player_put(players[i]);
     }
     npc_num++;
-    for (int i = NPC_ID_START + interval * npc_num; i < NPC_ID_START + +interval * (npc_num + 1); i++) {
+    for (int i = NPC_ID_START + interval * npc_num; i < NPC_ID_START + interval * (npc_num + 1); i++) {
         players[i] = new Npc(i);
         players[i]->Initialize_Lua("fallen_rabbit.lua");
-        m_SectorManager->player_put(players[i]);
     }
     npc_num++;
-    for (int i = NPC_ID_START + interval * npc_num; i < NPC_ID_START + +interval * (npc_num + 1); i++) {
+    for (int i = NPC_ID_START + interval * npc_num; i < NPC_ID_START + interval * (npc_num + 1); i++) {
         players[i] = new Npc(i);
         players[i]->Initialize_Lua("fallen_monkey.lua");
-        m_SectorManager->player_put(players[i]);
     }
     npc_num++;
-    for (int i = NPC_ID_START + interval * npc_num; i < NPC_ID_START + +interval * (npc_num + 1); i++) {
+    for (int i = NPC_ID_START + interval * npc_num; i < NPC_ID_START + interval * (npc_num + 1); i++) {
         players[i] = new Npc(i);
         players[i]->Initialize_Lua("wolf_boss.lua");
-        m_SectorManager->player_put(players[i]);
     }
     npc_num++;
-    for (int i = NPC_ID_START + interval * npc_num; i < NPC_ID_START + +interval * (npc_num + 1); i++) {
+    for (int i = NPC_ID_START + interval * npc_num; i < NPC_ID_START + interval * (npc_num + 1); i++) {
         players[i] = new Npc(i);
         players[i]->Initialize_Lua("fallen_tiger.lua");
-        m_SectorManager->player_put(players[i]);
     }
     npc_num++;
     cout << "NPC 초기화 완료" << endl;
@@ -330,11 +330,10 @@ void ObjectManager::worker()
                 players[exp_over->_target]->state_lock.lock();
                 if (players[exp_over->_target]->get_state() == ST_DEAD) {
                     players[exp_over->_target]->state_lock.unlock();
-                    m_SectorManager->player_erase(players[exp_over->_target]);
+                    m_SectorManager->player_remove(players[exp_over->_target], true, players[client_id]);
                 }
                 else {  // target의 피 변화량을 주위 사람들에게 보내주어야함
                     players[exp_over->_target]->state_lock.unlock();
-
                 }
 
             }
@@ -787,7 +786,6 @@ void ObjectManager::set_packetManager(PacketManager* packetManager)
 {
     m_PacketManager = packetManager;
     m_PacketManager->set_players_object(players);
-    cout << players[0] << endl;
 }
 
 int ObjectManager::get_new_id()

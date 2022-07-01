@@ -32,7 +32,7 @@ int main()
     m_ObjectManager.set_packetManager(&m_PacketManager);
     TimerManager m_TimerManager(s_socket.get_iocp());
 
-    static_ObjectManager::set_objManger(&m_ObjectManager);
+    //static_ObjectManager::set_objManger(&m_ObjectManager);
 
     // 멀티 쓰레드 생성
     vector <thread> worker_threads;

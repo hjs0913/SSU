@@ -119,7 +119,7 @@ void send_login_packet(char* id, char* password)
 	packet.job = 0;
 	strcpy_s(packet.password, password);
 	strcpy_s(packet.id, id);
-	strcpy_s(packet.name, "temp");
+	strcpy_s(packet.name, id);
 	do_send(sizeof(packet), &packet);
 }
 

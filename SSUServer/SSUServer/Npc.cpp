@@ -1,9 +1,11 @@
+#include "TimerManager.h"
 #include "Npc.h"
 #include "send.h"
 #include "LuaFunction.h"
-#include "TimerManager.h"
 #include <queue>
 #include <random>
+
+default_random_engine dre(std::chrono::system_clock::now().time_since_epoch().count());
 
 Npc::Npc(int id)
 {
@@ -72,7 +74,6 @@ void Npc::Initialize_Lua(const char* f_lua)
 
 	lua_getglobal(L, "Initailize_position");
 	error = lua_pcall(L, 0, 4, 0);
-	default_random_engine dre;
 	uniform_int_distribution<int> rng_x(lua_tointeger(L, -4), lua_tointeger(L, -3));
 	uniform_int_distribution<int> rng_z(lua_tointeger(L, -2), lua_tointeger(L, -1));
 	lua_pop(L, 5);

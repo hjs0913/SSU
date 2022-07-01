@@ -1,7 +1,7 @@
+#include "TimerManager.h"
 #include "Player.h"
 #include "send.h"
 #include "Gaia.h"
-#include "TimerManager.h"
 
 Player::Player(int id) : Npc(id)
 {
@@ -123,6 +123,9 @@ void Player::attack_dead_judge(Npc* target)
 			_exp = _exp + get_exp;
 		}
 		send_status_change_packet(this);
+
+
+
 	}
 	else {
 		//if (target->get_id() == 1180) { // 던전상황

@@ -40,6 +40,7 @@ protected:
 
 public:
 	mutex	state_lock;
+	mutex	sector_lock;
 
 	mutex		        vl;
 	unordered_set<int>	viewlist;

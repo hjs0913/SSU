@@ -47,7 +47,7 @@ const int  WORLD_HEIGHT = 4000;
 const int  WORLD_WIDTH = 4000;
 const int  MAX_NAME_SIZE = 20;
 const int  MAX_CHAT_SIZE = 100;
-const int  MAX_USER = 1000;
+const int  MAX_USER = 6000;
 // const int  MAX_NPC = 200000;
 const int  MAX_NPC = 180;		// 디버깅 용
 constexpr int NPC_ID_START = MAX_USER;
@@ -284,6 +284,7 @@ struct sc_packet_move {
 	char type;
 	int		id;
 	float  x, y, z;
+	float  lx, ly, lz;
 	int		move_time;
 	unsigned char move_right;		// 0 : 위치 수정, 1 : 유효성 올바름
 };

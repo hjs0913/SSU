@@ -13,7 +13,6 @@ PacketManager::PacketManager(ObjectManager* objectManager, SectorManager* sector
 void PacketManager::set_players_object(array <Npc*, MAX_USER + MAX_NPC>& pls)
 {
     players = pls;
-    cout << players[0] << endl;
 }
 
 void PacketManager::process_packet(Player* pl, unsigned char* p)
@@ -252,6 +251,18 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
             if (n->get_x() >= pl->get_x() - 20 && n->get_x() <= pl->get_x() + 20) {
                 if (n->get_z() >= pl->get_z() - 20 && n->get_z() <= pl->get_z() + 20) {
                     pl->basic_attack_success(n);
+
+                    // 죽었다면 섹터에서 제거해 주어야 함
+                    n->state_lock.lock();
+                    if (n->get_state() == ST_DEAD) {
+                        n->state_lock.unlock();
+                        m_SectorManager->player_remove(n, true, players[client_id]);
+                    }
+                    else {  // target의 피 변화량을 주위 사람들에게 보내주어야함
+                        n->state_lock.unlock();
+                    }
+
+
                     // 몬스터의 자동공격을 넣어주자
                     n->set_target_id(pl->get_id());
                     if (n->get_active() == false && n->get_tribe() == MONSTER) {
@@ -300,7 +311,6 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
         break;
     }
     case CS_PACKET_TELEPORT: {
-        cout << client_id << endl;
         pl->set_x(rand() % WORLD_WIDTH);
         //pl->set_y(rand() % WORLD_HEIGHT);
         pl->set_z(rand() % WORLD_HEIGHT);

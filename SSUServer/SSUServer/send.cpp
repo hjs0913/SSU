@@ -31,6 +31,9 @@ void send_move_packet(Player* pl, Npc* mover, int right)
     packet.x = mover->get_x();
     packet.y = mover->get_y();
     packet.z = mover->get_z();
+    packet.lx = mover->get_look_x();
+    packet.ly = mover->get_look_y();
+    packet.lz = mover->get_look_z();
     packet.move_time =  pl->last_move_time;
     packet.move_right = right;
     pl->do_send(sizeof(packet), &packet);
