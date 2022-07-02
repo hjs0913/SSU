@@ -2548,11 +2548,11 @@ void process_packet(int client_id, unsigned char* p)
             partner->set_origin_magical_defence(partner->get_magical_defence());
 
             partner->indun_player_cnt = dun->player_cnt + dun->partner_cnt;
-           // dun->player_cnt++;
-            //  여기까지 클라에서 패킷 받으면, 새 player id 생성 후 정보 초기화  
+            // dun->player_cnt++;
+             //  여기까지 클라에서 패킷 받으면, 새 player id 생성 후 정보 초기화  
 
-            // join dungeon party
-            // 이 방에 이 플레이어를 집어 넣는다
+             // join dungeon party
+             // 이 방에 이 플레이어를 집어 넣는다
             dun->partner_cnt++;
             dun->join_player(reinterpret_cast<Player*>(players[new_id]));
 
@@ -2565,7 +2565,9 @@ void process_packet(int client_id, unsigned char* p)
         }
         else
             break;
+        break;
     }
+        
     case CS_PACKET_RE_LOGIN: {
         cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(p);
 
@@ -4255,9 +4257,9 @@ void do_timer()
             }  
             else if (temp.ev == EVENT_PARTNER_SKILL) {
     
-                int indun_id = reinterpret_cast<Player*>(players[temp.target_id])->get_indun_id();  //바꿔야함!
-         
-                switch (dungeons[indun_id]->get_party_palyer()[temp.obj_id]->get_job())
+                int indun_id = reinterpret_cast<Player*>(players[temp.obj_id])->get_indun_id();  //바꿔야함
+
+                switch (reinterpret_cast<Player*>(players[temp.obj_id])->get_job())
                 {
                 case J_DILLER: {
                         for (int i = 0; i < GAIA_ROOM; ++i) {
@@ -4341,9 +4343,9 @@ void do_timer()
                 }
                 else if (ev.ev == EVENT_PARTNER_SKILL) {
 
-                    int indun_id = reinterpret_cast<Player*>(players[ev.target_id])->get_indun_id();  //바꿔야함
+                    int indun_id = reinterpret_cast<Player*>(players[ev.obj_id])->get_indun_id();  //바꿔야함
            
-                    switch (dungeons[indun_id]->get_party_palyer()[ev.obj_id]->get_job())
+                    switch (reinterpret_cast<Player*>(players[ev.obj_id])->get_job()) 
                     {
                     case J_DILLER: {
                         for (int i = 0; i < GAIA_ROOM; ++i) {
