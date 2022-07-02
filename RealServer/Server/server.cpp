@@ -237,7 +237,7 @@ void magical_skill_success(int p_id, int target, float skill_factor)
 
             send_status_change_packet(reinterpret_cast<Player*>(players[p_id]));
 
-            int max_exp = 100 * pow(2, (players[p_id]->get_lv() - 1));
+            float max_exp = 100 * pow(2, (players[p_id]->get_lv() - 1));
             if (reinterpret_cast<Player*>(players[p_id])->get_exp() + get_exp >= max_exp) {
                 players[p_id]->set_lv(players[p_id]->get_lv() + 1);
                 reinterpret_cast<Player*>(players[p_id])->
@@ -392,7 +392,7 @@ void physical_skill_success(int p_id, int target, float skill_factor)
 
             send_status_change_packet(reinterpret_cast<Player*>(players[p_id]));
 
-            int max_exp = 100 * pow(2, (players[p_id]->get_lv() - 1));
+            float max_exp = 100 * pow(2, (players[p_id]->get_lv() - 1));
             if (reinterpret_cast<Player*>(players[p_id])->get_exp() + get_exp >= max_exp) {
                 players[p_id]->set_lv(players[p_id]->get_lv() + 1);
                 reinterpret_cast<Player*>(players[p_id])->
@@ -630,7 +630,8 @@ void attack_success(Npc* p, Npc* target, float atk_factor)
 
             send_status_change_packet(reinterpret_cast<Player*>(p));
 
-            int max_exp = 100 * pow(2, (p->get_lv() - 1));
+            float max_exp = 100 * pow(2, (p->get_lv() - 1));
+            cout << max_exp << endl;
             if (reinterpret_cast<Player*>(p)->get_exp() + get_exp >= max_exp) {
                 p->set_lv(p->get_lv() + 1);
                 reinterpret_cast<Player*>(p)->
