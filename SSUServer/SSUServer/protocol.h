@@ -9,7 +9,7 @@ enum COMP_OP {
 	OP_PLAYER_ATTACK, OP_NPC_AGRO, OP_ELEMENT_COOLTIME,
 	OP_BOSS_MOVE, OP_BOSS_ATTACK, OP_GAIA_PATTERN,
 	OP_PARTNER_MOVE, OP_PARTNER_SKILL, OP_PARTNER_NORMAL_ATTACK, OP_GAMESTART_TIMER,
-	OP_FINISH_RAID
+	OP_FINISH_RAID, OP_SKILL_COOLTIME
 };
 enum EVENT_TYPE {
 	EVENT_NPC_MOVE, EVENT_NPC_ATTACK, EVENT_AUTO_PLAYER_HP,
@@ -47,11 +47,13 @@ const int  WORLD_HEIGHT = 4000;
 const int  WORLD_WIDTH = 4000;
 const int  MAX_NAME_SIZE = 20;
 const int  MAX_CHAT_SIZE = 100;
-const int  MAX_USER = 6000;
+const int  MAX_USER = 1000;
 // const int  MAX_NPC = 200000;
 const int  MAX_NPC = 180;		// µð¹ö±ë ¿ë
+const int  MAX_DUNGEONS = 1000;
 constexpr int NPC_ID_START = MAX_USER;
 constexpr int NPC_ID_END = MAX_USER + MAX_NPC - 1;
+const int NPC_INTERVAL = 30;
 constexpr int GAIA_ID = MAX_USER + MAX_NPC;
 const int GAIA_ROOM = 4;
 
@@ -78,7 +80,6 @@ const char CS_PACKET_PARTY_INVITE = 19;
 const char CS_PACKET_PARTY_INVITATION_REPLY = 20;
 const char CS_PACKET_PARTY_ADD_PARTNER = 21;
 const char CS_PACKET_RE_LOGIN = 22;
-
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -262,6 +263,7 @@ struct cs_packet_party_add_partner {
 	unsigned char room_id;
 	unsigned char job;
 };
+
 
 //---------------------------------------------
 struct sc_packet_login_ok {

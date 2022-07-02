@@ -39,6 +39,10 @@ StressTest/.vs
 StressTest/x64
 StressTest/dummy_client/x64
 
+SSUServer/.vs
+SSUServer/Debug
+SSUServer/SSUServer/x64
+SSUServer/x64
 
 *.exe
 *.pdb
