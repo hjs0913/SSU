@@ -4,9 +4,12 @@
 #include "SectorManager.h"
 #include "PacketManager.h"
 #include "TimerManager.h"
+#include "database.h"
 
 int main()
 {
+    Initialise_DB();
+
     // 소켓, 네트워크 초기화
 	setlocale(LC_ALL, "korean");
     wcout.imbue(locale("korean"));
@@ -44,6 +47,8 @@ int main()
         th.join();
     timer_thread.join();
 
+
+    m_ObjectManager.CloseServer();
 
     // 종료
     s_socket.CloseSocket();

@@ -47,7 +47,7 @@ const int  WORLD_HEIGHT = 4000;
 const int  WORLD_WIDTH = 4000;
 const int  MAX_NAME_SIZE = 20;
 const int  MAX_CHAT_SIZE = 100;
-const int  MAX_USER = 6000;
+const int  MAX_USER = 1000;
 // const int  MAX_NPC = 200000;
 const int  MAX_NPC = 180;		// µð¹ö±ë ¿ë
 const int  MAX_DUNGEONS = 1000;
@@ -79,7 +79,7 @@ const char CS_PACKET_PARTY_ROOM_QUIT_REQUEST = 18;
 const char CS_PACKET_PARTY_INVITE = 19;
 const char CS_PACKET_PARTY_INVITATION_REPLY = 20;
 const char CS_PACKET_PARTY_ADD_PARTNER = 21;
-
+const char CS_PACKET_RE_LOGIN = 22;
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -140,6 +140,9 @@ struct cs_packet_login {
 	char	id[MAX_NAME_SIZE];
 	char	name[MAX_NAME_SIZE];
 	char	job;
+	char    password[MAX_NAME_SIZE];
+	char	nickname[MAX_NAME_SIZE];
+	char	element;
 };
 
 struct cs_packet_move {

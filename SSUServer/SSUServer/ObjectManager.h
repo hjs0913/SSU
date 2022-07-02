@@ -39,6 +39,8 @@ public:
 	Npc* get_player(int c_id);
 	Gaia* get_dungeon(int d_id);
 	array<Gaia*, MAX_DUNGEONS>& get_dungeons();
+
+	void CloseServer();
 };
 
 class static_ObjectManager

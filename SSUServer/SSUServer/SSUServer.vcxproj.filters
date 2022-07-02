@@ -76,6 +76,9 @@
     <Filter Include="NetWork\EXP_OVER">
       <UniqueIdentifier>{f301979e-4daa-4f13-8953-0793676031d9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="NetWork\Database">
+      <UniqueIdentifier>{9ac3e937-bf23-4f7e-b286-bdeb44627b93}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Partner.cpp">
@@ -137,6 +140,9 @@
     </ClCompile>
     <ClCompile Include="EXP_OVER.cpp">
       <Filter>NetWork\EXP_OVER</Filter>
+    </ClCompile>
+    <ClCompile Include="database.cpp">
+      <Filter>NetWork\Database</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -243,6 +249,9 @@
     </ClInclude>
     <ClInclude Include="EXP_OVER.h">
       <Filter>NetWork\EXP_OVER</Filter>
+    </ClInclude>
+    <ClInclude Include="database.h">
+      <Filter>NetWork\Database</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

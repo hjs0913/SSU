@@ -2,6 +2,7 @@
 #include "send.h"
 #include "AllJobHeader.h"
 #include "TimerManager.h"
+#include "database.h"
 
 bool check_inside(Coord a, Coord b, Coord c, Coord n) {
     Coord A, B, C;
@@ -80,7 +81,25 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
             }
 
         }
+        // 데이터 베이스
+        pl->set_login_id(packet->id);
+        //데이터 베이스 
+        bool login = false;
+        login = Search_Id(pl, packet->id, packet->password);
+
+        if (login == false) {
+            send_login_fail_packet(pl, 2);
+            //  if (Add_DB(packet->id, packet->password, pl, packet->nickname, packet->job, packet->element) == true) {
+             //     pl->set_login_id(packet->id);
+             //     login = true;
+             // }
+            //  else
+            //      send_login_fail_packet(pl, 1);
+        }
+
+
         // 원래는 DB에서 받아와야 하는 정보를 기본 정보로 대체
+        /*
         pl->set_x(3210);
         pl->set_y(0);
         pl->set_z(940);
@@ -94,7 +113,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
 
         pl->indun_id - 1;
         pl->join_dungeon_room = false;
-
+        */
 
         // Stress Test용
         if (strcmp(packet->id, "admin") == 0) {
@@ -138,8 +157,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 pl->_auto_hp = true;
             }
         }
-
-        send_login_ok_packet(pl);
+        if(login == true) send_login_ok_packet(pl);
         pl->state_lock.lock();
         pl->set_state(ST_INGAME);
         pl->state_lock.unlock();
@@ -1429,6 +1447,107 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
         }
         else
             break;
+
+        break;
+    }
+    case CS_PACKET_RE_LOGIN: {
+        cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(p);
+        // 중복 아이디 검사
+        for (auto* p : players) {
+            if (p->get_tribe() != HUMAN) break;
+            if (p->get_state() == ST_FREE) continue;
+            if (p->get_id() == client_id) continue;
+            if (strcmp(packet->id, "admin") == 0) break;
+
+            if (strcmp(reinterpret_cast<Player*>(p)->get_login_id(), packet->id) == 0) {
+                cout << "중복된 아이디 접속 확인" << endl;
+                send_login_fail_packet(pl, 1);   // 중복 로그인
+                m_ObjectManger->Disconnect(client_id);
+                return;
+            }
+            if (strcmp(reinterpret_cast<Player*>(p)->get_name(), packet->name) == 0) {
+                cout << "중복된 닉네임 접속 확인" << endl;
+                send_login_fail_packet(pl, 1);   // 중복 로그인
+                m_ObjectManger->Disconnect(client_id);
+                return;
+            }
+
+        }
+        pl->set_login_id(packet->id);
+        //데이터 베이스 
+        bool login = false;
+        login = Add_DB(packet->id, packet->password, pl, packet->nickname, packet->job, packet->element);
+        if (login == false)
+            send_login_fail_packet(pl, 1);
+
+        // 원래는 DB에서 받아와야 하는 정보를 기본 정보로 대체
+        /*
+        pl->set_x(3210);
+        pl->set_y(0);
+        pl->set_z(940);
+        pl->set_job(static_cast<JOB>(packet->job));
+        //pl->set_job(J_DILLER);
+        pl->set_lv(25);
+        pl->set_element(E_WATER);
+        pl->set_exp(1000);
+        pl->set_name(packet->name);
+        pl->set_login_id(packet->id);
+
+        pl->indun_id - 1;
+        pl->join_dungeon_room = false;*/
+
+
+        // Stress Test용
+        if (strcmp(packet->id, "admin") == 0) {
+            pl->set_x(rand() % 4000);
+            pl->set_z(rand() % 4000);
+        }
+
+        switch (pl->get_job()) {
+        case J_DILLER: {
+            Diller::Initialize(pl);
+            break;
+        }
+        case J_TANKER: {
+            Tanker::Initialize(pl);
+            break;
+        }
+        case J_SUPPORTER: {
+            Supporter::Initialize(pl);
+            break;
+        }
+        case J_MAGICIAN: {
+            Magician::Initialize(pl);
+            break;
+        }
+        default: {
+            break;
+        }
+        }
+        // -- DB 대체 끝 --
+
+        // Hp회복
+        if (pl->get_hp() < pl->get_maxhp()) {
+            // hp가 깎이였으므로 hp자동회복을 해주도록 하자
+            if (reinterpret_cast<Player*>(players[client_id])->_auto_hp == false) {
+                timer_event ev;
+                ev.obj_id = client_id;
+                ev.start_time = chrono::system_clock::now() + 5s;
+                ev.ev = EVENT_AUTO_PLAYER_HP;
+                ev.target_id = 0;
+                TimerManager::timer_queue.push(ev);
+                reinterpret_cast<Player*>(players[client_id])->_auto_hp = true;
+            }
+        }
+        if (login == true)
+            send_login_ok_packet(pl);
+        pl->state_lock.lock();
+        pl->set_state(ST_INGAME);
+        pl->state_lock.unlock();
+
+        m_SectorManager->player_put(pl);
+
+        break;
     }
     default:
         break;

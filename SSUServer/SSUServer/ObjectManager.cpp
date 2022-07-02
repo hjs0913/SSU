@@ -2,6 +2,7 @@
 #include "send.h"
 #include "PacketManager.h"
 #include "TimerManager.h"
+#include "database.h"
 #include <fstream>
 
 ObjectManager* static_ObjectManager::objManager = nullptr;
@@ -205,6 +206,8 @@ void ObjectManager::worker()
         if (FALSE == ret) {
             int err_no = WSAGetLastError();
             error_display(err_no);
+            Player* pl = reinterpret_cast<Player*>(players[client_id]);
+            Save_position(pl);// 차라리 disconnect 함수에 넣자 
             Disconnect(client_id);
             if (exp_over->_comp_op == OP_SEND)
                 delete exp_over;
@@ -384,7 +387,6 @@ void ObjectManager::worker()
             break;
         }
         case OP_ELEMENT_COOLTIME: {
-
             timer_event ev;
 
             players[client_id]->state_lock.lock();
@@ -494,9 +496,10 @@ void ObjectManager::worker()
             }
             players[client_id]->state_lock.unlock();
 
-            int indun_id = reinterpret_cast<Player*>(players[exp_over->_target])->get_indun_id();  //바꿔야함!
+            int indun_id = reinterpret_cast<Player*>(players[client_id])->get_indun_id();  //바꿔야함!
 
-            switch (dungeons[indun_id]->get_party_palyer()[client_id]->get_job())
+
+            switch (reinterpret_cast<Player*>(players[client_id])->get_job())
             {
             case J_DILLER: {
                 for (int i = 0; i < GAIA_ROOM; ++i) {
@@ -842,11 +845,24 @@ array<Gaia*, MAX_DUNGEONS>& ObjectManager::get_dungeons()
     return dungeons;
 }
 
+void ObjectManager::CloseServer()
+{
+    for (auto& pl : players) {
+        if (pl->get_tribe() != HUMAN) break;
+        if (ST_INGAME == pl->get_state())
+            if (ST_INGAME == pl->get_state()) {
+                Save_position(reinterpret_cast<Player*>(pl));
+                Disconnect(pl->get_id());
+            }
+    }
+}
+
 // static_objectmanagr
 ObjectManager* static_ObjectManager::get_objManger()
 {
     return objManager;
 }
+
 void* static_ObjectManager::set_objManger(ObjectManager* om)
 {
     objManager = om;
