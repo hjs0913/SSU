@@ -13,10 +13,9 @@ SOCKET g_s_socket;
 array <Npc*, MAX_USER + MAX_NPC> players;
 array <Gaia*, MAX_USER / GAIA_ROOM> dungeons;
 array <Obstacle, MAX_OBSTACLE> obstacles;
-
 void do_npc_move(int npc_id, int target);
 void return_npc_position(int npc_id);
-
+bool login = false;
 concurrency::concurrent_priority_queue<timer_event> timer_queue;
 
 
@@ -762,7 +761,7 @@ bool isInsideTriangle(Coord a, Coord b, Coord c, Coord n)
     return true;
 
 }
-bool login = false;
+
 void process_packet(int client_id, unsigned char* p)
 {
 
@@ -809,36 +808,28 @@ void process_packet(int client_id, unsigned char* p)
         pl->set_login_id(packet->id);
         //데이터 베이스 
    
+        if (DB_On) {
             login = Search_Id(pl, packet->id, packet->password);
-            
-            if (login == false) {
+
+            if (login == false)
                 send_login_fail_packet(pl, 2);
-                //  if (Add_DB(packet->id, packet->password, pl, packet->nickname, packet->job, packet->element) == true) {
-                 //     pl->set_login_id(packet->id);
-                 //     login = true;
-                 // }
-                //  else
-                //      send_login_fail_packet(pl, 1);
-            }
-        
-    
-
-        // 원래는 DB에서 받아와야 하는 정보를 기본 정보로 대체
-        /*
-        pl->set_x(3210);
-        pl->set_y(0);
-        pl->set_z(940);
-        pl->set_job(static_cast<JOB>(packet->job));
-        //pl->set_job(J_DILLER);
-        pl->set_lv(25);
-        pl->set_element(E_WATER);
-        pl->set_exp(1000);
-        pl->set_name(packet->name);
-        pl->set_login_id(packet->id);
-
-        pl->indun_id - 1;
-        pl->join_dungeon_room = false;*/
-
+        }
+        else {
+            // 원래는 DB에서 받아와야 하는 정보를 기본 정보로 대체
+            pl->set_x(3210);
+            pl->set_y(0);
+            pl->set_z(940);
+            pl->set_job(static_cast<JOB>(packet->job));
+            //pl->set_job(J_DILLER);
+            pl->set_lv(25);
+            pl->set_element(E_WATER);
+            pl->set_exp(1000);
+            pl->set_name(packet->name);
+            pl->set_login_id(packet->id);
+            pl->indun_id - 1;
+            pl->join_dungeon_room = false;
+            login = true;
+        }
 
         // Stress Test용
         if (strcmp(packet->id, "admin") == 0) {
@@ -4402,8 +4393,7 @@ void initialise_DUNGEON()
 
 int main()
 {
-    //db 연결 
-    Initialise_DB();
+   
 
     setlocale(LC_ALL, "korean");
     wcout.imbue(locale("korean"));
@@ -4440,8 +4430,8 @@ int main()
         players[i] = new Player(i);
     }
 
-    // DB 연결1
-    // Initialise_DB();
+   
+    Initialise_DB(); //db 연결  주석처리하면 db안씀
     initialise_NPC();
     initialise_DUNGEON();
 
