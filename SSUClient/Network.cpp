@@ -410,6 +410,7 @@ void process_packet(unsigned char* p)
 		Info_str.append(my_element_str);
 		Login_ok = true;
 		break;
+
 	}
 	case SC_PACKET_MOVE: {
 		sc_packet_move* packet = reinterpret_cast<sc_packet_move*>(p);
