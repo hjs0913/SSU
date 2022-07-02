@@ -76,6 +76,7 @@ bool Add_DB(char* login_id, char* password, Player* pl, char* nick_name, int job
 
 	retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)exec, SQL_NTS);
+
 	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
 	{
 		SQLLEN* pcrow = new SQLLEN;
