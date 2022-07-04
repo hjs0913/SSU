@@ -4431,7 +4431,7 @@ int main()
     }
 
    
-    Initialise_DB(); //db 연결  주석처리하면 db안씀
+    //Initialise_DB(); //db 연결  주석처리하면 db안씀
     initialise_NPC();
     initialise_DUNGEON();
 
