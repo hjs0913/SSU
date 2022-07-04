@@ -426,6 +426,8 @@ void process_packet(unsigned char* p)
 		}
 		else {
 			mPlayer[packet->id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
+			XMFLOAT3 xmf3Look(packet->lx, packet->ly, packet->lz);
+			mPlayer[packet->id]->SetLook(xmf3Look);
 			//mPlayer[packet->id]->vCenter = XMFLOAT3(packet->x, packet->y, packet->z);
 		}
 		break;
