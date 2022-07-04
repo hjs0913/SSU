@@ -83,37 +83,30 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
         }
         // 데이터 베이스
         pl->set_login_id(packet->id);
-        //데이터 베이스 
         bool login = false;
-        login = Search_Id(pl, packet->id, packet->password);
-
-        if (login == false) {
-            send_login_fail_packet(pl, 2);
-            //  if (Add_DB(packet->id, packet->password, pl, packet->nickname, packet->job, packet->element) == true) {
-             //     pl->set_login_id(packet->id);
-             //     login = true;
-             // }
-            //  else
-            //      send_login_fail_packet(pl, 1);
+        //데이터 베이스 
+        if (DB_On) {
+            login = Search_Id(pl, packet->id, packet->password);
+            if (login == false) {
+                send_login_fail_packet(pl, 2);
+            }
         }
+        else {
+            pl->set_x(3210);
+            pl->set_y(0);
+            pl->set_z(940);
+            pl->set_job(static_cast<JOB>(packet->job));
+            //pl->set_job(J_DILLER);
+            pl->set_lv(25);
+            pl->set_element(E_WATER);
+            pl->set_exp(1000);
+            pl->set_name(packet->name);
+            pl->set_login_id(packet->id);
 
-
-        // 원래는 DB에서 받아와야 하는 정보를 기본 정보로 대체
-        /*
-        pl->set_x(3210);
-        pl->set_y(0);
-        pl->set_z(940);
-        pl->set_job(static_cast<JOB>(packet->job));
-        //pl->set_job(J_DILLER);
-        pl->set_lv(25);
-        pl->set_element(E_WATER);
-        pl->set_exp(1000);
-        pl->set_name(packet->name);
-        pl->set_login_id(packet->id);
-
-        pl->indun_id - 1;
-        pl->join_dungeon_room = false;
-        */
+            pl->indun_id - 1;
+            pl->join_dungeon_room = false;
+            login = true;
+        }
 
         // Stress Test용
         if (strcmp(packet->id, "admin") == 0) {

@@ -3,7 +3,7 @@
 SQLHENV henv;
 SQLHDBC hdbc;
 SQLHSTMT hstmt = 0;
-
+bool DB_On = false;
 void HandleDiagnosticRecord(SQLHANDLE hHandle, SQLSMALLINT hType, RETCODE RetCode)
 {
 	SQLSMALLINT iRec = 0;
@@ -49,10 +49,11 @@ void Initialise_DB()
 				if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
 					cout << "ODBC Connection Success" << endl;
 					retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
+					DB_On = true;
 				}
 				else {
-					cout << "연결 실패" << endl;
 					HandleDiagnosticRecord(hdbc, SQL_HANDLE_DBC, retcode);
+					cout << "연결 실패(DB없이 작동이 되도록 합니다)" << endl;
 				}
 			}
 		}
@@ -61,6 +62,7 @@ void Initialise_DB()
 
 bool Add_DB(char* login_id, char* password, Player* pl, char* nick_name, int job, int element)
 {
+	
 	SQLRETURN retcode;
 
 	char temp[100];
@@ -264,6 +266,9 @@ bool Search_Id(Player* pl, char* login_id, char* password)
 
 void Save_position(Player* pl)
 {
+	if (DB_On == false)
+		return;
+
 	SQLRETURN retcode;
 	cout << pl->get_login_id() << endl;
 	char temp[100];
@@ -302,4 +307,5 @@ void Disconnect_DB()
 	SQLDisconnect(hdbc);
 	SQLFreeHandle(SQL_HANDLE_DBC, hdbc);
 	SQLFreeHandle(SQL_HANDLE_ENV, henv);
+	DB_On = false;
 }

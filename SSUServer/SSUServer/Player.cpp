@@ -102,7 +102,7 @@ void Player::attack_dead_judge(Npc* target)
 		TimerManager::timer_queue.push(ev);
 
 		// 플레이어에게 경험치 제공, 그리고 바뀐 경험치와 레벨을 보내주자
-		int get_exp = target->get_lv() * target->get_lv() * 2;
+		float get_exp = target->get_lv() * target->get_lv() * 2;
 		if (target->get_tribe() == BOSS)
 			get_exp = get_exp * 2;
 		char mess[MAX_CHAT_SIZE];
@@ -112,7 +112,7 @@ void Player::attack_dead_judge(Npc* target)
 
 		send_status_change_packet(this);
 
-		int max_exp = 100 * pow(2, (_lv - 1));
+		float max_exp = 100 * pow(2, (_lv - 1));
 		if (_exp + get_exp >= max_exp) {
 			_lv += 1;
 			_exp = _exp + get_exp - max_exp;
@@ -144,7 +144,7 @@ void Player::attack_dead_judge(Npc* target)
 		//		}
 		//	}
 		//}
-
+		send_change_hp_packet(this, target);
 		sc_packet_combat_id packet;
 		packet.size = sizeof(packet);
 		packet.type = SC_PACKET_COMBAT_ID;

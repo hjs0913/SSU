@@ -319,6 +319,24 @@ public:
 	void AdvanceTime(float fElapsedTime, CGameObject *pRootGameObject);
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class CObjectMap
+{
+public:
+	CObjectMap(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, CLoadedModelInfo* pModel);
+	~CObjectMap();
+
+public:
+	int 							m_nSkinnedMeshes = 0;
+	CSkinnedMesh** m_ppSkinnedMeshes = NULL; //[SkinnedMeshes], Skinned Mesh Cache
+
+	ID3D12Resource** m_ppd3dcbSkinningBoneTransforms = NULL; //[SkinnedMeshes]
+	XMFLOAT4X4** m_ppcbxmf4x4MappedSkinningBoneTransforms = NULL; //[SkinnedMeshes]
+
+public:
+	void UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList);
+};
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 class CGameObject
@@ -409,6 +427,7 @@ public:
 
 public:
 	CAnimationController 			*m_pSkinnedAnimationController = NULL;
+	CObjectMap						*m_pObjectMap = NULL;
 
 	CSkinnedMesh *FindSkinnedMesh(char *pstrSkinnedMeshName);
 	void FindAndSetSkinnedMesh(CSkinnedMesh **ppSkinnedMeshes, int *pnSkinnedMesh);

@@ -28,64 +28,35 @@ CScene::~CScene()
 
 void CScene::BuildDefaultLightsAndMaterials()
 {
-	m_nLights = 5;
+	m_nLights = 2;
 	m_pLights = new LIGHT[m_nLights];
 	::ZeroMemory(m_pLights, sizeof(LIGHT) * m_nLights);
 
-	m_xmf4GlobalAmbient = XMFLOAT4(0.15f, 0.15f, 0.15f, 1.0f);
-	//m_xmf4GlobalAmbient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-
-	m_pLights[0].m_bEnable = false;
-	m_pLights[0].m_nType = POINT_LIGHT;
-	m_pLights[0].m_fRange = 300.0f;
-	m_pLights[0].m_xmf4Ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	m_pLights[0].m_xmf4Diffuse = XMFLOAT4(0.4f, 0.3f, 0.8f, 1.0f);
-	m_pLights[0].m_xmf4Specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 0.0f);
-	m_pLights[0].m_xmf3Position = XMFLOAT3(230.0f, 330.0f, 480.0f);
-	m_pLights[0].m_xmf3Attenuation = XMFLOAT3(1.0f, 0.001f, 0.0001f);
+	m_xmf4GlobalAmbient = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
+	
+	m_pLights[0].m_bEnable = true;
+	m_pLights[0].m_nType = SPOT_LIGHT;
+	m_pLights[0].m_fRange = 200.0f;
+	m_pLights[0].m_xmf4Ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	m_pLights[0].m_xmf4Diffuse = XMFLOAT4(0.4f, 0.4f, 0.4f, 1.0f);
+	m_pLights[0].m_xmf4Specular = XMFLOAT4(0.1f, 0.1f, 0.1f, 0.1f);
+	m_pLights[0].m_xmf3Position = XMFLOAT3(-50.0f, 20.0f, -5.0f);
+	m_pLights[0].m_xmf3Direction = XMFLOAT3(0.0f, -1.0f, 1.0f);
+	m_pLights[0].m_xmf3Attenuation = XMFLOAT3(0.1f, 0.1f, 0.1f);
+	m_pLights[0].m_fFalloff = 38.0f;
+	m_pLights[0].m_fPhi = (float)cos(XMConvertToRadians(50.0f));
+	m_pLights[0].m_fTheta = (float)cos(XMConvertToRadians(20.0f));
 
 	m_pLights[1].m_bEnable = true;
-	m_pLights[1].m_nType = SPOT_LIGHT;
-	m_pLights[1].m_fRange = 200.0f;
-	m_pLights[1].m_xmf4Ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	m_pLights[1].m_xmf4Diffuse = XMFLOAT4(0.4f, 0.4f, 0.4f, 1.0f);
-	m_pLights[1].m_xmf4Specular = XMFLOAT4(0.1f, 0.1f, 0.1f, 0.1f);
-	m_pLights[1].m_xmf3Position = XMFLOAT3(-50.0f, 20.0f, -5.0f);
-	m_pLights[1].m_xmf3Direction = XMFLOAT3(0.0f, -1.0f, 1.0f);
-	m_pLights[1].m_xmf3Attenuation = XMFLOAT3(0.1f, 0.1f, 0.1f);
-	m_pLights[1].m_fFalloff = 38.0f;
-	m_pLights[1].m_fPhi = (float)cos(XMConvertToRadians(50.0f));
-	m_pLights[1].m_fTheta = (float)cos(XMConvertToRadians(20.0f));
-
-	m_pLights[2].m_bEnable = true;
-	m_pLights[2].m_nType = DIRECTIONAL_LIGHT;
-	m_pLights[2].m_xmf4Ambient = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
-	m_pLights[2].m_xmf4Diffuse = XMFLOAT4(0.7f, 0.7f, 0.7f, 1.0f);
-	m_pLights[2].m_xmf4Specular = XMFLOAT4(0.4f, 0.4f, 0.4f, 0.0f);
-	m_pLights[2].m_xmf3Direction = XMFLOAT3(1.0f, -1.0f, 0.0f);
-
-
-	m_pLights[3].m_bEnable = false;
-	m_pLights[3].m_nType = SPOT_LIGHT;
-	m_pLights[3].m_fRange = 600.0f;
-	m_pLights[3].m_xmf4Ambient = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
-	m_pLights[3].m_xmf4Diffuse = XMFLOAT4(0.3f, 0.7f, 0.0f, 1.0f);
-	m_pLights[3].m_xmf4Specular = XMFLOAT4(0.3f, 0.3f, 0.3f, 0.0f);
-	m_pLights[3].m_xmf3Position = XMFLOAT3(550.0f, 330.0f, 530.0f);
-	m_pLights[3].m_xmf3Direction = XMFLOAT3(0.0f, -1.0f, 1.0f);
-	m_pLights[3].m_xmf3Attenuation = XMFLOAT3(1.0f, 0.01f, 0.0001f);
-	m_pLights[3].m_fFalloff = 8.0f;
-	m_pLights[3].m_fPhi = (float)cos(XMConvertToRadians(90.0f));
-	m_pLights[3].m_fTheta = (float)cos(XMConvertToRadians(30.0f));
-
-	m_pLights[4].m_bEnable = false;
-	m_pLights[4].m_nType = POINT_LIGHT;
-	m_pLights[4].m_fRange = 200.0f;
-	m_pLights[4].m_xmf4Ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	m_pLights[4].m_xmf4Diffuse = XMFLOAT4(0.8f, 0.3f, 0.3f, 1.0f);
-	m_pLights[4].m_xmf4Specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 0.0f);
-	m_pLights[4].m_xmf3Position = XMFLOAT3(600.0f, 250.0f, 700.0f);
-	m_pLights[4].m_xmf3Attenuation = XMFLOAT3(1.0f, 0.001f, 0.0001f);
+	m_pLights[1].m_nType = DIRECTIONAL_LIGHT;
+	//m_pLights[1].m_xmf4Ambient = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
+	//m_pLights[1].m_xmf4Diffuse = XMFLOAT4(0.7f, 0.7f, 0.7f, 1.0f);
+	//m_pLights[1].m_xmf4Specular = XMFLOAT4(0.4f, 0.4f, 0.4f, 0.0f);
+	//m_pLights[1].m_xmf3Direction = XMFLOAT3(1.0f, -1.0f, 0.0f);
+	m_pLights[1].m_xmf4Ambient = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
+	m_pLights[1].m_xmf4Diffuse = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
+	m_pLights[1].m_xmf4Specular = XMFLOAT4(0.1f, 0.1f, 0.1f, 0.0f);
+	m_pLights[1].m_xmf3Direction = XMFLOAT3(1.0f, -1.0f, 1.0f);
 }
 
 void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList)
@@ -94,7 +65,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
 
-	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 150); //SuperCobra(17), Gunship(2), Player:Mi24(1), Angrybot()
+	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 200); //SuperCobra(17), Gunship(2), Player:Mi24(1), Angrybot()
 
 	CMaterial::PrepareShaders(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature); 
 
@@ -106,25 +77,31 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	XMFLOAT4 xmf4Color(0.1f, 0.1f, 0.1f, 0.0f);
 	m_pTerrain = new CHeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Image/HeightMap.raw"), 512, 512, xmf3Scale, xmf4Color);
 
-	m_nHierarchicalGameObjects = 3 + 30 + 30;	// 성벽 1 + 집 2 + 몬스터 30 + 플레이어 30
+	m_nHierarchicalGameObjects = 3 + 30 + 30 + 609;	// 성벽 1 + 집 2 + 몬스터 30 + 플레이어 30 + 나무609
 	m_ppHierarchicalGameObjects = new CGameObject * [m_nHierarchicalGameObjects];
 	//for (int i = 0; i < m_nHierarchicalGameObjects; ++i) m_ppHierarchicalGameObjects[i] = NULL;
 
+
 	CLoadedModelInfo* pCastleModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Castle_Wall.bin", NULL);
 	m_ppHierarchicalGameObjects[0] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pCastleModel, 0);
-	m_ppHierarchicalGameObjects[0]->SetPosition(3200.0f, m_pTerrain->GetHeight(3200.0f, 1000.0f) - 30.0f, 1000.0f);
-	m_ppHierarchicalGameObjects[0]->SetScale(35.0f, 20.0f, 15.0f);
+	m_ppHierarchicalGameObjects[0]->SetPosition(3200.0f, m_pTerrain->GetHeight(3200.0f, 960.0f) - 10.0f, 960.0f);
+	m_ppHierarchicalGameObjects[0]->SetScale(15.0f, 15.0f, 12.0f);
+
 	if (pCastleModel) delete pCastleModel;
 
-	CLoadedModelInfo* pHouseModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/House.bin", NULL);
+	CLoadedModelInfo* pHouseModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Building_5.bin", NULL);
 	m_ppHierarchicalGameObjects[1] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pHouseModel, 0);
-	m_ppHierarchicalGameObjects[1]->SetPosition(3200.0f, m_pTerrain->GetHeight(3200.0f, 700.0f), 700.0f);
-	m_ppHierarchicalGameObjects[1]->SetScale(4.0f, 4.0f, 4.0f);
+	m_ppHierarchicalGameObjects[1]->SetPosition(2800.0f, m_pTerrain->GetHeight(2800.0f, 400.0f), 400.0f);
+	m_ppHierarchicalGameObjects[1]->SetScale(10.0f, 10.0f, 10.0f);
+	m_ppHierarchicalGameObjects[1]->Rotate(0.0f, 180.0f, 0.0f);
 
-	CLoadedModelInfo* pHouseModell = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/House.bin", NULL);
+	CLoadedModelInfo* pHouseModell = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Building_1.bin", NULL);
 	m_ppHierarchicalGameObjects[2] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pHouseModell, 0);
-	m_ppHierarchicalGameObjects[2]->SetPosition(3200.0f, m_pTerrain->GetHeight(3200.0f, 500.0f) - 20.0f, 500.0f);
-	m_ppHierarchicalGameObjects[2]->SetScale(4.0f, 4.0f, 4.0f);
+	m_ppHierarchicalGameObjects[2]->SetPosition(2790.0f, m_pTerrain->GetHeight(2790.0f, 550.0f) - 5.0f, 550.0f);
+	m_ppHierarchicalGameObjects[2]->SetScale(10.0f, 10.0f, 10.0f);
+
+
+
 	if (pHouseModel) delete pHouseModel;
 	if (pHouseModell) delete pHouseModell;
 
@@ -140,14 +117,13 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_ppHierarchicalGameObjects[i]->SetPosition(0.f, -100.f, 0.f);
 		m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
 	}
+	if (pMonsterModel) delete pMonsterModel;
 
 	pBastardModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Bastard_Warrior.bin", NULL);
 	player_anim_cnt = pBastardModel->m_pAnimationSets->m_nAnimationSets;
 
 	pTankerModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Mighty_Warrior.bin", NULL);
-
 	pSupporterModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Priestess.bin", NULL);
-
 	pMagicianModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Wizard_Girl.bin", NULL);
 
 	for (int i = 33; i < 63; ++i) {
@@ -161,6 +137,22 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
 	}
 
+	pTreeModel1 = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Tree1.bin", NULL);
+	pTreeModel2 = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Tree2.bin", NULL);
+	pTreeModel3 = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Tree3.bin", NULL);
+	//int zPos = -1;
+	//for (int i = 63; i < 672; ++i) {
+	//	m_ppHierarchicalGameObjects[i] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pTreeModel1, 0);
+	//	if (!((i - 3) % 10)) ++zPos;
+	//	m_ppHierarchicalGameObjects[i]->SetPosition(3000.0f + ((i - 63) % 10) * 50.0f, m_pTerrain->GetHeight(3000.0f + ((i - 63) % 10) * 50.0f, 1200.0f + zPos * 50.0f), 1200.0f + zPos * 50.0f);
+	//	m_ppHierarchicalGameObjects[i]->SetScale(1.0f, 1.0f, 1.0f);
+	//}
+
+	SetTreePosition(pd3dDevice, pd3dCommandList, 63, 671);
+
+	if (pTreeModel1) delete pTreeModel1;
+	if (pTreeModel3) delete pTreeModel2;
+	if (pTreeModel2) delete pTreeModel3;
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
 
@@ -704,8 +696,8 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	if (m_pLights)
 	{
 		XMFLOAT3 Light_pos = m_pPlayer->GetPosition();
-		m_pLights[1].m_xmf3Position = XMFLOAT3(Light_pos.x, Light_pos.y + 10.0f, Light_pos.z);
-		m_pLights[1].m_xmf3Direction = m_pPlayer->GetLookVector();
+		m_pLights[0].m_xmf3Position = XMFLOAT3(Light_pos.x, Light_pos.y + 10.0f, Light_pos.z);
+		m_pLights[0].m_xmf3Direction = m_pPlayer->GetLookVector();
 	}
 }
 
@@ -998,5 +990,49 @@ bool CScene::IsAnimationEnd(int objIndex, int animIndex)
 	return (anim_end - anim_now <= 0.1f);
 }
 
+void CScene::SetTreePosition(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int start, int end)
+{
+	ifstream in{ "tree_position.txt" };
+	if (!in)
+	{
+		cout << "tree_position.txt 파일을 열 수 없습니다." << endl;
+		exit(0);
+	}
 
+	random_device rd;
+	default_random_engine dre(rd());
+	uniform_real_distribution<float> uidScale(7.0f, 14.0f);
+	uniform_real_distribution<float> uidRotate(0.0f, 180.0f);
+	uniform_int_distribution<> uidModel(0, 2);
+
+	XMFLOAT3 xmf3Pos;
+	int cnt = start;
+	int nModel = 0;
+	while (cnt <= end) {
+		in >> xmf3Pos.x;
+		in >> xmf3Pos.y;
+		in >> xmf3Pos.z;
+		nModel = uidModel(dre);
+		switch (nModel) {
+		case 0:
+			m_ppHierarchicalGameObjects[cnt] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pTreeModel1, 0);
+			break;
+		case 1:
+			m_ppHierarchicalGameObjects[cnt] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pTreeModel2, 0);
+			break;
+		case 2:
+			m_ppHierarchicalGameObjects[cnt] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pTreeModel3, 0);
+			break;
+		default:
+			m_ppHierarchicalGameObjects[cnt] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pTreeModel1, 0);
+			break;
+		}
+		m_ppHierarchicalGameObjects[cnt]->SetPosition(xmf3Pos.x, m_pTerrain->GetHeight(xmf3Pos.x, xmf3Pos.z), xmf3Pos.z);
+		m_ppHierarchicalGameObjects[cnt]->SetScale(uidScale(dre), uidScale(dre), uidScale(dre));
+		m_ppHierarchicalGameObjects[cnt]->Rotate(0.0f, uidRotate(dre), 0.0f);
+		++cnt;
+	}
+
+
+}
 

@@ -574,6 +574,7 @@ void CTerrainPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVeloci
 		return;
 	}
 	if (m_pSkinnedAnimationController->m_pAnimationTracks[2].m_bEnable || m_pSkinnedAnimationController->m_pAnimationTracks[3].m_bEnable) return;
+
 	m_pSkinnedAnimationController->SetTrackEnable(0, false);
 	m_pSkinnedAnimationController->SetTrackEnable(1, true);
 	m_pSkinnedAnimationController->SetTrackEnable(2, false);
@@ -595,7 +596,7 @@ void CTerrainPlayer::Update(float fTimeElapsed)
 		}
 
 		float fLength = sqrtf(m_xmf3Velocity.x * m_xmf3Velocity.x + m_xmf3Velocity.z * m_xmf3Velocity.z);
-		if (::IsZero(fLength))	// 가만히 서있을 때
+		if (/*::IsZero(fLength)*/!dwDir)	// 가만히 서있을 때
 		{
 			m_pSkinnedAnimationController->SetTrackEnable(0, true);
 			m_pSkinnedAnimationController->SetTrackEnable(1, false);

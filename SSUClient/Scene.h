@@ -64,7 +64,7 @@ public:
     void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera=NULL);
 	void OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL, int i = 0);
 	void Raid_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL, int i = 0);
-
+	void SetTreePosition(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int start, int end);
 	void ReleaseUploadBuffers();
 
 	CPlayer								*m_pPlayer = NULL;
@@ -138,6 +138,10 @@ public:
 	CLoadedModelInfo					*pTankerModel = NULL;
 	CLoadedModelInfo					*pSupporterModel = NULL;
 	CLoadedModelInfo					*pMagicianModel = NULL;
+	CLoadedModelInfo* pTreeModel1 = NULL;
+	CLoadedModelInfo* pTreeModel2 = NULL;
+	CLoadedModelInfo* pTreeModel3 = NULL;
+
 
 	int									player_anim_cnt = 0;
 

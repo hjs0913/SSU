@@ -10,7 +10,7 @@ class Player : public Npc
 private:
     SOCKET				_socket;
     char                _login_id[MAX_NAME_SIZE];
-    int		            _exp;
+    float		        _exp;
 	EXP_OVER			_recv_over;
 	int					_prev_size;
 protected:

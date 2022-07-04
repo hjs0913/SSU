@@ -693,6 +693,7 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 				default:
 					break;
 			}
+			m_pPlayer->dwDir = 0;
 			break;
 		default:
 			break;
@@ -1084,15 +1085,19 @@ void CGameFramework::ProcessInput()
 		if (!PartyInviteUI_ON && !Chatting_On && Mouse_On) {
 			if (pKeysBuffer['S'] & 0xF0) {
 				dwDirection = DIR_BACKWARD;
+				m_pPlayer->dwDir = dwDirection;
 			}
 			if (pKeysBuffer['A'] & 0xF0) {
 				dwDirection = DIR_LEFT;
+				m_pPlayer->dwDir = dwDirection;
 			}
 			if (pKeysBuffer['D'] & 0xF0) {
 				dwDirection = DIR_RIGHT;
+				m_pPlayer->dwDir = dwDirection;
 			}
 			if (pKeysBuffer['W'] & 0xF0) {
 				dwDirection = DIR_FORWARD;
+				m_pPlayer->dwDir = dwDirection;
 			}
 
 			if (pKeysBuffer[VK_SPACE] & 0xF0) {
@@ -1212,6 +1217,18 @@ void CGameFramework::ProcessInput()
 				}
 			}*/
 		}
+		if (pKeysBuffer['L'] & 0xF0) {
+			m_pScene->m_pLights[1].m_xmf4Diffuse.x += 0.1f;
+			m_pScene->m_pLights[1].m_xmf4Diffuse.y += 0.1f;
+			m_pScene->m_pLights[1].m_xmf4Diffuse.z += 0.1f;
+		}
+		if (pKeysBuffer['K'] & 0xF0) {
+			if ((m_pScene->m_pLights[1].m_xmf4Diffuse.x > 0.0f) && (m_pScene->m_pLights[1].m_xmf4Diffuse.y > 0.0f) && (m_pScene->m_pLights[1].m_xmf4Diffuse.z > 0.0f)) {
+				m_pScene->m_pLights[1].m_xmf4Diffuse.x -= 0.1f;
+				m_pScene->m_pLights[1].m_xmf4Diffuse.y -= 0.1f;
+				m_pScene->m_pLights[1].m_xmf4Diffuse.z -= 0.1f;
+			}
+		}
 
 		if (pKeysBuffer[VK_PRIOR] & 0xF0) dwDirection |= DIR_UP;
 		if (pKeysBuffer[VK_NEXT] & 0xF0) dwDirection |= DIR_DOWN;
@@ -1227,7 +1244,11 @@ void CGameFramework::ProcessInput()
 				
 				send_look_packet(m_pPlayer->GetLookVector(), m_pPlayer->GetRightVector());
 			}
-			if (dwDirection) m_pPlayer->Move(dwDirection, /*12.25f*/10.5f, true);
+			if (dwDirection) {
+				float moveSpeed = (60.0f / static_cast<float>(m_GameTimer.GetFrameRate())) * 1.1f;
+				m_pPlayer->Move(dwDirection, /*12.25f*/moveSpeed, false);
+				
+			}
 			if (dwAttack) {
 				// m_pPlayer->Attack(true);
 				send_attack_packet(0);

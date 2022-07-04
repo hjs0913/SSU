@@ -73,6 +73,8 @@ public:
 	bool						m_net_dead;
 	bool						m_net_skill_animation[3];
 
+	DWORD						dwDir = 0;
+
 public:
 	CPlayer();
 	virtual ~CPlayer();
