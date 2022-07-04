@@ -1487,7 +1487,7 @@ HRESULT DirectX::LoadDDSTextureFromFileEx(
     }
     if (alphaMode)
     {
-        *alphaMode = DDS_ALPHA_MODE_OPAQUE;
+        *alphaMode = DDS_ALPHA_MODE_UNKNOWN;
     }
     if (isCubeMap)
     {
