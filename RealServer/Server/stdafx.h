@@ -34,7 +34,6 @@ struct timer_event {
     스킬 관련 쿨타임의 경우 : 어떤 스킬인지 넣어줌
     */
     int target_id;
-
     constexpr bool operator < (const timer_event& _left) const
     {
         return (start_time > _left.start_time);

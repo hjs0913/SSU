@@ -10,7 +10,7 @@
 #include <queue>
 #include <string>
 #include "Player.h"
-#include "../RealServer/Server/protocol.h"
+#include "../SSUServer/SSUServer/protocol.h"
 #include "stdafx.h"
 #include "Pattern.h"
 #include "PartyUI.h"
@@ -76,7 +76,7 @@ void err_quit(const char* msg);
 
 void err_display(const char* msg);
 
-void send_login_packet(char* id, char* name, int job);
+void send_login_packet(char* id, char* password);
 
 void send_attack_packet(int skill);
 

@@ -77,6 +77,7 @@ const char CS_PACKET_PARTY_ROOM_QUIT_REQUEST = 18;
 const char CS_PACKET_PARTY_INVITE = 19;
 const char CS_PACKET_PARTY_INVITATION_REPLY = 20;
 const char CS_PACKET_PARTY_ADD_PARTNER = 21;
+const char CS_PACKET_RE_LOGIN = 22;
 
 
 const char SC_PACKET_LOGIN_OK = 1;
@@ -138,6 +139,9 @@ struct cs_packet_login {
 	char	id[MAX_NAME_SIZE];
 	char	name[MAX_NAME_SIZE];
 	char	job;
+	char    password[MAX_NAME_SIZE];
+	char	nickname[MAX_NAME_SIZE];
+	char	element;
 };
 
 struct cs_packet_move {
@@ -259,7 +263,6 @@ struct cs_packet_party_add_partner {
 	unsigned char job;
 };
 
-
 //---------------------------------------------
 struct sc_packet_login_ok {
 	unsigned char size;
@@ -281,6 +284,7 @@ struct sc_packet_move {
 	char type;
 	int		id;
 	float  x, y, z;
+	float  lx, ly, lz;
 	int		move_time;
 	unsigned char move_right;		// 0 : 위치 수정, 1 : 유효성 올바름
 };

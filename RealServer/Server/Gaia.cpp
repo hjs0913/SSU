@@ -89,6 +89,7 @@ void Gaia::join_player(Player* pl)
 {
 
 	party[player_cnt] = pl;
+	pl->indun_player_cnt = player_cnt;
 	party_id[player_cnt] = pl->get_id();
 	player_cnt++;
 

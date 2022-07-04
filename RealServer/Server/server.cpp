@@ -13,10 +13,9 @@ SOCKET g_s_socket;
 array <Npc*, MAX_USER + MAX_NPC> players;
 array <Gaia*, MAX_USER / GAIA_ROOM> dungeons;
 array <Obstacle, MAX_OBSTACLE> obstacles;
-
 void do_npc_move(int npc_id, int target);
 void return_npc_position(int npc_id);
-
+bool login = false;
 concurrency::concurrent_priority_queue<timer_event> timer_queue;
 
 
@@ -237,7 +236,7 @@ void magical_skill_success(int p_id, int target, float skill_factor)
 
             send_status_change_packet(reinterpret_cast<Player*>(players[p_id]));
 
-            int max_exp = 100 * pow(2, (players[p_id]->get_lv() - 1));
+            float max_exp = 100 * pow(2, (players[p_id]->get_lv() - 1));
             if (reinterpret_cast<Player*>(players[p_id])->get_exp() + get_exp >= max_exp) {
                 players[p_id]->set_lv(players[p_id]->get_lv() + 1);
                 reinterpret_cast<Player*>(players[p_id])->
@@ -392,7 +391,7 @@ void physical_skill_success(int p_id, int target, float skill_factor)
 
             send_status_change_packet(reinterpret_cast<Player*>(players[p_id]));
 
-            int max_exp = 100 * pow(2, (players[p_id]->get_lv() - 1));
+            float max_exp = 100 * pow(2, (players[p_id]->get_lv() - 1));
             if (reinterpret_cast<Player*>(players[p_id])->get_exp() + get_exp >= max_exp) {
                 players[p_id]->set_lv(players[p_id]->get_lv() + 1);
                 reinterpret_cast<Player*>(players[p_id])->
@@ -630,7 +629,8 @@ void attack_success(Npc* p, Npc* target, float atk_factor)
 
             send_status_change_packet(reinterpret_cast<Player*>(p));
 
-            int max_exp = 100 * pow(2, (p->get_lv() - 1));
+            float max_exp = 100 * pow(2, (p->get_lv() - 1));
+            cout << max_exp << endl;
             if (reinterpret_cast<Player*>(p)->get_exp() + get_exp >= max_exp) {
                 p->set_lv(p->get_lv() + 1);
                 reinterpret_cast<Player*>(p)->
@@ -772,9 +772,9 @@ void process_packet(int client_id, unsigned char* p)
         cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(p);
         // pl->set_name(packet->name);
         // DB 연결
-        /*
+   /*  //여기 아래 고쳐야함
         EnterCriticalSection(&cs);
-        if (!(Search_Id(pl, packet->name))) {
+        if (!(Search_Id(pl, packet->name, packet->password))) {
             send_login_fail_packet(pl, 0);   // 아이디 없음
             Disconnect(client_id);
             LeaveCriticalSection(&cs);
@@ -805,21 +805,31 @@ void process_packet(int client_id, unsigned char* p)
             }
 
         }
-        // 원래는 DB에서 받아와야 하는 정보를 기본 정보로 대체
-        pl->set_x(3210);
-        pl->set_y(0);
-        pl->set_z(940);
-        pl->set_job(static_cast<JOB>(packet->job));
-        //pl->set_job(J_DILLER);
-        pl->set_lv(25);
-        pl->set_element(E_WATER);
-        pl->set_exp(1000);
-        pl->set_name(packet->name);
         pl->set_login_id(packet->id);
+        //데이터 베이스 
+   
+        if (DB_On) {
+            login = Search_Id(pl, packet->id, packet->password);
 
-        pl->indun_id - 1;
-        pl->join_dungeon_room = false;
-
+            if (login == false)
+                send_login_fail_packet(pl, 2);
+        }
+        else {
+            // 원래는 DB에서 받아와야 하는 정보를 기본 정보로 대체
+            pl->set_x(3210);
+            pl->set_y(0);
+            pl->set_z(940);
+            pl->set_job(static_cast<JOB>(packet->job));
+            //pl->set_job(J_DILLER);
+            pl->set_lv(25);
+            pl->set_element(E_WATER);
+            pl->set_exp(1000);
+            pl->set_name(packet->name);
+            pl->set_login_id(packet->id);
+            pl->indun_id - 1;
+            pl->join_dungeon_room = false;
+            login = true;
+        }
 
         // Stress Test용
         if (strcmp(packet->id, "admin") == 0) {
@@ -840,6 +850,12 @@ void process_packet(int client_id, unsigned char* p)
             pl->set_magical_defence(0.17 * lv * lv + 10 * lv);
             pl->set_basic_attack_factor(50.0f);
             pl->set_defence_factor(0.0002);
+
+            pl->set_origin_physical_attack(pl->get_physical_attack());
+            pl->set_origin_magical_attack(pl->get_magical_attack());
+            pl->set_origin_physical_defence(pl->get_physical_defence());
+            pl->set_origin_magical_defence(pl->get_magical_defence());
+
             break;
         }
         case J_TANKER: {
@@ -854,7 +870,11 @@ void process_packet(int client_id, unsigned char* p)
             pl->set_magical_defence(0.2 * lv * lv + 10 * lv);
             pl->set_basic_attack_factor(50.0f);
             pl->set_defence_factor(0.0002);
-            pl->set_element(E_WATER);
+  
+            pl->set_origin_physical_attack(pl->get_physical_attack());
+            pl->set_origin_magical_attack(pl->get_magical_attack());
+            pl->set_origin_physical_defence(pl->get_physical_defence());
+            pl->set_origin_magical_defence(pl->get_magical_defence());
             break;
         }
         case J_SUPPORTER: {
@@ -869,6 +889,11 @@ void process_packet(int client_id, unsigned char* p)
             pl->set_magical_defence(0.24 * lv * lv + 10 * lv);
             pl->set_basic_attack_factor(50.0f);
             pl->set_defence_factor(0.0002);
+
+            pl->set_origin_physical_attack(pl->get_physical_attack());
+            pl->set_origin_magical_attack(pl->get_magical_attack());
+            pl->set_origin_physical_defence(pl->get_physical_defence());
+            pl->set_origin_magical_defence(pl->get_magical_defence());
             break;
         }
         case J_MAGICIAN: {
@@ -883,6 +908,11 @@ void process_packet(int client_id, unsigned char* p)
             pl->set_magical_defence(0.24 * lv * lv + 10 * lv);
             pl->set_basic_attack_factor(50.0f);
             pl->set_defence_factor(0.0002);
+
+            pl->set_origin_physical_attack(pl->get_physical_attack());
+            pl->set_origin_magical_attack(pl->get_magical_attack());
+            pl->set_origin_physical_defence(pl->get_physical_defence());
+            pl->set_origin_magical_defence(pl->get_magical_defence());
             break;
         }
         default: {
@@ -904,8 +934,8 @@ void process_packet(int client_id, unsigned char* p)
                 reinterpret_cast<Player*>(players[client_id])->_auto_hp = true;
             }
         }
-
-        send_login_ok_packet(pl);
+        if(login == true)
+         send_login_ok_packet(pl);
         pl->state_lock.lock();
         pl->set_state(ST_INGAME);
         pl->state_lock.unlock();
@@ -2503,10 +2533,18 @@ void process_packet(int client_id, unsigned char* p)
             partner->set_basic_attack_factor(50.0f);
             partner->set_defence_factor(0.0002);
             partner->set_element(E_WATER);
-            //  여기까지 클라에서 패킷 받으면, 새 player id 생성 후 정보 초기화  
 
-            // join dungeon party
-            // 이 방에 이 플레이어를 집어 넣는다
+            partner->set_origin_physical_attack(partner->get_physical_attack());
+            partner->set_origin_magical_attack(partner->get_magical_attack());
+            partner->set_origin_physical_defence(partner->get_physical_defence());
+            partner->set_origin_magical_defence(partner->get_magical_defence());
+
+            partner->indun_player_cnt = dun->player_cnt + dun->partner_cnt;
+            // dun->player_cnt++;
+             //  여기까지 클라에서 패킷 받으면, 새 player id 생성 후 정보 초기화  
+
+             // join dungeon party
+             // 이 방에 이 플레이어를 집어 넣는다
             dun->partner_cnt++;
             dun->join_player(reinterpret_cast<Player*>(players[new_id]));
 
@@ -2519,6 +2557,271 @@ void process_packet(int client_id, unsigned char* p)
         }
         else
             break;
+        break;
+    }
+        
+    case CS_PACKET_RE_LOGIN: {
+        cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(p);
+
+
+        // 중복 아이디 검사
+
+        for (auto* p : players) {
+            if (p->get_tribe() != HUMAN) break;
+            if (p->get_state() == ST_FREE) continue;
+            if (p->get_id() == client_id) continue;
+            if (strcmp(packet->id, "admin") == 0) break;
+
+            if (strcmp(reinterpret_cast<Player*>(p)->get_login_id(), packet->id) == 0) {
+                cout << "중복된 아이디 접속 확인" << endl;
+                send_login_fail_packet(pl, 1);   // 중복 로그인
+                Disconnect(client_id);
+                return;
+            }
+            if (strcmp(reinterpret_cast<Player*>(p)->get_name(), packet->name) == 0) {
+                cout << "중복된 닉네임 접속 확인" << endl;
+                send_login_fail_packet(pl, 1);   // 중복 로그인
+                Disconnect(client_id);
+                return;
+            }
+
+        }
+        pl->set_login_id(packet->id);
+        //데이터 베이스 
+
+        login = Add_DB(packet->id, packet->password, pl, packet->nickname, packet->job, packet->element);
+        if(login == false)
+            send_login_fail_packet(pl, 1);
+
+        // 원래는 DB에서 받아와야 하는 정보를 기본 정보로 대체
+        /*
+        pl->set_x(3210);
+        pl->set_y(0);
+        pl->set_z(940);
+        pl->set_job(static_cast<JOB>(packet->job));
+        //pl->set_job(J_DILLER);
+        pl->set_lv(25);
+        pl->set_element(E_WATER);
+        pl->set_exp(1000);
+        pl->set_name(packet->name);
+        pl->set_login_id(packet->id);
+
+        pl->indun_id - 1;
+        pl->join_dungeon_room = false;*/
+
+
+        // Stress Test용
+        if (strcmp(packet->id, "admin") == 0) {
+            pl->set_x(rand() % 4000);
+            pl->set_z(rand() % 4000);
+        }
+
+        switch (pl->get_job()) {
+        case J_DILLER: {
+            int lv = pl->get_lv();
+            pl->set_maxhp(20 * lv * lv + 80 * lv);
+            pl->set_hp(pl->get_maxhp());
+            pl->set_maxmp(10 * lv * lv + 50 * lv);
+            pl->set_mp(pl->get_maxmp());
+            pl->set_physical_attack(0.3 * lv * lv + 10 * lv);
+            pl->set_magical_attack(0.1 * lv * lv + 5 * lv);
+            pl->set_physical_defence(0.24 * lv * lv + 10 * lv);
+            pl->set_magical_defence(0.17 * lv * lv + 10 * lv);
+            pl->set_basic_attack_factor(50.0f);
+            pl->set_defence_factor(0.0002);
+
+            pl->set_origin_physical_attack(pl->get_physical_attack());
+            pl->set_origin_magical_attack(pl->get_magical_attack());
+            pl->set_origin_physical_defence(pl->get_physical_defence());
+            pl->set_origin_magical_defence(pl->get_magical_defence());
+
+            break;
+        }
+        case J_TANKER: {
+            int lv = pl->get_lv();
+            pl->set_maxhp(22 * lv * lv + 80 * lv);
+            pl->set_hp(pl->get_maxhp());
+            pl->set_maxmp(8.5 * lv * lv + 50 * lv);
+            pl->set_mp(pl->get_maxmp());
+            pl->set_physical_attack(0.25 * lv * lv + 10 * lv);
+            pl->set_magical_attack(0.08 * lv * lv + 5 * lv);
+            pl->set_physical_defence(0.27 * lv * lv + 10 * lv);
+            pl->set_magical_defence(0.2 * lv * lv + 10 * lv);
+            pl->set_basic_attack_factor(50.0f);
+            pl->set_defence_factor(0.0002);
+
+            pl->set_origin_physical_attack(pl->get_physical_attack());
+            pl->set_origin_magical_attack(pl->get_magical_attack());
+            pl->set_origin_physical_defence(pl->get_physical_defence());
+            pl->set_origin_magical_defence(pl->get_magical_defence());
+            break;
+        }
+        case J_SUPPORTER: {
+            int lv = pl->get_lv();
+            pl->set_maxhp(18 * lv * lv + 70 * lv);
+            pl->set_hp(pl->get_maxhp());
+            pl->set_maxmp(15 * lv * lv + 60 * lv);
+            pl->set_mp(pl->get_maxmp());
+            pl->set_physical_attack(0.1 * lv * lv + 5 * lv);
+            pl->set_magical_attack(0.25 * lv * lv + 8 * lv);
+            pl->set_physical_defence(0.17 * lv * lv + 10 * lv);
+            pl->set_magical_defence(0.24 * lv * lv + 10 * lv);
+            pl->set_basic_attack_factor(50.0f);
+            pl->set_defence_factor(0.0002);
+
+            pl->set_origin_physical_attack(pl->get_physical_attack());
+            pl->set_origin_magical_attack(pl->get_magical_attack());
+            pl->set_origin_physical_defence(pl->get_physical_defence());
+            pl->set_origin_magical_defence(pl->get_magical_defence());
+            break;
+        }
+        case J_MAGICIAN: {
+            int lv = pl->get_lv();
+            pl->set_maxhp(16 * lv * lv + 70 * lv);
+            pl->set_hp(pl->get_maxhp());
+            pl->set_maxmp(17 * lv * lv + 60 * lv);
+            pl->set_mp(pl->get_maxmp());
+            pl->set_physical_attack(0.1 * lv * lv + 5 * lv);
+            pl->set_magical_attack(0.3 * lv * lv + 10 * lv);
+            pl->set_physical_defence(0.17 * lv * lv + 10 * lv);
+            pl->set_magical_defence(0.24 * lv * lv + 10 * lv);
+            pl->set_basic_attack_factor(50.0f);
+            pl->set_defence_factor(0.0002);
+
+            pl->set_origin_physical_attack(pl->get_physical_attack());
+            pl->set_origin_magical_attack(pl->get_magical_attack());
+            pl->set_origin_physical_defence(pl->get_physical_defence());
+            pl->set_origin_magical_defence(pl->get_magical_defence());
+            break;
+        }
+        default: {
+            break;
+        }
+        }
+        // -- DB 대체 끝 --
+
+        // Hp회복
+        if (pl->get_hp() < pl->get_maxhp()) {
+            // hp가 깎이였으므로 hp자동회복을 해주도록 하자
+            if (reinterpret_cast<Player*>(players[client_id])->_auto_hp == false) {
+                timer_event ev;
+                ev.obj_id = client_id;
+                ev.start_time = chrono::system_clock::now() + 5s;
+                ev.ev = EVENT_AUTO_PLAYER_HP;
+                ev.target_id = 0;
+                timer_queue.push(ev);
+                reinterpret_cast<Player*>(players[client_id])->_auto_hp = true;
+            }
+        }
+        if (login == true)
+            send_login_ok_packet(pl);
+        pl->state_lock.lock();
+        pl->set_state(ST_INGAME);
+        pl->state_lock.unlock();
+
+        // 새로 접속한 정보를 다른이에게 보내줌
+        for (auto& other : players) {
+            if (other->get_id() == client_id) continue;   // 나다
+
+            if (true == is_npc(other->get_id())) break;
+
+            other->state_lock.lock();
+            if (ST_INGAME != other->get_state()) {
+                other->state_lock.unlock();
+                continue;
+            }
+            other->state_lock.unlock();
+
+            if (false == is_near(other->get_id(), client_id)) continue;
+
+            // 여기는 플레이어 처리
+            Player* other_player = reinterpret_cast<Player*>(other);
+            other_player->vl.lock();
+            other_player->viewlist.insert(client_id);
+            other_player->vl.unlock();
+
+            send_put_object_packet(other_player, pl);
+
+            /*sc_packet_put_object packet;
+            packet.id = client_id;
+            strcpy_s(packet.name, pl->get_name());
+            packet.object_type = pl->get_tribe();
+            packet.size = sizeof(packet);
+            packet.type = SC_PACKET_PUT_OBJECT;
+            packet.x = pl->get_x();
+            packet.y = pl->get_y();
+            packet.z = pl->get_z();
+            other_player->do_send(sizeof(packet), &packet);*/
+        }
+        // 새로 접속한 플레이어에게 기존 정보를 보내중
+        pl->viewlist.clear();
+        for (auto& other : players) {
+            if (other->get_id() == client_id) continue;
+            other->state_lock.lock();
+            if (ST_INGAME != other->get_state()) {
+                other->state_lock.unlock();
+                continue;
+            }
+            other->state_lock.unlock();
+
+            if (false == is_near(other->get_id(), client_id))
+                continue;
+
+            // 스크립트와 함께 추가된 부분
+            if (true == is_npc(other->get_id())) {	// 시야에 npc가 있다면 
+                if (is_agro_near(client_id, other->get_id())) {
+                    if (other->get_active() == false) {
+                        other->set_active(true);
+                        timer_event ev;
+                        ev.obj_id = other->get_id();
+                        ev.start_time = chrono::system_clock::now() + 1s;
+                        ev.ev = EVENT_NPC_ATTACK;
+                        ev.target_id = client_id;
+                        timer_queue.push(ev);
+                        Activate_Npc_Move_Event(other->get_id(), pl->get_id());
+                    }
+                }
+            }
+
+            pl->vl.lock();
+            pl->viewlist.insert(other->get_id());
+            pl->vl.unlock();
+
+            send_put_object_packet(pl, other);
+            /*sc_packet_put_object packet;
+            packet.id = other->get_id();
+            strcpy_s(packet.name, other->get_name());
+            packet.object_type = other->get_tribe();
+            packet.size = sizeof(packet);
+            packet.type = SC_PACKET_PUT_OBJECT;
+            packet.x = other->get_x();
+            packet.y = other->get_y();
+            packet.z = other->get_z();
+            pl->do_send(sizeof(packet), &packet);*/
+        }
+        // 장애물 정보
+        for (auto& ob : obstacles) {
+            if (RANGE < abs(pl->get_x() - ob.get_x())) continue;
+            if (RANGE < abs(pl->get_z() - ob.get_z())) continue;
+
+            pl->ob_vl.lock();
+            pl->ob_viewlist.clear();
+            pl->ob_viewlist.insert(ob.get_id());
+            pl->ob_vl.unlock();
+
+            //send_put_object_packet(pl, ob);
+            sc_packet_put_object packet;
+            packet.id = ob.get_id();
+            strcpy_s(packet.name, "");
+            packet.object_type = ob.get_tribe();
+            packet.size = sizeof(packet);
+            packet.type = SC_PACKET_PUT_OBJECT;
+            packet.x = ob.get_x();
+            packet.y = ob.get_y();
+            packet.z = ob.get_z();
+            pl->do_send(sizeof(packet), &packet);
+        }
+        break;
     }
     default:
         break;
@@ -2702,9 +3005,15 @@ void worker()
         BOOL ret = GetQueuedCompletionStatus(g_h_iocp, &num_byte, (PULONG_PTR)&iocp_key, &p_over, INFINITE);
         int client_id = static_cast<int>(iocp_key);
         EXP_OVER* exp_over = reinterpret_cast<EXP_OVER*>(p_over);
+
+        Player* pl = reinterpret_cast<Player*>(players[client_id]);
+        int remain_data = num_byte + pl->get_prev_size();
+        unsigned char* packet_start = exp_over->_net_buf;
+        int packet_size = packet_start[0];
         if (FALSE == ret) {
             int err_no = WSAGetLastError();
             error_display(err_no);
+            Save_position(pl);// 차라리 disconnect 함수에 넣자 
             Disconnect(client_id);
             if (exp_over->_comp_op == OP_SEND)
                 delete exp_over;
@@ -2712,17 +3021,13 @@ void worker()
         }
 
         switch (exp_over->_comp_op) {
+          
         case OP_RECV: {
             if (num_byte == 0) {
+                Save_position(pl);
                 Disconnect(client_id);
                 continue;
             }
-
-            Player* pl = reinterpret_cast<Player*>(players[client_id]);
-            int remain_data = num_byte + pl->get_prev_size();
-            unsigned char* packet_start = exp_over->_net_buf;
-            int packet_size = packet_start[0];
-
             while (packet_size <= remain_data) {
                 process_packet(client_id, packet_start);
                 remain_data -= packet_size;
@@ -2742,6 +3047,7 @@ void worker()
         }
         case OP_SEND: {
             if (num_byte != exp_over->_wsa_buf.len) {
+                Save_position(pl);
                 Disconnect(client_id);
             }
             delete exp_over;
@@ -3940,36 +4246,35 @@ void do_timer()
                 }
                 reinterpret_cast<Player*>(players[temp.obj_id])->set_skill_active(temp.target_id, false);
                 continue;
-            }
-        /*    else if (temp.ev == EVENT_PARTNER_SKILL) {
-                // obj는 가이아의 넘버,  taget은 파트너 자신  
-                switch (reinterpret_cast<Player*>(dungeons[temp.obj_id]->get_party_palyer()[temp.target_id])->get_job())
+            }  
+            else if (temp.ev == EVENT_PARTNER_SKILL) {
+    
+                int indun_id = reinterpret_cast<Player*>(players[temp.obj_id])->get_indun_id();  //바꿔야함
+
+                switch (reinterpret_cast<Player*>(players[temp.obj_id])->get_job())
                 {
                 case J_DILLER: {
-                    if (temp.obj_id != MAX_USER / GAIA_ROOM + 1) {
-                        dungeons[temp.obj_id]->get_party_palyer()[temp.target_id]->set_physical_attack(0.3 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 10 * players[temp.obj_id]->get_lv());
-                        dungeons[temp.obj_id]->get_party_palyer()[temp.target_id]->set_magical_attack(0.1 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 5 * players[temp.obj_id]->get_lv());
-                    }
+                        for (int i = 0; i < GAIA_ROOM; ++i) {
+                            dungeons[indun_id]->get_party_palyer()[i]->set_physical_attack(dungeons[indun_id]->get_party_palyer()[i]->get_origin_physical_attack());
+                            dungeons[indun_id]->get_party_palyer()[i]->set_magical_attack(dungeons[indun_id]->get_party_palyer()[i]->get_origin_magical_attack());
+                        }
                     break;
                 }
                 case J_TANKER: {
-                    if (temp.obj_id != MAX_USER / GAIA_ROOM + 1) {
-                        dungeons[temp.obj_id]->get_party_palyer()[temp.target_id]->set_physical_defence(0.27 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 10 * players[temp.obj_id]->get_lv());
-                        dungeons[temp.obj_id]->get_party_palyer()[temp.target_id]->set_magical_defence(0.2 * players[temp.obj_id]->get_lv() * players[temp.obj_id]->get_lv() + 10 * players[temp.obj_id]->get_lv());
-                    }
-                    break;
-                }
-                case J_SUPPORTER: {   
-                    if (temp.target_id == MAX_USER / GAIA_ROOM + 1) {
                         for (int i = 0; i < GAIA_ROOM; ++i) {
-                            dungeons[temp.obj_id]->get_party_palyer()[i]->attack_speed_up = false;
-                        }
-                    }
+                            dungeons[indun_id]->get_party_palyer()[i]->set_physical_defence(dungeons[indun_id]->get_party_palyer()[i]->get_origin_physical_defence());
+                            dungeons[indun_id]->get_party_palyer()[i]->set_magical_defence(dungeons[indun_id]->get_party_palyer()[i]->get_origin_magical_defence());
+                        }        
+                    break;
+                }
+                case J_SUPPORTER: {         
+                    for (int i = 0; i < GAIA_ROOM; ++i) {
+                        dungeons[indun_id]->get_party_palyer()[i]->attack_speed_up = false;
+                    }    
                     break;
                 }
                 }
-
-            }*/
+            }
             else {
                 EXP_OVER* ex_over = new EXP_OVER;
                 ex_over->_comp_op = EVtoOP(temp.ev);
@@ -4028,35 +4333,36 @@ void do_timer()
                     reinterpret_cast<Player*>(players[ev.obj_id])->set_skill_active(ev.target_id, false);
                     continue;
                 }
-                /*   else if (ev.ev == EVENT_PARTNER_SKILL) {
-                    // obj는 가이아의 넘버,  taget은 파트너 자신  
-                    switch (reinterpret_cast<Player*>(dungeons[ev.obj_id]->get_party_palyer()[ev.target_id])->get_job())
+                else if (ev.ev == EVENT_PARTNER_SKILL) {
+
+                    int indun_id = reinterpret_cast<Player*>(players[ev.obj_id])->get_indun_id();  //바꿔야함
+           
+                    switch (reinterpret_cast<Player*>(players[ev.obj_id])->get_job()) 
                     {
                     case J_DILLER: {
-                        if (ev.obj_id != MAX_USER / GAIA_ROOM + 1) {
-                            dungeons[ev.obj_id]->get_party_palyer()[ev.target_id]->set_physical_attack(0.3 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 10 * players[ev.obj_id]->get_lv());
-                            dungeons[ev.obj_id]->get_party_palyer()[ev.target_id]->set_magical_attack(0.1 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 5 * players[ev.obj_id]->get_lv());
+                        for (int i = 0; i < GAIA_ROOM; ++i) {
+                            dungeons[indun_id]->get_party_palyer()[i]->set_physical_attack(dungeons[indun_id]->get_party_palyer()[i]->get_origin_physical_attack());
+                            dungeons[indun_id]->get_party_palyer()[i]->set_magical_attack(dungeons[indun_id]->get_party_palyer()[i]->get_origin_magical_attack());
                         }
                         break;
                     }
                     case J_TANKER: {
-                        if (ev.obj_id != MAX_USER / GAIA_ROOM + 1) {
-                            dungeons[ev.obj_id]->get_party_palyer()[ev.target_id]->set_physical_defence(0.27 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 10 * players[ev.obj_id]->get_lv());
-                            dungeons[ev.obj_id]->get_party_palyer()[ev.target_id]->set_magical_defence(0.2 * players[ev.obj_id]->get_lv() * players[ev.obj_id]->get_lv() + 10 * players[ev.obj_id]->get_lv());
-                        }
+                            for (int i = 0; i < GAIA_ROOM; ++i) {
+                                dungeons[indun_id]->get_party_palyer()[i]->set_physical_defence(dungeons[indun_id]->get_party_palyer()[i]->get_origin_physical_defence());
+                                dungeons[indun_id]->get_party_palyer()[i]->set_magical_defence(dungeons[indun_id]->get_party_palyer()[i]->get_origin_magical_defence());
+                            }
+
                         break;
                     }
-                    case J_SUPPORTER: {   // 대상이 여러명일 때는 어떻게 다시 초기화할까 
-                        if (ev.target_id == MAX_USER / GAIA_ROOM + 1) {
-                            for (int i = 0; i < GAIA_ROOM; ++i) {
-                                dungeons[ev.obj_id]->get_party_palyer()[i]->attack_speed_up = false;
-                            }
-                           }
+                    case J_SUPPORTER: {
+                        for (int i = 0; i < GAIA_ROOM; ++i) {
+                            dungeons[indun_id]->get_party_palyer()[i]->attack_speed_up = false;
+                        }
                         break;
                     }
                     }
 
-                }*/
+                }
 
                 ex_over->_comp_op = EVtoOP(ev.ev);
                 ex_over->_target = ev.target_id;
@@ -4087,6 +4393,8 @@ void initialise_DUNGEON()
 
 int main()
 {
+   
+
     setlocale(LC_ALL, "korean");
     wcout.imbue(locale("korean"));
     WSADATA WSAData;
@@ -4122,8 +4430,8 @@ int main()
         players[i] = new Player(i);
     }
 
-    // DB 연결1
-    // Initialise_DB();
+   
+    Initialise_DB(); //db 연결  주석처리하면 db안씀
     initialise_NPC();
     initialise_DUNGEON();
 
@@ -4155,13 +4463,15 @@ int main()
     timer_thread.join();
     for (auto& pl : players) {
         if (pl->get_tribe() != HUMAN) break;
-        if (ST_INGAME == pl->get_state())
+        if (ST_INGAME == pl->get_state()) {
+            Save_position(reinterpret_cast<Player*>(pl));
             Disconnect(pl->get_id());
+        }
     }
     closesocket(g_s_socket);
     DeleteCriticalSection(&cs);
     WSACleanup();
 
     // DB 연결
-    // Disconnect_DB();
+     Disconnect_DB();
 }

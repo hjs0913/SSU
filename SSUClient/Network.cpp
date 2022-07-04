@@ -61,6 +61,9 @@ int InvitationUser;
 CRITICAL_SECTION IndunCheck_cs;
 CRITICAL_SECTION UI_cs;
 
+char pl_id[MAX_NAME_SIZE];
+char pl_password[MAX_NAME_SIZE];
+
 struct EXP_OVER {
 	WSAOVERLAPPED m_wsa_over;
 	WSABUF m_wsa_buf;
@@ -108,14 +111,15 @@ void err_quit(const char* msg)
 	exit(1);
 }
 
-void send_login_packet(char* id, char* name, int job)
+void send_login_packet(char* id, char* password)
 {
 	cs_packet_login packet;
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET_LOGIN;
-	packet.job = job;
+	packet.job = 0;
+	strcpy_s(packet.password, password);
 	strcpy_s(packet.id, id);
-	strcpy_s(packet.name, name);
+	strcpy_s(packet.name, id);
 	do_send(sizeof(packet), &packet);
 }
 
@@ -283,6 +287,19 @@ void send_party_invitation_reply(int accept)
 	packet.accept = accept;
 	do_send(sizeof(packet), &packet);
 }
+void send_relogin_packet(char*  id, char*  password, char* nick_name, int job, int element)
+{
+	cs_packet_login packet;
+	packet.size = sizeof(packet);
+	packet.type = CS_PACKET_RE_LOGIN;
+	packet.job = job;
+	packet.element = element;
+	strcpy_s(packet.nickname, nick_name);
+	strcpy_s(packet.password, password);
+	strcpy_s(packet.id, id);
+	do_send(sizeof(packet), &packet);
+}
+
 
 void do_send(int num_bytes, void* mess)
 {
@@ -393,6 +410,7 @@ void process_packet(unsigned char* p)
 		Info_str.append(my_element_str);
 		Login_ok = true;
 		break;
+
 	}
 	case SC_PACKET_MOVE: {
 		sc_packet_move* packet = reinterpret_cast<sc_packet_move*>(p);
@@ -402,10 +420,14 @@ void process_packet(unsigned char* p)
 				my_position.x = packet->x;
 				my_position.y = packet->y;
 				my_position.z = packet->z;
+				XMFLOAT3 xmf3Look(packet->lx, packet->ly, packet->lz);
+				mPlayer[packet->id]->SetLook(xmf3Look);
 			}
 		}
 		else {
 			mPlayer[packet->id]->SetPosition(XMFLOAT3(packet->x, packet->y, packet->z));
+			XMFLOAT3 xmf3Look(packet->lx, packet->ly, packet->lz);
+			mPlayer[packet->id]->SetLook(xmf3Look);
 			//mPlayer[packet->id]->vCenter = XMFLOAT3(packet->x, packet->y, packet->z);
 		}
 		break;
@@ -461,9 +483,25 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_LOGIN_FAIL: {
-		cout << "로그인 실패(3초후 꺼집니다)" << endl;
-		Sleep(3000);
-		exit(0);
+		sc_packet_login_fail* packet = reinterpret_cast<sc_packet_login_fail*>(p);
+		if (packet->reason == 1) {
+			cout << "로그인 실패(3초후 꺼집니다)" << endl;
+			Sleep(3000);
+			exit(0);
+		}
+		else if(packet->reason == 2)
+		{
+			char nick_name[10];
+			cout << "새로운 아이디 입니다. 닉네임을 입력하세요: " << endl;
+			cin >> nick_name;
+			int job;
+			cout << "직업을 선택하세요(전사:0, 탱커:1, 마법사:2, 서포터:3): " << endl;
+			cin >> job;
+			int element;
+			cout << "속성을 선택하세요(물:1, 강철:2, 바람:3, 불:4, 나무:5, 땅:6, 얼음:7 ): " << endl;
+			cin >> element;
+			send_relogin_packet(pl_id, pl_password, nick_name, job, element);
+		}
 		break;
 	}
 	case SC_PACKET_STATUS_CHANGE: {
@@ -987,17 +1025,14 @@ int netInit()
 		m_party[i] = new Party(i);
 	}
 
-	char pl_id[MAX_NAME_SIZE];
-	char pl_name[MAX_NAME_SIZE];
-	int pl_job = 0;
+
 	cout << "ID를 입력하세요 : ";
 	cin >> pl_id;
-	cout << "이름을 입력하세요 : ";
-	cin >> pl_name;
-	cout << "직업을 고르세요(0 : 딜러, 1 : 탱커, 2 : 마법사, 3: 서포터) : ";
-	cin >> pl_job;
-	if (!(0 <= pl_job && pl_job <= 3)) pl_job = 0;
-	send_login_packet(pl_id, pl_name, pl_job);
+	cout << "패스워드를 입력하세요 : ";
+	cin >> pl_password;
+
+	//if (!(0 <= pl_job && pl_job <= 3)) pl_job = 0;
+	send_login_packet(pl_id, pl_password);
 
 	do_recv();
 }

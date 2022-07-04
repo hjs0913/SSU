@@ -33,11 +33,16 @@ SSU_Server_Dx/SSU_Server/x64
 
 RealServer/.vs
 RealServer/Server/x64
+RealServer/Server/Release
 
 StressTest/.vs
 StressTest/x64
 StressTest/dummy_client/x64
 
+SSUServer/.vs
+SSUServer/Debug
+SSUServer/SSUServer/x64
+SSUServer/x64
 
 *.exe
 *.pdb

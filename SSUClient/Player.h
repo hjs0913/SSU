@@ -11,7 +11,7 @@
 #include "Camera.h"
 #include "UILayer.h"
 #include "PartyUI.h"
-#include "../RealServer/Server/protocol.h"
+#include "../SSUServer/SSUServer/protocol.h"
 #include "Timer.h"
 
 struct CB_PLAYER_INFO

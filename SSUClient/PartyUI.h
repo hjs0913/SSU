@@ -1,7 +1,7 @@
 #pragma once
 #include "UILayer.h"
 #include "stdafx.h"
-#include "../RealServer/Server/protocol.h"
+#include "../SSUServer/SSUServer/protocol.h"
 
 class Party
 {
