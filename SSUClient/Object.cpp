@@ -201,6 +201,7 @@ void CMaterial::LoadTextureFromFile(ID3D12Device *pd3dDevice, ID3D12GraphicsComm
 		_stprintf_s(pstrDebug, 256, _T("Texture Name: %d %c %s\n"), (pstrTextureName[0] == '@') ? nRepeatedTextures++ : nTextures++, (pstrTextureName[0] == '@') ? '@' : ' ', pwstrTextureName);
 		OutputDebugString(pstrDebug);
 #endif
+
 		if (!bDuplicated)
 		{
 			*ppTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
@@ -526,6 +527,45 @@ void CAnimationController::AdvanceTime(float fTimeElapsed, CGameObject *pRootGam
 	}
 } 
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+CObjectMap::CObjectMap(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, CLoadedModelInfo* pModel)
+{
+	m_nSkinnedMeshes = pModel->m_nSkinnedMeshes;
+	m_ppSkinnedMeshes = new CSkinnedMesh * [m_nSkinnedMeshes];
+	for (int i = 0; i < m_nSkinnedMeshes; i++) m_ppSkinnedMeshes[i] = pModel->m_ppSkinnedMeshes[i];
+
+	m_ppd3dcbSkinningBoneTransforms = new ID3D12Resource * [m_nSkinnedMeshes];
+	m_ppcbxmf4x4MappedSkinningBoneTransforms = new XMFLOAT4X4 * [m_nSkinnedMeshes];
+
+	UINT ncbElementBytes = (((sizeof(XMFLOAT4X4) * SKINNED_ANIMATION_BONES) + 255) & ~255); //256ÀÇ ¹è¼ö
+	for (int i = 0; i < m_nSkinnedMeshes; i++)
+	{
+		m_ppd3dcbSkinningBoneTransforms[i] = ::CreateBufferResource(pd3dDevice, pd3dCommandList, NULL, ncbElementBytes, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, NULL);
+		m_ppd3dcbSkinningBoneTransforms[i]->Map(0, NULL, (void**)&m_ppcbxmf4x4MappedSkinningBoneTransforms[i]);
+	}
+}
+
+CObjectMap::~CObjectMap()
+{
+	for (int i = 0; i < m_nSkinnedMeshes; i++)
+	{
+		m_ppd3dcbSkinningBoneTransforms[i]->Unmap(0, NULL);
+		m_ppd3dcbSkinningBoneTransforms[i]->Release();
+	}
+	if (m_ppd3dcbSkinningBoneTransforms) delete[] m_ppd3dcbSkinningBoneTransforms;
+	if (m_ppcbxmf4x4MappedSkinningBoneTransforms) delete[] m_ppcbxmf4x4MappedSkinningBoneTransforms;
+	if (m_ppSkinnedMeshes) delete[] m_ppSkinnedMeshes;
+}
+
+void CObjectMap::UpdateShaderVariables(ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	for (int i = 0; i < m_nSkinnedMeshes; i++)
+	{
+		m_ppSkinnedMeshes[i]->m_pd3dcbSkinningBoneTransforms = m_ppd3dcbSkinningBoneTransforms[i];
+		m_ppSkinnedMeshes[i]->m_pcbxmf4x4MappedSkinningBoneTransforms = m_ppcbxmf4x4MappedSkinningBoneTransforms[i];
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 CLoadedModelInfo::~CLoadedModelInfo()
@@ -574,6 +614,7 @@ CGameObject::~CGameObject()
 	if (m_ppMaterials) delete[] m_ppMaterials;
 
 	if (m_pSkinnedAnimationController) delete m_pSkinnedAnimationController;
+	if (m_pObjectMap) delete m_pObjectMap;
 }
 
 void CGameObject::AddRef() 
@@ -939,6 +980,7 @@ void CGameObject::LoadMaterialsFromFile(ID3D12Device *pd3dDevice, ID3D12Graphics
 	m_nMaterials = ReadIntegerFromFile(pInFile);
 
 	m_ppMaterials = new CMaterial*[m_nMaterials];
+
 	for (int i = 0; i < m_nMaterials; i++) m_ppMaterials[i] = NULL;
 
 	CMaterial *pMaterial = NULL;
@@ -951,7 +993,7 @@ void CGameObject::LoadMaterialsFromFile(ID3D12Device *pd3dDevice, ID3D12Graphics
 		{
 			nMaterial = ReadIntegerFromFile(pInFile);
 
-			pMaterial = new CMaterial(7); //0:Albedo, 1:Specular, 2:Metallic, 3:Normal, 4:Emission, 5:DetailAlbedo, 6:DetailNormal
+			pMaterial = new CMaterial(7); //0:Albedo, 1:Specular,  2:Normal, 3:Metallic, 4:Emission, 5:DetailAlbedo, 6:DetailNormal
 
 			if (!pShader)
 			{
@@ -992,11 +1034,11 @@ void CGameObject::LoadMaterialsFromFile(ID3D12Device *pd3dDevice, ID3D12Graphics
 		}
 		else if (!strcmp(pstrToken, "<Metallic>:"))
 		{
-			nReads = (UINT)::fread(&(pMaterial->m_fSpecularHighlight), sizeof(float), 1, pInFile);
+			nReads = (UINT)::fread(&(pMaterial->m_fMetallic), sizeof(float), 1, pInFile);
 		}
 		else if (!strcmp(pstrToken, "<SpecularHighlight>:"))
 		{
-			nReads = (UINT)::fread(&(pMaterial->m_fMetallic), sizeof(float), 1, pInFile);
+			nReads = (UINT)::fread(&(pMaterial->m_fSpecularHighlight), sizeof(float), 1, pInFile);
 		}
 		else if (!strcmp(pstrToken, "<GlossyReflection>:"))
 		{
@@ -1262,7 +1304,7 @@ CHeightMapTerrain::CHeightMapTerrain(ID3D12Device *pd3dDevice, ID3D12GraphicsCom
 
 	CTexture *pTerrainBaseTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
 	if(!InDungeon)
-		pTerrainBaseTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/Base_Texture.dds", 0);
+		pTerrainBaseTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/Base_Texture_road_circle.dds", 0);
 	else
 		pTerrainBaseTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/indun_base.dds", 0);
 
@@ -1543,8 +1585,9 @@ CCastleObject::CCastleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList
 	if (!pCastleModel) pCastleModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, "Model/House.bin", NULL);
 
 	SetChild(pCastleModel->m_pModelRootObject, true);
-	m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pCastleModel, true);
+	//m_pSkinnedAnimationController = new CAnimationController(pd3dDevice, pd3dCommandList, nAnimationTracks, pCastleModel, false);
 
+	m_pObjectMap = new CObjectMap(pd3dDevice, pd3dCommandList, pCastleModel);
 }
 
 CCastleObject::~CCastleObject()
