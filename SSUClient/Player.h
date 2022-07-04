@@ -14,6 +14,7 @@
 #include "../SSUServer/SSUServer/protocol.h"
 #include "Timer.h"
 
+
 struct CB_PLAYER_INFO
 {
 	XMFLOAT4X4					m_xmf4x4World;

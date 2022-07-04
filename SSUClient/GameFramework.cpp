@@ -1095,7 +1095,10 @@ void CGameFramework::ProcessInput()
 				dwDirection = DIR_FORWARD;
 			}
 
-			if (pKeysBuffer[VK_SPACE] & 0xF0) dwAttack |= 0x30;
+			if (pKeysBuffer[VK_SPACE] & 0xF0) {
+				dwAttack |= 0x30;
+			}
+
 
 
 			if (first_skill_used == false) {
