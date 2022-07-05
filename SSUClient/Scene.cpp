@@ -100,24 +100,47 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	m_ppHierarchicalGameObjects[2]->SetPosition(2790.0f, m_pTerrain->GetHeight(2790.0f, 550.0f) - 5.0f, 550.0f);
 	m_ppHierarchicalGameObjects[2]->SetScale(10.0f, 10.0f, 10.0f);
 
-
-
 	if (pHouseModel) delete pHouseModel;
 	if (pHouseModell) delete pHouseModell;
 
-	CLoadedModelInfo* pMonsterModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Beast_Wolf.bin", NULL);
-	int wolf_anim_cnt = pMonsterModel->m_pAnimationSets->m_nAnimationSets;
+	pWolfModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Beast_Wolf.bin", NULL);
+	monster_anim_cnt = pWolfModel->m_pAnimationSets->m_nAnimationSets;
+
+	pMonkeyModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Monkeymon.bin", NULL);
+	pRabbitModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Rabbitmon.bin", NULL);
+	pFrogModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Frogmon.bin", NULL);
+
 	for (int i = 3; i < 33; ++i) {
-		m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMonsterModel, wolf_anim_cnt);
-		for (int j = 0; j < wolf_anim_cnt; ++j) {
+		if (i % 4 == 0)
+			m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pWolfModel, monster_anim_cnt);
+		else if (i % 4 == 1)
+			m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMonkeyModel, monster_anim_cnt);
+		else if (i % 4 == 2)
+			m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pRabbitModel, monster_anim_cnt);
+		else if (i % 4 == 3)
+			m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pFrogModel, monster_anim_cnt);
+
+		for (int j = 0; j < monster_anim_cnt; ++j) {
 			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
 			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 0.05f;
 		}
 		m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
 		m_ppHierarchicalGameObjects[i]->SetPosition(0.f, -100.f, 0.f);
-		m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
+
+		if (i % 4 == 0)			// 늑대
+			m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
+		else if (i % 4 == 1)	// 원숭이
+			m_ppHierarchicalGameObjects[i]->SetScale(20.0f, 20.0f, 20.0f);
+		else if (i % 4 == 2)	// 토끼
+			m_ppHierarchicalGameObjects[i]->SetScale(15.0f, 15.0f, 15.0f);
+		else if (i % 4 == 3)	// 개구리
+			m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
 	}
-	if (pMonsterModel) delete pMonsterModel;
+
+	if (pWolfModel) delete pWolfModel;
+	if (pMonkeyModel) delete pMonkeyModel;
+	if (pRabbitModel) delete pRabbitModel;
+	if (pFrogModel) delete pFrogModel;
 
 	pBastardModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Bastard_Warrior.bin", NULL);
 	player_anim_cnt = pBastardModel->m_pAnimationSets->m_nAnimationSets;
