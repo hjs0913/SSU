@@ -134,16 +134,28 @@ public:
 
 	ID3D12Device						*m_pd3dDevice = NULL;
 
+	// character model
 	CLoadedModelInfo					*pBastardModel = NULL;
 	CLoadedModelInfo					*pTankerModel = NULL;
 	CLoadedModelInfo					*pSupporterModel = NULL;
 	CLoadedModelInfo					*pMagicianModel = NULL;
-	CLoadedModelInfo* pTreeModel1 = NULL;
-	CLoadedModelInfo* pTreeModel2 = NULL;
-	CLoadedModelInfo* pTreeModel3 = NULL;
+
+	// object model
+	CLoadedModelInfo					*pTreeModel1 = NULL;
+	CLoadedModelInfo					*pTreeModel2 = NULL;
+	CLoadedModelInfo					*pTreeModel3 = NULL;
+
+	// monster model
+	//CLoadedModelInfo* pChickenModel = NULL;
+	CLoadedModelInfo					*pRabbitModel = NULL;
+	CLoadedModelInfo					*pFrogModel = NULL;
+	CLoadedModelInfo					*pMonkeyModel = NULL;
+	CLoadedModelInfo					*pWolfModel = NULL;
+	//CLoadedModelInfo* pTigerModel = NULL;
 
 
 	int									player_anim_cnt = 0;
+	int									monster_anim_cnt = 0;
 
 	float circle_time = 0.0f;
 
