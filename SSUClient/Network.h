@@ -10,7 +10,8 @@
 #include <queue>
 #include <string>
 #include "Player.h"
-#include "../SSUServer/SSUServer/protocol.h"
+#include "../RealServer/Server/protocol.h"
+//#include "../SSUServer/SSUServer/protocol.h"
 #include "stdafx.h"
 #include "Pattern.h"
 #include "PartyUI.h"

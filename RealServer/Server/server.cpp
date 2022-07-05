@@ -70,7 +70,7 @@ bool check_move_alright(int x, int z, bool monster)
 {
     int size = 0;
     if (monster) size = 15;
-    else size = 5;
+    else size = 10;
 
 
     for (auto& ob : obstacles) {
@@ -4446,9 +4446,9 @@ int main()
         float x, y, z;
         obstacles_read >> x >> y >> z;
         obstacles[i].set_id(i);
-        obstacles[i].set_x(0);
-        obstacles[i].set_y(0);
-        obstacles[i].set_z(0);
+        obstacles[i].set_x(x);
+        obstacles[i].set_y(y);
+        obstacles[i].set_z(z);
     }
 
     obstacles_read.close();
