@@ -11,7 +11,8 @@
 #include "Camera.h"
 #include "UILayer.h"
 #include "PartyUI.h"
-#include "../SSUServer/SSUServer/protocol.h"
+#include "../RealServer/Server/protocol.h"
+//#include "../SSUServer/SSUServer/protocol.h"
 #include "Timer.h"
 
 

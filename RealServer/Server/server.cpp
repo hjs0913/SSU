@@ -70,7 +70,7 @@ bool check_move_alright(int x, int z, bool monster)
 {
     int size = 0;
     if (monster) size = 15;
-    else size = 5;
+    else size = 10;
 
 
     for (auto& ob : obstacles) {
@@ -1543,7 +1543,7 @@ void process_packet(int client_id, unsigned char* p)
                                 bos->set_hp(bos->get_hp() - damage);
                                 //send_status_change_packet(pl);
                                 for (int i = 0; i < GAIA_ROOM; ++i) {
-                                    send_change_hp_packet(dungeons[client_id]->get_party_palyer()[i], dungeons[client_id]->boss);
+                                    send_change_hp_packet(dungeons[indun_id]->get_party_palyer()[i], dungeons[client_id]->boss);
                                 }
                                 if (bos->get_hp() < 0) {
                                     bos->set_hp(0);
@@ -4446,9 +4446,9 @@ int main()
         float x, y, z;
         obstacles_read >> x >> y >> z;
         obstacles[i].set_id(i);
-        obstacles[i].set_x(0);
-        obstacles[i].set_y(0);
-        obstacles[i].set_z(0);
+        obstacles[i].set_x(x);
+        obstacles[i].set_y(y);
+        obstacles[i].set_z(z);
     }
 
     obstacles_read.close();
