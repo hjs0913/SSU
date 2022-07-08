@@ -773,6 +773,18 @@ bool ObjectManager::check_move_alright(int x, int z, bool monster)
     return true;
 }
 
+bool ObjectManager::check_move_alright_indun(int x, int z)
+{
+    int m_x = 2037;
+    int m_z = 2112;
+    float r = 515.f;
+    
+    // 중심과 (x,z)의 거리가 r보다 작으면 true
+    if (sqrt(pow((x - m_x), 2) + pow((z - m_z), 2)) < r) return true;
+    else return false;
+
+}
+
 Npc* ObjectManager::get_player(int c_id)
 {
     return players[c_id];

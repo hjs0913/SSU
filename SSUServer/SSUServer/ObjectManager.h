@@ -37,6 +37,7 @@ public:
 	bool is_npc(int id) { return (id >= NPC_ID_START) && (id <= NPC_ID_END);}
 	bool is_near(int a, int b);
 	bool check_move_alright(int x, int z, bool monster);
+	bool check_move_alright_indun(int x, int z);
 
 	Npc* get_player(int c_id);
 	Gaia* get_dungeon(int d_id);

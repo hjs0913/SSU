@@ -1,3 +1,4 @@
+#include "ObjectManager.h"
 #include "TimerManager.h"
 #include "send.h"
 #include "Partner.h"
@@ -60,8 +61,10 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 		if (gaia->running_pattern == false) {   //보스 패턴을 실행 안하면 붙어
 			target_id = gaia->get_dungeon_id();
 			pos mv = pa->non_a_star(gaia->boss->get_x(), gaia->boss->get_z(), pa->get_x(), pa->get_z());
-			pa->set_x(mv.first);
-			pa->set_z(mv.second);
+			if (static_ObjectManager::get_objManger()->check_move_alright_indun(mv.first, mv.second)) {
+				pa->set_x(mv.first);
+				pa->set_z(mv.second);
+			}
 		}
 		else if (gaia->running_pattern == true) {  //보스가 패턴을 쓸 때,  패턴의 번호를 받아서 피할 수 있도록 하자 // 0.장판4개 1.날아오기3개  4.참격1개 
 			switch (gaia->pattern_num)
@@ -79,8 +82,10 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 
 				}
 				move = pa->non_a_star(gaia->pattern_one_position[nearest_num].first + 30, gaia->pattern_one_position[nearest_num].second, pa->get_x(), pa->get_z());
-				pa->set_x(move.first);
-				pa->set_z(move.second);
+				if (static_ObjectManager::get_objManger()->check_move_alright_indun(mv.first, mv.second)) {
+					pa->set_x(mv.first);
+					pa->set_z(mv.second);
+				}
 				break;
 			case 1:    //  안전지대 2개 중 가까운데로 가자 
 				dis = 0;
@@ -97,14 +102,18 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 						}
 					}
 					move = pa->non_a_star(gaia->pattern_two_safe_zone[nearest_num].first, gaia->pattern_two_safe_zone[nearest_num].second, pa->get_x(), pa->get_z());
-					pa->set_x(move.first);
-					pa->set_z(move.second);
+					if (static_ObjectManager::get_objManger()->check_move_alright_indun(mv.first, mv.second)) {
+						pa->set_x(mv.first);
+						pa->set_z(mv.second);
+					}
 				
 				break;
 			case 4:
 				move = pa->non_a_star(gaia->boss->get_look_x() + gaia->boss->get_right_x() * 10, gaia->boss->get_look_z() + gaia->boss->get_right_z() * 10, pa->get_x(), pa->get_z());
-				pa->set_x(move.first);
-				pa->set_z(move.second);
+				if (static_ObjectManager::get_objManger()->check_move_alright_indun(mv.first, mv.second)) {
+					pa->set_x(mv.first);
+					pa->set_z(mv.second);
+				}
 				break;
 			default:
 				break;
@@ -116,8 +125,10 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 		if (gaia->running_pattern == false) {   //보스 패턴을 실행 안하면 붙어
 			target_id = gaia->get_dungeon_id();
 			pos mv = pa->non_a_star(gaia->boss->get_x(), gaia->boss->get_z(), pa->get_x(), pa->get_z());
-			pa->set_x(mv.first);
-			pa->set_z(mv.second);
+			if (static_ObjectManager::get_objManger()->check_move_alright_indun(mv.first, mv.second)) {
+				pa->set_x(mv.first);
+				pa->set_z(mv.second);
+			}
 		}
 		else if (gaia->running_pattern == true) {  //보스가 패턴을 쓸 때,  패턴의 번호를 받아서 피할 수 있도록 하자 // 0.장판4개 1.날아오기3개  4.참격1개 
 			switch (gaia->pattern_num)
@@ -135,8 +146,10 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 
 				}
 				move = pa->non_a_star(gaia->pattern_one_position[nearest_num].first + 30, gaia->pattern_one_position[nearest_num].second, pa->get_x(), pa->get_z());
-				pa->set_x(move.first);
-				pa->set_z(move.second);
+				if (static_ObjectManager::get_objManger()->check_move_alright_indun(move.first, move.second)) {
+					pa->set_x(move.first);
+					pa->set_z(move.second);
+				}
 				break;
 			case 1:    //  안전지대 2개 중 가까운데로 가자 
 				dis = 0;
@@ -155,14 +168,18 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 				}
 				move = pa->non_a_star(gaia->pattern_two_safe_zone[nearest_num].first, gaia->pattern_two_safe_zone[nearest_num].second, pa->get_x(), pa->get_z());
 
-				pa->set_x(move.first);
-				pa->set_z(move.second);
+				if (static_ObjectManager::get_objManger()->check_move_alright_indun(move.first, move.second)) {
+					pa->set_x(move.first);
+					pa->set_z(move.second);
+				}
 
 				break;
 			case 4:
 				move = pa->non_a_star(gaia->boss->get_look_x() + gaia->boss->get_right_x() * 10, gaia->boss->get_look_z() + gaia->boss->get_right_z() * 10, pa->get_x(), pa->get_z());
-				pa->set_x(move.first);
-				pa->set_z(move.second);
+				if (static_ObjectManager::get_objManger()->check_move_alright_indun(move.first, move.second)) {
+					pa->set_x(move.first);
+					pa->set_z(move.second);
+				}
 				break;
 			default:
 				break;
@@ -174,8 +191,10 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 		if (gaia->running_pattern == false) {   //보스 패턴을 실행 안해도 그래도 일정기리는 유지해   // 일단 보스가 바라보는 반대방향?
 			target_id = gaia->get_dungeon_id();
 			pos mv = pa->non_a_star(gaia->boss->get_x() - gaia->boss->get_look_x() * 100, gaia->boss->get_z() + gaia->boss->get_look_z() * 100, pa->get_x(), pa->get_z());
-			pa->set_x(mv.first);
-			pa->set_z(mv.second);
+			if (static_ObjectManager::get_objManger()->check_move_alright_indun(mv.first, mv.second)) {
+				pa->set_x(mv.first);
+				pa->set_z(mv.second);
+			}
 		}
 		else if (gaia->running_pattern == true) {  //보스가 패턴을 쓸 때,  패턴의 번호를 받아서 피할 수 있도록 하자 // 0.장판4개 1.날아오기3개  4.참격1개 
 			switch (gaia->pattern_num)
@@ -193,8 +212,10 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 
 				}
 				move = pa->non_a_star(gaia->pattern_one_position[nearest_num].first + 30, gaia->pattern_one_position[nearest_num].second, pa->get_x(), pa->get_z());
-				pa->set_x(move.first);
-				pa->set_z(move.second);
+				if (static_ObjectManager::get_objManger()->check_move_alright_indun(move.first, move.second)) {
+					pa->set_x(move.first);
+					pa->set_z(move.second);
+				}
 				break;
 			case 1:    //  안전지대 2개 중 가까운데로 가자 
 				dis = 0;
@@ -213,15 +234,19 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 				}
 				move = pa->non_a_star(gaia->pattern_two_safe_zone[nearest_num].first, gaia->pattern_two_safe_zone[nearest_num].second, pa->get_x(), pa->get_z());
 
-				pa->set_x(move.first);
-				pa->set_z(move.second);
+				if (static_ObjectManager::get_objManger()->check_move_alright_indun(move.first, move.second)) {
+					pa->set_x(move.first);
+					pa->set_z(move.second);
+				}
 
 				break;
 			case 4:
 
 				move = pa->non_a_star(gaia->boss->get_look_x() + gaia->boss->get_right_x() * 10, gaia->boss->get_look_z() + gaia->boss->get_right_z() * 10, pa->get_x(), pa->get_z());
-				pa->set_x(move.first);
-				pa->set_z(move.second);
+				if (static_ObjectManager::get_objManger()->check_move_alright_indun(move.first, move.second)) {
+					pa->set_x(move.first);
+					pa->set_z(move.second);
+				}
 				break;
 			default:
 				break;
@@ -233,8 +258,10 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 		if (gaia->running_pattern == false) {   //보스 패턴을 실행 안해도 그래도 일정기리는 유지해 
 			target_id = gaia->get_dungeon_id();
 			pos mv = pa->non_a_star(gaia->boss->get_x() - gaia->boss->get_look_x() * 100, gaia->boss->get_z() + gaia->boss->get_look_z() * 100, pa->get_x(), pa->get_z());
-			pa->set_x(mv.first);
-			pa->set_z(mv.second);
+			if (static_ObjectManager::get_objManger()->check_move_alright_indun(mv.first, mv.second)) {
+				pa->set_x(mv.first);
+				pa->set_z(mv.second);
+			}
 		}
 		else if (gaia->running_pattern == true) {  //보스가 패턴을 쓸 때,  패턴의 번호를 받아서 피할 수 있도록 하자 // 0.장판4개 1.날아오기3개  4.참격1개 
 			switch (gaia->pattern_num)
@@ -252,8 +279,10 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 
 				}
 				move = pa->non_a_star(gaia->pattern_one_position[nearest_num].first + 30, gaia->pattern_one_position[nearest_num].second, pa->get_x(), pa->get_z());
-				pa->set_x(move.first);
-				pa->set_z(move.second);
+				if (static_ObjectManager::get_objManger()->check_move_alright_indun(move.first, move.second)) {
+					pa->set_x(move.first);
+					pa->set_z(move.second);
+				}
 				break;
 			case 1:    //  안전지대 2개 중 가까운데로 가자 
 				dis = 0;
@@ -272,15 +301,19 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 				}
 				move = pa->non_a_star(gaia->pattern_two_safe_zone[nearest_num].first, gaia->pattern_two_safe_zone[nearest_num].second, pa->get_x(), pa->get_z());
 
-				pa->set_x(move.first);
-				pa->set_z(move.second);
+				if (static_ObjectManager::get_objManger()->check_move_alright_indun(move.first, move.second)) {
+					pa->set_x(move.first);
+					pa->set_z(move.second);
+				}
 
 				break;
 			case 4:
 
 				move = pa->non_a_star(gaia->boss->get_look_x() + gaia->boss->get_right_x() * 10, gaia->boss->get_look_z() + gaia->boss->get_right_z() * 10, pa->get_x(), pa->get_z());
-				pa->set_x(move.first);
-				pa->set_z(move.second);
+				if (static_ObjectManager::get_objManger()->check_move_alright_indun(move.first, move.second)) {
+					pa->set_x(move.first);
+					pa->set_z(move.second);
+				}
 				break;
 			default:
 				break;
