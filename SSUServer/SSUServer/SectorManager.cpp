@@ -10,7 +10,7 @@ SectorManager::SectorManager()
 	}
 }
 
-void SectorManager::set_players_object(array <Npc*, MAX_USER + MAX_NPC>& pls)
+void SectorManager::set_players_object(array <Npc*, MAX_USER + MAX_NPC + MAX_AI>& pls)
 {
 	players = pls;
 }

@@ -10,7 +10,7 @@ class PacketManager;
 class ObjectManager
 {
 private:
-	array <Npc*, MAX_USER + MAX_NPC> players;
+	array <Npc*, MAX_USER + MAX_NPC + MAX_AI> players;
 	array <Obstacle*, MAX_OBSTACLE> obstacles;
 	array <Gaia*, MAX_DUNGEONS> dungeons;
 
@@ -24,6 +24,7 @@ public:
 	void Initialize_Npc();
 	void Initialize_Obstacle();
 	void Initialize_Dungeons();
+	void Initialize_Ai();
 
 	void error_display(int err_no);
 	void Disconnect(int c_id);
@@ -32,6 +33,7 @@ public:
 	void set_packetManager(PacketManager* packetManager);
 
 	int get_new_id();
+	int get_new_ai_id();
 	bool is_npc(int id) { return (id >= NPC_ID_START) && (id <= NPC_ID_END);}
 	bool is_near(int a, int b);
 	bool check_move_alright(int x, int z, bool monster);

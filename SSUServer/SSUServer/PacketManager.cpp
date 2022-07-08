@@ -33,7 +33,7 @@ PacketManager::PacketManager(ObjectManager* objectManager, SectorManager* sector
     h_iocp = iocp;
 }
 
-void PacketManager::set_players_object(array <Npc*, MAX_USER + MAX_NPC>& pls)
+void PacketManager::set_players_object(array <Npc*, MAX_USER + MAX_NPC + MAX_AI>& pls)
 {
     players = pls;
 }
@@ -1282,8 +1282,9 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
 
             for (int i = 0; i < dun->player_cnt; i++) {
                 int delete_id = party_players[i]->get_id();
-                delete players[delete_id];
-                players[delete_id] = new Player(delete_id);
+                players[delete_id]->state_lock.lock();
+                players[delete_id]->set_state(ST_FREE);
+                players[delete_id]->state_lock.unlock();
             }
             dun->destroy_dungeon();
 
@@ -1382,12 +1383,10 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
 
         if (dun->player_cnt < GAIA_ROOM) {  // 제한 인원수 보다 적을 때만 추가 가능하도록 하자 
 
-            int new_id = m_ObjectManger->get_new_id();
+            int new_id = m_ObjectManger->get_new_ai_id();
             if (-1 == new_id) {
                 cout << "Maxmum user overflow.Accept aborted.\n";
             }
-            delete players[new_id];
-            players[new_id] = new Partner(new_id);
             players[new_id]->state_lock.lock();
             players[new_id]->set_state(ST_ACCEPT);
             players[new_id]->state_lock.unlock();

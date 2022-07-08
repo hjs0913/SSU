@@ -51,10 +51,17 @@ const int  MAX_USER = 1000;
 // const int  MAX_NPC = 200000;
 const int  MAX_NPC = 180;		// µð¹ö±ë ¿ë
 const int  MAX_DUNGEONS = 1000;
+constexpr int MAX_AI = MAX_DUNGEONS * 3;
+
 constexpr int NPC_ID_START = MAX_USER;
 constexpr int NPC_ID_END = MAX_USER + MAX_NPC - 1;
+
+constexpr int AI_ID_START = MAX_USER + MAX_NPC;
+constexpr int AI_ID_END = MAX_USER + MAX_NPC + MAX_AI - 1;
+
 const int NPC_INTERVAL = 30;
-constexpr int GAIA_ID = MAX_USER + MAX_NPC;
+constexpr int GAIA_ID = MAX_USER + MAX_NPC + MAX_AI;
+
 const int GAIA_ROOM = 4;
 
 

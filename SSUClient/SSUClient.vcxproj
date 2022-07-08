@@ -152,7 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\RealServer\Server\protocol.h" />
+    <ClInclude Include="..\SSUServer\SSUServer\protocol.h" />
     <ClInclude Include="Bitmap.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="DDSTextureLoader12.h" />

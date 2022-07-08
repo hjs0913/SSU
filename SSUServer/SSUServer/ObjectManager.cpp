@@ -21,6 +21,8 @@ ObjectManager::ObjectManager(SectorManager* sectorManager, MainSocketManager* so
     cout << "플레이어 초기화 완료" << endl;
     Initialize_Npc();
 
+    Initialize_Ai();
+
     Initialize_Obstacle();
 
     Initialize_Dungeons();
@@ -103,6 +105,13 @@ void ObjectManager::Initialize_Dungeons()
     cout << "던전 초기화 완료" << endl;
 }
 
+void ObjectManager::Initialize_Ai()
+{
+    for (int i = AI_ID_START; i < AI_ID_END; i++) {
+        players[i] = new Partner(i);
+    }
+}
+
 void ObjectManager::error_display(int err_no)
 {
     WCHAR* lpMsgBuf;
@@ -149,8 +158,9 @@ void ObjectManager::Disconnect(int c_id)
 
             for (int i = 0; i < dun->player_cnt; i++) {
                 int delete_id = party_players[i]->get_id();
-                delete players[delete_id];
-                players[delete_id] = new Player(delete_id);
+                players[delete_id]->state_lock.lock();
+                players[delete_id]->set_state(ST_FREE);
+                players[delete_id]->state_lock.unlock();
             }
             dun->destroy_dungeon();
         }
@@ -321,7 +331,7 @@ void ObjectManager::worker()
             players[client_id]->state_lock.lock();
             if ((players[client_id]->get_state() != ST_INGAME) || (false == players[client_id]->get_active())) {
                 players[client_id]->state_lock.unlock();
-                delete exp_over; EVENT_PLAYER_ATTACK;
+                delete exp_over;
                 break;
             }
             players[client_id]->state_lock.unlock();
@@ -620,91 +630,8 @@ void ObjectManager::worker()
                     party_players[i]->set_state(ST_INGAME);
                     party_players[i]->state_lock.unlock();
 
-
-
-                    // 새로 접속한 정보를 다른이에게 보내줌
-                    for (auto& other : players) {
-                        if (other->get_id() == client_id) continue;   // 나다
-
-                        if (true == is_npc(other->get_id())) break;
-
-                        other->state_lock.lock();
-                        if (ST_INGAME != other->get_state()) {
-                            other->state_lock.unlock();
-                            continue;
-                        }
-                        other->state_lock.unlock();
-
-                        if (false == is_near(other->get_id(), client_id)) continue;
-
-                        // 여기는 플레이어 처리
-                        Player* other_player = reinterpret_cast<Player*>(other);
-                        other_player->vl.lock();
-                        other_player->viewlist.insert(client_id);
-                        other_player->vl.unlock();
-
-                        send_put_object_packet(other_player, party_players[i]);
-                    }
-                    // 새로 접속한 플레이어에게 기존 정보를 보내중
-                    party_players[i]->viewlist.clear();
-                    for (auto& other : players) {
-                        if (other->get_id() == client_id) continue;
-                        other->state_lock.lock();
-                        if (ST_INGAME != other->get_state()) {
-                            other->state_lock.unlock();
-                            continue;
-                        }
-                        other->state_lock.unlock();
-
-                        if (false == is_near(other->get_id(), client_id))
-                            continue;
-
-                        // 스크립트와 함께 추가된 부분
-                        if (true == is_npc(other->get_id())) {	// 시야에 npc가 있다면 
-                            // 현재 어그로 몬스터 없음
-
-                            /*if (is_agro_near(client_id, other->get_id())) {
-                                if (other->get_active() == false) {
-                                    other->set_active(true);
-                                    timer_event ev;
-                                    ev.obj_id = other->get_id();
-                                    ev.start_time = chrono::system_clock::now() + 1s;
-                                    ev.ev = EVENT_NPC_ATTACK;
-                                    ev.target_id = client_id;
-                                    timer_queue.push(ev);
-                                    Activate_Npc_Move_Event(other->get_id(), party_players[i]->get_id());
-                                }
-                            }*/
-                        }
-
-                        party_players[i]->vl.lock();
-                        party_players[i]->viewlist.insert(other->get_id());
-                        party_players[i]->vl.unlock();
-
-                        send_put_object_packet(party_players[i], other);
-                    }
-                    // 장애물 정보
-                    for (auto ob : obstacles) {
-                        if (RANGE < abs(party_players[i]->get_x() - ob->get_x())) continue;
-                        if (RANGE < abs(party_players[i]->get_z() - ob->get_z())) continue;
-
-                        party_players[i]->ob_vl.lock();
-                        party_players[i]->ob_viewlist.clear();
-                        party_players[i]->ob_viewlist.insert(ob->get_id());
-                        party_players[i]->ob_vl.unlock();
-
-                        sc_packet_put_object packet;
-                        packet.id = ob->get_id();
-                        strcpy_s(packet.name, "");
-                        packet.object_type = ob->get_tribe();
-                        packet.size = sizeof(packet);
-                        packet.type = SC_PACKET_PUT_OBJECT;
-                        packet.x = ob->get_x();
-                        packet.y = ob->get_y();
-                        packet.z = ob->get_z();
-                        party_players[i]->do_send(sizeof(packet), &packet);
-                    }
-
+                    m_SectorManager->player_put(party_players[i]);
+                
                     dun->quit_palyer(party_players[i]);
                     i--;
                     human_player++;
@@ -730,8 +657,9 @@ void ObjectManager::worker()
             // AI는 해제해주기
             for (int i = 0; i < dun->player_cnt; i++) {
                 int delete_id = party_players[i]->get_id();
-                delete players[delete_id];
-                players[delete_id] = new Player(delete_id);
+                players[delete_id]->state_lock.lock();
+                players[delete_id]->set_state(ST_FREE);
+                players[delete_id]->state_lock.unlock();
             }
 
             // 방 파괴해주기
@@ -795,6 +723,21 @@ void ObjectManager::set_packetManager(PacketManager* packetManager)
 int ObjectManager::get_new_id()
 {
     for (int i = 0; i < MAX_USER; ++i) {
+        players[i]->state_lock.lock();
+        if (ST_FREE == players[i]->get_state()) {
+            players[i]->set_state(ST_ACCEPT);
+            players[i]->state_lock.unlock();
+            return i;
+        }
+        players[i]->state_lock.unlock();
+    }
+    cout << "Maximum Number of Clients Overflow!!\n";
+    return -1;
+}
+
+int ObjectManager::get_new_ai_id()
+{
+    for (int i = AI_ID_START; i < AI_ID_END; ++i) {
         players[i]->state_lock.lock();
         if (ST_FREE == players[i]->get_state()) {
             players[i]->set_state(ST_ACCEPT);

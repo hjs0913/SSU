@@ -12,12 +12,12 @@ private:
 	array<Sector*, 64> sectors;
 	array<Sector*, 64> obs_sectors;
 
-	array <Npc*, MAX_USER + MAX_NPC> players;
+	array <Npc*, MAX_USER + MAX_NPC + MAX_AI> players;
 
 public:
 	SectorManager();
 	
-	void set_players_object(array <Npc*, MAX_USER + MAX_NPC>& pls);
+	void set_players_object(array <Npc*, MAX_USER + MAX_NPC + MAX_AI>& pls);
 
 	void player_put(Npc* p);
 	void player_move(Npc* p);
