@@ -4,8 +4,8 @@
 
 #include "stdafx.h"
 #include "Scene.h"
-#include "../RealServer/Server/protocol.h"
-//#include "../SSUServer/SSUServer/protocol.h"
+//#include "../RealServer/Server/protocol.h"
+#include "../SSUServer/SSUServer/protocol.h"
 #include "Network.h"
 ID3D12DescriptorHeap *CScene::m_pd3dCbvSrvDescriptorHeap = NULL;
 

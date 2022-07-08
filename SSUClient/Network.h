@@ -10,8 +10,8 @@
 #include <queue>
 #include <string>
 #include "Player.h"
-#include "../RealServer/Server/protocol.h"
-//#include "../SSUServer/SSUServer/protocol.h"
+//#include "../RealServer/Server/protocol.h"
+#include "../SSUServer/SSUServer/protocol.h"
 #include "stdafx.h"
 #include "Pattern.h"
 #include "PartyUI.h"
@@ -24,7 +24,7 @@
 
 using namespace std;
 
-extern array<CPlayer*, MAX_USER + MAX_NPC+1> mPlayer;
+extern array<CPlayer*, MAX_USER + MAX_NPC + MAX_AI +1> mPlayer;
 extern int my_id;
 extern int m_prev_recv;
 extern vector<string> g_msg;
