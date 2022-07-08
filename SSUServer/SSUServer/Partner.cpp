@@ -82,9 +82,9 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 
 				}
 				move = pa->non_a_star(gaia->pattern_one_position[nearest_num].first + 30, gaia->pattern_one_position[nearest_num].second, pa->get_x(), pa->get_z());
-				if (static_ObjectManager::get_objManger()->check_move_alright_indun(mv.first, mv.second)) {
-					pa->set_x(mv.first);
-					pa->set_z(mv.second);
+				if (static_ObjectManager::get_objManger()->check_move_alright_indun(move.first, move.second)) {
+					pa->set_x(move.first);
+					pa->set_z(move.second);
 				}
 				break;
 			case 1:    //  안전지대 2개 중 가까운데로 가자 
@@ -102,17 +102,17 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 						}
 					}
 					move = pa->non_a_star(gaia->pattern_two_safe_zone[nearest_num].first, gaia->pattern_two_safe_zone[nearest_num].second, pa->get_x(), pa->get_z());
-					if (static_ObjectManager::get_objManger()->check_move_alright_indun(mv.first, mv.second)) {
-						pa->set_x(mv.first);
-						pa->set_z(mv.second);
+					if (static_ObjectManager::get_objManger()->check_move_alright_indun(move.first, move.second)) {
+						pa->set_x(move.first);
+						pa->set_z(move.second);
 					}
 				
 				break;
 			case 4:
 				move = pa->non_a_star(gaia->boss->get_look_x() + gaia->boss->get_right_x() * 10, gaia->boss->get_look_z() + gaia->boss->get_right_z() * 10, pa->get_x(), pa->get_z());
-				if (static_ObjectManager::get_objManger()->check_move_alright_indun(mv.first, mv.second)) {
-					pa->set_x(mv.first);
-					pa->set_z(mv.second);
+				if (static_ObjectManager::get_objManger()->check_move_alright_indun(move.first, move.second)) {
+					pa->set_x(move.first);
+					pa->set_z(move.second);
 				}
 				break;
 			default:

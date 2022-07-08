@@ -78,7 +78,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	XMFLOAT4 xmf4Color(0.1f, 0.1f, 0.1f, 0.0f);
 	m_pTerrain = new CHeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Image/HeightMap.raw"), 512, 512, xmf3Scale, xmf4Color);
 
-	m_nHierarchicalGameObjects = 3 + 30 + 30 + 609;	// 성벽 1 + 집 2 + 몬스터 30 + 플레이어 30 + 나무609
+	m_nHierarchicalGameObjects = 3 + MAX_NPC + 30 + 609;	// 성벽 1 + 집 2 + 몬스터 30 + 플레이어 30 + 나무609
 	m_ppHierarchicalGameObjects = new CGameObject * [m_nHierarchicalGameObjects];
 	//for (int i = 0; i < m_nHierarchicalGameObjects; ++i) m_ppHierarchicalGameObjects[i] = NULL;
 
@@ -111,14 +111,19 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	pRabbitModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Rabbitmon.bin", NULL);
 	pFrogModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Frogmon.bin", NULL);
 
-	for (int i = 3; i < 33; ++i) {
-		if (i % 4 == 0)
+	for (int i = 3; i < 3+MAX_NPC; ++i) {
+		int temp_id = i - 3;
+		if (temp_id/NPC_INTERVAL == 0)
 			m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pWolfModel, monster_anim_cnt);
-		else if (i % 4 == 1)
+		else if (temp_id / NPC_INTERVAL == 1)
 			m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMonkeyModel, monster_anim_cnt);
-		else if (i % 4 == 2)
+		else if (temp_id / NPC_INTERVAL == 2)
 			m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pRabbitModel, monster_anim_cnt);
-		else if (i % 4 == 3)
+		else if (temp_id / NPC_INTERVAL == 3)
+			m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pFrogModel, monster_anim_cnt);
+		else if (temp_id / NPC_INTERVAL == 4)	// 모델 추가하면 바꾸기
+			m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pFrogModel, monster_anim_cnt);
+		else if (temp_id / NPC_INTERVAL == 5)	// 모델 추가하면 바꾸기
 			m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pFrogModel, monster_anim_cnt);
 
 		for (int j = 0; j < monster_anim_cnt; ++j) {
@@ -128,13 +133,17 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
 		m_ppHierarchicalGameObjects[i]->SetPosition(0.f, -100.f, 0.f);
 
-		if (i % 4 == 0)			// 늑대
+		if (temp_id / NPC_INTERVAL == 0)			// 늑대
 			m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
-		else if (i % 4 == 1)	// 원숭이
+		else if (temp_id / NPC_INTERVAL == 1)	// 원숭이
 			m_ppHierarchicalGameObjects[i]->SetScale(20.0f, 20.0f, 20.0f);
-		else if (i % 4 == 2)	// 토끼
+		else if (temp_id / NPC_INTERVAL == 2)	// 토끼
 			m_ppHierarchicalGameObjects[i]->SetScale(15.0f, 15.0f, 15.0f);
-		else if (i % 4 == 3)	// 개구리
+		else if (temp_id / NPC_INTERVAL == 3)	// 개구리
+			m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
+		else if (temp_id / NPC_INTERVAL == 4)	// 개구리  // 모델 추가하면 바꾸기
+			m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
+		else if (temp_id / NPC_INTERVAL == 5)	// 개구리 // 모델 추가하면 바꾸기
 			m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
 	}
 
@@ -150,7 +159,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	pSupporterModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Priestess.bin", NULL);
 	pMagicianModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Wizard_Girl.bin", NULL);
 
-	for (int i = 33; i < 63; ++i) {
+	for (int i = 3+MAX_NPC; i < 3+MAX_NPC+30; ++i) {
 		m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pSupporterModel, player_anim_cnt);
 		for (int j = 0; j < player_anim_cnt; ++j) {
 			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
@@ -172,7 +181,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	//	m_ppHierarchicalGameObjects[i]->SetScale(1.0f, 1.0f, 1.0f);
 	//}
 
-	SetTreePosition(pd3dDevice, pd3dCommandList, 63, 671);
+	SetTreePosition(pd3dDevice, pd3dCommandList, 3 + MAX_NPC + 30, m_nHierarchicalGameObjects-1);
 
 	if (pTreeModel1) delete pTreeModel1;
 	if (pTreeModel3) delete pTreeModel2;
@@ -760,7 +769,7 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 
 void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, int i)
 {
-	if (i >= 3 && i < 33) {
+	if (i >= 3 && i < 3+MAX_NPC) {
 		get_object_information(m_ppHierarchicalGameObjects[i], NPC_ID_START + (i - 3));
 		m_ppHierarchicalGameObjects[i]->SetPosition(
 			XMFLOAT3(m_ppHierarchicalGameObjects[i]->GetPosition().x,
@@ -770,7 +779,7 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 		);
 	}
 
-	if (i >= 33 && i < 63) {
+	if (i >= 3 + MAX_NPC && i < 3 + MAX_NPC + 30) {
 		if (mPlayer[i - 33]->GetUse() == true && m_ppHierarchicalGameObjects[i]->GetPosition().x == 0.f) {
 			switch (mPlayer[i-33]->m_job) {
 			case J_DILLER: {
