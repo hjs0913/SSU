@@ -283,7 +283,7 @@ HRESULT UIBitmap::D2DLoadBitmap(LPCWSTR fileName, ID2D1RenderTarget* target, IWI
     // 디코더 생성
     IWICBitmapDecoder* decoder = 0;
     if(fileName == NULL)
-        hr = factory->CreateDecoderFromFilename(L"\Image/Metal.png", 0, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &decoder);
+        hr = factory->CreateDecoderFromFilename(L"\Image/Element/none.png", 0, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &decoder);
     else
         hr = factory->CreateDecoderFromFilename(fileName, 0, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &decoder);
 

@@ -176,10 +176,10 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
         // InDunProcess
         if (pl->get_state() == ST_INDUN) {
             // 유효성 검사
-            //if (check_move_alright(x, z, false) == false) { // Raid Map에 맞는 유효성 검사 필요
-            //    send_move_packet(pl, pl);   
-            //    break;
-            //}
+            if (m_ObjectManger->check_move_alright_indun(x, z) == false) { // Raid Map에 맞는 유효성 검사 필요
+                send_move_packet(pl, pl, 0);   
+                break;
+            }
             pl->set_x(x);
             pl->set_y(y);
             pl->set_z(z);

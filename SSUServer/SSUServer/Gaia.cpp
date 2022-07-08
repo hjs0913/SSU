@@ -1,3 +1,4 @@
+#include "ObjectManager.h"
 #include "TimerManager.h"
 #include "Gaia.h"
 #include "send.h"
@@ -256,18 +257,15 @@ void Gaia::boss_move()
 		(party[target_id]->get_z() >= boss->get_z() - 8 && party[target_id]->get_z() <= boss->get_z() + 8)) return;
 
 	pos mv = boss->non_a_star(party[target_id]->get_x(), party[target_id]->get_z(), boss->get_x(), boss->get_z());
-	// send boss position
-	//if(mv == 밖으로 떨어지지 않는가) 
-	//		값을 적용시키고 새로운 좌표를 클라이언트에게 보내주기
-	boss->set_x(mv.first);
-	boss->set_z(mv.second);
-	for (auto pt : party) {
-		if (pt->get_tribe() != HUMAN) continue;
-		send_move_packet(pt, boss, 1);
-		send_look_packet(pt, boss);
+	if (static_ObjectManager::get_objManger()->check_move_alright_indun(mv.first, mv.second)) {
+		boss->set_x(mv.first);
+		boss->set_z(mv.second);
+		for (auto pt : party) {
+			if (pt->get_tribe() != HUMAN) continue;
+			send_move_packet(pt, boss, 1);
+			send_look_packet(pt, boss);
+		}
 	}
-
-
 }
 
 void Gaia::boss_attack()
