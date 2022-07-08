@@ -826,7 +826,7 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[3]->setAlpha(0.0, 1.0);
 		m_ppUILayer[4]->setAlpha(0.0, 1.0);
 		m_ppUILayer[5]->setAlpha(0.0, 1.0);
-		m_ppUILayer[6]->setAlpha(0.0, 1.0);
+		m_ppUILayer[6]->setAlpha(0.0, 0.0);
 
 		m_ppUILayer[7]->setAlpha(0.3, 1.0);
 		m_ppUILayer[8]->setAlpha(0.0, 1.0);
@@ -985,7 +985,40 @@ void CGameFramework::Create_OpenWorld_Object()
 	if (m_pPlayer) m_pPlayer->ReleaseUploadBuffers();
 
 	// 여기서 속성에 맞는 이미지 출력해주자
-	reinterpret_cast<UIBitmap*>(m_ppUILayer[6])->Setup(L"\Image/Metal.png");
+	switch (my_element) {
+	case E_WATER: {
+		reinterpret_cast<UIBitmap*>(m_ppUILayer[6])->Setup(L"\Image/Element/water.png");
+		break;
+	}
+	case E_FULLMETAL: {
+		reinterpret_cast<UIBitmap*>(m_ppUILayer[6])->Setup(L"\Image/Element/metal.png");
+		break;
+	}
+	case E_WIND: {
+		reinterpret_cast<UIBitmap*>(m_ppUILayer[6])->Setup(L"\Image/Element/wind.png");
+		break;
+	}
+	case E_FIRE: {
+		reinterpret_cast<UIBitmap*>(m_ppUILayer[6])->Setup(L"\Image/Element/fire.png");
+		break;
+	}
+	case E_TREE: {
+		reinterpret_cast<UIBitmap*>(m_ppUILayer[6])->Setup(L"\Image/Element/tree.png");
+		break;
+	}
+	case E_EARTH: {
+		reinterpret_cast<UIBitmap*>(m_ppUILayer[6])->Setup(L"\Image/Element/eartg.png");
+		break;
+	}
+	case E_ICE: {
+		reinterpret_cast<UIBitmap*>(m_ppUILayer[6])->Setup(L"\Image/Element/ice.png");
+		break;
+	}
+	default: {
+		reinterpret_cast<UIBitmap*>(m_ppUILayer[6])->Setup(L"\Image/Element/none.png");
+		break;
+	}
+	}
 
 	m_GameTimer.Reset();
 }
