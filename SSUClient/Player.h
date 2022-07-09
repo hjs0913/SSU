@@ -14,7 +14,7 @@
 //#include "../RealServer/Server/protocol.h"
 #include "../SSUServer/SSUServer/protocol.h"
 #include "Timer.h"
-
+#include "Network.h"
 
 struct CB_PLAYER_INFO
 {

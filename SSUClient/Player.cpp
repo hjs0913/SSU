@@ -671,6 +671,15 @@ void CTerrainPlayer::Attack(bool isAttack)
 		m_pSkinnedAnimationController->SetTrackEnable(1, false);
 		m_pSkinnedAnimationController->SetTrackEnable(2, true);
 		m_pSkinnedAnimationController->SetTrackEnable(3, false);
+
+		m_pSkinnedAnimationController->SetCallbackKeys(2, 3);
+#ifdef _WITH_SOUND_RESOURCE
+		m_pSkinnedAnimationController->SetCallbackKey(1, 0.1f, _T("NormalAttack"));
+#else
+		m_pSkinnedAnimationController->SetCallbackKey(2, 1, 0.125f, _T("Sound/일반공격.wav"));
+#endif
+		CAnimationCallbackHandler* pAnimationCallbackHandler = new CSoundCallbackHandler();
+		m_pSkinnedAnimationController->SetAnimationCallbackHandler(2, pAnimationCallbackHandler);
 	}
 }
 
@@ -679,15 +688,62 @@ void CTerrainPlayer::Skill(int n)
 	if (m_pSkinnedAnimationController->m_pAnimationTracks[6].m_bEnable) {
 		return;
 	}
-
+	 
 	CPlayer::Skill(n);
 	m_pSkinnedAnimationController->SetTrackAllDisable();
 	/*m_pSkinnedAnimationController->SetTrackEnable(0, false);
 	m_pSkinnedAnimationController->SetTrackEnable(1, false);
 	m_pSkinnedAnimationController->SetTrackEnable(2, false);*/
-	if(n == 0) m_pSkinnedAnimationController->SetTrackEnable(3, true);
-	else if (n == 1) m_pSkinnedAnimationController->SetTrackEnable(4, true);
-	else if (n == 2) m_pSkinnedAnimationController->SetTrackEnable(5, true);
+	if (n == 0) {
+		m_pSkinnedAnimationController->SetTrackEnable(3, true);
+		switch (my_job)
+		{
+		case J_DILLER:
+			m_pSkinnedAnimationController->SetCallbackKeys(3, 4);
+#ifdef _WITH_SOUND_RESOURCE
+			m_pSkinnedAnimationController->SetCallbackKey(2, 0.01f, _T("SKILL1"));
+#else
+			m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.01F, _T("Sound/전사 1번 스킬.wav"));
+#endif
+			CAnimationCallbackHandler* pAnimationCallbackHandler = new CSoundCallbackHandler();
+			m_pSkinnedAnimationController->SetAnimationCallbackHandler(3, pAnimationCallbackHandler);
+			break;
+		//case J_TANKER:
+		//	break;
+	//	case J_MAGICIAN:
+		//	break;
+	//	case J_SUPPORTER:
+	//		break;
+		}
+	}
+	else if (n == 1) {
+		m_pSkinnedAnimationController->SetTrackEnable(4, true);
+		switch (my_job)
+		{
+		case J_DILLER:
+			break;
+		case J_TANKER:
+			break;
+		case J_MAGICIAN:
+			break;
+		case J_SUPPORTER:
+			break;
+		}
+	}
+	else if (n == 2) {
+		switch (my_job)
+		{
+		case J_DILLER:
+			break;
+		case J_TANKER:
+			break;
+		case J_MAGICIAN:
+			break;
+		case J_SUPPORTER:
+			break;
+		}
+		m_pSkinnedAnimationController->SetTrackEnable(5, true);
+	}
 }
 
 void CTerrainPlayer::ChangeAnimationState(Player_Animation animState)
