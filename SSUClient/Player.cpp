@@ -741,18 +741,27 @@ void CTerrainPlayer::Skill(int n)
 		m_pSkinnedAnimationController->SetAnimationCallbackHandler(4, pAnimationCallbackHandler);
 	}
 	else if (n == 2) {
+		m_pSkinnedAnimationController->SetTrackEnable(5, true);
+		m_pSkinnedAnimationController->SetCallbackKeys(5, 6);
+#ifdef _WITH_SOUND_RESOURCE
+		m_pSkinnedAnimationController->SetCallbackKey(4, 0.1f, _T("SKILL3"));
+#else
 		switch (my_job)
 		{
+		/*
 		case J_DILLER:
 			break;
 		case J_TANKER:
 			break;
 		case J_MAGICIAN:
-			break;
+			break;*/
 		case J_SUPPORTER:
+			m_pSkinnedAnimationController->SetCallbackKey(5, 4, 0.125f, _T("Sound/서포터 3번 스킬.wav"));
 			break;
 		}
-		m_pSkinnedAnimationController->SetTrackEnable(5, true);
+#endif
+		CAnimationCallbackHandler* pAnimationCallbackHandler = new CSoundCallbackHandler();
+		m_pSkinnedAnimationController->SetAnimationCallbackHandler(5, pAnimationCallbackHandler);
 	}
 
 }
