@@ -63,6 +63,7 @@ CRITICAL_SECTION UI_cs;
 
 char pl_id[MAX_NAME_SIZE];
 char pl_password[MAX_NAME_SIZE];
+int pl_job;
 
 struct EXP_OVER {
 	WSAOVERLAPPED m_wsa_over;
@@ -111,12 +112,12 @@ void err_quit(const char* msg)
 	exit(1);
 }
 
-void send_login_packet(char* id, char* password)
+void send_login_packet(char* id, char* password, JOB job)
 {
 	cs_packet_login packet;
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET_LOGIN;
-	packet.job = 0;
+	packet.job = job;
 	strcpy_s(packet.password, password);
 	strcpy_s(packet.id, id);
 	strcpy_s(packet.name, id);
@@ -1030,9 +1031,10 @@ int netInit()
 	cin >> pl_id;
 	cout << "패스워드를 입력하세요 : ";
 	cin >> pl_password;
-
+	cout << "직업을 입력하세요 : ";
+	cin >> pl_job;
 	//if (!(0 <= pl_job && pl_job <= 3)) pl_job = 0;
-	send_login_packet(pl_id, pl_password);
+	send_login_packet(pl_id, pl_password, (JOB)pl_job);
 
 	do_recv();
 }
