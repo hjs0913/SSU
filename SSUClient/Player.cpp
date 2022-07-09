@@ -696,54 +696,80 @@ void CTerrainPlayer::Skill(int n)
 	m_pSkinnedAnimationController->SetTrackEnable(2, false);*/
 	if (n == 0) {
 		m_pSkinnedAnimationController->SetTrackEnable(3, true);
+		m_pSkinnedAnimationController->SetCallbackKeys(3, 4);
+#ifdef _WITH_SOUND_RESOURCE
+		m_pSkinnedAnimationController->SetCallbackKey(2, 0.1f, _T("SKILL1"));
+#else
 		switch (my_job)
 		{
 		case J_DILLER:
-			m_pSkinnedAnimationController->SetCallbackKeys(3, 4);
-#ifdef _WITH_SOUND_RESOURCE
-			m_pSkinnedAnimationController->SetCallbackKey(2, 0.01f, _T("SKILL1"));
-#else
-			m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.01F, _T("Sound/전사 1번 스킬.wav"));
-#endif
-			CAnimationCallbackHandler* pAnimationCallbackHandler = new CSoundCallbackHandler();
-			m_pSkinnedAnimationController->SetAnimationCallbackHandler(3, pAnimationCallbackHandler);
+			m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.125f, _T("Sound/전사 1번 스킬.wav"));
 			break;
-		//case J_TANKER:
-		//	break;
-	//	case J_MAGICIAN:
-		//	break;
-	//	case J_SUPPORTER:
-	//		break;
+		case J_TANKER:
+			m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.125f, _T("Sound/탱커 1번 스킬.wav"));
+			break;
+		case J_MAGICIAN:
+			m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.125f, _T("Sound/마법사 1번 스킬.wav"));
+			break;
+		case J_SUPPORTER:
+			m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.125f, _T("Sound/서포터 1번 스킬.wav"));
+			break;
 		}
+#endif
+		CAnimationCallbackHandler* pAnimationCallbackHandler = new CSoundCallbackHandler();
+		m_pSkinnedAnimationController->SetAnimationCallbackHandler(3, pAnimationCallbackHandler);
 	}
 	else if (n == 1) {
 		m_pSkinnedAnimationController->SetTrackEnable(4, true);
+		m_pSkinnedAnimationController->SetCallbackKeys(4, 5);
+#ifdef _WITH_SOUND_RESOURCE
+		m_pSkinnedAnimationController->SetCallbackKey(3, 0.1f, _T("SKILL2"));
+#else
 		switch (my_job)
 		{
 		case J_DILLER:
+			m_pSkinnedAnimationController->SetCallbackKey(4, 3, 0.125f, _T("Sound/전사 2번 스킬.wav"));
 			break;
 		case J_TANKER:
+			m_pSkinnedAnimationController->SetCallbackKey(4, 3, 0.125f, _T("Sound/탱커 2번 스킬.wav"));
 			break;
-		case J_MAGICIAN:
-			break;
+		/*case J_MAGICIAN:
+			m_pSkinnedAnimationController->SetCallbackKey(4, 3, 0.125f, _T("Sound/마법사 2번 스킬.wav"));
+			break;*/
 		case J_SUPPORTER:
+			m_pSkinnedAnimationController->SetCallbackKey(4, 3, 0.125f, _T("Sound/서포터 2번 스킬.wav"));
 			break;
 		}
+#endif
+		CAnimationCallbackHandler* pAnimationCallbackHandler = new CSoundCallbackHandler();
+		m_pSkinnedAnimationController->SetAnimationCallbackHandler(4, pAnimationCallbackHandler);
 	}
 	else if (n == 2) {
+		m_pSkinnedAnimationController->SetTrackEnable(5, true);
+		m_pSkinnedAnimationController->SetCallbackKeys(5, 6);
+#ifdef _WITH_SOUND_RESOURCE
+		m_pSkinnedAnimationController->SetCallbackKey(4, 0.1f, _T("SKILL3"));
+#else
 		switch (my_job)
 		{
+
 		case J_DILLER:
+			m_pSkinnedAnimationController->SetCallbackKey(5, 4, 0.125f, _T("Sound/전사 3번 스킬.wav"));
 			break;
 		case J_TANKER:
+			m_pSkinnedAnimationController->SetCallbackKey(5, 4, 0.125f, _T("Sound/탱커 3번 스킬.wav"));
 			break;
-		case J_MAGICIAN:
-			break;
+			/*	case J_MAGICIAN:
+					break;*/
 		case J_SUPPORTER:
+			m_pSkinnedAnimationController->SetCallbackKey(5, 4, 0.125f, _T("Sound/서포터 3번 스킬.wav"));
 			break;
 		}
-		m_pSkinnedAnimationController->SetTrackEnable(5, true);
+#endif
+		CAnimationCallbackHandler* pAnimationCallbackHandler = new CSoundCallbackHandler();
+		m_pSkinnedAnimationController->SetAnimationCallbackHandler(5, pAnimationCallbackHandler);
 	}
+
 }
 
 void CTerrainPlayer::ChangeAnimationState(Player_Animation animState)
