@@ -28,8 +28,8 @@ const static char* SERVER_IP = "127.0.0.1";
 
 #pragma comment (lib, "ws2_32.lib")
 
-#include "../../RealServer/Server/protocol.h"
-
+#//include "../../RealServer/Server/protocol.h"
+#include "../../SSUServer/SSUServer/protocol.h"
 HANDLE g_hiocp;
 
 //enum OPTYPE { OP_SEND, OP_RECV, OP_DO_MOVE };
