@@ -441,55 +441,50 @@ HRESULT BuffUI::D2DLoadBitmap(LPCWSTR fileName, ID2D1RenderTarget* target, IWICI
 
 bool BuffUI::Setup()
 {
-    if (buff_ui_num[0] == 0) {
-        if (FAILED(WICInit(&imagingFactory[0])))
-        {
-            MessageBox(0, L"Imaging  Factory", 0, 0);
-            return false;
-        }
-        if (FAILED(D2DLoadBitmap(L"\Image/마나2.png", m_pd2dDeviceContext, imagingFactory[0], &bitmap[0])))
-            return false;
-    }
-    if (buff_ui_num[1] == 1) {
-        if (FAILED(WICInit(&imagingFactory[1])))
-        {
-            MessageBox(0, L"Imaging  Factory", 0, 0);
-            return false;
-        }
-        if (FAILED(D2DLoadBitmap(L"\Image/가호.png", m_pd2dDeviceContext, imagingFactory[1], &bitmap[1])))
-            return false;
-    }
-    if (buff_ui_num[2] == 2) {
 
-        if (FAILED(WICInit(&imagingFactory[2])))
-        {
-            MessageBox(0, L"Imaging  Factory", 0, 0);
-            return false;
-        }
-        if (FAILED(D2DLoadBitmap(L"\Image/천사.png", m_pd2dDeviceContext, imagingFactory[2], &bitmap[2])))
-            return false;
+    if (FAILED(WICInit(&imagingFactory[0])))
+    {
+        MessageBox(0, L"Imaging  Factory", 0, 0);
+        return false;
     }
-    if (buff_ui_num[3] == 3) {
+    if (FAILED(D2DLoadBitmap(L"\Image/마나2.png", m_pd2dDeviceContext, imagingFactory[0], &bitmap[0])))
+        return false;
 
-        if (FAILED(WICInit(&imagingFactory[3])))
-        {
-            MessageBox(0, L"Imaging  Factory", 0, 0);
-            return false;
-        }
-        if (FAILED(D2DLoadBitmap(L"\Image/공격력.png", m_pd2dDeviceContext, imagingFactory[3], &bitmap[3])))
-            return false;
+
+    if (FAILED(WICInit(&imagingFactory[1])))
+    {
+        MessageBox(0, L"Imaging  Factory", 0, 0);
+        return false;
     }
-    if (buff_ui_num[4] == 4) {
+    if (FAILED(D2DLoadBitmap(L"\Image/가호.png", m_pd2dDeviceContext, imagingFactory[1], &bitmap[1])))
+        return false;
 
-        if (FAILED(WICInit(&imagingFactory[4])))
-        {
-            MessageBox(0, L"Imaging  Factory", 0, 0);
-            return false;
-        }
-        if (FAILED(D2DLoadBitmap(L"\Image/전광석화.png", m_pd2dDeviceContext, imagingFactory[4], &bitmap[4])))
-            return false;
+
+    if (FAILED(WICInit(&imagingFactory[2])))
+    {
+        MessageBox(0, L"Imaging  Factory", 0, 0);
+        return false;
     }
+    if (FAILED(D2DLoadBitmap(L"\Image/천사.png", m_pd2dDeviceContext, imagingFactory[2], &bitmap[2])))
+        return false;
 
+
+    if (FAILED(WICInit(&imagingFactory[3])))
+    {
+        MessageBox(0, L"Imaging  Factory", 0, 0);
+        return false;
+    }
+    if (FAILED(D2DLoadBitmap(L"\Image/공격력.png", m_pd2dDeviceContext, imagingFactory[3], &bitmap[3])))
+        return false;
+
+
+    if (FAILED(WICInit(&imagingFactory[4])))
+    {
+        MessageBox(0, L"Imaging  Factory", 0, 0);
+        return false;
+    }
+    if (FAILED(D2DLoadBitmap(L"\Image/전광석화.png", m_pd2dDeviceContext, imagingFactory[4], &bitmap[4])))
+        return false;
 
     return true;
 }
@@ -515,10 +510,6 @@ void BuffUI::UpdateLabels(const std::wstring& strUIText, UINT LeftTop_x, UINT Le
 
 void BuffUI::Render(UINT nFrame)
 {
-    if (Setup()) {
-        m_pd2dDeviceContext->SetTarget(m_vd2dRenderTargets[nFrame]);
-    }
-
     ID3D11Resource* ppResources[] = { m_vWrappedRenderTargets[nFrame] };
 
     m_pd2dDeviceContext->SetTarget(m_vd2dRenderTargets[nFrame]);
@@ -799,11 +790,11 @@ void SkillUI::UpdateLabels(const std::wstring& strUIText, UINT LeftTop_x, UINT L
 
 void SkillUI::Render(UINT nFrame)
 {
-    for (int i = 0; i < 3; i++)
-        skill_ui_num[i] = i;
+   // for (int i = 0; i < 3; i++)
+     //   skill_ui_num[i] = i;
 
 
-    Setup();
+   // Setup();
     ID3D11Resource* ppResources[] = { m_vWrappedRenderTargets[nFrame] };
 
     m_pd2dDeviceContext->SetTarget(m_vd2dRenderTargets[nFrame]);
@@ -812,15 +803,15 @@ void SkillUI::Render(UINT nFrame)
 
     m_pd2dDeviceContext->BeginDraw();
 
-    if (skill_ui_num[0] == 0) {
+   // if (skill_ui_num[0] == 0) {
         m_pd2dDeviceContext->DrawBitmap(bitmap[0], skill_space0);
-    }
-    if (skill_ui_num[1] == 1) {
+    //}
+   // if (skill_ui_num[1] == 1) {
         m_pd2dDeviceContext->DrawBitmap(bitmap[1], skill_space1);
-    }
-    if (skill_ui_num[2] == 2) {
+  //  }
+  //  if (skill_ui_num[2] == 2) {
         m_pd2dDeviceContext->DrawBitmap(bitmap[2], skill_space2);
-    }
+   // }
 
     if (first_skill_used == true) {
         end_skill[0] = clock();

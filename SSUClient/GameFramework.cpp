@@ -1097,6 +1097,10 @@ void CGameFramework::Create_OpenWorld_Object()
 	}
 	if(!Login_OK)
 		reinterpret_cast<UIBitmap*>(m_ppUILayer[27])->Setup(L"\Image/Title.png");
+
+	reinterpret_cast<SkillUI*>(m_ppUILayer[23])->Setup(); //아래 스킬 ui
+	reinterpret_cast<BuffUI*>(m_ppUILayer[16])->Setup();  //위에 버프 ui
+
 	m_GameTimer.Reset();
 }
 
@@ -1426,8 +1430,8 @@ void CGameFramework::FrameAdvance()
 
 	if(Login_OK)
 		ProcessInput();
-
-    AnimateObjects();
+	if (Login_OK)
+		AnimateObjects();
 
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
@@ -1769,6 +1773,7 @@ void CGameFramework::FrameAdvance()
 		if (i == 27 && Login_OK) continue;
 		if (i == 28 && Login_OK) continue;
 		if (i == 29 && Login_OK) continue;
+		if (i == 30 && Login_OK) continue;
 		m_ppUILayer[i]->Render(m_nSwapChainBufferIndex);
 	}
 	LeaveCriticalSection(&UI_cs);
