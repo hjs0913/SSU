@@ -702,7 +702,7 @@ void process_packet(unsigned char* p)
 		sc_packet_gaia_pattern_five* packet = reinterpret_cast<sc_packet_gaia_pattern_five*>(p);
 		m_gaiaPattern.pattern_on[4] = true;
 		m_gaiaPattern.pattern_five = XMFLOAT3(packet->point_x, 20.0f, packet->point_z);
-		m_gaiaPattern.pattern_five_look = XMFLOAT3(mPlayer[MAX_USER+MAX_NPC]->GetLook());
+		m_gaiaPattern.pattern_five_look = XMFLOAT3(mPlayer[GAIA_ID]->GetLook());
 		break;
 	}
 	case SC_PACKET_CHANGE_DEATH_COUNT: {

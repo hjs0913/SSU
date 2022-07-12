@@ -78,7 +78,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	XMFLOAT4 xmf4Color(0.1f, 0.1f, 0.1f, 0.0f);
 	m_pTerrain = new CHeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Image/HeightMap.raw"), 512, 512, xmf3Scale, xmf4Color);
 
-	m_nHierarchicalGameObjects = 3 + MAX_NPC + 30 + 609;	// 성벽 1 + 집 2 + 몬스터 30 + 플레이어 30 + 나무609
+	m_nHierarchicalGameObjects = 3 + MAX_NPC + 30 + 609;	// 성벽 1 + 집 2 + 몬스터 MAX_NPC(180) + 플레이어 30 + 나무609
 	m_ppHierarchicalGameObjects = new CGameObject * [m_nHierarchicalGameObjects];
 	//for (int i = 0; i < m_nHierarchicalGameObjects; ++i) m_ppHierarchicalGameObjects[i] = NULL;
 
@@ -302,16 +302,18 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	// 장판
 	CLoadedModelInfo* pCircleModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/shark_modeling.bin", NULL);
 	for (int i = 4; i < 8; i++) {
-		m_ppHierarchicalGameObjects[i] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pCircleModel, 0);
+		m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pCircleModel, 1);
+		m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+		m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[0].m_fSpeed = 1.0f;
 		m_ppHierarchicalGameObjects[i]->SetPosition(3200.0f, m_pTerrain->GetHeight(3200.0f, 700.0f), 700.0f);
 		m_ppHierarchicalGameObjects[i]->Rotate(-90, 0, 0.0f);
 		m_ppHierarchicalGameObjects[i]->SetScale(15.0f, 15.0f, 15.0f);
 	}
 
 	// 파도
-	CLoadedModelInfo* pWaveModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/shark_modeling.bin", NULL);
+	//CLoadedModelInfo* pWaveModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/shark_modeling.bin", NULL);
 	for (int i = 8; i < 11; i++) {
-		m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pWaveModel, 1);
+		m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pCircleModel, 1);
 		m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 		m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[0].m_fSpeed = 1.0f;
 		m_ppHierarchicalGameObjects[i]->SetPosition(0.f, -100.f, 0.f);
@@ -319,8 +321,8 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	}
 
 	// 참격
-	CLoadedModelInfo* pSlashModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/shark_modeling.bin", NULL);
-	m_ppHierarchicalGameObjects[11] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pWaveModel, 1);
+	//CLoadedModelInfo* pSlashModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/shark_modeling.bin", NULL);
+	m_ppHierarchicalGameObjects[11] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pCircleModel, 1);
 	m_ppHierarchicalGameObjects[11]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 	m_ppHierarchicalGameObjects[11]->m_pSkinnedAnimationController->m_pAnimationTracks[0].m_fSpeed = 1.0f;
 	m_ppHierarchicalGameObjects[11]->SetPosition(0.0f, -100.f, 0.0f);
@@ -334,8 +336,8 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 	if (pRaidObjModel) delete pRaidObjModel;
 	if (pCircleModel) delete pCircleModel;
-	if (pWaveModel) delete pWaveModel;
-	if (pSlashModel) delete pSlashModel;
+	//if (pWaveModel) delete pWaveModel;
+	//if (pSlashModel) delete pSlashModel;
 
 	for (int i = 0; i < 4; i++) get_raid_initialize_position(m_ppHierarchicalGameObjects[i], i);
 
