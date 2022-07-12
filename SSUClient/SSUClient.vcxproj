@@ -170,6 +170,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Timer.h" />
+    <ClInclude Include="TownNpc.h" />
     <ClInclude Include="UILayer.h" />
     <ClInclude Include="WICTextureLoader12.h" />
   </ItemGroup>
@@ -193,6 +194,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Timer.cpp" />
+    <ClCompile Include="TownNpc.cpp" />
     <ClCompile Include="UILayer.cpp" />
     <ClCompile Include="WICTextureLoader12.cpp" />
   </ItemGroup>

@@ -160,4 +160,7 @@ public:
 	float circle_time = 0.0f;
 
 	bool m_isIdle = true;
+
+	const int NUM_PLAYER = 30;
+	const int NUM_TOWN_NPC = 10;
 };

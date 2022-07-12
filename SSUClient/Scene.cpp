@@ -7,6 +7,7 @@
 //#include "../RealServer/Server/protocol.h"
 #include "../SSUServer/SSUServer/protocol.h"
 #include "Network.h"
+#include "TownNpc.h"
 ID3D12DescriptorHeap *CScene::m_pd3dCbvSrvDescriptorHeap = NULL;
 
 D3D12_CPU_DESCRIPTOR_HANDLE	CScene::m_d3dCbvCPUDescriptorStartHandle;
@@ -78,7 +79,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	XMFLOAT4 xmf4Color(0.1f, 0.1f, 0.1f, 0.0f);
 	m_pTerrain = new CHeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Image/HeightMap.raw"), 512, 512, xmf3Scale, xmf4Color);
 
-	m_nHierarchicalGameObjects = 3 + MAX_NPC + 30 + 609;	// 성벽 1 + 집 2 + 몬스터 MAX_NPC(180) + 플레이어 30 + 나무609
+	m_nHierarchicalGameObjects = 3 + MAX_NPC + NUM_PLAYER + NUM_TOWN_NPC +  609;	// 성벽 1 + 집 2 + 몬스터 MAX_NPC(180) + 플레이어 30 + 마을 내에 NPC 10명+ 나무609
 	m_ppHierarchicalGameObjects = new CGameObject * [m_nHierarchicalGameObjects];
 	//for (int i = 0; i < m_nHierarchicalGameObjects; ++i) m_ppHierarchicalGameObjects[i] = NULL;
 
@@ -159,13 +160,36 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	pSupporterModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Priestess.bin", NULL);
 	pMagicianModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Wizard_Girl.bin", NULL);
 
-	for (int i = 3+MAX_NPC; i < 3+MAX_NPC+30; ++i) {
+	for (int i = 3+MAX_NPC; i < 3+MAX_NPC+NUM_PLAYER; ++i) {
 		m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pSupporterModel, player_anim_cnt);
 		for (int j = 0; j < player_anim_cnt; ++j) {
 			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
 			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 0.05f;
 		}
 		m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
+		m_ppHierarchicalGameObjects[i]->SetPosition(0.f, -100.f, 0.f);
+		m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
+	}
+
+	for (int i = 3 + MAX_NPC + NUM_PLAYER; i < 3 + MAX_NPC + NUM_PLAYER + NUM_TOWN_NPC; i++) {
+		switch (i%4)
+		{
+		case 0 : m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pBastardModel, player_anim_cnt);
+			break;
+		case 1: m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pTankerModel, player_anim_cnt);
+			break;
+		case 2: m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pSupporterModel, player_anim_cnt);
+			break;
+		case 3: m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMagicianModel, player_anim_cnt);
+			break;
+		default:
+			break;
+		}
+		for (int j = 0; j < player_anim_cnt; ++j) {
+			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
+			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 0.05f;
+		}
+		m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(1, true);
 		m_ppHierarchicalGameObjects[i]->SetPosition(0.f, -100.f, 0.f);
 		m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
 	}
@@ -181,7 +205,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	//	m_ppHierarchicalGameObjects[i]->SetScale(1.0f, 1.0f, 1.0f);
 	//}
 
-	SetTreePosition(pd3dDevice, pd3dCommandList, 3 + MAX_NPC + 30, m_nHierarchicalGameObjects-1);
+	SetTreePosition(pd3dDevice, pd3dCommandList, 3 + MAX_NPC + NUM_PLAYER + NUM_TOWN_NPC, m_nHierarchicalGameObjects-1);
 
 	if (pTreeModel1) delete pTreeModel1;
 	if (pTreeModel3) delete pTreeModel2;
@@ -781,7 +805,7 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 		);
 	}
 
-	if (i >= 3 + MAX_NPC && i < 3 + MAX_NPC + 30) {
+	if (i >= 3 + MAX_NPC && i < 3 + MAX_NPC + NUM_PLAYER) {
 		if (mPlayer[i - 33]->GetUse() == true && m_ppHierarchicalGameObjects[i]->GetPosition().x == 0.f) {
 			switch (mPlayer[i-33]->m_job) {
 			case J_DILLER: {
@@ -862,6 +886,19 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 		);
 	}
 	
+	TownNpc::UpdateTime(m_fElapsedTime);
+	if (i >= 3 + MAX_NPC + NUM_PLAYER && i < 3 + MAX_NPC + NUM_PLAYER + NUM_TOWN_NPC) {
+		int temp_i = i - (3 + MAX_NPC + NUM_PLAYER);
+		m_ppHierarchicalGameObjects[i]->SetPosition(TownNpc::UpdatePosition(temp_i));
+		m_ppHierarchicalGameObjects[i]->SetPosition(
+			XMFLOAT3(m_ppHierarchicalGameObjects[i]->GetPosition().x,
+				m_pTerrain->GetHeight(m_ppHierarchicalGameObjects[i]->GetPosition().x, m_ppHierarchicalGameObjects[i]->GetPosition().z),
+				m_ppHierarchicalGameObjects[i]->GetPosition().z
+			)
+		);
+		m_ppHierarchicalGameObjects[i]->SetLook(TownNpc::UpdateLook(temp_i));
+	}
+
 	m_ppHierarchicalGameObjects[i]->Animate(m_fElapsedTime);
 
 	if (!m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController) m_ppHierarchicalGameObjects[i]->UpdateTransform(NULL);

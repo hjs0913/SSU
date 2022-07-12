@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="TownNpc">
+      <UniqueIdentifier>{52a1045d-bdb6-4775-a926-5eba1eb5a355}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">
@@ -75,6 +78,9 @@
     <ClInclude Include="..\SSUServer\SSUServer\protocol.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="TownNpc.h">
+      <Filter>TownNpc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -124,6 +130,9 @@
     </ClCompile>
     <ClCompile Include="Scene.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="TownNpc.cpp">
+      <Filter>TownNpc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
