@@ -52,6 +52,7 @@ bool AddAIUI_On = false;
 bool NoticeUI_On = false;
 bool RaidEnterNotice = false;
 bool DeadNotice = false;
+bool Login_OK = false;
 wstring Notice_str = L"";
 chrono::system_clock::time_point InvitationCardTimer = chrono::system_clock::now();
 chrono::system_clock::time_point NoticeTimer = chrono::system_clock::now();
@@ -356,6 +357,7 @@ void process_packet(unsigned char* p)
 	int type = *(p + 1);
 	switch (type) {
 	case SC_PACKET_LOGIN_OK: {
+		Login_OK = true;
 		// 플레이어의 모든 정보를 보내주자
 		cout << "로그인 성공" << endl;
 		sc_packet_login_ok* packet = reinterpret_cast<sc_packet_login_ok*>(p);
@@ -1026,15 +1028,15 @@ int netInit()
 		m_party[i] = new Party(i);
 	}
 
-
+	/*
 	cout << "ID를 입력하세요 : ";
 	cin >> pl_id;
 	cout << "패스워드를 입력하세요 : ";
 	cin >> pl_password;
 	cout << "직업을 입력하세요 : ";
 	cin >> pl_job;
-	//if (!(0 <= pl_job && pl_job <= 3)) pl_job = 0;
-	send_login_packet(pl_id, pl_password, (JOB)pl_job);
+
+	send_login_packet(pl_id, pl_password, (JOB)pl_job);*/
 
 	do_recv();
 }

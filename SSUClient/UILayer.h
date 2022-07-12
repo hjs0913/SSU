@@ -173,3 +173,20 @@ public:
     void Display();
     void Clean();
 };
+
+
+class Title_UI : public UILayer
+{
+private:
+    IDWriteTextFormat* m_pdwTextFormat2 = NULL;
+    ID2D1SolidColorBrush* m_pTextLayoutBrush;
+
+public:
+    Title_UI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor);
+    ~Title_UI();
+
+     void UpdateLabels_ID(const std::wstring& strUIText);
+     void UpdateLabels_PASSWORD( const std::wstring& strUIText);
+    virtual void Render(UINT nFrame);
+    virtual void Resize(ID3D12Resource** ppd3dRenderTargets, UINT width, UINT height, UINT TextAlignment, UINT ParagraphAlignment);
+};

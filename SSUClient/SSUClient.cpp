@@ -44,9 +44,9 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	::LoadString(hInstance, IDC_SSU_CLIENT, szWindowClass, MAX_LOADSTRING);
 	MyRegisterClass(hInstance);
 	
-	while (1) {
-		if (Login_ok) break;
-	}
+	//while (1) {
+	//	if (!Login_ok) break;
+//	}
 
 	if (!InitInstance(hInstance, nCmdShow)) return(FALSE);
 
@@ -68,6 +68,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 		}
 		else
 		{
+
 			if (change_dungeon != InDungeon) {
 				change_dungeon = InDungeon;
 				if (change_dungeon) {
@@ -116,6 +117,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
+
 	ghAppInstance = hInstance;
 
 	RECT rc = { 0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT };
@@ -220,6 +222,35 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				if (Chatting_Str.size() < 20)
 				{
 					Chatting_Str.push_back((wchar_t)wParam);
+				}
+			}
+		}
+
+		if (!Login_OK && ID_On) {
+			if ((wchar_t)wParam == '\b') {
+				if (ID_Str.size() > 0) {
+					ID_Str.pop_back();
+				}
+			}
+			else if ((wchar_t)wParam == '\r') break;
+			else {
+				if (ID_Str.size() < MAX_NAME_SIZE - 1)
+				{
+					ID_Str.push_back((wchar_t)wParam);
+				}
+			}
+		}
+		if (!Login_OK && PASSWORD_On) {
+			if ((wchar_t)wParam == '\b') {
+				if (PASSWORD_Str.size() > 0) {
+					PASSWORD_Str.pop_back();
+				}
+			}
+			else if ((wchar_t)wParam == '\r') break;
+			else {
+				if (PASSWORD_Str.size() < MAX_NAME_SIZE - 1)
+				{
+					PASSWORD_Str.push_back((wchar_t)wParam);
 				}
 			}
 		}

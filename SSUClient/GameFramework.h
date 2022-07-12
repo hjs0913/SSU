@@ -2,7 +2,7 @@
 
 #define FRAME_BUFFER_WIDTH		1800 //640
 #define FRAME_BUFFER_HEIGHT		900 //480
-#define UICOUNT 27
+#define UICOUNT 31
 
 #include "Timer.h"
 #include "Player.h"
@@ -26,7 +26,8 @@ extern bool hit_check;
 extern int nnn;
 
 extern CCamera* m_pCamera;
-
+extern wstring ID_Str;
+extern wstring PASSWORD_Str;
 
 class CGameFramework
 {

@@ -25,10 +25,14 @@ wstring Invite_Str = L"";
 wstring Send_str = L"";
 wstring Hp_str = L"";
 wstring Mp_str = L"";
+wstring ID_Str = L"";
+wstring PASSWORD_Str = L"";
 
 bool Chatting_On = false;
 bool Mouse_On = false;
 bool PartyUI_On = false;
+ bool ID_On = false;
+ bool PASSWORD_On = false;
 
 int effect_x = 0;
 int effect_y = 0;
@@ -417,6 +421,13 @@ void CGameFramework::ChangeSwapChainState()
 	CreateRenderTargetViews();
 }
 
+void wstring2string(string& dest, const wstring& src)
+{
+	dest.resize(src.size());
+	for (unsigned int i = 0; i < src.size(); i++)
+		dest[i] = src[i] < 256 ? src[i] : ' ';
+}
+
 void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 {
 	if (!InDungeon) {
@@ -538,6 +549,31 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 				}
 				break;
 			}
+			if(!Login_OK) {
+				if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - 50) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 150)) {
+					if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 200) && CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 245)){
+						PASSWORD_On = false;
+						ID_On = true;
+					}
+				}
+				 if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - 50) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 150)) {
+					if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 250) && CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 295)) {
+						ID_On = false;
+						PASSWORD_On = true;
+					}
+				}
+				 if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 + 160) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 200)) {
+					 if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 200) && CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 295)) {
+						 string id, passwoird;
+						 wstring2string(id, ID_Str);
+						 strcpy(pl_id,id.c_str());
+						 wstring2string(passwoird, PASSWORD_Str);
+						 strcpy(pl_password, passwoird.c_str());
+						 pl_job = 0;
+						 send_login_packet(pl_id, pl_password, (JOB)pl_job);
+					 }
+				 }
+			}
 
 			if (f4_picking_possible) {
 				//cRay r; 
@@ -634,6 +670,26 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 						Chatting_Str = L"";
 						delete send_str;
 					}
+
+					if (!Login_OK && ID_On) {
+						len = 1 + ID_Str.length();
+						send_str = new char[len * 4];
+						temp = ID_Str.c_str();
+						wcstombs(send_str, temp, MAX_NAME_SIZE);
+						//send_party_invite(send_str);
+						delete send_str;
+						break;
+					}
+					if (!Login_OK && PASSWORD_On) {
+						len = 1 + PASSWORD_Str.length();
+						send_str = new char[len * 4];
+						temp = PASSWORD_Str.c_str();
+						wcstombs(send_str, temp, MAX_NAME_SIZE);
+						//send_party_invite(send_str);
+						delete send_str;
+						break;
+					}
+
 					break;
 				}
 				case VK_F1: {
@@ -817,7 +873,13 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[25] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Black, D2D1::ColorF::Black);
 		m_ppUILayer[26] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Black, D2D1::ColorF::Black);
 
-
+		//Title UI  화면
+		m_ppUILayer[27] = new UIBitmap(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
+		//Title  id/ password
+		m_ppUILayer[28] = new PartyInviteUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::SkyBlue, D2D1::ColorF::Black);
+		m_ppUILayer[29] = new PartyInviteUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::SkyBlue, D2D1::ColorF::Black);
+		// 로그인 버튼
+		m_ppUILayer[30] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::RoyalBlue, D2D1::ColorF::Black); //DodgerBlue
 
 		m_ppUILayer[0]->setAlpha(0.5, 1.0);
 		m_ppUILayer[1]->setAlpha(0.5, 1.0);
@@ -852,6 +914,11 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[24]->setAlpha(0.8, 0.0); //글씨 없음 
 		m_ppUILayer[25]->setAlpha(0.8, 0.0); //글씨 없음 
 		m_ppUILayer[26]->setAlpha(0.8, 0.0); //글씨 없음 
+
+		m_ppUILayer[27]->setAlpha(0.8, 1.0);  //배경
+		m_ppUILayer[28]->setAlpha(0.8, 1.0);  //입력
+		m_ppUILayer[29]->setAlpha(0.8, 1.0);   //입력 
+		m_ppUILayer[30]->setAlpha(1.0, 1.0);   //입력 
 
 		m_ppUILayer[0]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_FAR);
@@ -910,6 +977,15 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[25]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		m_ppUILayer[26]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+		m_ppUILayer[27]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[28]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[29]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[30]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 		// UIBar Setting
@@ -1019,7 +1095,8 @@ void CGameFramework::Create_OpenWorld_Object()
 		break;
 	}
 	}
-
+	if(!Login_OK)
+		reinterpret_cast<UIBitmap*>(m_ppUILayer[27])->Setup(L"\Image/Title.png");
 	m_GameTimer.Reset();
 }
 
@@ -1347,7 +1424,8 @@ void CGameFramework::FrameAdvance()
 	get_basic_information(m_pPlayer, my_id);
 	m_pPlayer->SetPosition(return_myPosition());
 
-	ProcessInput();
+	if(Login_OK)
+		ProcessInput();
 
     AnimateObjects();
 
@@ -1655,6 +1733,22 @@ void CGameFramework::FrameAdvance()
 		case 26:
 			m_ppUILayer[i]->UpdateLabels(L"", FRAME_BUFFER_WIDTH / 2.06, FRAME_BUFFER_HEIGHT / 1.2 + skill_cool_rect[2], FRAME_BUFFER_WIDTH / 2.06 + 60, FRAME_BUFFER_HEIGHT / 1.2 + FRAME_BUFFER_WIDTH / 30);
 			break;
+		case 27:
+			if (Login_OK) break; //로그인 됐으면 없어지자 -> 아직 Login_OK 변수 true 하는 부분 안 넣음 
+			m_ppUILayer[i]->UpdateLabels(L"", 0, 0,	m_nWndClientWidth , m_nWndClientHeight ); 
+			break;
+		case 28:
+			if (Login_OK) break;
+			reinterpret_cast<Title_UI*>(m_ppUILayer[i])->UpdateLabels_ID(ID_Str);
+			break;
+		case 29:
+			if (Login_OK) break;
+			reinterpret_cast<Title_UI*>(m_ppUILayer[i])->UpdateLabels_PASSWORD(PASSWORD_Str);
+			break;
+		case 30:
+			if (Login_OK) break;
+			m_ppUILayer[i]->UpdateLabels(L"LOGIN", FRAME_BUFFER_WIDTH / 2 + 160, FRAME_BUFFER_HEIGHT / 2 + 200, FRAME_BUFFER_WIDTH / 2.0 + 250, FRAME_BUFFER_HEIGHT / 2 + 295);
+			break;
 		}
 	}
 
@@ -1672,6 +1766,9 @@ void CGameFramework::FrameAdvance()
 		if (i == 19 && !InvitationCardUI_On) continue;
 		if (i == 20 && !AddAIUI_On) continue;
 		if (i == 21 && !NoticeUI_On) continue;
+		if (i == 27 && Login_OK) continue;
+		if (i == 28 && Login_OK) continue;
+		if (i == 29 && Login_OK) continue;
 		m_ppUILayer[i]->Render(m_nSwapChainBufferIndex);
 	}
 	LeaveCriticalSection(&UI_cs);

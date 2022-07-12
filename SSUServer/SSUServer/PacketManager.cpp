@@ -187,7 +187,9 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
             unordered_set <int> my_vl{ pl->viewlist };
             pl->vl.unlock();
             send_move_packet(pl, pl, 1);
-            m_SectorManager->player_move(pl);
+
+            if(pl->get_state() != ST_FREE)
+                 m_SectorManager->player_move(pl);
             break;
         }
 
@@ -202,8 +204,8 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
         pl->set_x(x);
         pl->set_y(y);
         pl->set_z(z);
-
-        m_SectorManager->player_move(pl);
+        if (pl->get_state() != ST_FREE)
+            m_SectorManager->player_move(pl);
         break;
     }
     case CS_PACKET_ATTACK: {

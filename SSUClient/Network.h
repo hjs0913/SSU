@@ -73,12 +73,21 @@ extern wstring Notice_str;
 
 extern CRITICAL_SECTION IndunCheck_cs;
 extern CRITICAL_SECTION UI_cs;
+
+extern bool ID_On;
+extern bool PASSWORD_On;
+extern bool Login_OK;
+
+extern char pl_id[MAX_NAME_SIZE];
+extern char pl_password[MAX_NAME_SIZE];
+extern int pl_job;
+
 void err_quit(const char* msg);
 
 void err_display(const char* msg);
 
 void send_login_packet(char* id, char* password, char* job);
-
+void send_login_packet(char* id, char* password, JOB job);
 void send_attack_packet(int skill);
 
 void send_move_packet(XMFLOAT3 position);
