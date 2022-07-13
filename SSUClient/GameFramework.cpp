@@ -682,7 +682,7 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 				if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 220)
 					&& CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 270)) {
 					if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 - 100)  //확인 
-						&& FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 - 20) {					
+						&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 - 20)) {
 				
 						string id, passwoird, nickname;
 						wstring2string(id, JOIN_ID_Str);
@@ -693,13 +693,14 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 
 						wstring2string(nickname, JOIN_NICKNAME_Str);
 						strcpy(pl_nickname, nickname.c_str());
-		
 						send_relogin_packet(pl_id, pl_password, pl_nickname, (JOB)pl_job, (ELEMENT)pl_element);
 						Join_On = false;
+				
 					}
 					if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 )  //취소 
-						&& FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 + 80) {
+						&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 + 80)) {
 						Join_On = false;
+					
 					}
 
 				}
@@ -1232,6 +1233,8 @@ void CGameFramework::BuildObjects()
 	}
 
 	Create_OpenWorld_Object();
+
+	
 }
 
 void CGameFramework::Create_OpenWorld_Object()

@@ -388,8 +388,8 @@ void process_packet(unsigned char* p)
 		mPlayer[my_id]->m_net_dead = false;
 		my_element = packet->element;
 		my_job = packet->job;
-		
-
+		mPlayer[my_id]->m_job = my_job;
+		cout << "³»Á÷¾÷: " << my_job << endl;
 		wchar_t* temp;;
 		int len = 1 + strlen(mPlayer[my_id]->m_name);
 		temp = new TCHAR[len];
