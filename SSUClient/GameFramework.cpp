@@ -27,6 +27,11 @@ wstring Hp_str = L"";
 wstring Mp_str = L"";
 wstring ID_Str = L"";
 wstring PASSWORD_Str = L"";
+wstring JOIN_ID_Str = L"";
+wstring JOIN_PASSWORD_Str = L"";
+wstring JOIN_NICKNAME_Str = L"";
+wstring JOIN_JOB_Str = L"";
+wstring JOIN_ELEMENT_Str = L"";
 
 bool Chatting_On = false;
 bool Mouse_On = false;
@@ -550,30 +555,137 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 				break;
 			}
 			if(!Login_OK) {
-				if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - 50) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 150)) {
+				if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - 50) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 150)) {  //id
 					if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 200) && CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 245)){
 						PASSWORD_On = false;
 						ID_On = true;
 					}
 				}
-				 if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - 50) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 150)) {
+				 if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - 50) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 150)) {   //password
 					if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 250) && CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 295)) {
 						ID_On = false;
 						PASSWORD_On = true;
 					}
 				}
-				 if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 + 160) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 200)) {
+				 if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 + 160) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 200)) {   //로그인 버튼
 					 if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 200) && CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 295)) {
 						 string id, passwoird;
 						 wstring2string(id, ID_Str);
 						 strcpy(pl_id,id.c_str());
 						 wstring2string(passwoird, PASSWORD_Str);
 						 strcpy(pl_password, passwoird.c_str());
-						 pl_job = 0;
-						 send_login_packet(pl_id, pl_password, (JOB)pl_job);
+						 pl_job = 0;  //나중엔 db연결땐 빼야함 
+						 send_login_packet(pl_id, pl_password, (JOB)pl_job);   //회원가입 확인 버튼 누르면 정보 싹다 보내고 db추가  
+					 }
+				 }
+				 if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - 250) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 250)) {   //회원가입  버튼
+					 if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 300) && CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 330)) {
+						 Join_On = true;
+						 ID_On = false;
+						 PASSWORD_On = false;
 					 }
 				 }
 			}
+			if (Join_On && !Login_OK) {
+				if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 ) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 200)) {  //id
+					if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 - 250) && CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 - 205)) {
+						JOIN_ID_On = true;
+						JOIN_PASSWORD_On = false;
+						JOIN_NICKNAME_On = false;
+					}
+				}
+				if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 200)) {  //password
+					if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2  -195) && CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 - 150)) {
+						JOIN_ID_On = false;
+						JOIN_PASSWORD_On = true;
+						JOIN_NICKNAME_On = false;
+					}
+				}
+				if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 200)) {  //nickname
+					if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 - 140) && CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 - 95)) {
+						JOIN_ID_On = false;
+						JOIN_PASSWORD_On = false;
+						JOIN_NICKNAME_On = true;
+					}
+				}
+
+				if (CursorPosInClient.y >= (m_nWndClientHeight / 2 + m_nWndClientHeight / 20 - m_nWndClientHeight / 22.5)
+					&& CursorPosInClient.y <= (m_nWndClientHeight / 2 + m_nWndClientHeight / 20 - 10)) {
+					if (CursorPosInClient.x >= (m_nWndClientWidth / 2 - m_nWndClientWidth / 10 + m_nWndClientWidth / 360)
+						&& CursorPosInClient.x <= (m_nWndClientWidth / 2 - m_nWndClientWidth / 10 + m_nWndClientWidth / 360 + m_nWndClientWidth / 22.5)) {
+						JOIN_DILLER_On = true; 		JOIN_TANKER_On = false; 		JOIN_MAGICIAN_On = false;		JOIN_SUPPORTER_On = false;  //굳이 필요?
+						pl_job = 0;
+						JOIN_ID_On = false;
+						JOIN_PASSWORD_On = false;
+						JOIN_NICKNAME_On = false;
+					}
+					if (CursorPosInClient.x >= (m_nWndClientWidth / 2 - m_nWndClientWidth / 360 - m_nWndClientWidth / 22.5)
+						&& CursorPosInClient.x <= (m_nWndClientWidth / 2 - m_nWndClientWidth / 360)) {
+						JOIN_DILLER_On = false; 		JOIN_TANKER_On = true; 		JOIN_MAGICIAN_On = false;		JOIN_SUPPORTER_On = false;
+						pl_job = 1;
+						JOIN_ID_On = false;
+						JOIN_PASSWORD_On = false;
+						JOIN_NICKNAME_On = false;
+					}
+					if (CursorPosInClient.x >= (m_nWndClientWidth / 2 + m_nWndClientWidth / 360)
+						&& CursorPosInClient.x <= (m_nWndClientWidth / 2 + m_nWndClientWidth / 360 + m_nWndClientWidth / 22.5)) {
+						JOIN_DILLER_On = false; 		JOIN_TANKER_On = false; 		JOIN_MAGICIAN_On = true;		JOIN_SUPPORTER_On = false;  
+						pl_job = 2;
+						JOIN_ID_On = false;
+						JOIN_PASSWORD_On = false;
+						JOIN_NICKNAME_On = false;
+					}
+					if (CursorPosInClient.x >= (m_nWndClientWidth / 2 + m_nWndClientWidth / 10 - m_nWndClientWidth / 360 - m_nWndClientWidth / 22.5)
+						&& CursorPosInClient.x <= (m_nWndClientWidth / 2 + m_nWndClientWidth / 10 - m_nWndClientWidth / 360)) {
+						JOIN_DILLER_On = false; 		JOIN_TANKER_On = false; 		JOIN_MAGICIAN_On = false;		JOIN_SUPPORTER_On = true;
+						pl_job = 3;
+						JOIN_ID_On = false;
+						JOIN_PASSWORD_On = false;
+						JOIN_NICKNAME_On = false;
+					}
+				}
+				if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 100)  //위 속성 4개 
+					&& CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 130)) {
+					if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - 175)  //물 
+						&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 - 175 + 80)) {
+						pl_element = 1;
+					}
+					if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 360 - FRAME_BUFFER_WIDTH / 22.5) //강철 
+						&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 360)) {
+						pl_element = 2;
+					}
+					if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360)
+						&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 + FRAME_BUFFER_WIDTH / 22.5)) { //바람 
+						pl_element = 3;
+					}
+					if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 10 - FRAME_BUFFER_WIDTH / 360 - FRAME_BUFFER_WIDTH / 22.5) //불 
+						&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 10 - FRAME_BUFFER_WIDTH / 360)) {
+						pl_element = 4;
+					}
+				}
+				if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 140)//아래 속성 3개 
+					&& CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 170)) {
+					if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - 175)  //나무
+						&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 - 175 + 80)) {
+						pl_element = 5;
+					}
+					if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 360 - FRAME_BUFFER_WIDTH / 22.5) //땅
+						&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 360)) {
+						pl_element = 6;
+					}
+					if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360)
+						&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 + FRAME_BUFFER_WIDTH / 22.5)) { //얼음
+						pl_element = 7;
+					}
+				}
+
+
+			}
+			
+			
+			
+
+			
 
 			if (f4_picking_possible) {
 				//cRay r; 
@@ -689,7 +801,31 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 						delete send_str;
 						break;
 					}
-
+					//회원가입 
+					if (!Login_OK && JOIN_ID_On && Join_On) {
+						len = 1 + JOIN_ID_Str.length();
+						send_str = new char[len * 4];
+						temp = JOIN_ID_Str.c_str();
+						wcstombs(send_str, temp, MAX_NAME_SIZE);
+						delete send_str;
+						break;
+					}
+					if (!Login_OK && JOIN_PASSWORD_On && Join_On) {
+						len = 1 + JOIN_PASSWORD_Str.length();
+						send_str = new char[len * 4];
+						temp = JOIN_PASSWORD_Str.c_str();
+						wcstombs(send_str, temp, MAX_NAME_SIZE);
+						delete send_str;
+						break;
+					}
+					if (!Login_OK && JOIN_NICKNAME_On && Join_On) {
+						len = 1 + JOIN_NICKNAME_Str.length();
+						send_str = new char[len * 4];
+						temp = JOIN_NICKNAME_Str.c_str();
+						wcstombs(send_str, temp, MAX_NAME_SIZE);
+						delete send_str;
+						break;
+					}
 					break;
 				}
 				case VK_F1: {
@@ -879,7 +1015,21 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[28] = new PartyInviteUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::SkyBlue, D2D1::ColorF::Black);
 		m_ppUILayer[29] = new PartyInviteUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::SkyBlue, D2D1::ColorF::Black);
 		// 로그인 버튼
-		m_ppUILayer[30] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::RoyalBlue, D2D1::ColorF::Black); //DodgerBlue
+		m_ppUILayer[30] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::RoyalBlue, D2D1::ColorF::Black); 
+		// 회원가입 버튼
+		m_ppUILayer[31] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::DodgerBlue, D2D1::ColorF::Black); 
+		//JOIN 상자와   id/ password/nickname
+		m_ppUILayer[32] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::GhostWhite, D2D1::ColorF::Black);
+		m_ppUILayer[33] = new Title_UI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::DodgerBlue, D2D1::ColorF::Black);
+		m_ppUILayer[34] = new Title_UI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::DodgerBlue, D2D1::ColorF::Black);
+		m_ppUILayer[35] = new Title_UI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::DodgerBlue, D2D1::ColorF::Black);
+		// 직업 추가 
+		m_ppUILayer[36] = new AddAIUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::SkyBlue, D2D1::ColorF::White);
+		// 속성 추가 
+		m_ppUILayer[37] = new JOIN_ELEMENT_UI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::SkyBlue, D2D1::ColorF::White);
+		// 선택 직업과 속성 표시 
+		m_ppUILayer[38] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::SkyBlue, D2D1::ColorF::Black);
+		m_ppUILayer[39] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::SkyBlue, D2D1::ColorF::Black);
 
 		m_ppUILayer[0]->setAlpha(0.5, 1.0);
 		m_ppUILayer[1]->setAlpha(0.5, 1.0);
@@ -919,6 +1069,17 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[28]->setAlpha(0.8, 1.0);  //입력
 		m_ppUILayer[29]->setAlpha(0.8, 1.0);   //입력 
 		m_ppUILayer[30]->setAlpha(1.0, 1.0);   //입력 
+		m_ppUILayer[31]->setAlpha(1.0, 1.0);   
+
+		m_ppUILayer[32]->setAlpha(0.5, 1.0);  
+		m_ppUILayer[33]->setAlpha(1.0, 1.0);   //입력 
+		m_ppUILayer[34]->setAlpha(1.0, 1.0);
+		m_ppUILayer[35]->setAlpha(1.0, 1.0);
+
+		m_ppUILayer[36]->setAlpha(1.0, 1.0);
+		m_ppUILayer[37]->setAlpha(1.0, 1.0);
+		m_ppUILayer[38]->setAlpha(1.0, 1.0);
+		m_ppUILayer[39]->setAlpha(1.0, 1.0);
 
 		m_ppUILayer[0]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_FAR);
@@ -987,6 +1148,25 @@ void CGameFramework::BuildObjects()
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		m_ppUILayer[30]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[31]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+		m_ppUILayer[32]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_FLOW_DIRECTION_TOP_TO_BOTTOM);
+		m_ppUILayer[33]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[34]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[35]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[36]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[37]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[38]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_FLOW_DIRECTION_LEFT_TO_RIGHT);
+		m_ppUILayer[39]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_FLOW_DIRECTION_LEFT_TO_RIGHT);
 
 		// UIBar Setting
 		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, m_nWndClientHeight / 5 - 2*(m_nWndClientHeight / 22.5) - 20,
@@ -1420,15 +1600,15 @@ void CGameFramework::MoveToNextFrame()
 //#define _WITH_PLAYER_TOP
 
 void CGameFramework::FrameAdvance()
-{    
+{
 	EnterCriticalSection(&IndunCheck_cs);
 
 	m_GameTimer.Tick(60.0f);
-	
+
 	get_basic_information(m_pPlayer, my_id);
 	m_pPlayer->SetPosition(return_myPosition());
 
-	if(Login_OK)
+	if (Login_OK)
 		ProcessInput();
 	if (Login_OK)
 		AnimateObjects();
@@ -1474,8 +1654,8 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandList->ResourceBarrier(1, &d3dResourceBarrier);
 
 	hResult = m_pd3dCommandList->Close();
-	
-	ID3D12CommandList *ppd3dCommandLists[] = { m_pd3dCommandList };
+
+	ID3D12CommandList* ppd3dCommandLists[] = { m_pd3dCommandList };
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
 
 	WaitForGpuComplete();
@@ -1726,7 +1906,7 @@ void CGameFramework::FrameAdvance()
 			m_ppUILayer[i]->UpdateLabels(Notice_str, 0, 0, m_nWndClientWidth, m_nWndClientHeight / 15);
 			break;
 		case 22:
-			m_ppUILayer[i]->UpdateLabels(L"SKILL",  FRAME_BUFFER_WIDTH / 2.8, FRAME_BUFFER_HEIGHT / 1.2,FRAME_BUFFER_WIDTH / 2.0 + 60, FRAME_BUFFER_HEIGHT / 1.2 + FRAME_BUFFER_WIDTH / 30);
+			m_ppUILayer[i]->UpdateLabels(L"SKILL", FRAME_BUFFER_WIDTH / 2.8, FRAME_BUFFER_HEIGHT / 1.2, FRAME_BUFFER_WIDTH / 2.0 + 60, FRAME_BUFFER_HEIGHT / 1.2 + FRAME_BUFFER_WIDTH / 30);
 			break;
 		case 24:
 			m_ppUILayer[i]->UpdateLabels(L"", FRAME_BUFFER_WIDTH / 2.5, FRAME_BUFFER_HEIGHT / 1.2 + skill_cool_rect[0], FRAME_BUFFER_WIDTH / 2.5 + 60, FRAME_BUFFER_HEIGHT / 1.2 + FRAME_BUFFER_WIDTH / 30);
@@ -1737,15 +1917,15 @@ void CGameFramework::FrameAdvance()
 		case 26:
 			m_ppUILayer[i]->UpdateLabels(L"", FRAME_BUFFER_WIDTH / 2.06, FRAME_BUFFER_HEIGHT / 1.2 + skill_cool_rect[2], FRAME_BUFFER_WIDTH / 2.06 + 60, FRAME_BUFFER_HEIGHT / 1.2 + FRAME_BUFFER_WIDTH / 30);
 			break;
-		case 27:
-			if (Login_OK) break; //로그인 됐으면 없어지자 -> 아직 Login_OK 변수 true 하는 부분 안 넣음 
-			m_ppUILayer[i]->UpdateLabels(L"", 0, 0,	m_nWndClientWidth , m_nWndClientHeight ); 
+		case 27:  //로그인 타이틀 배경 
+			if (Login_OK) break;
+			m_ppUILayer[i]->UpdateLabels(L"", 0, 0, m_nWndClientWidth, m_nWndClientHeight);
 			break;
-		case 28:
+		case 28: //ID 사각형과 입력 
 			if (Login_OK) break;
 			reinterpret_cast<Title_UI*>(m_ppUILayer[i])->UpdateLabels_ID(ID_Str);
 			break;
-		case 29:
+		case 29: //비번 사각형과 입력 
 			if (Login_OK) break;
 			reinterpret_cast<Title_UI*>(m_ppUILayer[i])->UpdateLabels_PASSWORD(PASSWORD_Str);
 			break;
@@ -1753,8 +1933,93 @@ void CGameFramework::FrameAdvance()
 			if (Login_OK) break;
 			m_ppUILayer[i]->UpdateLabels(L"LOGIN", FRAME_BUFFER_WIDTH / 2 + 160, FRAME_BUFFER_HEIGHT / 2 + 200, FRAME_BUFFER_WIDTH / 2.0 + 250, FRAME_BUFFER_HEIGHT / 2 + 295);
 			break;
+		case 31:
+			if (Login_OK) break;
+			m_ppUILayer[i]->UpdateLabels(L"회원가입", FRAME_BUFFER_WIDTH / 2 - 250, FRAME_BUFFER_HEIGHT / 2 + 300, FRAME_BUFFER_WIDTH / 2.0 + 250, FRAME_BUFFER_HEIGHT / 2 + 330);
+			break;
+		case 32:// 회원가입 창
+			if (!Join_On) break;
+			m_ppUILayer[i]->UpdateLabels(L"회원가입", FRAME_BUFFER_WIDTH / 2 - 250, FRAME_BUFFER_HEIGHT / 2 - 300, FRAME_BUFFER_WIDTH / 2.0 + 250, FRAME_BUFFER_HEIGHT / 2 + 300);
+			break;
+		case 33:
+			if (!Join_On) break;
+			reinterpret_cast<Title_UI*>(m_ppUILayer[i])->UpdateLabels_JOIN_ID(JOIN_ID_Str);
+			break;
+		case 34:
+			if (!Join_On) break;
+			reinterpret_cast<Title_UI*>(m_ppUILayer[i])->UpdateLabels_JOIN_PASSWORD(JOIN_PASSWORD_Str);
+			break;
+		case 35:
+			if (!Join_On) break;
+			reinterpret_cast<Title_UI*>(m_ppUILayer[i])->UpdateLabels_JOIN_NICKNAME(JOIN_NICKNAME_Str);
+			break;
+		case 36:  // JOB
+			if (!Join_On) break;
+			reinterpret_cast<AddAIUI*>(m_ppUILayer[i])->UpdateLabels_JOIN_JOB();
+			//reinterpret_cast<AddAIUI*>(m_ppUILayer[36])->m_pButtonBrush->SetColor(D2D1::ColorF(D2D1::ColorF::DarkBlue));  //m_pButtonBrush 4 배열로 만들자 
+			break;
+		case 37:  // element
+			if (!Join_On) break;
+			reinterpret_cast<JOIN_ELEMENT_UI*>(m_ppUILayer[i])->UpdateLabels_JOIN_ELEMENT();
+			break;
+		case 38:
+			if (!Join_On) break;
+			switch (pl_job)
+			{
+			case -1:
+				JOIN_JOB_Str = L"직업: 미선택";
+				break;
+			case 0:
+				JOIN_JOB_Str = L"직업: 전사";
+				break;
+			case 1:
+				JOIN_JOB_Str = L"직업: 탱커";
+				break;
+			case 2:
+				JOIN_JOB_Str = L"직업: 마법사";
+				break;
+			case 3:
+				JOIN_JOB_Str = L"직업: 서포터";
+				break;
+			}
+			m_ppUILayer[i]->UpdateLabels(JOIN_JOB_Str, FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 10 + FRAME_BUFFER_WIDTH / 360, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20 - FRAME_BUFFER_HEIGHT / 22.5 - 50,
+				FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 10 + FRAME_BUFFER_WIDTH / 360 + FRAME_BUFFER_WIDTH / 22.5 + 50, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20 - 10 - 50);
+			break;
+		case 39:
+			if (!Join_On) break;
+			switch (pl_element)
+			{
+			case 0:
+				JOIN_ELEMENT_Str = L"속성: 미선택";
+				break;
+			case 1:
+				JOIN_ELEMENT_Str = L"속성: 물";
+				break;
+			case 2:
+				JOIN_ELEMENT_Str = L"속성: 강철";
+				break;
+			case 3:
+				JOIN_ELEMENT_Str = L"속성: 바람";
+				break;
+			case 4:
+				JOIN_ELEMENT_Str = L"속성: 불";
+				break;
+			case 5:
+				JOIN_ELEMENT_Str = L"속성: 나무";
+				break;
+			case 6:
+				JOIN_ELEMENT_Str = L"속성: 땅";
+				break;
+			case 7:
+				JOIN_ELEMENT_Str = L"속성: 얼음";
+				break;
+			}
+			m_ppUILayer[i]->UpdateLabels(JOIN_ELEMENT_Str, FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 10 + FRAME_BUFFER_WIDTH / 360, FRAME_BUFFER_HEIGHT / 2 + 140 -70,
+				FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 10 + FRAME_BUFFER_WIDTH / 360 + FRAME_BUFFER_WIDTH / 22.5 + 50, FRAME_BUFFER_HEIGHT / 2 + 140 -70);
+			break;
 		}
 	}
+
 
 	for (int i = 0; i < UICOUNT; i++) {
 		if ((i == 7 || i == 8)) {
@@ -1774,6 +2039,16 @@ void CGameFramework::FrameAdvance()
 		if (i == 28 && Login_OK) continue;
 		if (i == 29 && Login_OK) continue;
 		if (i == 30 && Login_OK) continue;
+		if (i == 31 && Login_OK) continue;
+		if (i == 32 && !Join_On) continue;
+		if (i == 33 && !Join_On) continue;
+		if (i == 34 && !Join_On) continue;
+		if (i == 35 && !Join_On) continue;
+		if (i == 36 && !Join_On) continue;
+		if (i == 37 && !Join_On) continue;
+		if (i == 38 && !Join_On) continue;
+		if (i == 39 && !Join_On) continue;
+
 		m_ppUILayer[i]->Render(m_nSwapChainBufferIndex);
 	}
 	LeaveCriticalSection(&UI_cs);

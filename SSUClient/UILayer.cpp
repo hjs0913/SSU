@@ -879,6 +879,30 @@ void Title_UI::UpdateLabels_PASSWORD(const std::wstring& strUIText)
     m_vTextBlocks[1] = { strUIText, D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - 50, FRAME_BUFFER_HEIGHT / 2 + 250,
         FRAME_BUFFER_WIDTH / 2 + 150, FRAME_BUFFER_HEIGHT / 2 + 295), m_pdwTextFormat2 };
 }
+
+void Title_UI::UpdateLabels_JOIN_ID(const std::wstring& strUIText)
+{
+    m_vTextBlocks[0] = { L"ID", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - 200, FRAME_BUFFER_HEIGHT / 2 - 250 ,
+        FRAME_BUFFER_WIDTH / 2  , FRAME_BUFFER_HEIGHT / 2 - 205), m_pdwTextFormat };
+    m_vTextBlocks[1] = { strUIText, D2D1::RectF(FRAME_BUFFER_WIDTH / 2 , FRAME_BUFFER_HEIGHT / 2 -250,
+        FRAME_BUFFER_WIDTH / 2 + 200, FRAME_BUFFER_HEIGHT / 2 -205), m_pdwTextFormat2 };
+}
+
+void Title_UI::UpdateLabels_JOIN_PASSWORD(const std::wstring& strUIText)
+{
+    m_vTextBlocks[0] = { L"PASSWORD", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - 200, FRAME_BUFFER_HEIGHT / 2 - 195,
+        FRAME_BUFFER_WIDTH / 2 , FRAME_BUFFER_HEIGHT / 2 -150), m_pdwTextFormat };
+    m_vTextBlocks[1] = { strUIText, D2D1::RectF(FRAME_BUFFER_WIDTH / 2 , FRAME_BUFFER_HEIGHT / 2 -195,
+        FRAME_BUFFER_WIDTH / 2 + 200, FRAME_BUFFER_HEIGHT / 2 -150), m_pdwTextFormat2 };
+}
+void Title_UI::UpdateLabels_JOIN_NICKNAME(const std::wstring& strUIText)
+{
+    m_vTextBlocks[0] = { L"NICKNAME", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - 200, FRAME_BUFFER_HEIGHT / 2 -140 ,
+        FRAME_BUFFER_WIDTH / 2  , FRAME_BUFFER_HEIGHT / 2 - 95), m_pdwTextFormat };
+    m_vTextBlocks[1] = { strUIText, D2D1::RectF(FRAME_BUFFER_WIDTH / 2 , FRAME_BUFFER_HEIGHT / 2 -140,
+        FRAME_BUFFER_WIDTH / 2 + 200, FRAME_BUFFER_HEIGHT / 2  -95), m_pdwTextFormat2 };
+}
+
 void Title_UI::Render(UINT nFrame)
 {
 
@@ -944,4 +968,70 @@ void Title_UI::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT nHe
     m_pd2dWriteFactory->CreateTextFormat(L"Arial", nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fSmallFontSize, L"en-us", &m_pdwTextFormat2);
     m_pdwTextFormat2->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
     m_pdwTextFormat2->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+}
+///----
+JOIN_ELEMENT_UI::JOIN_ELEMENT_UI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor)
+    : UILayer(nFrame, pd3dDevice, pd3dCommandQueue, LayoutColor, TextColor)
+{
+    m_vTextBlocks.resize(7);
+    BG_Rect = D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 10, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20 + 10,
+        FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 10, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20+ 130);
+
+    m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Gray), (ID2D1SolidColorBrush**)&m_pButtonBrush);
+    m_pButtonBrush->SetColor(D2D1::ColorF(D2D1::ColorF::Gray));
+    m_pButtonBrush->SetOpacity(1.0f);
+}
+
+JOIN_ELEMENT_UI::~JOIN_ELEMENT_UI()
+{
+
+}
+void JOIN_ELEMENT_UI::UpdateLabels_JOIN_ELEMENT()  //아래 와이는 100 , 130 
+{
+    m_vTextBlocks[0] = { L"물", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - 175, FRAME_BUFFER_HEIGHT / 2  +  100,
+        FRAME_BUFFER_WIDTH / 2 - 175 + 80, FRAME_BUFFER_HEIGHT / 2 + 130), m_pdwTextFormat };
+
+    m_vTextBlocks[1] = { L"강철", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 360 - FRAME_BUFFER_WIDTH / 22.5, FRAME_BUFFER_HEIGHT / 2 + 100,
+        FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 360, FRAME_BUFFER_HEIGHT / 2 + 130), m_pdwTextFormat };
+
+    m_vTextBlocks[2] = { L"바람", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360, FRAME_BUFFER_HEIGHT / 2 + 100,
+        FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 + FRAME_BUFFER_WIDTH / 22.5, FRAME_BUFFER_HEIGHT / 2 + 130), m_pdwTextFormat };
+
+    m_vTextBlocks[3] = { L"불", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 10 - FRAME_BUFFER_WIDTH / 360 - FRAME_BUFFER_WIDTH / 22.5 ,FRAME_BUFFER_HEIGHT / 2 + 100,
+        FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 10 - FRAME_BUFFER_WIDTH / 360, FRAME_BUFFER_HEIGHT / 2 + 130), m_pdwTextFormat };
+
+    m_vTextBlocks[4] = { L"나무", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - 175 , FRAME_BUFFER_HEIGHT / 2 + 140,
+
+    FRAME_BUFFER_WIDTH / 2 - 175 + 80, FRAME_BUFFER_HEIGHT / 2 + 170), m_pdwTextFormat };
+
+    m_vTextBlocks[5] = { L"땅", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 360 - FRAME_BUFFER_WIDTH / 22.5 , FRAME_BUFFER_HEIGHT / 2 + 140,
+     FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 360, FRAME_BUFFER_HEIGHT / 2 + 170), m_pdwTextFormat };
+
+    m_vTextBlocks[6] = { L"얼음", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360, FRAME_BUFFER_HEIGHT / 2 + 140,
+     FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 + FRAME_BUFFER_WIDTH / 22.5, FRAME_BUFFER_HEIGHT / 2 + 170), m_pdwTextFormat };
+
+}
+void JOIN_ELEMENT_UI::Render(UINT nFrame)
+{
+    ID3D11Resource* ppResources[] = { m_vWrappedRenderTargets[nFrame] };
+
+    m_pd2dDeviceContext->SetTarget(m_vd2dRenderTargets[nFrame]);
+
+    m_pd3d11On12Device->AcquireWrappedResources(ppResources, _countof(ppResources));
+    //--------
+    m_pd2dDeviceContext->BeginDraw();
+    m_pd2dDeviceContext->FillRectangle(BG_Rect, m_pBrush);
+    m_pd2dDeviceContext->DrawRectangle(BG_Rect, m_pBrush);
+    for (int i = 0; i < 7; i++)
+    {
+        m_pd2dDeviceContext->FillRectangle(m_vTextBlocks[i].d2dLayoutRect, m_pButtonBrush);
+        m_pd2dDeviceContext->DrawRectangle(m_vTextBlocks[i].d2dLayoutRect, m_pButtonBrush);
+        m_pd2dDeviceContext->DrawText(m_vTextBlocks[i].strText.c_str(), static_cast<UINT>(m_vTextBlocks[i].strText.length()),
+            m_vTextBlocks[i].pdwFormat, m_vTextBlocks[i].d2dLayoutRect, m_pd2dTextBrush);
+
+    }
+    m_pd2dDeviceContext->EndDraw();
+
+    m_pd3d11On12Device->ReleaseWrappedResources(ppResources, _countof(ppResources));
+    m_pd3d11DeviceContext->Flush();
 }

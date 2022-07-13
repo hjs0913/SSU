@@ -2,7 +2,7 @@
 
 #define FRAME_BUFFER_WIDTH		1800 //640
 #define FRAME_BUFFER_HEIGHT		900 //480
-#define UICOUNT 31
+#define UICOUNT 40
 
 #include "Timer.h"
 #include "Player.h"
@@ -28,7 +28,11 @@ extern int nnn;
 extern CCamera* m_pCamera;
 extern wstring ID_Str;
 extern wstring PASSWORD_Str;
-
+extern wstring JOIN_ID_Str;
+extern wstring JOIN_PASSWORD_Str;
+extern wstring JOIN_NICKNAME_Str;
+extern wstring JOIN_JOB_Str;
+extern wstring JOIN_ELEMENT_Str;
 class CGameFramework
 {
 public:

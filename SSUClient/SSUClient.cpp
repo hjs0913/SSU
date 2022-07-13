@@ -254,6 +254,49 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				}
 			}
 		}
+
+		if (!Login_OK && JOIN_ID_On && Join_On) {
+			if ((wchar_t)wParam == '\b') {
+				if (JOIN_ID_Str.size() > 0) {
+					JOIN_ID_Str.pop_back();
+				}
+			}
+			else if ((wchar_t)wParam == '\r') break;
+			else {
+				if (JOIN_ID_Str.size() < MAX_NAME_SIZE - 1)
+				{
+					JOIN_ID_Str.push_back((wchar_t)wParam);
+				}
+			}
+		}
+		if (!Login_OK && JOIN_PASSWORD_On && Join_On) {
+			if ((wchar_t)wParam == '\b') {
+				if (JOIN_PASSWORD_Str.size() > 0) {
+					JOIN_PASSWORD_Str.pop_back();
+				}
+			}
+			else if ((wchar_t)wParam == '\r') break;
+			else {
+				if (JOIN_PASSWORD_Str.size() < MAX_NAME_SIZE - 1)
+				{
+					JOIN_PASSWORD_Str.push_back((wchar_t)wParam);
+				}
+			}
+		}
+		if (!Login_OK && JOIN_NICKNAME_On && Join_On) {
+			if ((wchar_t)wParam == '\b') {
+				if (JOIN_NICKNAME_Str.size() > 0) {
+					JOIN_NICKNAME_Str.pop_back();
+				}
+			}
+			else if ((wchar_t)wParam == '\r') break;
+			else {
+				if (JOIN_NICKNAME_Str.size() < MAX_NAME_SIZE - 1)
+				{
+					JOIN_NICKNAME_Str.push_back((wchar_t)wParam);
+				}
+			}
+		}
 		break;
 	}
 	default:

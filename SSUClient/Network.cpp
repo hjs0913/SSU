@@ -53,6 +53,14 @@ bool NoticeUI_On = false;
 bool RaidEnterNotice = false;
 bool DeadNotice = false;
 bool Login_OK = false;
+bool Join_On = false;
+bool JOIN_ID_On = false;
+bool JOIN_PASSWORD_On = false;
+bool JOIN_NICKNAME_On = false;
+bool JOIN_DILLER_On = false;
+bool JOIN_TANKER_On = false;
+bool JOIN_MAGICIAN_On = false;
+bool JOIN_SUPPORTER_On = false;
 wstring Notice_str = L"";
 chrono::system_clock::time_point InvitationCardTimer = chrono::system_clock::now();
 chrono::system_clock::time_point NoticeTimer = chrono::system_clock::now();
@@ -64,7 +72,9 @@ CRITICAL_SECTION UI_cs;
 
 char pl_id[MAX_NAME_SIZE];
 char pl_password[MAX_NAME_SIZE];
-int pl_job;
+char pl_nicknme[MAX_NAME_SIZE];
+int pl_job = -1;
+int pl_element = 0;
 
 struct EXP_OVER {
 	WSAOVERLAPPED m_wsa_over;
@@ -119,9 +129,10 @@ void send_login_packet(char* id, char* password, JOB job)
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET_LOGIN;
 	packet.job = job;
+//	packet.element = element;
 	strcpy_s(packet.password, password);
 	strcpy_s(packet.id, id);
-	strcpy_s(packet.name, id);
+//	strcpy_s(packet.name, nicknme);
 	do_send(sizeof(packet), &packet);
 }
 

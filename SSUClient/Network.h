@@ -77,10 +77,19 @@ extern CRITICAL_SECTION UI_cs;
 extern bool ID_On;
 extern bool PASSWORD_On;
 extern bool Login_OK;
-
+extern bool Join_On;
+extern bool JOIN_ID_On;
+extern bool JOIN_PASSWORD_On;
+extern bool JOIN_NICKNAME_On;
+extern bool JOIN_DILLER_On;
+extern bool JOIN_TANKER_On;
+extern bool JOIN_MAGICIAN_On;
+extern bool JOIN_SUPPORTER_On;
 extern char pl_id[MAX_NAME_SIZE];
 extern char pl_password[MAX_NAME_SIZE];
+extern char pl_nickname[MAX_NAME_SIZE];
 extern int pl_job;
+extern int pl_element;
 
 void err_quit(const char* msg);
 
