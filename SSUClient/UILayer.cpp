@@ -973,7 +973,7 @@ void Title_UI::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT nHe
 JOIN_ELEMENT_UI::JOIN_ELEMENT_UI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor)
     : UILayer(nFrame, pd3dDevice, pd3dCommandQueue, LayoutColor, TextColor)
 {
-    m_vTextBlocks.resize(7);
+    m_vTextBlocks.resize(9);
     BG_Rect = D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 10, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20 + 10,
         FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 10, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20+ 130);
 
@@ -1010,6 +1010,11 @@ void JOIN_ELEMENT_UI::UpdateLabels_JOIN_ELEMENT()  //아래 와이는 100 , 130
     m_vTextBlocks[6] = { L"얼음", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360, FRAME_BUFFER_HEIGHT / 2 + 140,
      FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 + FRAME_BUFFER_WIDTH / 22.5, FRAME_BUFFER_HEIGHT / 2 + 170), m_pdwTextFormat };
 
+    m_vTextBlocks[7] = { L"확인", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 - 100, FRAME_BUFFER_HEIGHT / 2 + 220,
+   FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 -20, FRAME_BUFFER_HEIGHT / 2 + 270), m_pdwTextFormat };
+    m_vTextBlocks[8] = { L"취소", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 , FRAME_BUFFER_HEIGHT / 2 + 220,
+   FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 +80 , FRAME_BUFFER_HEIGHT / 2 + 270), m_pdwTextFormat };
+
 }
 void JOIN_ELEMENT_UI::Render(UINT nFrame)
 {
@@ -1022,7 +1027,7 @@ void JOIN_ELEMENT_UI::Render(UINT nFrame)
     m_pd2dDeviceContext->BeginDraw();
     m_pd2dDeviceContext->FillRectangle(BG_Rect, m_pBrush);
     m_pd2dDeviceContext->DrawRectangle(BG_Rect, m_pBrush);
-    for (int i = 0; i < 7; i++)
+    for (int i = 0; i < 9; i++)
     {
         m_pd2dDeviceContext->FillRectangle(m_vTextBlocks[i].d2dLayoutRect, m_pButtonBrush);
         m_pd2dDeviceContext->DrawRectangle(m_vTextBlocks[i].d2dLayoutRect, m_pButtonBrush);

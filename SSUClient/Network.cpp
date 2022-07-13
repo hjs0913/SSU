@@ -72,7 +72,7 @@ CRITICAL_SECTION UI_cs;
 
 char pl_id[MAX_NAME_SIZE];
 char pl_password[MAX_NAME_SIZE];
-char pl_nicknme[MAX_NAME_SIZE];
+char pl_nickname[MAX_NAME_SIZE];
 int pl_job = -1;
 int pl_element = 0;
 
