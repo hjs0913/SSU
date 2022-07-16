@@ -49,12 +49,42 @@ XMFLOAT3 TownNpc::UpdatePosition(int i)
 		break;
 	}
 	case 6: {
+		if (sin(m_fTimeElapsed) >= 0) {
+			x = m_x + r * cos(m_fTimeElapsed/2);
+			z = m_z + r * sin(m_fTimeElapsed/2);
+		}
+		else {
+			if (m_fTimeElapsed < round90 * 3) {
+				x = m_x;
+				z = m_z + r*(1.f +  sin(m_fTimeElapsed));
+			}
+			else {
+				x = m_x + r * cos(m_fTimeElapsed);
+				z = m_z;
+			}
+		}
 		break;
 	}
 	case 7: {
+		if (sin(m_fTimeElapsed) >= 0) {
+			x = m_x + r * cos(m_fTimeElapsed / 2 + round90);
+			z = m_z + r * sin(m_fTimeElapsed / 2 + round90);
+		}
+		else {
+			if (m_fTimeElapsed < round90 * 3) {
+				x = m_x + r * cos(m_fTimeElapsed);
+				z = m_z;
+			}
+			else {
+				x = m_x;
+				z = m_z + r * cos(m_fTimeElapsed);
+			}
+		}
 		break;
 	}
 	case 8: {
+		x = 3409.f;
+		z = 264.f;
 		break;
 	}
 	case 9: {
@@ -98,10 +128,23 @@ XMFLOAT3 TownNpc::UpdateLook(int i)
 		x = 0.f;
 		if (m_fTimeElapsed > round90 && m_fTimeElapsed < 3 * round90) z = -1.f;
 		else z = 1.f;
-
 		break;
 	}
 	case 6: {
+		if (sin(m_fTimeElapsed) >= 0) {
+			x = cos(m_fTimeElapsed + round90);
+			z = sin(m_fTimeElapsed + round90);
+		}
+		else {
+			if (m_fTimeElapsed < round90 * 3) {
+				x = 0.f;
+				z = 1.f;
+			}
+			else {
+				x = 1.f;
+				z = 0.f;
+			}
+		}
 		break;
 	}
 	case 7: {

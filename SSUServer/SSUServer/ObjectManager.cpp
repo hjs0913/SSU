@@ -620,14 +620,22 @@ void ObjectManager::worker()
                     party_players[i]->set_x(3210);
                     party_players[i]->set_y(0);
                     party_players[i]->set_z(940);
+                    party_players[i]->set_hp(party_players[i]->get_maxhp());
                     party_players[i]->indun_id - 1;
 
                     // 오픈월드로 이동한다는 패킷 보내주기
                     send_move_openwrold(party_players[i]);
 
                     // 오픈월드로 위치 이동 및 시야처리
+                    party_players[i]->state_lock.lock();
+                    if (party_players[i]->get_state() == ST_DEAD) {
+                        send_revive_packet(party_players[i], party_players[i]);
+                    }
+                    party_players[i]->set_state(ST_INGAME);
+                    party_players[i]->state_lock.unlock();
+
                     m_SectorManager->player_put(party_players[i]);
-                    party_players[i]->revive();
+                    send_status_change_packet(party_players[i]);
 
                     dun->quit_palyer(party_players[i]);
                     i--;

@@ -903,6 +903,7 @@ void process_packet(unsigned char* p)
 		PartyInviteUI_ON = false;
 		InvitationCardUI_On = false;
 		InDungeon = false;
+		party_enter = false;
 		my_position.x = packet->x;
 		my_position.y = packet->y;
 		my_position.z = packet->z;

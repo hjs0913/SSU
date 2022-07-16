@@ -806,8 +806,8 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 	}
 
 	if (i >= 3 + MAX_NPC && i < 3 + MAX_NPC + NUM_PLAYER) {
-		if (mPlayer[i - 33]->GetUse() == true && m_ppHierarchicalGameObjects[i]->GetPosition().x == 0.f) {
-			switch (mPlayer[i-33]->m_job) {
+		if (mPlayer[i - (3+MAX_NPC)]->GetUse() == true && m_ppHierarchicalGameObjects[i]->GetPosition().x == 0.f) {
+			switch (mPlayer[i- (3 + MAX_NPC)]->m_job) {
 			case J_DILLER: {
 				//delete m_ppHierarchicalGameObjects[i];
 				m_ppHierarchicalGameObjects[i] = nullptr;
@@ -877,7 +877,7 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 			}
 			}
 		}
-		get_player_information(m_ppHierarchicalGameObjects[i], i - 33);
+		get_player_information(m_ppHierarchicalGameObjects[i], i - (3+MAX_NPC));
 		m_ppHierarchicalGameObjects[i]->SetPosition(
 			XMFLOAT3(m_ppHierarchicalGameObjects[i]->GetPosition().x,
 				m_pTerrain->GetHeight(m_ppHierarchicalGameObjects[i]->GetPosition().x, m_ppHierarchicalGameObjects[i]->GetPosition().z),

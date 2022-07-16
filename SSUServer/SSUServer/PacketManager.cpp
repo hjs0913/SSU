@@ -1309,7 +1309,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
             else {
                 if (check_pl->get_tribe() != HUMAN) {
                     check_pl->state_lock.unlock();
-                    continue;
+                    break;
                 }
                 check_pl->state_lock.unlock();
                 // 이름 비교
