@@ -1006,12 +1006,17 @@ void CScene::Raid_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pC
 
 	else if (i == 3) {
 		get_gaia_information(m_ppHierarchicalGameObjects[i]);
-		m_ppHierarchicalGameObjects[i]->SetPosition(
-			XMFLOAT3(m_ppHierarchicalGameObjects[i]->GetPosition().x,
-				m_pTerrain->GetHeight(m_ppHierarchicalGameObjects[i]->GetPosition().x, m_ppHierarchicalGameObjects[i]->GetPosition().z),
-				m_ppHierarchicalGameObjects[i]->GetPosition().z
-			)
-		);
+		if (get_combat_id_hp() <= 0) {
+			m_ppHierarchicalGameObjects[i]->SetPosition(0, -100, 0);
+		}
+		else {
+			m_ppHierarchicalGameObjects[i]->SetPosition(
+				XMFLOAT3(m_ppHierarchicalGameObjects[i]->GetPosition().x,
+					m_pTerrain->GetHeight(m_ppHierarchicalGameObjects[i]->GetPosition().x, m_ppHierarchicalGameObjects[i]->GetPosition().z),
+					m_ppHierarchicalGameObjects[i]->GetPosition().z
+				)
+			);
+		}
 
 		if (m_isIdle) {
 			SetAnimationEnableTrue(3, 0);

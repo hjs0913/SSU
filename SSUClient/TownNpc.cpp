@@ -10,6 +10,7 @@ float TownNpc::m_fTimeElapsed = 0.0f;
 void TownNpc::UpdateTime(float fTimeElapsed)
 {
 	m_fTimeElapsed += fTimeElapsed * 0.0005f;
+	if (m_fTimeElapsed >= round90 * 4) m_fTimeElapsed = 0.f;
 }
 
 XMFLOAT3 TownNpc::UpdatePosition(int i)
@@ -18,7 +19,6 @@ XMFLOAT3 TownNpc::UpdatePosition(int i)
 	float z = 0.f;
 	switch (i) {
 	case 0: {
-		cout << m_fTimeElapsed << endl;
 		x = m_x + r * cos(m_fTimeElapsed);
 		z = m_z + r * sin(m_fTimeElapsed);
 		break;
@@ -39,9 +39,13 @@ XMFLOAT3 TownNpc::UpdatePosition(int i)
 		break;
 	}
 	case 4: {
+		x = m_x + 171 * sin(m_fTimeElapsed+1);
+		z = m_z;
 		break;
 	}
 	case 5: {
+		x = m_x;
+		z = m_z + 171 * sin(m_fTimeElapsed);
 		break;
 	}
 	case 6: {
@@ -63,7 +67,7 @@ XMFLOAT3 TownNpc::UpdatePosition(int i)
 
 XMFLOAT3 TownNpc::UpdateLook(int i)
 {
-	float x = 0.f;
+	float x = 1.f;
 	float z = 0.f;
 	switch (i) {
 	case 0: {
@@ -87,9 +91,14 @@ XMFLOAT3 TownNpc::UpdateLook(int i)
 		break;
 	}
 	case 4: {
+		if (m_fTimeElapsed+1 > round90 && m_fTimeElapsed+1 < 3 * round90) x = -1.f;
 		break;
 	}
 	case 5: {
+		x = 0.f;
+		if (m_fTimeElapsed > round90 && m_fTimeElapsed < 3 * round90) z = -1.f;
+		else z = 1.f;
+
 		break;
 	}
 	case 6: {

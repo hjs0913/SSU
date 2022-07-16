@@ -626,12 +626,9 @@ void ObjectManager::worker()
                     send_move_openwrold(party_players[i]);
 
                     // 오픈월드로 위치 이동 및 시야처리
-                    party_players[i]->state_lock.lock();
-                    party_players[i]->set_state(ST_INGAME);
-                    party_players[i]->state_lock.unlock();
-
                     m_SectorManager->player_put(party_players[i]);
-                
+                    party_players[i]->revive();
+
                     dun->quit_palyer(party_players[i]);
                     i--;
                     human_player++;
