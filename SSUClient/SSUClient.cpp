@@ -44,21 +44,33 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	::LoadString(hInstance, IDC_SSU_CLIENT, szWindowClass, MAX_LOADSTRING);
 	MyRegisterClass(hInstance);
 	
-	while (1) {
-		if (Login_ok) break;
-	}
+	//while (1) {
+	//	if (!Login_ok) break;
+//	}
 
 	if (!InitInstance(hInstance, nCmdShow)) return(FALSE);
 
 	hAccelTable = ::LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_SSU_CLIENT));
 
 
+	//if (Login_OK)
+	//	gGameFramework.Create_OpenWorld_Object();
 	bool change_dungeon = false;
 
 	while (1)
 	{
 		if (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
+			if (!Login_OK&& !Login_Build_Once) {
+				gGameFramework.BuildObjects_login();
+				Login_Build_Once = true;
+			}
+		/*	else if (Login_OK && !Open_Build_Once) {
+				gGameFramework.Release_Login_Object();
+				gGameFramework.BuildObjects();
+				Open_Build_Once = true;
+				//gGameFramework.Create_OpenWorld_Object();
+			}*/
 			if (msg.message == WM_QUIT) break;
 			if (!::TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
 			{
@@ -68,20 +80,23 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 		}
 		else
 		{
-			if (change_dungeon != InDungeon) {
-				change_dungeon = InDungeon;
-				if (change_dungeon) {
-					gGameFramework.Release_OpenWorld_Object();
-					gGameFramework.Create_InDungeon_Object();
-					send_raid_rander_ok_packet();
-					//	send_partner_rander_ok_packet();
-				}
-				else {
-					gGameFramework.Release_InDungeon_Object();
-					gGameFramework.Create_OpenWorld_Object();
+			if (Login_OK) {
+				if (change_dungeon != InDungeon) {
+					change_dungeon = InDungeon;
+					if (change_dungeon) {
+						gGameFramework.Release_OpenWorld_Object();
+						gGameFramework.Create_InDungeon_Object();
+						send_raid_rander_ok_packet();
+						//	send_partner_rander_ok_packet();
+					}
+					else {
+						
+						gGameFramework.Release_Login_Object();
+						gGameFramework.Release_InDungeon_Object();
+						gGameFramework.Create_OpenWorld_Object();
+					}
 				}
 			}
-
 			gGameFramework.FrameAdvance();
 		}
 	}
@@ -116,6 +131,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
+
 	ghAppInstance = hInstance;
 
 	RECT rc = { 0, 0, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT };
@@ -220,6 +236,78 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				if (Chatting_Str.size() < 20)
 				{
 					Chatting_Str.push_back((wchar_t)wParam);
+				}
+			}
+		}
+
+		if (!Login_OK && ID_On) {
+			if ((wchar_t)wParam == '\b') {
+				if (ID_Str.size() > 0) {
+					ID_Str.pop_back();
+				}
+			}
+			else if ((wchar_t)wParam == '\r') break;
+			else {
+				if (ID_Str.size() < MAX_NAME_SIZE - 1)
+				{
+					ID_Str.push_back((wchar_t)wParam);
+				}
+			}
+		}
+		if (!Login_OK && PASSWORD_On) {
+			if ((wchar_t)wParam == '\b') {
+				if (PASSWORD_Str.size() > 0) {
+					PASSWORD_Str.pop_back();
+				}
+			}
+			else if ((wchar_t)wParam == '\r') break;
+			else {
+				if (PASSWORD_Str.size() < MAX_NAME_SIZE - 1)
+				{
+					PASSWORD_Str.push_back((wchar_t)wParam);
+				}
+			}
+		}
+
+		if (!Login_OK && JOIN_ID_On && Join_On) {
+			if ((wchar_t)wParam == '\b') {
+				if (JOIN_ID_Str.size() > 0) {
+					JOIN_ID_Str.pop_back();
+				}
+			}
+			else if ((wchar_t)wParam == '\r') break;
+			else {
+				if (JOIN_ID_Str.size() < MAX_NAME_SIZE - 1)
+				{
+					JOIN_ID_Str.push_back((wchar_t)wParam);
+				}
+			}
+		}
+		if (!Login_OK && JOIN_PASSWORD_On && Join_On) {
+			if ((wchar_t)wParam == '\b') {
+				if (JOIN_PASSWORD_Str.size() > 0) {
+					JOIN_PASSWORD_Str.pop_back();
+				}
+			}
+			else if ((wchar_t)wParam == '\r') break;
+			else {
+				if (JOIN_PASSWORD_Str.size() < MAX_NAME_SIZE - 1)
+				{
+					JOIN_PASSWORD_Str.push_back((wchar_t)wParam);
+				}
+			}
+		}
+		if (!Login_OK && JOIN_NICKNAME_On && Join_On) {
+			if ((wchar_t)wParam == '\b') {
+				if (JOIN_NICKNAME_Str.size() > 0) {
+					JOIN_NICKNAME_Str.pop_back();
+				}
+			}
+			else if ((wchar_t)wParam == '\r') break;
+			else {
+				if (JOIN_NICKNAME_Str.size() < MAX_NAME_SIZE - 1)
+				{
+					JOIN_NICKNAME_Str.push_back((wchar_t)wParam);
 				}
 			}
 		}

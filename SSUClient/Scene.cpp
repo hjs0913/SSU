@@ -341,6 +341,27 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
+void CScene::BuildObjects_Login(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
+{
+	m_pd3dDevice = pd3dDevice;
+
+	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
+
+	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 150); //SuperCobra(17), Gunship(2), Player:Mi24(1), Angrybot()
+
+	CMaterial::PrepareShaders(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
+
+	BuildDefaultLightsAndMaterials();
+
+	m_pSkyBox = new CSkyBox(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
+
+	XMFLOAT3 xmf3Scale(8.0f, 50.0f, 8.0f);
+	XMFLOAT4 xmf4Color(0.0f, 0.0f, 0.0f, 0.0f);
+	m_pTerrain = new CHeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Image/Gaia2.raw"), 512, 512, xmf3Scale, xmf4Color);
+
+
+	CreateShaderVariables(pd3dDevice, pd3dCommandList);
+}
 
 void CScene::ReleaseObjects()
 {
@@ -600,6 +621,7 @@ void CScene::ReleaseUploadBuffers()
 
 	for (int i = 0; i < m_nShaders; i++) m_ppShaders[i]->ReleaseUploadBuffers();
 	for (int i = 0; i < m_nGameObjects; i++) if (m_ppGameObjects[i]) m_ppGameObjects[i]->ReleaseUploadBuffers();
+	if(Login_OK)
 	for (int i = 0; i < m_nHierarchicalGameObjects; i++) m_ppHierarchicalGameObjects[i]->ReleaseUploadBuffers();
 }
 
@@ -757,11 +779,16 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	{
 		if (m_ppHierarchicalGameObjects[i])
 		{
-			if (InDungeon) {
-				Raid_Render(pd3dCommandList, pCamera, i);
+			if (Login_OK) {
+				if (InDungeon) {
+					Raid_Render(pd3dCommandList, pCamera, i);
+				}
+				else {
+					OpenWorld_Render(pd3dCommandList, pCamera, i);
+				}
 			}
 			else {
-				OpenWorld_Render(pd3dCommandList, pCamera, i);
+				Login_Render(pd3dCommandList, pCamera, i);
 			}
 		}
 	}
@@ -983,7 +1010,10 @@ void CScene::Raid_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pC
 	if (!m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController) m_ppHierarchicalGameObjects[i]->UpdateTransform(NULL);
 	m_ppHierarchicalGameObjects[i]->Render(pd3dCommandList, pCamera);
 }
+void CScene::Login_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, int i)
+{
 
+}
 void CScene::SetAnimationEnableTrue(int objIndex, int animIndex, int speed)
 {
 	int max_anim = m_ppHierarchicalGameObjects[objIndex]->m_pSkinnedAnimationController->m_nAnimationTracks;

@@ -54,6 +54,7 @@ public:
 	void BuildDefaultLightsAndMaterials();
 	void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
 	void BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
+	void BuildObjects_Login(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	void ReleaseObjects();
 
 	ID3D12RootSignature *CreateGraphicsRootSignature(ID3D12Device *pd3dDevice);
@@ -64,6 +65,7 @@ public:
     void Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera=NULL);
 	void OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL, int i = 0);
 	void Raid_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL, int i = 0);
+	void Login_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL, int i = 0);
 	void SetTreePosition(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int start, int end);
 	void ReleaseUploadBuffers();
 

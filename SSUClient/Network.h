@@ -73,11 +73,36 @@ extern wstring Notice_str;
 
 extern CRITICAL_SECTION IndunCheck_cs;
 extern CRITICAL_SECTION UI_cs;
+
+extern bool ID_On;
+extern bool PASSWORD_On;
+extern bool Login_OK;
+extern bool Login_Build_Once;
+extern bool Open_Build_Once;
+extern bool Join_On;
+extern bool JOIN_ID_On;
+extern bool JOIN_PASSWORD_On;
+extern bool JOIN_NICKNAME_On;
+extern bool JOIN_DILLER_On;
+extern bool JOIN_TANKER_On;
+extern bool JOIN_MAGICIAN_On;
+extern bool JOIN_SUPPORTER_On;
+extern char pl_id[MAX_NAME_SIZE];
+extern char pl_password[MAX_NAME_SIZE];
+extern char pl_nickname[MAX_NAME_SIZE];
+
+extern int pl_job;
+extern int pl_element;
+
 void err_quit(const char* msg);
 
 void err_display(const char* msg);
 
 void send_login_packet(char* id, char* password, char* job);
+
+void send_login_packet(char* id, char* password, JOB job, ELEMENT element, char* nickname);
+
+void send_relogin_packet(char* id, char* password, char* nick_name, int job, int element);
 
 void send_attack_packet(int skill);
 

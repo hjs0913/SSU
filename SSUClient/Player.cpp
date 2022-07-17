@@ -468,7 +468,9 @@ CTerrainPlayer::CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLi
 	SetCameraUpdatedContext(pContext);
 
 	CHeightMapTerrain *pTerrain = (CHeightMapTerrain *)pContext;
+	
 	SetPosition(XMFLOAT3(3500.0f, pTerrain->GetHeight(3500.0f, 590.0f), 590.0f));
+
 	//SetScale(XMFLOAT3(10.0f, 10.0f, 10.0f));
 
 	if (pAngrybotModel) delete pAngrybotModel;
@@ -688,7 +690,7 @@ void CTerrainPlayer::Skill(int n)
 	if (m_pSkinnedAnimationController->m_pAnimationTracks[6].m_bEnable) {
 		return;
 	}
-	 
+
 	CPlayer::Skill(n);
 	m_pSkinnedAnimationController->SetTrackAllDisable();
 	/*m_pSkinnedAnimationController->SetTrackEnable(0, false);
@@ -733,9 +735,9 @@ void CTerrainPlayer::Skill(int n)
 		case J_TANKER:
 			m_pSkinnedAnimationController->SetCallbackKey(4, 3, 0.125f, _T("Sound/탱커 2번 스킬.wav"));
 			break;
-		/*case J_MAGICIAN:
+		case J_MAGICIAN:
 			m_pSkinnedAnimationController->SetCallbackKey(4, 3, 0.125f, _T("Sound/마법사 2번 스킬.wav"));
-			break;*/
+			break;
 		case J_SUPPORTER:
 			m_pSkinnedAnimationController->SetCallbackKey(4, 3, 0.125f, _T("Sound/서포터 2번 스킬.wav"));
 			break;
@@ -759,8 +761,9 @@ void CTerrainPlayer::Skill(int n)
 		case J_TANKER:
 			m_pSkinnedAnimationController->SetCallbackKey(5, 4, 0.125f, _T("Sound/탱커 3번 스킬.wav"));
 			break;
-			/*	case J_MAGICIAN:
-					break;*/
+		case J_MAGICIAN:
+			m_pSkinnedAnimationController->SetCallbackKey(5, 4, 0.125f, _T("Sound/서포터 3번 스킬.wav"));
+			break;
 		case J_SUPPORTER:
 			m_pSkinnedAnimationController->SetCallbackKey(5, 4, 0.125f, _T("Sound/서포터 3번 스킬.wav"));
 			break;
@@ -769,7 +772,6 @@ void CTerrainPlayer::Skill(int n)
 		CAnimationCallbackHandler* pAnimationCallbackHandler = new CSoundCallbackHandler();
 		m_pSkinnedAnimationController->SetAnimationCallbackHandler(5, pAnimationCallbackHandler);
 	}
-
 }
 
 void CTerrainPlayer::ChangeAnimationState(Player_Animation animState)
