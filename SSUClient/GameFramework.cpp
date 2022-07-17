@@ -194,8 +194,10 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 
 	CoInitialize(NULL);
 
-	BuildObjects();
 
+		//BuildObjects();
+
+	BuildObjects_login();
 	return(true);
 }
 
@@ -574,8 +576,14 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 						 strcpy(pl_id,id.c_str());
 						 wstring2string(passwoird, PASSWORD_Str);
 						 strcpy(pl_password, passwoird.c_str());
-						 pl_job = 0;  //나중엔 db연결땐 빼야함 
-						 send_login_packet(pl_id, pl_password, (JOB)pl_job);   //회원가입 확인 버튼 누르면 정보 싹다 보내고 db추가  
+					//	 pl_job = 0;  //나중엔 db연결땐 빼야함 						
+						 send_login_packet(pl_id, pl_password, (JOB)pl_job, (ELEMENT)(0), pl_id);   //회원가입 확인 버튼 누르면 정보 싹다 보내고 db추가  
+						 Release_Login_Object();
+						 if (!Open_Build_Once) {
+							 BuildObjects();
+							 Open_Build_Once = true;
+						 }
+
 					 }
 				 }
 				 if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - 250) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 250)) {   //회원가입  버튼
@@ -693,9 +701,14 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 
 						wstring2string(nickname, JOIN_NICKNAME_Str);
 						strcpy(pl_nickname, nickname.c_str());
+					//	send_login_packet(pl_id, pl_password, (JOB)pl_job, (ELEMENT)pl_element, pl_nickname);
 						send_relogin_packet(pl_id, pl_password, pl_nickname, (JOB)pl_job, (ELEMENT)pl_element);
 						Join_On = false;
-				
+						Release_Login_Object();
+						if (!Open_Build_Once) {
+							BuildObjects();
+							Open_Build_Once = true;
+						}
 					}
 					if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 )  //취소 
 						&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 + 80)) {
@@ -975,7 +988,266 @@ void CGameFramework::OnDestroy()
 }
 
 #define _WITH_TERRAIN_PLAYER
+void CGameFramework::BuildObjects_login()
+{
+	if (!m_ppUILayer) {
+		m_ppUILayer = new UILayer * [UICOUNT];
 
+		// Chatting(0 : read, 1 : Write)
+		m_ppUILayer[0] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::White);
+		m_ppUILayer[1] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::White);
+
+		// PlayerInfo( 2 : Info, 3: Hp, 4 : Mp, 5: exp, 6 : element)
+		m_ppUILayer[2] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::White, D2D1::ColorF::Black);
+		m_ppUILayer[3] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
+		m_ppUILayer[4] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Blue, D2D1::ColorF::White);
+		m_ppUILayer[5] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Blue, D2D1::ColorF::White);
+		m_ppUILayer[6] = new UIBitmap(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
+
+		// Combat Npc Info( 7: info, 8 : Hp)
+		m_ppUILayer[7] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::White, D2D1::ColorF::Black);
+		m_ppUILayer[8] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
+
+		// Boss Hp Info
+		m_ppUILayer[9] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::White, D2D1::ColorF::Black);
+		m_ppUILayer[10] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
+
+		// Party Hp Info
+		m_ppUILayer[11] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::White, D2D1::ColorF::Black);
+		m_ppUILayer[12] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
+		m_ppUILayer[13] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
+		m_ppUILayer[14] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
+		m_ppUILayer[15] = new UIBar(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
+
+		// Buff UI
+		m_ppUILayer[16] = new BuffUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
+
+		// Party UI
+		m_ppUILayer[17] = new PartyUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::White);
+
+		// 파티초대 UI
+		m_ppUILayer[18] = new PartyInviteUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::SkyBlue, D2D1::ColorF::Black);
+
+		// 파티 초대장
+		m_ppUILayer[19] = new InvitationCardUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::DarkGray, D2D1::ColorF::White);
+
+		// AI추가 UI
+		m_ppUILayer[20] = new AddAIUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::SkyBlue, D2D1::ColorF::White);
+
+		// Notice AI
+		m_ppUILayer[21] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Gray, D2D1::ColorF::Black);
+
+		// Skill UI
+		m_ppUILayer[22] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::White, D2D1::ColorF::Black);
+		m_ppUILayer[23] = new SkillUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::White, D2D1::ColorF::Black);
+		// Skill Cooltime
+		m_ppUILayer[24] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Black, D2D1::ColorF::Black);
+		m_ppUILayer[25] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Black, D2D1::ColorF::Black);
+		m_ppUILayer[26] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Black, D2D1::ColorF::Black);
+
+		//Title UI  화면
+		m_ppUILayer[27] = new UIBitmap(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::White);
+		//Title  id/ password
+		m_ppUILayer[28] = new PartyInviteUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::SkyBlue, D2D1::ColorF::Black);
+		m_ppUILayer[29] = new PartyInviteUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::SkyBlue, D2D1::ColorF::Black);
+		// 로그인 버튼
+		m_ppUILayer[30] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::RoyalBlue, D2D1::ColorF::Black);
+		// 회원가입 버튼
+		m_ppUILayer[31] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::DodgerBlue, D2D1::ColorF::Black);
+		//JOIN 상자와   id/ password/nickname
+		m_ppUILayer[32] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::GhostWhite, D2D1::ColorF::Black);
+		m_ppUILayer[33] = new Title_UI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::DodgerBlue, D2D1::ColorF::Black);
+		m_ppUILayer[34] = new Title_UI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::DodgerBlue, D2D1::ColorF::Black);
+		m_ppUILayer[35] = new Title_UI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::DodgerBlue, D2D1::ColorF::Black);
+		// 직업 추가 
+		m_ppUILayer[36] = new AddAIUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::SkyBlue, D2D1::ColorF::White);
+		// 속성 추가 
+		m_ppUILayer[37] = new JOIN_ELEMENT_UI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::SkyBlue, D2D1::ColorF::White);
+		// 선택 직업과 속성 표시 
+		m_ppUILayer[38] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::SkyBlue, D2D1::ColorF::Black);
+		m_ppUILayer[39] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::SkyBlue, D2D1::ColorF::Black);
+
+		m_ppUILayer[0]->setAlpha(0.5, 1.0);
+		m_ppUILayer[1]->setAlpha(0.5, 1.0);
+
+		m_ppUILayer[2]->setAlpha(0.3, 1.0);
+		m_ppUILayer[3]->setAlpha(0.0, 1.0);
+		m_ppUILayer[4]->setAlpha(0.0, 1.0);
+		m_ppUILayer[5]->setAlpha(0.0, 1.0);
+		m_ppUILayer[6]->setAlpha(0.0, 0.0);
+
+		m_ppUILayer[7]->setAlpha(0.3, 1.0);
+		m_ppUILayer[8]->setAlpha(0.0, 1.0);
+
+		m_ppUILayer[9]->setAlpha(0.3, 1.0);
+		m_ppUILayer[10]->setAlpha(0.0, 1.0);
+
+		m_ppUILayer[11]->setAlpha(0.3, 1.0);
+		m_ppUILayer[12]->setAlpha(0.0, 1.0);
+		m_ppUILayer[13]->setAlpha(0.0, 1.0);
+		m_ppUILayer[14]->setAlpha(0.0, 1.0);
+		m_ppUILayer[15]->setAlpha(0.0, 1.0);
+
+		m_ppUILayer[16]->setAlpha(0.0, 1.0);
+		m_ppUILayer[17]->setAlpha(0.7, 1.0);
+		m_ppUILayer[18]->setAlpha(1.0, 1.0);
+		m_ppUILayer[19]->setAlpha(1.0, 1.0);
+		m_ppUILayer[20]->setAlpha(1.0, 1.0);
+		m_ppUILayer[21]->setAlpha(0.8, 1.0);
+
+		m_ppUILayer[22]->setAlpha(0.5, 1.0);
+		m_ppUILayer[23]->setAlpha(0.5, 1.0);
+		m_ppUILayer[24]->setAlpha(0.8, 0.0); //글씨 없음 
+		m_ppUILayer[25]->setAlpha(0.8, 0.0); //글씨 없음 
+		m_ppUILayer[26]->setAlpha(0.8, 0.0); //글씨 없음 
+
+		m_ppUILayer[27]->setAlpha(0.8, 1.0);  //배경
+		m_ppUILayer[28]->setAlpha(0.8, 1.0);  //입력
+		m_ppUILayer[29]->setAlpha(0.8, 1.0);   //입력 
+		m_ppUILayer[30]->setAlpha(1.0, 1.0);   //입력 
+		m_ppUILayer[31]->setAlpha(1.0, 1.0);
+
+		m_ppUILayer[32]->setAlpha(0.5, 1.0);
+		m_ppUILayer[33]->setAlpha(1.0, 1.0);   //입력 
+		m_ppUILayer[34]->setAlpha(1.0, 1.0);
+		m_ppUILayer[35]->setAlpha(1.0, 1.0);
+
+		m_ppUILayer[36]->setAlpha(1.0, 1.0);
+		m_ppUILayer[37]->setAlpha(1.0, 1.0);
+		m_ppUILayer[38]->setAlpha(1.0, 1.0);
+		m_ppUILayer[39]->setAlpha(1.0, 1.0);
+
+		m_ppUILayer[0]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_FAR);
+		m_ppUILayer[1]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[2]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+		m_ppUILayer[3]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[4]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[5]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[6]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+		m_ppUILayer[7]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+		m_ppUILayer[8]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[9]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+		m_ppUILayer[10]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+		m_ppUILayer[11]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+		m_ppUILayer[12]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[13]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[14]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[15]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+		m_ppUILayer[16]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[17]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		reinterpret_cast<PartyInviteUI*>(m_ppUILayer[18])->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+		reinterpret_cast<InvitationCardUI*>(m_ppUILayer[19])->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+		m_ppUILayer[20]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[21]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+		m_ppUILayer[22]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[23]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[24]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[25]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[26]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+		m_ppUILayer[27]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[28]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[29]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[30]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[31]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+		m_ppUILayer[32]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_FLOW_DIRECTION_TOP_TO_BOTTOM);
+		m_ppUILayer[33]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[34]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[35]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[36]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[37]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[38]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_FLOW_DIRECTION_LEFT_TO_RIGHT);
+		m_ppUILayer[39]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_FLOW_DIRECTION_LEFT_TO_RIGHT);
+
+		// UIBar Setting
+		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, m_nWndClientHeight / 5 - 2 * (m_nWndClientHeight / 22.5) - 20,
+			20 + (m_nWndClientWidth / 10) * 3, m_nWndClientHeight / 5 - m_nWndClientHeight / 22.5 - 20);
+		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetColorBrush(D2D1::ColorF::Red, 1.0, 20, m_nWndClientHeight / 5 - 2 * (m_nWndClientHeight / 22.5) - 20,
+			20 + (m_nWndClientWidth / 10) * 3, m_nWndClientHeight / 5 - m_nWndClientHeight / 22.5 - 20);
+		reinterpret_cast<UIBar*>(m_ppUILayer[4])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, m_nWndClientHeight / 5 - m_nWndClientHeight / 22.5 - 10,
+			20 + (m_nWndClientWidth / 10) * 3, m_nWndClientHeight / 5 - 10);
+		reinterpret_cast<UIBar*>(m_ppUILayer[4])->SetColorBrush(D2D1::ColorF::Blue, 1.0, 20, m_nWndClientHeight / 5 - m_nWndClientHeight / 22.5 - 10,
+			20 + (m_nWndClientWidth / 10) * 3, m_nWndClientHeight / 5 - 10);
+		reinterpret_cast<UIBar*>(m_ppUILayer[5])->SetBehindBrush(D2D1::ColorF::Black, 0.5, 0, m_nWndClientHeight - 20,
+			m_nWndClientWidth, m_nWndClientHeight);
+		reinterpret_cast<UIBar*>(m_ppUILayer[5])->SetColorBrush(D2D1::ColorF::Green, 1.0, 0, m_nWndClientHeight - 20,
+			m_nWndClientWidth, m_nWndClientHeight);
+		reinterpret_cast<UIBar*>(m_ppUILayer[8])->SetBehindBrush(D2D1::ColorF::Black, 1.0, (m_nWndClientWidth / 2) - ((m_nWndClientWidth / 10) - 10), (m_nWndClientHeight / 6) - 20 - m_nWndClientHeight / 22.5,
+			(m_nWndClientWidth / 2) + ((m_nWndClientWidth / 10) - 10), (m_nWndClientHeight / 6) - 20);
+		reinterpret_cast<UIBar*>(m_ppUILayer[8])->SetColorBrush(D2D1::ColorF::Red, 1.0, (m_nWndClientWidth / 2) - ((m_nWndClientWidth / 10) - 10), (m_nWndClientHeight / 6) - 20 - m_nWndClientHeight / 22.5,
+			(m_nWndClientWidth / 2) + ((m_nWndClientWidth / 10) - 10), (m_nWndClientHeight / 6) - 20);
+		reinterpret_cast<UIBar*>(m_ppUILayer[10])->SetBehindBrush(D2D1::ColorF::Black, 1.0, (m_nWndClientWidth / 2) - (m_nWndClientWidth / 18) + (m_nWndClientWidth / 180), (m_nWndClientHeight / 6) - (m_nWndClientHeight / 12.5),
+			(m_nWndClientWidth)-10, (m_nWndClientHeight / 6) - 10);
+		reinterpret_cast<UIBar*>(m_ppUILayer[10])->SetColorBrush(D2D1::ColorF::Red, 1.0, (m_nWndClientWidth / 2) - (m_nWndClientWidth / 18) + (m_nWndClientWidth / 180), (m_nWndClientHeight / 6) - (m_nWndClientHeight / 12.5),
+			(m_nWndClientWidth)-10, (m_nWndClientHeight / 6) - 10);
+
+		reinterpret_cast<UIBar*>(m_ppUILayer[12])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 10, (m_nWndClientHeight / 2) - (m_nWndClientHeight / 9) + (m_nWndClientHeight / 90),
+			10 + (m_nWndClientWidth / 9 - 20), (m_nWndClientHeight / 2) - (m_nWndClientHeight / 9) + (m_nWndClientHeight / 90) + (m_nWndClientHeight / 22.5));
+		reinterpret_cast<UIBar*>(m_ppUILayer[12])->SetColorBrush(D2D1::ColorF::Red, 1.0, 10, (m_nWndClientHeight / 2) - (m_nWndClientHeight / 9) + (m_nWndClientHeight / 90),
+			10 + (m_nWndClientWidth / 9 - 20), (m_nWndClientHeight / 2) - (m_nWndClientHeight / 9) + (m_nWndClientHeight / 90) + (m_nWndClientHeight / 22.5));
+		reinterpret_cast<UIBar*>(m_ppUILayer[13])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 10, (m_nWndClientHeight / 2) - (m_nWndClientHeight / 180) - (m_nWndClientHeight / 22.5),
+			10 + (m_nWndClientWidth / 9 - 20), (m_nWndClientHeight / 2) - (m_nWndClientHeight / 180));
+		reinterpret_cast<UIBar*>(m_ppUILayer[13])->SetColorBrush(D2D1::ColorF::Red, 1.0, 10, (m_nWndClientHeight / 2) - (m_nWndClientHeight / 180) - (m_nWndClientHeight / 22.5),
+			10 + (m_nWndClientWidth / 9 - 20), (m_nWndClientHeight / 2) - (m_nWndClientHeight / 180));
+		reinterpret_cast<UIBar*>(m_ppUILayer[14])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 10, (m_nWndClientHeight / 2) + (m_nWndClientHeight / 180),
+			10 + (m_nWndClientWidth / 9 - 20), (m_nWndClientHeight / 2) + (m_nWndClientHeight / 180) + (m_nWndClientHeight / 22.5));
+		reinterpret_cast<UIBar*>(m_ppUILayer[14])->SetColorBrush(D2D1::ColorF::Red, 1.0, 10, (m_nWndClientHeight / 2) + (m_nWndClientHeight / 180),
+			10 + (m_nWndClientWidth / 9 - 20), (m_nWndClientHeight / 2) + (m_nWndClientHeight / 180) + (m_nWndClientHeight / 22.5));
+		reinterpret_cast<UIBar*>(m_ppUILayer[15])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 10, (m_nWndClientHeight / 2) + (m_nWndClientHeight / 9) - (m_nWndClientHeight / 90) - (m_nWndClientHeight / 22.5),
+			10 + (m_nWndClientWidth / 9 - 20), (m_nWndClientHeight / 2) + (m_nWndClientHeight / 9) - (m_nWndClientHeight / 90));
+		reinterpret_cast<UIBar*>(m_ppUILayer[15])->SetColorBrush(D2D1::ColorF::Red, 1.0, 10, (m_nWndClientHeight / 2) + (m_nWndClientHeight / 9) - (m_nWndClientHeight / 90) - (m_nWndClientHeight / 22.5),
+			10 + (m_nWndClientWidth / 9 - 20), (m_nWndClientHeight / 2) + (m_nWndClientHeight / 9) - (m_nWndClientHeight / 90));
+	}
+
+	Create_Login_Object();
+
+
+}
 void CGameFramework::BuildObjects()
 {
 	if (!m_ppUILayer) {
@@ -1234,7 +1506,7 @@ void CGameFramework::BuildObjects()
 
 	Create_OpenWorld_Object();
 
-	
+
 }
 
 void CGameFramework::Create_OpenWorld_Object()
@@ -1245,9 +1517,9 @@ void CGameFramework::Create_OpenWorld_Object()
 	if (m_pScene) m_pScene->BuildObjects(m_pd3dDevice, m_pd3dCommandList);
 
 #ifdef _WITH_TERRAIN_PLAYER
+
 	CTerrainPlayer* pPlayer = new CTerrainPlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), m_pScene->m_pTerrain, my_job);
 	//get_basic_information(pPlayer, 0);
-
 #else
 	CAirplanePlayer* pPlayer = new CAirplanePlayer(m_pd3dDevice, m_pd3dCommandList, m_pScene->GetGraphicsRootSignature(), NULL);
 	pPlayer->SetPosition(XMFLOAT3(425.0f, 240.0f, 640.0f));
@@ -1307,7 +1579,6 @@ void CGameFramework::Create_OpenWorld_Object()
 	reinterpret_cast<SkillUI*>(m_ppUILayer[23])->Setup(); //아래 스킬 ui
 	reinterpret_cast<BuffUI*>(m_ppUILayer[16])->Setup();  //위에 버프 ui
 
-	m_GameTimer.Reset();
 }
 
 void CGameFramework::Create_InDungeon_Object()
@@ -1341,6 +1612,69 @@ void CGameFramework::Create_InDungeon_Object()
 
 	m_GameTimer.Reset();
 }
+void CGameFramework::Create_Login_Object()
+{
+	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
+
+	m_pLogin_Scene = new CScene();
+	if (m_pLogin_Scene) m_pLogin_Scene->BuildObjects_Login(m_pd3dDevice, m_pd3dCommandList);
+
+	CTerrainPlayer* pPlayer = new CTerrainPlayer(m_pd3dDevice, m_pd3dCommandList, m_pLogin_Scene->GetGraphicsRootSignature(), m_pLogin_Scene->m_pTerrain, my_job);
+	m_pLogin_Scene->m_pPlayer = m_pPlayer = pPlayer;
+	m_pCamera = m_pPlayer->GetCamera();
+	m_pPlayer->SetUse(true);
+
+
+
+	m_pd3dCommandList->Close();
+	ID3D12CommandList* ppd3dCommandLists[] = { m_pd3dCommandList };
+	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
+
+	WaitForGpuComplete();
+
+	if (m_pLogin_Scene) m_pLogin_Scene->ReleaseUploadBuffers();
+	if (m_pPlayer) m_pPlayer->ReleaseUploadBuffers();
+	switch (my_element) {
+	case E_WATER: {
+		reinterpret_cast<UIBitmap*>(m_ppUILayer[6])->Setup(L"\Image/Element/water.png");
+		break;
+	}
+	case E_FULLMETAL: {
+		reinterpret_cast<UIBitmap*>(m_ppUILayer[6])->Setup(L"\Image/Element/metal.png");
+		break;
+	}
+	case E_WIND: {
+		reinterpret_cast<UIBitmap*>(m_ppUILayer[6])->Setup(L"\Image/Element/wind.png");
+		break;
+	}
+	case E_FIRE: {
+		reinterpret_cast<UIBitmap*>(m_ppUILayer[6])->Setup(L"\Image/Element/fire.png");
+		break;
+	}
+	case E_TREE: {
+		reinterpret_cast<UIBitmap*>(m_ppUILayer[6])->Setup(L"\Image/Element/tree.png");
+		break;
+	}
+	case E_EARTH: {
+		reinterpret_cast<UIBitmap*>(m_ppUILayer[6])->Setup(L"\Image/Element/eartg.png");
+		break;
+	}
+	case E_ICE: {
+		reinterpret_cast<UIBitmap*>(m_ppUILayer[6])->Setup(L"\Image/Element/ice.png");
+		break;
+	}
+	default: {
+		reinterpret_cast<UIBitmap*>(m_ppUILayer[6])->Setup(L"\Image/Element/none.png");
+		break;
+	}
+	}
+	if (!Login_OK)
+		reinterpret_cast<UIBitmap*>(m_ppUILayer[27])->Setup(L"\Image/Title.png");
+
+	reinterpret_cast<SkillUI*>(m_ppUILayer[23])->Setup(); //아래 스킬 ui
+	reinterpret_cast<BuffUI*>(m_ppUILayer[16])->Setup();  //위에 버프 ui
+	m_GameTimer.Reset();
+}
 
 void CGameFramework::Release_OpenWorld_Object()
 {
@@ -1357,7 +1691,13 @@ void CGameFramework::Release_InDungeon_Object()
 	if (m_pRaid_Scene) m_pRaid_Scene->ReleaseObjects();
 	if (m_pRaid_Scene) delete m_pRaid_Scene;
 }
+void CGameFramework::Release_Login_Object()
+{
+	if (m_pPlayer) m_pPlayer->Release();
 
+	if (m_pScene) m_pScene->ReleaseObjects();
+	if (m_pScene) delete m_pScene;
+}
 
 void CGameFramework::ReleaseObjects()
 {
@@ -1662,18 +2002,24 @@ void CGameFramework::FrameAdvance()
 	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 	m_pd3dCommandList->OMSetRenderTargets(1, &d3dRtvCPUDescriptorHandle, TRUE, &d3dDsvCPUDescriptorHandle);
 
-	if (!InDungeon) {
-		if (m_pScene) m_pScene->Render(m_pd3dCommandList, m_pCamera);
+	if (Login_OK) {
+		if (!InDungeon) {
+			if (m_pScene) m_pScene->Render(m_pd3dCommandList, m_pCamera);
+		}
+		else {
+			if (m_pRaid_Scene) m_pRaid_Scene->Render(m_pd3dCommandList, m_pCamera);
+		}
 	}
 	else {
-		if (m_pRaid_Scene) m_pRaid_Scene->Render(m_pd3dCommandList, m_pCamera);
+		if (m_pLogin_Scene) m_pLogin_Scene->Render(m_pd3dCommandList, m_pCamera);
 	}
 
 #ifdef _WITH_PLAYER_TOP
 	m_pd3dCommandList->ClearDepthStencilView(d3dDsvCPUDescriptorHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
 #endif
-	if (m_pPlayer) m_pPlayer->Render(m_pd3dCommandList, m_pCamera);
 
+	if (m_pPlayer) m_pPlayer->Render(m_pd3dCommandList, m_pCamera);
+	
 	d3dResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	d3dResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 	d3dResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;

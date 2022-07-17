@@ -24,7 +24,7 @@ void HandleDiagnosticRecord(SQLHANDLE hHandle, SQLSMALLINT hType, RETCODE RetCod
 	}
 }
 
-void Initialise_DB()
+void Initialize_DB()
 {
 	SQLRETURN retcode;
 

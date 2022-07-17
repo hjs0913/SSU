@@ -53,6 +53,8 @@ bool NoticeUI_On = false;
 bool RaidEnterNotice = false;
 bool DeadNotice = false;
 bool Login_OK = false;
+bool Login_Build_Once = false;;
+bool Open_Build_Once = false;;
 bool Join_On = false;
 bool JOIN_ID_On = false;
 bool JOIN_PASSWORD_On = false;
@@ -123,16 +125,16 @@ void err_quit(const char* msg)
 	exit(1);
 }
 
-void send_login_packet(char* id, char* password, JOB job)
+void send_login_packet(char* id, char* password, JOB job, ELEMENT element, char* nickname)
 {
 	cs_packet_login packet;
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET_LOGIN;
 	packet.job = job;
-//	packet.element = element;
+	packet.element = element;
 	strcpy_s(packet.password, password);
 	strcpy_s(packet.id, id);
-//	strcpy_s(packet.name, nicknme);
+	strcpy_s(packet.name, nickname);
 	do_send(sizeof(packet), &packet);
 }
 
@@ -389,7 +391,7 @@ void process_packet(unsigned char* p)
 		my_element = packet->element;
 		my_job = packet->job;
 		mPlayer[my_id]->m_job = my_job;
-		cout << "내직업: " << my_job << endl;
+	
 		wchar_t* temp;;
 		int len = 1 + strlen(mPlayer[my_id]->m_name);
 		temp = new TCHAR[len];
@@ -503,7 +505,7 @@ void process_packet(unsigned char* p)
 			Sleep(3000);
 			exit(0);
 		}
-		else if(packet->reason == 2)
+		else if(packet->reason == 2)  //여기서는 없는 아이디나 비밀번호가 틀리다고 말해주자 
 		{
 			char nick_name[10];
 			cout << "새로운 아이디 입니다. 닉네임을 입력하세요: " << endl;

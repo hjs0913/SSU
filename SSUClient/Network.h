@@ -77,6 +77,8 @@ extern CRITICAL_SECTION UI_cs;
 extern bool ID_On;
 extern bool PASSWORD_On;
 extern bool Login_OK;
+extern bool Login_Build_Once;
+extern bool Open_Build_Once;
 extern bool Join_On;
 extern bool JOIN_ID_On;
 extern bool JOIN_PASSWORD_On;
@@ -98,7 +100,7 @@ void err_display(const char* msg);
 
 void send_login_packet(char* id, char* password, char* job);
 
-void send_login_packet(char* id, char* password, JOB job);
+void send_login_packet(char* id, char* password, JOB job, ELEMENT element, char* nickname);
 
 void send_relogin_packet(char* id, char* password, char* nick_name, int job, int element);
 

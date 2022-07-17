@@ -53,12 +53,24 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	hAccelTable = ::LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_SSU_CLIENT));
 
 
+	//if (Login_OK)
+	//	gGameFramework.Create_OpenWorld_Object();
 	bool change_dungeon = false;
 
 	while (1)
 	{
 		if (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
+			if (!Login_OK&& !Login_Build_Once) {
+				gGameFramework.BuildObjects_login();
+				Login_Build_Once = true;
+			}
+		/*	else if (Login_OK && !Open_Build_Once) {
+				gGameFramework.Release_Login_Object();
+				gGameFramework.BuildObjects();
+				Open_Build_Once = true;
+				//gGameFramework.Create_OpenWorld_Object();
+			}*/
 			if (msg.message == WM_QUIT) break;
 			if (!::TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
 			{
@@ -68,21 +80,23 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 		}
 		else
 		{
-
-			if (change_dungeon != InDungeon) {
-				change_dungeon = InDungeon;
-				if (change_dungeon) {
-					gGameFramework.Release_OpenWorld_Object();
-					gGameFramework.Create_InDungeon_Object();
-					send_raid_rander_ok_packet();
-					//	send_partner_rander_ok_packet();
-				}
-				else {
-					gGameFramework.Release_InDungeon_Object();
-					gGameFramework.Create_OpenWorld_Object();
+			if (Login_OK) {
+				if (change_dungeon != InDungeon) {
+					change_dungeon = InDungeon;
+					if (change_dungeon) {
+						gGameFramework.Release_OpenWorld_Object();
+						gGameFramework.Create_InDungeon_Object();
+						send_raid_rander_ok_packet();
+						//	send_partner_rander_ok_packet();
+					}
+					else {
+						
+						gGameFramework.Release_Login_Object();
+						gGameFramework.Release_InDungeon_Object();
+						gGameFramework.Create_OpenWorld_Object();
+					}
 				}
 			}
-
 			gGameFramework.FrameAdvance();
 		}
 	}
