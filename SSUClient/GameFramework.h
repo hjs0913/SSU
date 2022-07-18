@@ -2,7 +2,7 @@
 
 #define FRAME_BUFFER_WIDTH		1800 //640
 #define FRAME_BUFFER_HEIGHT		900 //480
-#define UICOUNT 27
+#define UICOUNT 40
 
 #include "Timer.h"
 #include "Player.h"
@@ -26,8 +26,13 @@ extern bool hit_check;
 extern int nnn;
 
 extern CCamera* m_pCamera;
-
-
+extern wstring ID_Str;
+extern wstring PASSWORD_Str;
+extern wstring JOIN_ID_Str;
+extern wstring JOIN_PASSWORD_Str;
+extern wstring JOIN_NICKNAME_Str;
+extern wstring JOIN_JOB_Str;
+extern wstring JOIN_ELEMENT_Str;
 class CGameFramework
 {
 public:
@@ -49,6 +54,7 @@ public:
 	void ChangeSwapChainState();
 
     void BuildObjects();
+	void BuildObjects_login();
     void ReleaseObjects();
 
     void ProcessInput();
@@ -64,9 +70,10 @@ public:
 
 	void Release_OpenWorld_Object();
 	void Release_InDungeon_Object();
-
+	void Release_Login_Object();
 	void Create_OpenWorld_Object();
 	void Create_InDungeon_Object();
+	void Create_Login_Object();
 
 	bool RaySphereIntersect(XMFLOAT3 rayOrigin, XMFLOAT3 rayDirection, float radius);
 	bool TestIntersection(int mouseX, int mouseY, CPlayer* obj);
@@ -110,6 +117,7 @@ private:
 
 	CScene						*m_pScene = NULL;
 	CScene						*m_pRaid_Scene = NULL;
+	CScene						*m_pLogin_Scene = NULL;
 
 	CPlayer						*m_pPlayer = NULL;
 	CCamera						*m_pCamera = NULL;

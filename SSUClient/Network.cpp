@@ -52,6 +52,17 @@ bool AddAIUI_On = false;
 bool NoticeUI_On = false;
 bool RaidEnterNotice = false;
 bool DeadNotice = false;
+bool Login_OK = false;
+bool Login_Build_Once = false;;
+bool Open_Build_Once = false;;
+bool Join_On = false;
+bool JOIN_ID_On = false;
+bool JOIN_PASSWORD_On = false;
+bool JOIN_NICKNAME_On = false;
+bool JOIN_DILLER_On = false;
+bool JOIN_TANKER_On = false;
+bool JOIN_MAGICIAN_On = false;
+bool JOIN_SUPPORTER_On = false;
 wstring Notice_str = L"";
 chrono::system_clock::time_point InvitationCardTimer = chrono::system_clock::now();
 chrono::system_clock::time_point NoticeTimer = chrono::system_clock::now();
@@ -63,7 +74,9 @@ CRITICAL_SECTION UI_cs;
 
 char pl_id[MAX_NAME_SIZE];
 char pl_password[MAX_NAME_SIZE];
-int pl_job;
+char pl_nickname[MAX_NAME_SIZE];
+int pl_job = -1;
+int pl_element = 0;
 
 struct EXP_OVER {
 	WSAOVERLAPPED m_wsa_over;
@@ -112,15 +125,16 @@ void err_quit(const char* msg)
 	exit(1);
 }
 
-void send_login_packet(char* id, char* password, JOB job)
+void send_login_packet(char* id, char* password, JOB job, ELEMENT element, char* nickname)
 {
 	cs_packet_login packet;
 	packet.size = sizeof(packet);
 	packet.type = CS_PACKET_LOGIN;
 	packet.job = job;
+	packet.element = element;
 	strcpy_s(packet.password, password);
 	strcpy_s(packet.id, id);
-	strcpy_s(packet.name, id);
+	strcpy_s(packet.name, nickname);
 	do_send(sizeof(packet), &packet);
 }
 
@@ -356,6 +370,7 @@ void process_packet(unsigned char* p)
 	int type = *(p + 1);
 	switch (type) {
 	case SC_PACKET_LOGIN_OK: {
+		Login_OK = true;
 		// 플레이어의 모든 정보를 보내주자
 		cout << "로그인 성공" << endl;
 		sc_packet_login_ok* packet = reinterpret_cast<sc_packet_login_ok*>(p);
@@ -375,8 +390,8 @@ void process_packet(unsigned char* p)
 		mPlayer[my_id]->m_net_dead = false;
 		my_element = packet->element;
 		my_job = packet->job;
-		
-
+		mPlayer[my_id]->m_job = my_job;
+	
 		wchar_t* temp;;
 		int len = 1 + strlen(mPlayer[my_id]->m_name);
 		temp = new TCHAR[len];
@@ -490,7 +505,7 @@ void process_packet(unsigned char* p)
 			Sleep(3000);
 			exit(0);
 		}
-		else if(packet->reason == 2)
+		else if(packet->reason == 2)  //여기서는 없는 아이디나 비밀번호가 틀리다고 말해주자 
 		{
 			char nick_name[10];
 			cout << "새로운 아이디 입니다. 닉네임을 입력하세요: " << endl;
@@ -1027,15 +1042,15 @@ int netInit()
 		m_party[i] = new Party(i);
 	}
 
-
+	/*
 	cout << "ID를 입력하세요 : ";
 	cin >> pl_id;
 	cout << "패스워드를 입력하세요 : ";
 	cin >> pl_password;
 	cout << "직업을 입력하세요 : ";
 	cin >> pl_job;
-	//if (!(0 <= pl_job && pl_job <= 3)) pl_job = 0;
-	send_login_packet(pl_id, pl_password, (JOB)pl_job);
+
+	send_login_packet(pl_id, pl_password, (JOB)pl_job);*/
 
 	do_recv();
 }

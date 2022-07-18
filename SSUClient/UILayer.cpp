@@ -348,10 +348,6 @@ bool UIBitmap::Setup(LPCWSTR fileName)
 
 void UIBitmap::Render(UINT nFrame)
 {
-    /*if (Setup()) {
-        m_pd2dDeviceContext->SetTarget(m_vd2dRenderTargets[nFrame]);
-    }*/
-
     ID3D11Resource* ppResources[] = { m_vWrappedRenderTargets[nFrame] };
 
     m_pd2dDeviceContext->SetTarget(m_vd2dRenderTargets[nFrame]);
@@ -445,55 +441,50 @@ HRESULT BuffUI::D2DLoadBitmap(LPCWSTR fileName, ID2D1RenderTarget* target, IWICI
 
 bool BuffUI::Setup()
 {
-    if (buff_ui_num[0] == 0) {
-        if (FAILED(WICInit(&imagingFactory[0])))
-        {
-            MessageBox(0, L"Imaging  Factory", 0, 0);
-            return false;
-        }
-        if (FAILED(D2DLoadBitmap(L"\Image/마나2.png", m_pd2dDeviceContext, imagingFactory[0], &bitmap[0])))
-            return false;
-    }
-    if (buff_ui_num[1] == 1) {
-        if (FAILED(WICInit(&imagingFactory[1])))
-        {
-            MessageBox(0, L"Imaging  Factory", 0, 0);
-            return false;
-        }
-        if (FAILED(D2DLoadBitmap(L"\Image/가호.png", m_pd2dDeviceContext, imagingFactory[1], &bitmap[1])))
-            return false;
-    }
-    if (buff_ui_num[2] == 2) {
 
-        if (FAILED(WICInit(&imagingFactory[2])))
-        {
-            MessageBox(0, L"Imaging  Factory", 0, 0);
-            return false;
-        }
-        if (FAILED(D2DLoadBitmap(L"\Image/천사.png", m_pd2dDeviceContext, imagingFactory[2], &bitmap[2])))
-            return false;
+    if (FAILED(WICInit(&imagingFactory[0])))
+    {
+        MessageBox(0, L"Imaging  Factory", 0, 0);
+        return false;
     }
-    if (buff_ui_num[3] == 3) {
+    if (FAILED(D2DLoadBitmap(L"\Image/마나2.png", m_pd2dDeviceContext, imagingFactory[0], &bitmap[0])))
+        return false;
 
-        if (FAILED(WICInit(&imagingFactory[3])))
-        {
-            MessageBox(0, L"Imaging  Factory", 0, 0);
-            return false;
-        }
-        if (FAILED(D2DLoadBitmap(L"\Image/공격력.png", m_pd2dDeviceContext, imagingFactory[3], &bitmap[3])))
-            return false;
+
+    if (FAILED(WICInit(&imagingFactory[1])))
+    {
+        MessageBox(0, L"Imaging  Factory", 0, 0);
+        return false;
     }
-    if (buff_ui_num[4] == 4) {
+    if (FAILED(D2DLoadBitmap(L"\Image/가호.png", m_pd2dDeviceContext, imagingFactory[1], &bitmap[1])))
+        return false;
 
-        if (FAILED(WICInit(&imagingFactory[4])))
-        {
-            MessageBox(0, L"Imaging  Factory", 0, 0);
-            return false;
-        }
-        if (FAILED(D2DLoadBitmap(L"\Image/전광석화.png", m_pd2dDeviceContext, imagingFactory[4], &bitmap[4])))
-            return false;
+
+    if (FAILED(WICInit(&imagingFactory[2])))
+    {
+        MessageBox(0, L"Imaging  Factory", 0, 0);
+        return false;
     }
+    if (FAILED(D2DLoadBitmap(L"\Image/천사.png", m_pd2dDeviceContext, imagingFactory[2], &bitmap[2])))
+        return false;
 
+
+    if (FAILED(WICInit(&imagingFactory[3])))
+    {
+        MessageBox(0, L"Imaging  Factory", 0, 0);
+        return false;
+    }
+    if (FAILED(D2DLoadBitmap(L"\Image/공격력.png", m_pd2dDeviceContext, imagingFactory[3], &bitmap[3])))
+        return false;
+
+
+    if (FAILED(WICInit(&imagingFactory[4])))
+    {
+        MessageBox(0, L"Imaging  Factory", 0, 0);
+        return false;
+    }
+    if (FAILED(D2DLoadBitmap(L"\Image/전광석화.png", m_pd2dDeviceContext, imagingFactory[4], &bitmap[4])))
+        return false;
 
     return true;
 }
@@ -519,10 +510,6 @@ void BuffUI::UpdateLabels(const std::wstring& strUIText, UINT LeftTop_x, UINT Le
 
 void BuffUI::Render(UINT nFrame)
 {
-    if (Setup()) {
-        m_pd2dDeviceContext->SetTarget(m_vd2dRenderTargets[nFrame]);
-    }
-
     ID3D11Resource* ppResources[] = { m_vWrappedRenderTargets[nFrame] };
 
     m_pd2dDeviceContext->SetTarget(m_vd2dRenderTargets[nFrame]);
@@ -803,11 +790,11 @@ void SkillUI::UpdateLabels(const std::wstring& strUIText, UINT LeftTop_x, UINT L
 
 void SkillUI::Render(UINT nFrame)
 {
-    for (int i = 0; i < 3; i++)
-        skill_ui_num[i] = i;
+   // for (int i = 0; i < 3; i++)
+     //   skill_ui_num[i] = i;
 
 
-    Setup();
+   // Setup();
     ID3D11Resource* ppResources[] = { m_vWrappedRenderTargets[nFrame] };
 
     m_pd2dDeviceContext->SetTarget(m_vd2dRenderTargets[nFrame]);
@@ -816,15 +803,15 @@ void SkillUI::Render(UINT nFrame)
 
     m_pd2dDeviceContext->BeginDraw();
 
-    if (skill_ui_num[0] == 0) {
+   // if (skill_ui_num[0] == 0) {
         m_pd2dDeviceContext->DrawBitmap(bitmap[0], skill_space0);
-    }
-    if (skill_ui_num[1] == 1) {
+    //}
+   // if (skill_ui_num[1] == 1) {
         m_pd2dDeviceContext->DrawBitmap(bitmap[1], skill_space1);
-    }
-    if (skill_ui_num[2] == 2) {
+  //  }
+  //  if (skill_ui_num[2] == 2) {
         m_pd2dDeviceContext->DrawBitmap(bitmap[2], skill_space2);
-    }
+   // }
 
     if (first_skill_used == true) {
         end_skill[0] = clock();
@@ -858,4 +845,198 @@ void SkillUI::Render(UINT nFrame)
     m_pd3d11On12Device->ReleaseWrappedResources(ppResources, _countof(ppResources));
     m_pd3d11DeviceContext->Flush();
     
+}
+//-------------------------
+
+
+Title_UI::Title_UI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor)   : UILayer(nFrame, pd3dDevice, pd3dCommandQueue, LayoutColor, TextColor)
+{
+    m_vTextBlocks.resize(2);
+
+    m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), (ID2D1SolidColorBrush**)&m_pTextLayoutBrush);
+    m_pTextLayoutBrush->SetColor(D2D1::ColorF(D2D1::ColorF::White));
+    m_pTextLayoutBrush->SetOpacity(1.0f);
+
+}
+
+Title_UI::~Title_UI()
+{
+
+}
+
+void Title_UI::UpdateLabels_ID(const std::wstring& strUIText)
+{
+    m_vTextBlocks[0] = { L"ID", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - 250, FRAME_BUFFER_HEIGHT / 2 +200 ,
+        FRAME_BUFFER_WIDTH / 2 - 50 , FRAME_BUFFER_HEIGHT / 2 + 245), m_pdwTextFormat };
+    m_vTextBlocks[1] = { strUIText, D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - 50, FRAME_BUFFER_HEIGHT / 2 + 200,
+        FRAME_BUFFER_WIDTH / 2 + 150, FRAME_BUFFER_HEIGHT / 2 + 245), m_pdwTextFormat2 };
+}
+
+void Title_UI::UpdateLabels_PASSWORD(const std::wstring& strUIText)
+{
+    m_vTextBlocks[0] = { L"PASSWORD", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - 250, FRAME_BUFFER_HEIGHT / 2  + 250,
+        FRAME_BUFFER_WIDTH / 2 - 50 , FRAME_BUFFER_HEIGHT / 2 +  295), m_pdwTextFormat };
+    m_vTextBlocks[1] = { strUIText, D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - 50, FRAME_BUFFER_HEIGHT / 2 + 250,
+        FRAME_BUFFER_WIDTH / 2 + 150, FRAME_BUFFER_HEIGHT / 2 + 295), m_pdwTextFormat2 };
+}
+
+void Title_UI::UpdateLabels_JOIN_ID(const std::wstring& strUIText)
+{
+    m_vTextBlocks[0] = { L"ID", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - 200, FRAME_BUFFER_HEIGHT / 2 - 250 ,
+        FRAME_BUFFER_WIDTH / 2  , FRAME_BUFFER_HEIGHT / 2 - 205), m_pdwTextFormat };
+    m_vTextBlocks[1] = { strUIText, D2D1::RectF(FRAME_BUFFER_WIDTH / 2 , FRAME_BUFFER_HEIGHT / 2 -250,
+        FRAME_BUFFER_WIDTH / 2 + 200, FRAME_BUFFER_HEIGHT / 2 -205), m_pdwTextFormat2 };
+}
+
+void Title_UI::UpdateLabels_JOIN_PASSWORD(const std::wstring& strUIText)
+{
+    m_vTextBlocks[0] = { L"PASSWORD", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - 200, FRAME_BUFFER_HEIGHT / 2 - 195,
+        FRAME_BUFFER_WIDTH / 2 , FRAME_BUFFER_HEIGHT / 2 -150), m_pdwTextFormat };
+    m_vTextBlocks[1] = { strUIText, D2D1::RectF(FRAME_BUFFER_WIDTH / 2 , FRAME_BUFFER_HEIGHT / 2 -195,
+        FRAME_BUFFER_WIDTH / 2 + 200, FRAME_BUFFER_HEIGHT / 2 -150), m_pdwTextFormat2 };
+}
+void Title_UI::UpdateLabels_JOIN_NICKNAME(const std::wstring& strUIText)
+{
+    m_vTextBlocks[0] = { L"NICKNAME", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - 200, FRAME_BUFFER_HEIGHT / 2 -140 ,
+        FRAME_BUFFER_WIDTH / 2  , FRAME_BUFFER_HEIGHT / 2 - 95), m_pdwTextFormat };
+    m_vTextBlocks[1] = { strUIText, D2D1::RectF(FRAME_BUFFER_WIDTH / 2 , FRAME_BUFFER_HEIGHT / 2 -140,
+        FRAME_BUFFER_WIDTH / 2 + 200, FRAME_BUFFER_HEIGHT / 2  -95), m_pdwTextFormat2 };
+}
+
+void Title_UI::Render(UINT nFrame)
+{
+
+    ID3D11Resource* ppResources[] = { m_vWrappedRenderTargets[nFrame] };
+
+    m_pd2dDeviceContext->SetTarget(m_vd2dRenderTargets[nFrame]);
+
+    m_pd3d11On12Device->AcquireWrappedResources(ppResources, _countof(ppResources));
+
+    m_pd2dDeviceContext->BeginDraw();
+
+    m_pd2dDeviceContext->FillRectangle(m_vTextBlocks[0].d2dLayoutRect, m_pBrush);
+    m_pd2dDeviceContext->DrawRectangle(m_vTextBlocks[0].d2dLayoutRect, m_pBrush);
+    m_pd2dDeviceContext->DrawText(m_vTextBlocks[0].strText.c_str(), static_cast<UINT>(m_vTextBlocks[0].strText.length()),
+        m_vTextBlocks[0].pdwFormat, m_vTextBlocks[0].d2dLayoutRect, m_pd2dTextBrush);
+
+    m_pd2dDeviceContext->FillRectangle(m_vTextBlocks[1].d2dLayoutRect, m_pTextLayoutBrush);
+    m_pd2dDeviceContext->DrawRectangle(m_vTextBlocks[1].d2dLayoutRect, m_pTextLayoutBrush);
+    m_pd2dDeviceContext->DrawText(m_vTextBlocks[1].strText.c_str(), static_cast<UINT>(m_vTextBlocks[1].strText.length()),
+        m_vTextBlocks[1].pdwFormat, m_vTextBlocks[1].d2dLayoutRect, m_pd2dTextBrush);
+
+    m_pd2dDeviceContext->EndDraw();
+
+    m_pd3d11On12Device->ReleaseWrappedResources(ppResources, _countof(ppResources));
+    m_pd3d11DeviceContext->Flush();
+}
+
+void Title_UI::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT nHeight, UINT TextAlignment, UINT ParagraphAlignment)
+{
+    m_fWidth = static_cast<float>(nWidth);
+    m_fHeight = static_cast<float>(nHeight);
+
+    D2D1_BITMAP_PROPERTIES1 d2dBitmapProperties = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW, D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED));
+
+    for (UINT i = 0; i < GetRenderTargetsCount(); i++)
+    {
+
+        D3D11_RESOURCE_FLAGS d3d11Flags = { D3D11_BIND_RENDER_TARGET };
+        m_pd3d11On12Device->CreateWrappedResource(ppd3dRenderTargets[i], &d3d11Flags, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT, IID_PPV_ARGS(&m_vWrappedRenderTargets[i]));
+        IDXGISurface* pdxgiSurface = NULL;
+        m_vWrappedRenderTargets[i]->QueryInterface(__uuidof(IDXGISurface), (void**)&pdxgiSurface);
+
+
+        m_pd2dDeviceContext->CreateBitmapFromDxgiSurface(pdxgiSurface, &d2dBitmapProperties, &m_vd2dRenderTargets[i]);
+        pdxgiSurface->Release();
+    }
+
+    if (m_pd2dDeviceContext) m_pd2dDeviceContext->Release();
+    m_pd2dDevice->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, &m_pd2dDeviceContext);
+    m_pd2dDeviceContext->SetTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE);
+    if (m_pd2dTextBrush) m_pd2dTextBrush->Release();
+    m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(m_TextColor), &m_pd2dTextBrush);
+
+    const float fFontSize = m_fHeight / 25.0f;
+    const float fSmallFontSize = m_fHeight / 40.0f;
+
+    //m_pd2dWriteFactory->CreateTextFormat(L"궁서체", nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fFontSize, L"en-us", &m_pdwTextFormat);
+    m_pd2dWriteFactory->CreateTextFormat(L"Arial", nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fSmallFontSize, L"en-us", &m_pdwTextFormat);
+
+    m_pdwTextFormat->SetTextAlignment(static_cast<DWRITE_TEXT_ALIGNMENT>(TextAlignment));
+    m_pdwTextFormat->SetParagraphAlignment(static_cast<DWRITE_PARAGRAPH_ALIGNMENT>(ParagraphAlignment));
+
+    m_pd2dWriteFactory->CreateTextFormat(L"Arial", nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fSmallFontSize, L"en-us", &m_pdwTextFormat2);
+    m_pdwTextFormat2->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
+    m_pdwTextFormat2->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+}
+///----
+JOIN_ELEMENT_UI::JOIN_ELEMENT_UI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor)
+    : UILayer(nFrame, pd3dDevice, pd3dCommandQueue, LayoutColor, TextColor)
+{
+    m_vTextBlocks.resize(9);
+    BG_Rect = D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 10, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20 + 10,
+        FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 10, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20+ 130);
+
+    m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Gray), (ID2D1SolidColorBrush**)&m_pButtonBrush);
+    m_pButtonBrush->SetColor(D2D1::ColorF(D2D1::ColorF::Gray));
+    m_pButtonBrush->SetOpacity(1.0f);
+}
+
+JOIN_ELEMENT_UI::~JOIN_ELEMENT_UI()
+{
+
+}
+void JOIN_ELEMENT_UI::UpdateLabels_JOIN_ELEMENT()  //아래 와이는 100 , 130 
+{
+    m_vTextBlocks[0] = { L"물", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - 175, FRAME_BUFFER_HEIGHT / 2  +  100,
+        FRAME_BUFFER_WIDTH / 2 - 175 + 80, FRAME_BUFFER_HEIGHT / 2 + 130), m_pdwTextFormat };
+
+    m_vTextBlocks[1] = { L"강철", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 360 - FRAME_BUFFER_WIDTH / 22.5, FRAME_BUFFER_HEIGHT / 2 + 100,
+        FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 360, FRAME_BUFFER_HEIGHT / 2 + 130), m_pdwTextFormat };
+
+    m_vTextBlocks[2] = { L"바람", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360, FRAME_BUFFER_HEIGHT / 2 + 100,
+        FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 + FRAME_BUFFER_WIDTH / 22.5, FRAME_BUFFER_HEIGHT / 2 + 130), m_pdwTextFormat };
+
+    m_vTextBlocks[3] = { L"불", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 10 - FRAME_BUFFER_WIDTH / 360 - FRAME_BUFFER_WIDTH / 22.5 ,FRAME_BUFFER_HEIGHT / 2 + 100,
+        FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 10 - FRAME_BUFFER_WIDTH / 360, FRAME_BUFFER_HEIGHT / 2 + 130), m_pdwTextFormat };
+
+    m_vTextBlocks[4] = { L"나무", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - 175 , FRAME_BUFFER_HEIGHT / 2 + 140,
+
+    FRAME_BUFFER_WIDTH / 2 - 175 + 80, FRAME_BUFFER_HEIGHT / 2 + 170), m_pdwTextFormat };
+
+    m_vTextBlocks[5] = { L"땅", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 360 - FRAME_BUFFER_WIDTH / 22.5 , FRAME_BUFFER_HEIGHT / 2 + 140,
+     FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 360, FRAME_BUFFER_HEIGHT / 2 + 170), m_pdwTextFormat };
+
+    m_vTextBlocks[6] = { L"얼음", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360, FRAME_BUFFER_HEIGHT / 2 + 140,
+     FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 + FRAME_BUFFER_WIDTH / 22.5, FRAME_BUFFER_HEIGHT / 2 + 170), m_pdwTextFormat };
+
+    m_vTextBlocks[7] = { L"확인", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 - 100, FRAME_BUFFER_HEIGHT / 2 + 220,
+   FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 -20, FRAME_BUFFER_HEIGHT / 2 + 270), m_pdwTextFormat };
+    m_vTextBlocks[8] = { L"취소", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 , FRAME_BUFFER_HEIGHT / 2 + 220,
+   FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 +80 , FRAME_BUFFER_HEIGHT / 2 + 270), m_pdwTextFormat };
+
+}
+void JOIN_ELEMENT_UI::Render(UINT nFrame)
+{
+    ID3D11Resource* ppResources[] = { m_vWrappedRenderTargets[nFrame] };
+
+    m_pd2dDeviceContext->SetTarget(m_vd2dRenderTargets[nFrame]);
+
+    m_pd3d11On12Device->AcquireWrappedResources(ppResources, _countof(ppResources));
+    //--------
+    m_pd2dDeviceContext->BeginDraw();
+    m_pd2dDeviceContext->FillRectangle(BG_Rect, m_pBrush);
+    m_pd2dDeviceContext->DrawRectangle(BG_Rect, m_pBrush);
+    for (int i = 0; i < 9; i++)
+    {
+        m_pd2dDeviceContext->FillRectangle(m_vTextBlocks[i].d2dLayoutRect, m_pButtonBrush);
+        m_pd2dDeviceContext->DrawRectangle(m_vTextBlocks[i].d2dLayoutRect, m_pButtonBrush);
+        m_pd2dDeviceContext->DrawText(m_vTextBlocks[i].strText.c_str(), static_cast<UINT>(m_vTextBlocks[i].strText.length()),
+            m_vTextBlocks[i].pdwFormat, m_vTextBlocks[i].d2dLayoutRect, m_pd2dTextBrush);
+
+    }
+    m_pd2dDeviceContext->EndDraw();
+
+    m_pd3d11On12Device->ReleaseWrappedResources(ppResources, _countof(ppResources));
+    m_pd3d11DeviceContext->Flush();
 }
