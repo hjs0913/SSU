@@ -97,9 +97,9 @@ bool Add_DB(char* login_id, char* password, Player* pl, char* nick_name, int job
 	}
 	pl->set_login_id(login_id);
 	pl->set_name(nick_name);
-	pl->set_x(100);
-	pl->set_y(100);
-	pl->set_z(100);
+	pl->set_x(3200);
+	pl->set_y(32);
+	pl->set_z(785);
 	pl->set_lv(1);
 	pl->set_job((JOB)job);
 	pl->set_element((ELEMENT)element);

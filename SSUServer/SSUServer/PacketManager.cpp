@@ -1484,9 +1484,9 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
         if (DB_On == false) {
             pl->set_login_id(packet->id);
             pl->set_name(packet->nickname);
-            pl->set_x(100);
-            pl->set_y(100);
-            pl->set_z(100);
+            pl->set_x(3200);
+            pl->set_y(32);
+            pl->set_z(785);
             pl->set_lv(1);
             pl->set_job((JOB)packet->job);
             pl->set_element((ELEMENT)packet->element);
