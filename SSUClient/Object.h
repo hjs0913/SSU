@@ -163,6 +163,8 @@ class CAnimationSet
 {
 public:
 	CAnimationSet(float fLength, int nFramesPerSecond, int nKeyFrameTransforms, int nSkinningBones, char *pstrName);
+	CAnimationSet(const CAnimationSet& a);
+	
 	~CAnimationSet();
 
 public:
@@ -221,6 +223,7 @@ public:
 
 public:
 	CAnimationSets(int nAnimationSets);
+	CAnimationSets(const CAnimationSets& p);
 	~CAnimationSets();
 
 public:

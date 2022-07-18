@@ -129,9 +129,9 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 		for (int j = 0; j < monster_anim_cnt; ++j) {
 			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
-			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 0.05f;
+			//m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 0.05f;
 		}
-		m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
+		m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(1, true);
 		m_ppHierarchicalGameObjects[i]->SetPosition(0.f, -100.f, 0.f);
 
 		if (temp_id / NPC_INTERVAL == 0)			// 늑대
@@ -164,7 +164,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pSupporterModel, player_anim_cnt);
 		for (int j = 0; j < player_anim_cnt; ++j) {
 			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
-			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 0.05f;
+			//m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 0.05f;
 		}
 		m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
 		m_ppHierarchicalGameObjects[i]->SetPosition(0.f, -100.f, 0.f);
@@ -187,11 +187,12 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		}
 		for (int j = 0; j < player_anim_cnt; ++j) {
 			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
-			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 0.05f;
+			//m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 0.05f;
 		}
 		m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(1, true);
 		m_ppHierarchicalGameObjects[i]->SetPosition(0.f, -100.f, 0.f);
 		m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
+
 	}
 
 	pTreeModel1 = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Tree1.bin", NULL);
@@ -924,6 +925,8 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 			)
 		);
 		m_ppHierarchicalGameObjects[i]->SetLook(TownNpc::UpdateLook(temp_i));
+		if (m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[1].m_bEnable) {
+		}
 	}
 
 	m_ppHierarchicalGameObjects[i]->Animate(m_fElapsedTime);
