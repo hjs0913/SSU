@@ -57,7 +57,7 @@ constexpr int NPC_ID_START = MAX_USER;
 constexpr int NPC_ID_END = MAX_USER + MAX_NPC - 1;
 
 constexpr int AI_ID_START = MAX_USER + MAX_NPC;
-constexpr int AI_ID_END = MAX_USER + MAX_NPC + MAX_AI - 1;
+constexpr int AI_ID_END = MAX_USER + MAX_NPC + MAX_AI;
 
 const int NPC_INTERVAL = 30;
 constexpr int GAIA_ID = MAX_USER + MAX_NPC + MAX_AI;

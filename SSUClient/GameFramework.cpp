@@ -501,7 +501,7 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 					&& CursorPosInClient.y <= (m_nWndClientHeight / 2 + m_nWndClientHeight / 3 - 10)) {
 					if (CursorPosInClient.x >= (m_nWndClientWidth / 4 + m_nWndClientWidth / 90) 
 						&& CursorPosInClient.x <= (m_nWndClientWidth / 4 + m_nWndClientWidth / 90 + m_nWndClientWidth / 9)) {
-						if (!party_enter)send_party_room_make();
+						if (!party_enter) send_party_room_make();
 					}
 					if (CursorPosInClient.x >= (m_nWndClientWidth / 2 - m_nWndClientWidth / 180 - m_nWndClientWidth / 9)
 						&& CursorPosInClient.x <= (m_nWndClientWidth / 2 - m_nWndClientWidth / 180)) {
