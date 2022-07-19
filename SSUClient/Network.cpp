@@ -1354,21 +1354,13 @@ void get_basic_information(CPlayer* m_otherPlayer, int id)
 			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(6, 6);
 			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(6, true);
 		}
-		else {
-			float playTime = m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[6]->m_fLength -
-				m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[6]->m_fPosition;
-			/*if (playTime < 0.1f) {
-				m_otherPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
-			}*/
-		}
 		return;
 	}
-	else {
-		if (m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[6].m_bEnable) {
-			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
-			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
-			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(0, true);
-		}
+
+	if (m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[6].m_bEnable) {
+		m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
+		m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+		m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(0, true);
 	}
 
 	if (mPlayer[id]->m_net_attack == true) {
@@ -1379,17 +1371,9 @@ void get_basic_information(CPlayer* m_otherPlayer, int id)
 	for (int i = 0; i < 3; i++) {
 		if (mPlayer[id]->m_net_skill_animation[i] == true) {
 			if (!m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[3 + i].m_bEnable) {
+				m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[i + 3]->m_fPosition = 0.f;
 				reinterpret_cast<CTerrainPlayer*>(m_otherPlayer)->Skill(i);
-			}
-			else {
-				float playtime = m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[i + 3]->m_fLength - m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[i + 3]->m_fPosition;
-				if (playtime <= 0.05) {
-					m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
-					m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
-					m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(0, true);
-					m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[i + 3].m_fPosition = 0.0f;
-					mPlayer[id]->m_net_skill_animation[i] = false;
-				}
+				mPlayer[id]->m_net_skill_animation[i] = false;
 			}
 		}
 	}
