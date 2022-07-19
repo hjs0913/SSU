@@ -241,6 +241,23 @@ CAnimationSet::CAnimationSet(float fLength, int nFramesPerSecond, int nKeyFrames
 	for (int i = 0; i < nKeyFrames; i++) m_ppxmf4x4KeyFrameTransforms[i] = new XMFLOAT4X4[nAnimatedBones];
 }
 
+CAnimationSet::CAnimationSet(const CAnimationSet& a)
+{
+	m_fLength = a.m_fLength;
+	m_nFramesPerSecond = a.m_nFramesPerSecond;
+	m_nKeyFrames = a.m_nKeyFrames;
+
+	strcpy_s(m_pstrAnimationSetName, 64, a.m_pstrAnimationSetName);
+
+	m_pfKeyFrameTimes = new float[m_nKeyFrames];
+
+	m_ppxmf4x4KeyFrameTransforms = new XMFLOAT4X4 * [m_nKeyFrames];
+	for (int i = 0; i < m_nKeyFrames; i++) {
+		m_pfKeyFrameTimes[i] = a.m_pfKeyFrameTimes[i];
+		m_ppxmf4x4KeyFrameTransforms[i] = a.m_ppxmf4x4KeyFrameTransforms[i];
+	}
+}
+
 CAnimationSet::~CAnimationSet()
 {
 	if (m_pfKeyFrameTimes) delete[] m_pfKeyFrameTimes;
@@ -363,6 +380,22 @@ CAnimationSets::CAnimationSets(int nAnimationSets)
 	m_pAnimationSets = new CAnimationSet*[nAnimationSets];
 }
 
+CAnimationSets::CAnimationSets(const CAnimationSets& p)
+{
+	m_nAnimationSets = p.m_nAnimationSets;
+	m_pAnimationSets = new CAnimationSet * [m_nAnimationSets];
+
+	for (int i = 0; i < m_nAnimationSets; i++) {
+		m_pAnimationSets[i] = new CAnimationSet(*p.m_pAnimationSets[i]);
+	}
+
+	m_nAnimatedBoneFrames = p.m_nAnimatedBoneFrames;
+	m_ppAnimatedBoneFrameCaches = new CGameObject*[m_nAnimatedBoneFrames];
+	for (int i = 0; i < m_nAnimatedBoneFrames; i++) {
+		m_ppAnimatedBoneFrameCaches[i] = p.m_ppAnimatedBoneFrameCaches[i];
+	}
+}
+
 CAnimationSets::~CAnimationSets()
 {
 	for (int i = 0; i < m_nAnimationSets; i++) if (m_pAnimationSets[i]) delete m_pAnimationSets[i];
@@ -397,12 +430,19 @@ CAnimationController::CAnimationController(ID3D12Device *pd3dDevice, ID3D12Graph
 		m_nAnimationTracks = nAnimationTracks;
 		if (m_nAnimationTracks) m_pAnimationTracks = new CAnimationTrack[nAnimationTracks];
 
-		m_pAnimationSets = pModel->m_pAnimationSets;
-		if (m_pAnimationSets) m_pAnimationSets->AddRef();
+		//m_pAnimationSets = new CAnimationSets(pModel->m_pAnimationSets->m_nAnimationSets);
+		m_pAnimationSets = new CAnimationSets(*pModel->m_pAnimationSets);
+		//memcpy_s(m_pAnimationSets, sizeof(m_pAnimationSets), pModel->m_pAnimationSets, sizeof(pModel->m_pAnimationSets));
+		//m_pAnimationSets = pModel->m_pAnimationSets;
+		if (m_pAnimationSets) {
+			m_pAnimationSets->AddRef();
+			//m_pAnimationSets->m_nAnimatedBoneFrames = pModel->m_pAnimationSets->m_nAnimatedBoneFrames;
+		}
 	}
 
 	m_nSkinnedMeshes = pModel->m_nSkinnedMeshes;
 	m_ppSkinnedMeshes = new CSkinnedMesh*[m_nSkinnedMeshes];
+
 	for (int i = 0; i < m_nSkinnedMeshes; i++) m_ppSkinnedMeshes[i] = pModel->m_ppSkinnedMeshes[i];
 
 	m_ppd3dcbSkinningBoneTransforms = new ID3D12Resource*[m_nSkinnedMeshes];
@@ -498,7 +538,7 @@ void CAnimationController::AdvanceTime(float fTimeElapsed, CGameObject *pRootGam
 {
 	if (m_pAnimationTracks)
 	{
-//		for (int k = 0; k < m_nAnimationTracks; k++) m_pAnimationTracks[k].m_fPosition += (fTimeElapsed * m_pAnimationTracks[k].m_fSpeed);
+		//for (int k = 0; k < m_nAnimationTracks; k++) m_pAnimationTracks[k].m_fPosition += (fTimeElapsed * m_pAnimationTracks[k].m_fSpeed);
 		for (int k = 0; k < m_nAnimationTracks; k++) m_pAnimationSets->m_pAnimationSets[m_pAnimationTracks[k].m_nAnimationSet]->SetPosition(fTimeElapsed * m_pAnimationTracks[k].m_fSpeed);
 
 		for (int j = 0; j < m_pAnimationSets->m_nAnimatedBoneFrames; j++)
