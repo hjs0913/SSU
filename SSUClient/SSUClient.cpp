@@ -90,8 +90,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 						//	send_partner_rander_ok_packet();
 					}
 					else {
-						
-						gGameFramework.Release_Login_Object();
+						//gGameFramework.Release_Login_Object();
 						gGameFramework.Release_InDungeon_Object();
 						gGameFramework.Create_OpenWorld_Object();
 					}

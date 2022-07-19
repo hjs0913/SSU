@@ -433,6 +433,11 @@ void CScene::ReleaseObjects()
 	ReleaseShaderVariables();
 
 	if (m_pLights) delete[] m_pLights;
+
+	if (pBastardModel) delete pBastardModel;
+	if (pTankerModel) delete pTankerModel;
+	if (pSupporterModel) delete pSupporterModel;
+	if (pMagicianModel) delete pMagicianModel;
 }
 
 ID3D12RootSignature *CScene::CreateGraphicsRootSignature(ID3D12Device *pd3dDevice)
