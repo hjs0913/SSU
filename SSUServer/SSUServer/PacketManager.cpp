@@ -188,8 +188,9 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
             pl->vl.unlock();
             send_move_packet(pl, pl, 1);
 
-            if(pl->get_state() != ST_FREE)
-                 m_SectorManager->player_move(pl);
+            for (int vl_id : my_vl) {
+                send_move_packet(reinterpret_cast<Player*>(players[vl_id]), pl, 1);
+            }
             break;
         }
 

@@ -578,7 +578,6 @@ void CTerrainPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVeloci
 		m_pSkinnedAnimationController->m_pAnimationTracks[5].m_bEnable ||
 		m_pSkinnedAnimationController->m_pAnimationTracks[6].m_bEnable
 		) return;
-	cout << "???" << endl;
 	m_pSkinnedAnimationController->SetTrackAllDisable();
 	m_pSkinnedAnimationController->SetTrackEnable(1, true);
 	/*m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[2]->m_fPosition = 0.0f;
