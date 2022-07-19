@@ -1357,11 +1357,9 @@ void get_basic_information(CPlayer* m_otherPlayer, int id)
 		else {
 			float playTime = m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[6]->m_fLength -
 				m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[6]->m_fPosition;
-			if (playTime < 0.1f) {
-				//m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[13]->m_fPosition = 0.0f;
+			/*if (playTime < 0.1f) {
 				m_otherPlayer->SetPosition(XMFLOAT3(0.0f, 0.0f, 0.0f));
-				//m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[13]->m_fPosition = 0.994f;
-			}
+			}*/
 		}
 		return;
 	}

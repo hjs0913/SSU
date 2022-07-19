@@ -386,6 +386,8 @@ void ObjectManager::worker()
             else {
                 reinterpret_cast<Player*>(players[client_id])->revive();
                 // 冀磐 贸府
+                m_SectorManager->player_put(players[client_id]);
+
             }
             delete exp_over;
             break;
@@ -393,6 +395,7 @@ void ObjectManager::worker()
         case OP_NPC_REVIVE: {
             players[client_id]->revive();
             // 冀磐 贸府
+            m_SectorManager->player_put(players[client_id]);
             delete exp_over;
             break;
         }
