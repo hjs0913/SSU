@@ -40,7 +40,7 @@ int main()
     // 멀티 쓰레드 생성
     vector <thread> worker_threads;
     thread timer_thread{ &TimerManager::do_timer, m_TimerManager };
-    for (int i = 0; i < 16; ++i)
+    for (int i = 0; i < 10; ++i)
         worker_threads.emplace_back(std::thread(&ObjectManager::worker, m_ObjectManager));
 
     for (auto& th : worker_threads)
