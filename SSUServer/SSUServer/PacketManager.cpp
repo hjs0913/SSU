@@ -1487,7 +1487,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
             pl->set_x(3200);
             pl->set_y(32);
             pl->set_z(785);
-            pl->set_lv(1);
+            pl->set_lv(25);
             pl->set_job((JOB)packet->job);
             pl->set_element((ELEMENT)packet->element);
             /*
