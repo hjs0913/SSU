@@ -131,6 +131,10 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
 			//m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 0.05f;
 		}
+		// 2번 부터 ANIMATION_TYPE_ONCE
+		for (int j = 3; j < monster_anim_cnt; ++j) {
+			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[j]->m_nType = ANIMATION_TYPE_ONCE;
+		}
 		m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(1, true);
 		m_ppHierarchicalGameObjects[i]->SetPosition(0.f, -100.f, 0.f);
 
@@ -169,6 +173,11 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
 		m_ppHierarchicalGameObjects[i]->SetPosition(0.f, -100.f, 0.f);
 		m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
+
+		// 2번 부터 ANIMATION_TYPE_ONCE
+		for (int j = 2; j < player_anim_cnt; ++j) {
+			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[j]->m_nType = ANIMATION_TYPE_ONCE;
+		}
 	}
 
 	for (int i = 3 + MAX_NPC + NUM_PLAYER; i < 3 + MAX_NPC + NUM_PLAYER + NUM_TOWN_NPC; i++) {
@@ -424,6 +433,11 @@ void CScene::ReleaseObjects()
 	ReleaseShaderVariables();
 
 	if (m_pLights) delete[] m_pLights;
+
+	if (pBastardModel) delete pBastardModel;
+	if (pTankerModel) delete pTankerModel;
+	if (pSupporterModel) delete pSupporterModel;
+	if (pMagicianModel) delete pMagicianModel;
 }
 
 ID3D12RootSignature *CScene::CreateGraphicsRootSignature(ID3D12Device *pd3dDevice)
@@ -847,6 +861,9 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
 					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 1.0f;
 				}
+				for (int j = 2; j < player_anim_cnt; ++j) {
+					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[j]->m_nType = ANIMATION_TYPE_ONCE;
+				}
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
 				break;
 			}
@@ -859,6 +876,9 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 				for (int j = 0; j < player_anim_cnt; ++j) {
 					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
 					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 1.0f;
+				}
+				for (int j = 2; j < player_anim_cnt; ++j) {
+					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[j]->m_nType = ANIMATION_TYPE_ONCE;
 				}
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
 				break;
@@ -873,6 +893,9 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
 					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 1.0f;
 				}
+				for (int j = 2; j < player_anim_cnt; ++j) {
+					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[j]->m_nType = ANIMATION_TYPE_ONCE;
+				}
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
 				break;
 			}
@@ -885,6 +908,9 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 				for (int j = 0; j < player_anim_cnt; ++j) {
 					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
 					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 1.0f;
+				}
+				for (int j = 2; j < player_anim_cnt; ++j) {
+					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[j]->m_nType = ANIMATION_TYPE_ONCE;
 				}
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
 				break;
@@ -899,6 +925,9 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 				for (int j = 0; j < player_anim_cnt; ++j) {
 					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
 					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 0.5f;
+				}
+				for (int j = 2; j < player_anim_cnt; ++j) {
+					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[j]->m_nType = ANIMATION_TYPE_ONCE;
 				}
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
 				break;

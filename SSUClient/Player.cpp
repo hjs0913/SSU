@@ -572,17 +572,17 @@ void CTerrainPlayer::OnCameraUpdateCallback(float fTimeElapsed)
 
 void CTerrainPlayer::Move(DWORD dwDirection, float fDistance, bool bUpdateVelocity)
 {
-	if (m_pSkinnedAnimationController->m_pAnimationTracks[6].m_bEnable) {
-		return;
-	}
-	if (m_pSkinnedAnimationController->m_pAnimationTracks[2].m_bEnable || m_pSkinnedAnimationController->m_pAnimationTracks[3].m_bEnable) return;
-
-	m_pSkinnedAnimationController->SetTrackEnable(0, false);
+	if (m_pSkinnedAnimationController->m_pAnimationTracks[2].m_bEnable || 
+		m_pSkinnedAnimationController->m_pAnimationTracks[3].m_bEnable ||
+		m_pSkinnedAnimationController->m_pAnimationTracks[4].m_bEnable ||
+		m_pSkinnedAnimationController->m_pAnimationTracks[5].m_bEnable ||
+		m_pSkinnedAnimationController->m_pAnimationTracks[6].m_bEnable
+		) return;
+	cout << "???" << endl;
+	m_pSkinnedAnimationController->SetTrackAllDisable();
 	m_pSkinnedAnimationController->SetTrackEnable(1, true);
-	m_pSkinnedAnimationController->SetTrackEnable(2, false);
-	m_pSkinnedAnimationController->SetTrackEnable(3, false);
-	m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[2]->m_fPosition = 0.0f;
-	m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[3]->m_fPosition = 0.0f;
+	/*m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[2]->m_fPosition = 0.0f;
+	m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[3]->m_fPosition = 0.0f;*/
 
 	CPlayer::Move(dwDirection, fDistance, bUpdateVelocity);
 }
@@ -625,11 +625,11 @@ void CTerrainPlayer::Update(float fTimeElapsed)
 		if (m_pSkinnedAnimationController->m_pAnimationTracks[2].m_bEnable) {
 			float playTime = m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[2]->m_fLength - m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[2]->m_fPosition;
 
-			if (playTime <= 0.049) {
+			/*if (playTime <= 0.049) {
 				m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[2]->m_fPosition = 0.0f;
 				m_pSkinnedAnimationController->SetTrackEnable(0, true);
 				m_pSkinnedAnimationController->SetTrackEnable(2, false);
-			}
+			}*/
 		}
 
 		if (m_pSkinnedAnimationController->m_pAnimationTracks[3].m_bEnable) {
@@ -645,9 +645,9 @@ void CTerrainPlayer::Update(float fTimeElapsed)
 		if (m_pSkinnedAnimationController->m_pAnimationTracks[4].m_bEnable) {
 			float playTime = m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[4]->m_fLength - m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[4]->m_fPosition;
 			if (playTime <= 0.049) {
-				m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[4]->m_fPosition = 0.0f;
+				/*m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[4]->m_fPosition = 0.0f;
 				m_pSkinnedAnimationController->SetTrackEnable(0, true);
-				m_pSkinnedAnimationController->SetTrackEnable(4, false);
+				m_pSkinnedAnimationController->SetTrackEnable(4, false);*/
 			}
 		}
 
@@ -669,11 +669,8 @@ void CTerrainPlayer::Attack(bool isAttack)
 	CPlayer::Attack(isAttack);
 
 	if (isAttack) {
-		m_pSkinnedAnimationController->SetTrackEnable(0, false);
-		m_pSkinnedAnimationController->SetTrackEnable(1, false);
+		m_pSkinnedAnimationController->SetTrackAllDisable();
 		m_pSkinnedAnimationController->SetTrackEnable(2, true);
-		m_pSkinnedAnimationController->SetTrackEnable(3, false);
-
 		m_pSkinnedAnimationController->SetCallbackKeys(2, 3);
 #ifdef _WITH_SOUND_RESOURCE
 		m_pSkinnedAnimationController->SetCallbackKey(1, 0.1f, _T("NormalAttack"));
@@ -693,9 +690,6 @@ void CTerrainPlayer::Skill(int n)
 
 	CPlayer::Skill(n);
 	m_pSkinnedAnimationController->SetTrackAllDisable();
-	/*m_pSkinnedAnimationController->SetTrackEnable(0, false);
-	m_pSkinnedAnimationController->SetTrackEnable(1, false);
-	m_pSkinnedAnimationController->SetTrackEnable(2, false);*/
 	if (n == 0) {
 		m_pSkinnedAnimationController->SetTrackEnable(3, true);
 		m_pSkinnedAnimationController->SetCallbackKeys(3, 4);
@@ -722,6 +716,7 @@ void CTerrainPlayer::Skill(int n)
 		m_pSkinnedAnimationController->SetAnimationCallbackHandler(3, pAnimationCallbackHandler);
 	}
 	else if (n == 1) {
+		//m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[4]->m_fPosition = 0.0f;
 		m_pSkinnedAnimationController->SetTrackEnable(4, true);
 		m_pSkinnedAnimationController->SetCallbackKeys(4, 5);
 #ifdef _WITH_SOUND_RESOURCE
