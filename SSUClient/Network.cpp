@@ -1340,6 +1340,7 @@ void get_basic_information(CPlayer* m_otherPlayer, int id)
 
 	if (mPlayer[id]->m_net_dead == true) {	// 사망 애니메이션 출력
 		if (!m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[6].m_bEnable) {
+			m_otherPlayer->m_pSkinnedAnimationController->m_bDie = true;
 			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
 			m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[6]->m_fPosition = 0.0f;
 			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(6, 6);
@@ -1349,6 +1350,7 @@ void get_basic_information(CPlayer* m_otherPlayer, int id)
 	}
 
 	if (m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[6].m_bEnable) {
+		m_otherPlayer->m_pSkinnedAnimationController->m_bDie = false;
 		m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
 		m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 		m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(0, true);
@@ -1385,6 +1387,7 @@ void get_player_information(CGameObject* m_otherPlayer, int id)
 		// Death
 		if (mPlayer[id]->m_net_dead == true) {	
 			if (!m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[6].m_bEnable) {
+				m_otherPlayer->m_pSkinnedAnimationController->m_bDie = true;
 				m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
 				m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[6]->m_fPosition = 0.0f;
 				m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(6, 6);
@@ -1395,6 +1398,7 @@ void get_player_information(CGameObject* m_otherPlayer, int id)
 
 		// Revive
 		if (m_otherPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[6].m_bEnable) {
+			m_otherPlayer->m_pSkinnedAnimationController->m_bDie = false;
 			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
 			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(0, true);

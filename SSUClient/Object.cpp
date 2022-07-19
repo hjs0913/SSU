@@ -542,9 +542,7 @@ void CAnimationController::AdvanceTime(float fTimeElapsed, CGameObject *pRootGam
 		for (int k = 0; k < m_nAnimationTracks; k++) {
 			m_pAnimationSets->m_pAnimationSets[m_pAnimationTracks[k].m_nAnimationSet]->SetPosition(fTimeElapsed * m_pAnimationTracks[k].m_fSpeed);
 			if (m_pAnimationTracks[k].m_bEnable && (m_pAnimationSets->m_pAnimationSets[k]->m_nType == ANIMATION_TYPE_ONCE)) {
-				cout << k << "ÀÛµ¿Áß" << endl;
-				if (m_pAnimationSets->m_pAnimationSets[k]->m_fPosition >= m_pAnimationSets->m_pAnimationSets[k]->m_fLength) {
-					cout << k << "ÀÛµ¿¸ØÃç" << endl;
+				if (m_pAnimationSets->m_pAnimationSets[k]->m_fPosition >= m_pAnimationSets->m_pAnimationSets[k]->m_fLength && !m_bDie) {
 					SetTrackAllDisable();
 					m_pAnimationTracks[0].m_bEnable = true;
 					//m_pAnimationSets->m_pAnimationSets[k]->m_fPosition = 0.f;
