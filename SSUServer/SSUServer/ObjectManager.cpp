@@ -88,9 +88,9 @@ void ObjectManager::Initialize_Obstacle()
         float x, y, z;
         obstacles_read >> x >> y >> z;
         obstacles[i]->set_id(i);
-        obstacles[i]->set_x(0);
-        obstacles[i]->set_y(0);
-        obstacles[i]->set_z(0);
+        obstacles[i]->set_x(x);
+        obstacles[i]->set_y(y);
+        obstacles[i]->set_z(z);
     }
     obstacles_read.close();
 
