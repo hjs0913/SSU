@@ -250,19 +250,20 @@ CAnimationSet::CAnimationSet(const CAnimationSet& a)
 	strcpy_s(m_pstrAnimationSetName, 64, a.m_pstrAnimationSetName);
 
 	m_pfKeyFrameTimes = new float[m_nKeyFrames];
+	m_ppxmf4x4KeyFrameTransforms = a.m_ppxmf4x4KeyFrameTransforms;
 
-	m_ppxmf4x4KeyFrameTransforms = new XMFLOAT4X4 * [m_nKeyFrames];
+	//m_ppxmf4x4KeyFrameTransforms = new XMFLOAT4X4 * [m_nKeyFrames];
 	for (int i = 0; i < m_nKeyFrames; i++) {
 		m_pfKeyFrameTimes[i] = a.m_pfKeyFrameTimes[i];
-		m_ppxmf4x4KeyFrameTransforms[i] = a.m_ppxmf4x4KeyFrameTransforms[i];
+		//m_ppxmf4x4KeyFrameTransforms[i] = new XMFLOAT4X4(*a.m_ppxmf4x4KeyFrameTransforms[i]);
 	}
 }
 
 CAnimationSet::~CAnimationSet()
 {
 	if (m_pfKeyFrameTimes) delete[] m_pfKeyFrameTimes;
-	for (int j = 0; j < m_nKeyFrames; j++) if (m_ppxmf4x4KeyFrameTransforms[j]) delete[] m_ppxmf4x4KeyFrameTransforms[j];
-	if (m_ppxmf4x4KeyFrameTransforms) delete[] m_ppxmf4x4KeyFrameTransforms;
+	//for (int j = 0; j < m_nKeyFrames; j++) if (m_ppxmf4x4KeyFrameTransforms[j]) delete[] m_ppxmf4x4KeyFrameTransforms[j];
+	//if (m_ppxmf4x4KeyFrameTransforms) delete[] m_ppxmf4x4KeyFrameTransforms;
 	
 	if (m_pCallbackKeys) delete[] m_pCallbackKeys;
 	if (m_pAnimationCallbackHandler) delete m_pAnimationCallbackHandler;
@@ -436,6 +437,7 @@ CAnimationController::CAnimationController(ID3D12Device *pd3dDevice, ID3D12Graph
 		//m_pAnimationSets = pModel->m_pAnimationSets;
 		if (m_pAnimationSets) {
 			m_pAnimationSets->AddRef();
+
 			//m_pAnimationSets->m_nAnimatedBoneFrames = pModel->m_pAnimationSets->m_nAnimatedBoneFrames;
 		}
 	}
@@ -539,7 +541,21 @@ void CAnimationController::AdvanceTime(float fTimeElapsed, CGameObject *pRootGam
 	if (m_pAnimationTracks)
 	{
 		//for (int k = 0; k < m_nAnimationTracks; k++) m_pAnimationTracks[k].m_fPosition += (fTimeElapsed * m_pAnimationTracks[k].m_fSpeed);
-		for (int k = 0; k < m_nAnimationTracks; k++) m_pAnimationSets->m_pAnimationSets[m_pAnimationTracks[k].m_nAnimationSet]->SetPosition(fTimeElapsed * m_pAnimationTracks[k].m_fSpeed);
+		for (int k = 0; k < m_nAnimationTracks; k++) {
+			if (m_nAnimationTracks == 7 && k == 2) {
+				m_pAnimationSets->m_pAnimationSets[m_pAnimationTracks[k].m_nAnimationSet]->SetPosition((fTimeElapsed * 2) * m_pAnimationTracks[k].m_fSpeed);
+			}
+			else m_pAnimationSets->m_pAnimationSets[m_pAnimationTracks[k].m_nAnimationSet]->SetPosition((fTimeElapsed) * m_pAnimationTracks[k].m_fSpeed);
+			if (m_pAnimationTracks[k].m_bEnable && (m_pAnimationSets->m_pAnimationSets[k]->m_nType == ANIMATION_TYPE_ONCE)) {
+				if (m_pAnimationSets->m_pAnimationSets[k]->m_fPosition >= m_pAnimationSets->m_pAnimationSets[k]->m_fLength && !m_bDie) {
+					SetTrackAllDisable();
+					m_pAnimationTracks[0].m_bEnable = true;
+					//m_pAnimationSets->m_pAnimationSets[k]->m_fPosition = 0.f;
+				}
+			}
+		}
+		
+			
 
 		for (int j = 0; j < m_pAnimationSets->m_nAnimatedBoneFrames; j++)
 		{

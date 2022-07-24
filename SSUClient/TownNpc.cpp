@@ -83,8 +83,6 @@ XMFLOAT3 TownNpc::UpdatePosition(int i)
 		break;
 	}
 	case 8: {
-		x = 3409.f;
-		z = 264.f;
 		break;
 	}
 	case 9: {
@@ -132,13 +130,13 @@ XMFLOAT3 TownNpc::UpdateLook(int i)
 	}
 	case 6: {
 		if (sin(m_fTimeElapsed) >= 0) {
-			x = cos(m_fTimeElapsed + round90);
-			z = sin(m_fTimeElapsed + round90);
+			x = cos((m_fTimeElapsed/2) + round90);
+			z = sin((m_fTimeElapsed / 2) + round90);
 		}
 		else {
 			if (m_fTimeElapsed < round90 * 3) {
 				x = 0.f;
-				z = 1.f;
+				z = -1.f;
 			}
 			else {
 				x = 1.f;
@@ -148,6 +146,16 @@ XMFLOAT3 TownNpc::UpdateLook(int i)
 		break;
 	}
 	case 7: {
+		if (sin(m_fTimeElapsed) >= 0) {
+			x = -cos(m_fTimeElapsed / 2);
+			z = -sin(m_fTimeElapsed / 2);
+		}
+		else {
+			if (m_fTimeElapsed > round90 * 3) {
+				x = 0.f;
+				z = 1.f;
+			}
+		}
 		break;
 	}
 	case 8: {

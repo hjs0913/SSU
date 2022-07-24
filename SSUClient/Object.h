@@ -290,6 +290,7 @@ public:
 	float m_fPlayTime = 0.0f;
 	float m_fStartTime = 0.0f;
 	bool m_bIsStartAnim = false;
+	bool	m_bDie = false;
 
     int 							m_nAnimationTracks = 0;
     CAnimationTrack 				*m_pAnimationTracks = NULL;

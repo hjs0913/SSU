@@ -103,12 +103,14 @@ void Player::attack_dead_judge(Npc* target)
 
 		// 플레이어에게 경험치 제공, 그리고 바뀐 경험치와 레벨을 보내주자
 		float get_exp = target->get_lv() * target->get_lv() * 2;
+		cout << "Exp : " << get_exp << endl;
 		if (target->get_tribe() == BOSS)
 			get_exp = get_exp * 2;
 		char mess[MAX_CHAT_SIZE];
 		sprintf_s(mess, MAX_CHAT_SIZE, "%s을 죽였습니다, %d의 경험치를 획득합니다",
-			target->get_name(), get_exp);
+			target->get_name(), (int)get_exp);
 		send_chat_packet(this, _id, mess);
+		cout << mess << endl;
 
 		send_status_change_packet(this);
 

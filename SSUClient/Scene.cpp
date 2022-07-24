@@ -131,6 +131,10 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
 			//m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 0.05f;
 		}
+		// 2번 부터 ANIMATION_TYPE_ONCE
+		for (int j = 3; j < monster_anim_cnt; ++j) {
+			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[j]->m_nType = ANIMATION_TYPE_ONCE;
+		}
 		m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(1, true);
 		m_ppHierarchicalGameObjects[i]->SetPosition(0.f, -100.f, 0.f);
 
@@ -169,6 +173,11 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
 		m_ppHierarchicalGameObjects[i]->SetPosition(0.f, -100.f, 0.f);
 		m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
+
+		// 2번 부터 ANIMATION_TYPE_ONCE
+		for (int j = 2; j < player_anim_cnt; ++j) {
+			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[j]->m_nType = ANIMATION_TYPE_ONCE;
+		}
 	}
 
 	for (int i = 3 + MAX_NPC + NUM_PLAYER; i < 3 + MAX_NPC + NUM_PLAYER + NUM_TOWN_NPC; i++) {
@@ -305,6 +314,10 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 			break;
 		}
 		}
+
+		for (int j = 2; j < player_anim_cnt; ++j) {
+			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[j]->m_nType = ANIMATION_TYPE_ONCE;
+		}
 	}
 
 	CLoadedModelInfo* pGaiaModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Gaia.bin", NULL);
@@ -424,6 +437,11 @@ void CScene::ReleaseObjects()
 	ReleaseShaderVariables();
 
 	if (m_pLights) delete[] m_pLights;
+
+	if (pBastardModel) delete pBastardModel;
+	if (pTankerModel) delete pTankerModel;
+	if (pSupporterModel) delete pSupporterModel;
+	if (pMagicianModel) delete pMagicianModel;
 }
 
 ID3D12RootSignature *CScene::CreateGraphicsRootSignature(ID3D12Device *pd3dDevice)
@@ -837,8 +855,8 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 		if (mPlayer[i - (3+MAX_NPC)]->GetUse() == true && m_ppHierarchicalGameObjects[i]->GetPosition().x == 0.f) {
 			switch (mPlayer[i- (3 + MAX_NPC)]->m_job) {
 			case J_DILLER: {
-				//delete m_ppHierarchicalGameObjects[i];
-				m_ppHierarchicalGameObjects[i] = nullptr;
+				delete m_ppHierarchicalGameObjects[i];
+				//m_ppHierarchicalGameObjects[i] = nullptr;
 				m_ppHierarchicalGameObjects[i] = new CMonsterObject(m_pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pBastardModel, player_anim_cnt);
 				m_ppHierarchicalGameObjects[i]->SetPosition(3550.0f, m_pTerrain->GetHeight(3550.0f, 650.0f), 650.0f);
 				m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
@@ -847,12 +865,14 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
 					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 1.0f;
 				}
+				for (int j = 2; j < player_anim_cnt; ++j) {
+					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[j]->m_nType = ANIMATION_TYPE_ONCE;
+				}
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
 				break;
 			}
 			case J_TANKER: {
-				//delete m_ppHierarchicalGameObjects[i];
-				m_ppHierarchicalGameObjects[i] = nullptr;
+				delete m_ppHierarchicalGameObjects[i];
 				m_ppHierarchicalGameObjects[i] = new CMonsterObject(m_pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pTankerModel, player_anim_cnt);
 				m_ppHierarchicalGameObjects[i]->SetPosition(3600.0f, m_pTerrain->GetHeight(3600.0f, 650.0f), 650.0f);
 				m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
@@ -860,12 +880,14 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
 					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 1.0f;
 				}
+				for (int j = 2; j < player_anim_cnt; ++j) {
+					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[j]->m_nType = ANIMATION_TYPE_ONCE;
+				}
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
 				break;
 			}
 			case J_SUPPORTER: {
-				//delete m_ppHierarchicalGameObjects[i];
-				m_ppHierarchicalGameObjects[i] = nullptr;
+				delete m_ppHierarchicalGameObjects[i];
 				m_ppHierarchicalGameObjects[i] = new CMonsterObject(m_pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pSupporterModel, player_anim_cnt);
 				m_ppHierarchicalGameObjects[i]->SetPosition(3600.0f, m_pTerrain->GetHeight(3600.0f, 650.0f), 650.0f);
 				m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
@@ -873,12 +895,14 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
 					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 1.0f;
 				}
+				for (int j = 2; j < player_anim_cnt; ++j) {
+					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[j]->m_nType = ANIMATION_TYPE_ONCE;
+				}
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
 				break;
 			}
 			case J_MAGICIAN: {
-				//delete m_ppHierarchicalGameObjects[i];
-				m_ppHierarchicalGameObjects[i] = nullptr;
+				delete m_ppHierarchicalGameObjects[i];
 				m_ppHierarchicalGameObjects[i] = new CMonsterObject(m_pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMagicianModel, player_anim_cnt);
 				m_ppHierarchicalGameObjects[i]->SetPosition(3600.0f, m_pTerrain->GetHeight(3600.0f, 650.0f), 650.0f);
 				m_ppHierarchicalGameObjects[i]->SetScale(12.0f, 12.0f, 12.0f);
@@ -886,19 +910,24 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
 					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 1.0f;
 				}
+				for (int j = 2; j < player_anim_cnt; ++j) {
+					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[j]->m_nType = ANIMATION_TYPE_ONCE;
+				}
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
 				break;
 			}
 
 			default: {
-				//delete m_ppHierarchicalGameObjects[i];
-				m_ppHierarchicalGameObjects[i] = nullptr; 
+				delete m_ppHierarchicalGameObjects[i];
 				m_ppHierarchicalGameObjects[i] = new CMonsterObject(m_pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pBastardModel, player_anim_cnt);
 				m_ppHierarchicalGameObjects[i]->SetPosition(3550.0f, m_pTerrain->GetHeight(3550.0f, 650.0f), 650.0f);
 				m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
 				for (int j = 0; j < player_anim_cnt; ++j) {
 					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(j, j);
 					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 0.5f;
+				}
+				for (int j = 2; j < player_anim_cnt; ++j) {
+					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[j]->m_nType = ANIMATION_TYPE_ONCE;
 				}
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
 				break;

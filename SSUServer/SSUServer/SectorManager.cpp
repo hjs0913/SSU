@@ -28,8 +28,6 @@ void SectorManager::player_put(Npc* p)
 	p->sector_lock.unlock();
 
 	check_sector_put(p, sector_id);
-
-	// 기존의 사람에게 새로 들어온 사람을 put해준다
 }
 
 void SectorManager::player_move(Npc* p)
@@ -42,16 +40,9 @@ void SectorManager::player_move(Npc* p)
 		// 원래있던 섹터에서 플레이어 id를 뺀다
 		sectors[origin_sector_id]->erase_player(p->get_id());
 		p->set_sector_id(new_sector_id);
-		p->sector_lock.unlock();
-		// 본래 섹터와 이동된 섹터 관련이 있는 플레이어에게 put, delete send를 한다
-		//send_put_packet_sector_player(p, new_sector_id);
-		//send_delete_packet_sector_player(p, origin_sector_id);
 	}
-	else{
-		p->sector_lock.unlock();
-		// 이동 패킷을 해당되는 섹터에게 보내주자
-		check_sector_move(p, new_sector_id);
-	}
+	p->sector_lock.unlock();
+	check_sector_move(p, new_sector_id);
 	send_move_packet(reinterpret_cast<Player*>(p), p, 1);
 }
 
@@ -63,7 +54,6 @@ void SectorManager::player_remove(Npc* p, bool dead)
 	p->set_sector_id(-1);
 	p->vl.unlock();
 
-	// 본래 섹터와 관련이 있는 플레이어에게 delete send를 한다.
 	check_sector_remove(p, origin_sector_id, dead);
 }
 
@@ -127,16 +117,32 @@ void SectorManager::check_sector_put(Npc* p, int sector_id)
 	}
 	default: {
 		if (sector_id / 8 == 0) {
-
+			for (int i = -1; i <= 0; i++) {
+				for (int j = -1; j <= 1; j++) {
+					check_viewlist_put(p, (sector_id_z - i) * 8 + (sector_id_x - j));
+				}
+			}
 		}
 		else if (sector_id / 8 == 7) {
-
+			for (int i = 0; i <= 1; i++) {
+				for (int j = -1; j <= 1; j++) {
+					check_viewlist_put(p, (sector_id_z - i) * 8 + (sector_id_x - j));
+				}
+			}
 		}
 		else if (sector_id % 8 == 0) {
-
+			for (int i = -1; i <= 1; i++) {
+				for (int j = -1; j <= 0; j++) {
+					check_viewlist_put(p, (sector_id_z - i) * 8 + (sector_id_x - j));
+				}
+			}
 		}
 		else if (sector_id % 8 == 7) {
-
+			for (int i = -1; i <= 1; i++) {
+				for (int j = 0; j <= 1; j++) {
+					check_viewlist_put(p, (sector_id_z - i) * 8 + (sector_id_x - j));
+				}
+			}
 		}
 		else {
 			for (int i = -1; i <= 1; i++) {
@@ -187,16 +193,32 @@ void SectorManager::check_sector_move(Npc* p, int sector_id)
 	}
 	default: {
 		if (sector_id / 8 == 0) {
-
+			for (int i = -1; i <= 0; i++) {
+				for (int j = -1; j <= 1; j++) {
+					check_viewlist_move(p, (sector_id_z - i) * 8 + (sector_id_x - j));
+				}
+			}
 		}
 		else if (sector_id / 8 == 7) {
-
+			for (int i = 0; i <= 1; i++) {
+				for (int j = -1; j <= 1; j++) {
+					check_viewlist_move(p, (sector_id_z - i) * 8 + (sector_id_x - j));
+				}
+			}
 		}
 		else if (sector_id % 8 == 0) {
-
+			for (int i = -1; i <= 1; i++) {
+				for (int j = -1; j <= 0; j++) {
+					check_viewlist_move(p, (sector_id_z - i) * 8 + (sector_id_x - j));
+				}
+			}
 		}
 		else if (sector_id % 8 == 7) {
-
+			for (int i = -1; i <= 1; i++) {
+				for (int j = 0; j <= 1; j++) {
+					check_viewlist_move(p, (sector_id_z - i) * 8 + (sector_id_x - j));
+				}
+			}
 		}
 		else {
 			for (int i = -1; i <= 1; i++) {
