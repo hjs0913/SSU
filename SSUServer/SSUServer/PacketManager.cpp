@@ -233,21 +233,27 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
         }
 
         timer_event ev;
-        if (pl->attack_speed_up == false) {
+        if (pl->attack_speed_up == 0) {
             ev.obj_id = client_id;
             ev.start_time = chrono::system_clock::now() + 1s;
             ev.ev = EVENT_PLAYER_ATTACK;
             ev.target_id = client_id;
             TimerManager::timer_queue.push(ev);
         }
-        else {
+        else if (pl->attack_speed_up == 1) {
             ev.obj_id = client_id;
             ev.start_time = chrono::system_clock::now() + 50ms;
             ev.ev = EVENT_PLAYER_ATTACK;
             ev.target_id = client_id;
             TimerManager::timer_queue.push(ev);
         }
-
+        else if (pl->attack_speed_up == -1) {
+            ev.obj_id = client_id;
+            ev.start_time = chrono::system_clock::now() + 2s;
+            ev.ev = EVENT_PLAYER_ATTACK;
+            ev.target_id = client_id;
+            TimerManager::timer_queue.push(ev);
+        }
         if (pl->join_dungeon_room) {
             //int indun_id = pl->indun_id;
             Gaia* indun = m_ObjectManger->get_dungeon(pl->indun_id);
@@ -808,7 +814,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                             }
                             players[i]->state_lock.unlock();
                             if ((players[i]->get_x() >= pl->get_x() - 15 && players[i]->get_x() <= pl->get_x() + 15) && (players[i]->get_z() >= pl->get_z() - 15 && players[i]->get_z() <= pl->get_z() + 15)) {
-                                reinterpret_cast<Player*>(players[i])->attack_speed_up = true;
+                                reinterpret_cast<Player*>(players[i])->attack_speed_up = 1;
                                 send_buff_ui_packet(reinterpret_cast<Player*>(players[i]), 4);
                             }
                         }
@@ -816,7 +822,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                     else {
                         Gaia* indun = m_ObjectManger->get_dungeon(pl->get_indun_id());
                         for (int i = 0; i < GAIA_ROOM; ++i) {
-                            indun->get_party_palyer()[i]->attack_speed_up = true;
+                            indun->get_party_palyer()[i]->attack_speed_up = 1;
                             send_buff_ui_packet(indun->get_party_palyer()[i], 4);
                         }
                     }

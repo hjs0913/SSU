@@ -37,6 +37,8 @@ protected:
 
 	//skill
 	float _skill_factors[3][10];
+	
+	bool burn_on;
 
 public:
 	mutex	state_lock;

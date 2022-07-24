@@ -19,7 +19,7 @@ Player::Player(int id) : Npc(id)
     superposition = false;
     join_dungeon_room = false;
     indun_id = -1;
-    attack_speed_up = false;
+    attack_speed_up = 0;
 }
 
 void Player::set_exp(int exp)
@@ -177,9 +177,8 @@ void Player::attack_element_judge(Npc* target)
 			if (target->get_element() == E_WATER || target->get_element() == E_EARTH
 				|| target->get_element() == E_FIRE) {
 				// Npc에는 없는 속성
-				attack_speed_up = true;
-
-				//공속  상승 , 쿨타임 감소 
+				attack_speed_up = 1;
+				//공속 상승 
 				target->set_element_cooltime(true);
 			}
 			break;
@@ -187,7 +186,16 @@ void Player::attack_element_judge(Npc* target)
 			if (target->get_element() == E_ICE || target->get_element() == E_TREE
 				|| target->get_element() == E_FULLMETAL) {
 				//10초 공격력 10프로의 화상 피해 
-				target->set_element_cooltime(true);
+				
+				timer_event ev;
+				//if (reinterpret_cast<Player*>(target)->burn_on == false) {
+					ev.obj_id = _id;
+					ev.start_time = chrono::system_clock::now() + 5s;
+					ev.ev = EVENT_ELEMENT_FIRE_COOLTIME;
+					ev.target_id = target->get_id();
+					TimerManager::timer_queue.push(ev);
+					target->set_element_cooltime(true);
+				//}
 			}
 			break;
 		case E_TREE:
@@ -207,7 +215,8 @@ void Player::attack_element_judge(Npc* target)
 		case E_ICE:
 			if (target->get_element() == E_TREE || target->get_element() == E_WATER
 				|| target->get_element() == E_WIND) {
-				//동결 and  10초동안 공속, 시전속도, 이동속도 10프로감소 
+				//10초동안 공속 감소  or move 보내는 곳에 변수하나 넣어서 이동 못하게 
+				attack_speed_up = -1;
 				target->set_element_cooltime(true);
 			}
 			break;
