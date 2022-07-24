@@ -84,23 +84,28 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	//for (int i = 0; i < m_nHierarchicalGameObjects; ++i) m_ppHierarchicalGameObjects[i] = NULL;
 
 
-	CLoadedModelInfo* pCastleModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Castle_Wall.bin", NULL);
+	//CLoadedModelInfo* pCastleModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Castle_Wall.bin", NULL);
+	//m_ppHierarchicalGameObjects[0] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pCastleModel, 0);
+	//m_ppHierarchicalGameObjects[0]->SetPosition(3200.0f, m_pTerrain->GetHeight(3200.0f, 970.0f), 970.0f);
+	//m_ppHierarchicalGameObjects[0]->SetScale(15.0f, 15.0f, 12.0f);
+
+	CLoadedModelInfo* pCastleModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/BuildingMap.bin", NULL);
 	m_ppHierarchicalGameObjects[0] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pCastleModel, 0);
-	m_ppHierarchicalGameObjects[0]->SetPosition(3200.0f, m_pTerrain->GetHeight(3200.0f, 960.0f) - 10.0f, 960.0f);
-	m_ppHierarchicalGameObjects[0]->SetScale(15.0f, 15.0f, 12.0f);
+	m_ppHierarchicalGameObjects[0]->SetPosition(3270.0f, m_pTerrain->GetHeight(3270.0f, 460.0f), 460.0f);
+	m_ppHierarchicalGameObjects[0]->SetScale(10.0f, 10.0f, 10.0f);
 
 	if (pCastleModel) delete pCastleModel;
 
 	CLoadedModelInfo* pHouseModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Building_5.bin", NULL);
 	m_ppHierarchicalGameObjects[1] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pHouseModel, 0);
 	m_ppHierarchicalGameObjects[1]->SetPosition(2800.0f, m_pTerrain->GetHeight(2800.0f, 400.0f), 400.0f);
-	m_ppHierarchicalGameObjects[1]->SetScale(10.0f, 10.0f, 10.0f);
+	m_ppHierarchicalGameObjects[1]->SetScale(1.0f, 1.0f, 1.0f);
 	m_ppHierarchicalGameObjects[1]->Rotate(0.0f, 180.0f, 0.0f);
 
 	CLoadedModelInfo* pHouseModell = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Building_1.bin", NULL);
 	m_ppHierarchicalGameObjects[2] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pHouseModell, 0);
-	m_ppHierarchicalGameObjects[2]->SetPosition(2790.0f, m_pTerrain->GetHeight(2790.0f, 550.0f) - 5.0f, 550.0f);
-	m_ppHierarchicalGameObjects[2]->SetScale(10.0f, 10.0f, 10.0f);
+	m_ppHierarchicalGameObjects[2]->SetPosition(2790.0f, m_pTerrain->GetHeight(2790.0f, 550.0f), 550.0f);
+	m_ppHierarchicalGameObjects[2]->SetScale(1.0f, 1.0f, 1.0f);
 
 	if (pHouseModel) delete pHouseModel;
 	if (pHouseModell) delete pHouseModell;
