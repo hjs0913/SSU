@@ -96,7 +96,10 @@ CHeightMapImage::CHeightMapImage(LPCTSTR pFileName, int nWidth, int nLength, XMF
 	{
 		for (int x = 0; x < m_nWidth; x++)
 		{
-			m_pHeightMapPixels[x + ((m_nLength - 1 - y)*m_nWidth)] = pHeightMapPixels[x + (y*m_nWidth)];
+			if (x >= 325 && y >= (m_nLength - 125))		// 마을 위치는 높이를 똑같게 -> 건물 배치에서 경사진 곳 없게
+				m_pHeightMapPixels[x + ((m_nLength - 1 - y) * m_nWidth)] = 5.0f;
+			else
+				m_pHeightMapPixels[x + ((m_nLength - 1 - y)*m_nWidth)] = pHeightMapPixels[x + (y*m_nWidth)];
 		}
 	}
 
@@ -143,6 +146,7 @@ float CHeightMapImage::GetHeight(float fx, float fz, bool bReverseQuad)
 	float fBottomRight = (float)m_pHeightMapPixels[(x + 1) + (z*m_nWidth)];
 	float fTopLeft = (float)m_pHeightMapPixels[x + ((z + 1)*m_nWidth)];
 	float fTopRight = (float)m_pHeightMapPixels[(x + 1) + ((z + 1)*m_nWidth)];
+
 #ifdef _WITH_APPROXIMATE_OPPOSITE_CORNER
 	if (bReverseQuad)
 	{

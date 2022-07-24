@@ -1362,8 +1362,9 @@ CHeightMapTerrain::CHeightMapTerrain(ID3D12Device *pd3dDevice, ID3D12GraphicsCom
 		pTerrainBaseTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/indun_base.dds", 0);
 
 	CTexture *pTerrainDetailTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
-	if (!InDungeon)
+	if (!InDungeon) {
 		pTerrainDetailTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Terrain/Detail_Texture_Ground.dds", 0);
+	}
 	else
 		pTerrainDetailTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/indun_detail.dds", 0);
 
