@@ -38,6 +38,17 @@ struct LIGHTS
 	int									m_nLights;
 };
 
+struct TOOBJECTSPACEINFO
+{
+	XMFLOAT4X4						m_xmf4x4ToTexture;
+	XMFLOAT4						m_xmf4Position;
+};
+
+struct TOLIGHTSPACES
+{
+	TOOBJECTSPACEINFO				m_pToLightSpaces[MAX_LIGHTS];
+};
+
 class CScene
 {
 public:
@@ -51,7 +62,7 @@ public:
 	virtual void UpdateShaderVariables(ID3D12GraphicsCommandList *pd3dCommandList);
 	virtual void ReleaseShaderVariables();
 
-	void BuildDefaultLightsAndMaterials();
+	void BuildDefaultLightsAndMaterials(ID3D12GraphicsCommandList* pd3dCommandList);
 	void BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList);
 	void BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
 	void BuildObjects_Login(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList);
@@ -68,6 +79,8 @@ public:
 	void Login_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera = NULL, int i = 0);
 	void SetTreePosition(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int start, int end);
 	void ReleaseUploadBuffers();
+	void OnPreShadowMapRender(ID3D12GraphicsCommandList* pd3dCommandList, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, ID3D12Fence* pd3dFence, HANDLE hFenceEvent);
+
 
 	CPlayer								*m_pPlayer = NULL;
 
@@ -90,6 +103,8 @@ protected:
 	static D3D12_GPU_DESCRIPTOR_HANDLE	m_d3dCbvGPUDescriptorNextHandle;
 	static D3D12_CPU_DESCRIPTOR_HANDLE	m_d3dSrvCPUDescriptorNextHandle;
 	static D3D12_GPU_DESCRIPTOR_HANDLE	m_d3dSrvGPUDescriptorNextHandle;
+
+	XMMATRIX						m_xmProjectionToTexture;
 
 public:
 	static void CreateCbvSrvDescriptorHeaps(ID3D12Device *pd3dDevice, int nConstantBufferViews, int nShaderResourceViews);
@@ -124,10 +139,19 @@ public:
 	LIGHT								*m_pLights = NULL;
 	int									m_nLights = 0;
 
+	TOLIGHTSPACES						*m_pToLightSpaces;
+	int									m_nToLightSpaces = 0;
+
+	CTexture							*m_pDepthTexture = NULL;
+
 	XMFLOAT4							m_xmf4GlobalAmbient;
 
 	ID3D12Resource						*m_pd3dcbLights = NULL;
 	LIGHTS								*m_pcbMappedLights = NULL;
+
+	ID3D12Resource						*m_pd3dcbToLightSpaces = NULL;
+	TOLIGHTSPACES						*m_pcbMappedToLightSpaces = NULL;
+
 	//-----------------------------------------
 	CMaterial* m_pMaterial = NULL;
 	ID3D12Resource* m_pd3dcbMaterials = NULL;

@@ -175,6 +175,17 @@ VS_STANDARD_OUTPUT VSSkinnedAnimationStandard(VS_SKINNED_STANDARD_INPUT input)
 Texture2D gtxtTerrainBaseTexture : register(t1);
 Texture2D gtxtTerrainDetailTexture : register(t2);
 
+struct CB_TOOBJECTSPACE
+{
+	matrix		mtxToTexture;
+	float4		f4Position;
+};
+
+cbuffer cbToLightSpace : register(b5)
+{
+	CB_TOOBJECTSPACE gcbToLightSpaces[MAX_LIGHTS];
+}
+
 struct VS_TERRAIN_INPUT
 {
 	float3 position : POSITION;
@@ -189,16 +200,26 @@ struct VS_TERRAIN_OUTPUT
 	float4 color : COLOR;
 	float2 uv0 : TEXCOORD0;
 	float2 uv1 : TEXCOORD1;
+	float4 uvs[MAX_LIGHTS] : TEXCOORD2;
 };
 
 VS_TERRAIN_OUTPUT VSTerrain(VS_TERRAIN_INPUT input)
 {
-	VS_TERRAIN_OUTPUT output;
-
+	//VS_TERRAIN_OUTPUT output;
+	VS_TERRAIN_OUTPUT output = (VS_TERRAIN_OUTPUT)0;
+	float4 positionW = mul(float4(input.position, 1.0f), gmtxGameObject);
+	//output.position = positionW;
 	output.position = mul(mul(mul(float4(input.position, 1.0f), gmtxGameObject), gmtxView), gmtxProjection);
 	output.color = input.color;
 	output.uv0 = input.uv0;
 	output.uv1 = input.uv1;
+
+	[unroll(MAX_LIGHTS)] for (int i = 0; i < MAX_LIGHTS; i++)
+	{
+		//if (gcbToLightSpaces[i].f4Position.w != 0.0f) output.uvs[0] = float4(1.f, 0.f, 0.f, 0.f);
+		if (gcbToLightSpaces[i].f4Position.w != 0.0f) output.uvs[i] = mul(positionW, gcbToLightSpaces[i].mtxToTexture);
+		else output.uvs[i] = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	}
 
 	return(output);
 }
@@ -210,7 +231,11 @@ float4 PSTerrain(VS_TERRAIN_OUTPUT input) : SV_TARGET
 //	float4 cColor = saturate((cBaseTexColor * 0.5f) + (cDetailTexColor * 0.5f));
 	float4 cColor = input.color * saturate((cBaseTexColor * 0.5f) + (cDetailTexColor * 0.5f));
 
-	return(cColor);
+	float4 cIllumination = TerrainLighting(input.position.xyz, float3(0.0f, 1.0f, 0.0f), input.uvs);
+
+
+	//return(cColor);
+	return(lerp(cColor, cIllumination, 0.01f));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

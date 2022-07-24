@@ -1,7 +1,4 @@
 #pragma once
-
-#define FRAME_BUFFER_WIDTH		1800 //640
-#define FRAME_BUFFER_HEIGHT		900 //480
 #define UICOUNT 40
 
 #include "Timer.h"

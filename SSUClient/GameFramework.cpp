@@ -1981,7 +1981,12 @@ void CGameFramework::FrameAdvance()
 
 	HRESULT hResult = m_pd3dCommandAllocator->Reset();
 	hResult = m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
-
+	if (Login_OK) {
+		if (InDungeon)
+			m_pRaid_Scene->OnPreShadowMapRender(m_pd3dCommandList, m_pd3dDevice, m_pd3dCommandQueue, m_pd3dFence, m_hFenceEvent);
+		else
+			m_pScene->OnPreShadowMapRender(m_pd3dCommandList, m_pd3dDevice, m_pd3dCommandQueue, m_pd3dFence, m_hFenceEvent);
+	}
 	D3D12_RESOURCE_BARRIER d3dResourceBarrier;
 	::ZeroMemory(&d3dResourceBarrier, sizeof(D3D12_RESOURCE_BARRIER));
 	d3dResourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
