@@ -849,7 +849,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 switch ((int)packet->skill_num)
                 {
 
-                case 0: // mpÈí¼ö 
+                case 0: // hpÈñ»ýÇØ »ó´ë hp¸¦ mp·Î Èí¼ö 
 
                     pl->set_hp(pl->get_hp() - 300);
                     send_status_change_packet(pl);
@@ -861,8 +861,6 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                             continue;
                         }
                         players[i]->state_lock.unlock();
-
-
 
                         if ((players[i]->get_x() >= pl->get_x() - 10 && players[i]->get_x() <= pl->get_x() + 10) && (players[i]->get_z() >= pl->get_z() - 10 && players[i]->get_z() <= pl->get_z() + 10)) {
 
@@ -889,27 +887,23 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                         }
                     }
                     break;
-                case 1:
-
+                case 1: {
                     send_play_shoot_packet(pl); // ½î¶ó°í º¸³»Áà¾ß ½îÀÚ 
 
                     pl->set_mp(pl->get_mp() - 1500);
                     send_status_change_packet(pl);
-
-                    Coord a = { pl->get_x() + pl->get_right_x() * -10, pl->get_z() + pl->get_right_z() * -10 };
-                    Coord b = { pl->get_x() + pl->get_right_x() * 10, pl->get_z() + pl->get_right_z() * 10 };
-                    Coord c = { (pl->get_x() + pl->get_right_x() * -10) + pl->get_look_x() * 100,
-                   (pl->get_z() + pl->get_right_z() * -10) + pl->get_look_z() * 100, };
-
-
-                    Coord d = { pl->get_x() + pl->get_right_x() * 10, pl->get_z() + pl->get_right_z() * 10 };
-                    Coord e = { (pl->get_x() + pl->get_right_x() * 10) + pl->get_look_x() * 100
-                        , (pl->get_z() + pl->get_right_z() * 10) + pl->get_look_x() * 100 };
-                    Coord f = { (pl->get_x() + pl->get_right_x() * -10) + pl->get_look_x() * 100,
-                   (pl->get_z() + pl->get_right_z() * -10) + pl->get_look_z() * 100, };
+                    //ÁÂ¿ì »ï°¢Çü µÎ°³·Î »ç°¢Çü ¹üÀ§ ?
+                    Coord a = { pl->get_x() + pl->get_right_x() * -30, pl->get_z() + pl->get_right_z() * -30 };
+                    Coord b = { pl->get_x() + pl->get_right_x() * 30, pl->get_z() + pl->get_right_z() * 30 };
+                    Coord c = { (pl->get_x() + pl->get_right_x() * -30) + pl->get_look_x() * 100,
+                   (pl->get_z() + pl->get_right_z() * -30) + pl->get_look_z() * 100, };
 
 
-
+                    Coord d = { pl->get_x() + pl->get_right_x() * 30, pl->get_z() + pl->get_right_z() * 30 };
+                    Coord e = { (pl->get_x() + pl->get_right_x() * 30) + pl->get_look_x() * 100
+                        , (pl->get_z() + pl->get_right_z() * 30) + pl->get_look_x() * 100 };
+                    Coord f = { (pl->get_x() + pl->get_right_x() * -30) + pl->get_look_x() * 100,
+                   (pl->get_z() + pl->get_right_z() * -30) + pl->get_look_z() * 100, };
 
                     for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
                         players[i]->state_lock.lock();
@@ -922,7 +916,6 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                         Coord n = { players[i]->get_x(), players[i]->get_z() };
                         //  players[i]->set_pos(players[i]->get_x() + pl->get_look_x() * 40 , players[i]->get_z() + pl->get_look_z() * 40);
 
-
                          //if (players[i]->get_x() < pl->get_x() + pl->get_look_x() * 20 &&  players[i]->get_z() < pl->get_z()  + pl->get_look_z() * 100) {
                         if (isInsideTriangle(a, b, c, n) || isInsideTriangle(d, e, f, n)) {
 
@@ -930,8 +923,6 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                             players[i]->set_target_id(pl->get_id());
                             pl->magical_skill_success(players[i], pl->get_skill_factor((int)packet->skill_type, (int)packet->skill_num));
                             send_play_effect_packet(pl, players[i]); // ÀÌÆåÆ® ÅÍÆ®¸± À§Ä¡ 
-
-
 
                             if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
                                 players[i]->set_active(true);
@@ -946,9 +937,25 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
 
                         }
                     }
-
                     break;
+                }
+                case 2: // ºö 
+                   // send_play_shoot_packet(pl); ´Ù¸¥ °É·Î 
+                    pl->set_mp(pl->get_mp() - 1500);
+                    send_status_change_packet(pl);
 
+                    Coord a1 = { pl->get_x() + pl->get_right_x() * -10, pl->get_z() + pl->get_right_z() * -10 };
+                    Coord b1 = { pl->get_x() + pl->get_right_x() * 10, pl->get_z() + pl->get_right_z() * 10 };
+                    Coord c1 = { (pl->get_x() + pl->get_right_x() * -10) + pl->get_look_x() * 50,
+                   (pl->get_z() + pl->get_right_z() * -10) + pl->get_look_z() * 50, };
+
+
+                    Coord d1 = { pl->get_x() + pl->get_right_x() * 10, pl->get_z() + pl->get_right_z() * 10 };
+                    Coord e1 = { (pl->get_x() + pl->get_right_x() * 10) + pl->get_look_x() * 50
+                        , (pl->get_z() + pl->get_right_z() * 10) + pl->get_look_x() * 50 };
+                    Coord f1 = { (pl->get_x() + pl->get_right_x() * -10) + pl->get_look_x() * 50,
+                   (pl->get_z() + pl->get_right_z() * -10) + pl->get_look_z() * 50, };
+                    break;
                 }
                 break;
             }
