@@ -767,10 +767,12 @@ bool ObjectManager::is_near(int a, int b)
 
 bool ObjectManager::check_move_alright(int x, int z, bool monster)
 {
+    if (x <= 0 || WORLD_WIDTH <= x) return false;
+    if (z <= 0 || WORLD_HEIGHT <= z) return false;
+
     int size = 0;
     if (monster) size = 15;
     else size = 5;
-
 
     for (auto ob : obstacles) {
         if ((ob->get_x() - size <= x && x <= ob->get_x() + size) && 
