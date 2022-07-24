@@ -136,7 +136,7 @@ void PartyUI::UpdateLabels_PartyInfo(const std::wstring* strUIText, Party* p, bo
             temp2.append(L"\tJOB : ");
             switch (p->player_job[tmp])
             {
-            case J_DILLER:  temp2.append(L"µô·¯\n"); break;
+            case J_DILLER:  temp2.append(L"Àü»ç\n"); break;
             case J_TANKER:  temp2.append(L"ÅÊÄ¿\n"); break;
             case J_MAGICIAN:  temp2.append(L"¸¶¹ý»ç\n"); break;
             case J_SUPPORTER:  temp2.append(L"¼­Æ÷ÅÍ\n"); break;
@@ -399,7 +399,7 @@ AddAIUI::~AddAIUI()
 
 void AddAIUI::UpdateLabels()
 {
-    m_vTextBlocks[0] = { L"µô·¯", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 10 + FRAME_BUFFER_WIDTH / 360, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20 - FRAME_BUFFER_HEIGHT / 22.5,
+    m_vTextBlocks[0] = { L"Àü»ç", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 10 + FRAME_BUFFER_WIDTH / 360, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20 - FRAME_BUFFER_HEIGHT / 22.5,
         FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 10 + FRAME_BUFFER_WIDTH / 360 + FRAME_BUFFER_WIDTH / 22.5, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20 - 10), m_pdwTextFormat };
     m_vTextBlocks[1] = { L"ÅÊÄ¿", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 360 - FRAME_BUFFER_WIDTH / 22.5, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20 - FRAME_BUFFER_HEIGHT / 22.5,
         FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 360, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20 - 10), m_pdwTextFormat };
@@ -410,7 +410,7 @@ void AddAIUI::UpdateLabels()
 }
 void AddAIUI::UpdateLabels_JOIN_JOB()
 {
-    m_vTextBlocks[0] = { L"µô·¯", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 10 + FRAME_BUFFER_WIDTH / 360, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20 - FRAME_BUFFER_HEIGHT / 22.5,
+    m_vTextBlocks[0] = { L"Àü»ç", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 10 + FRAME_BUFFER_WIDTH / 360, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20 - FRAME_BUFFER_HEIGHT / 22.5,
         FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 10 + FRAME_BUFFER_WIDTH / 360 + FRAME_BUFFER_WIDTH / 22.5, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20 - 10), m_pdwTextFormat };
     m_vTextBlocks[1] = { L"ÅÊÄ¿", D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 360 - FRAME_BUFFER_WIDTH / 22.5, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20 - FRAME_BUFFER_HEIGHT / 22.5,
         FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 360, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20 - 10), m_pdwTextFormat };
