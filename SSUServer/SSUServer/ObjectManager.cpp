@@ -767,10 +767,24 @@ bool ObjectManager::is_near(int a, int b)
 
 bool ObjectManager::check_move_alright(int x, int z, bool monster)
 {
+    if (x <= 0 || WORLD_WIDTH <= x) return false;
+    if (z <= 0 || WORLD_HEIGHT <= z) return false;
+
+    if (z >= 940 && z <= 995) {
+        if (x <= 3124 || x >= 3275) return false;
+    }
+
+    if ((x >= 3124 && x <= 3154) || (x >= 3245 && x <= 3275)) {
+        if (z <= 1000 && z >= 900) return false;
+    }
+
+    if (z <= (-0.95 * (x - 2764))) return false;
+
+    if (sqrt(pow((x - 2265), 2) + pow((z - 962), 2)) < 68) return false;
+
     int size = 0;
     if (monster) size = 15;
     else size = 5;
-
 
     for (auto ob : obstacles) {
         if ((ob->get_x() - size <= x && x <= ob->get_x() + size) && 
