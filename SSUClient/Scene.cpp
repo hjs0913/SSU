@@ -855,8 +855,8 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 		if (mPlayer[i - (3+MAX_NPC)]->GetUse() == true && m_ppHierarchicalGameObjects[i]->GetPosition().x == 0.f) {
 			switch (mPlayer[i- (3 + MAX_NPC)]->m_job) {
 			case J_DILLER: {
-				//delete m_ppHierarchicalGameObjects[i];
-				m_ppHierarchicalGameObjects[i] = nullptr;
+				delete m_ppHierarchicalGameObjects[i];
+				//m_ppHierarchicalGameObjects[i] = nullptr;
 				m_ppHierarchicalGameObjects[i] = new CMonsterObject(m_pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pBastardModel, player_anim_cnt);
 				m_ppHierarchicalGameObjects[i]->SetPosition(3550.0f, m_pTerrain->GetHeight(3550.0f, 650.0f), 650.0f);
 				m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
@@ -872,8 +872,7 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 				break;
 			}
 			case J_TANKER: {
-				//delete m_ppHierarchicalGameObjects[i];
-				m_ppHierarchicalGameObjects[i] = nullptr;
+				delete m_ppHierarchicalGameObjects[i];
 				m_ppHierarchicalGameObjects[i] = new CMonsterObject(m_pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pTankerModel, player_anim_cnt);
 				m_ppHierarchicalGameObjects[i]->SetPosition(3600.0f, m_pTerrain->GetHeight(3600.0f, 650.0f), 650.0f);
 				m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
@@ -888,8 +887,7 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 				break;
 			}
 			case J_SUPPORTER: {
-				//delete m_ppHierarchicalGameObjects[i];
-				m_ppHierarchicalGameObjects[i] = nullptr;
+				delete m_ppHierarchicalGameObjects[i];
 				m_ppHierarchicalGameObjects[i] = new CMonsterObject(m_pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pSupporterModel, player_anim_cnt);
 				m_ppHierarchicalGameObjects[i]->SetPosition(3600.0f, m_pTerrain->GetHeight(3600.0f, 650.0f), 650.0f);
 				m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);
@@ -904,8 +902,7 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 				break;
 			}
 			case J_MAGICIAN: {
-				//delete m_ppHierarchicalGameObjects[i];
-				m_ppHierarchicalGameObjects[i] = nullptr;
+				delete m_ppHierarchicalGameObjects[i];
 				m_ppHierarchicalGameObjects[i] = new CMonsterObject(m_pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMagicianModel, player_anim_cnt);
 				m_ppHierarchicalGameObjects[i]->SetPosition(3600.0f, m_pTerrain->GetHeight(3600.0f, 650.0f), 650.0f);
 				m_ppHierarchicalGameObjects[i]->SetScale(12.0f, 12.0f, 12.0f);
@@ -921,8 +918,7 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 			}
 
 			default: {
-				//delete m_ppHierarchicalGameObjects[i];
-				m_ppHierarchicalGameObjects[i] = nullptr; 
+				delete m_ppHierarchicalGameObjects[i];
 				m_ppHierarchicalGameObjects[i] = new CMonsterObject(m_pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pBastardModel, player_anim_cnt);
 				m_ppHierarchicalGameObjects[i]->SetPosition(3550.0f, m_pTerrain->GetHeight(3550.0f, 650.0f), 650.0f);
 				m_ppHierarchicalGameObjects[i]->SetScale(10.0f, 10.0f, 10.0f);

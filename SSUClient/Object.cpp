@@ -542,7 +542,10 @@ void CAnimationController::AdvanceTime(float fTimeElapsed, CGameObject *pRootGam
 	{
 		//for (int k = 0; k < m_nAnimationTracks; k++) m_pAnimationTracks[k].m_fPosition += (fTimeElapsed * m_pAnimationTracks[k].m_fSpeed);
 		for (int k = 0; k < m_nAnimationTracks; k++) {
-			m_pAnimationSets->m_pAnimationSets[m_pAnimationTracks[k].m_nAnimationSet]->SetPosition(fTimeElapsed * m_pAnimationTracks[k].m_fSpeed);
+			if (m_nAnimationTracks == 7 && k == 2) {
+				m_pAnimationSets->m_pAnimationSets[m_pAnimationTracks[k].m_nAnimationSet]->SetPosition((fTimeElapsed * 2) * m_pAnimationTracks[k].m_fSpeed);
+			}
+			else m_pAnimationSets->m_pAnimationSets[m_pAnimationTracks[k].m_nAnimationSet]->SetPosition((fTimeElapsed) * m_pAnimationTracks[k].m_fSpeed);
 			if (m_pAnimationTracks[k].m_bEnable && (m_pAnimationSets->m_pAnimationSets[k]->m_nType == ANIMATION_TYPE_ONCE)) {
 				if (m_pAnimationSets->m_pAnimationSets[k]->m_fPosition >= m_pAnimationSets->m_pAnimationSets[k]->m_fLength && !m_bDie) {
 					SetTrackAllDisable();
