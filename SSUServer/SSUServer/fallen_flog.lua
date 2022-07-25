@@ -1,5 +1,5 @@
 my_id = 99999;
-my_element = 1;
+my_element = 5;  --1
 my_lv = 12;
 my_name = "≈∏∂Ù«— ¥¡¥Î";
 my_hp = 100000;

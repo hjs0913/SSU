@@ -234,21 +234,27 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
         }
 
         timer_event ev;
-        if (pl->attack_speed_up == false) {
+        if (pl->attack_speed_up == 0) {
             ev.obj_id = client_id;
             ev.start_time = chrono::system_clock::now() + 1s;
             ev.ev = EVENT_PLAYER_ATTACK;
             ev.target_id = client_id;
             TimerManager::timer_queue.push(ev);
         }
-        else {
+        else if (pl->attack_speed_up == 1) {
             ev.obj_id = client_id;
             ev.start_time = chrono::system_clock::now() + 50ms;
             ev.ev = EVENT_PLAYER_ATTACK;
             ev.target_id = client_id;
             TimerManager::timer_queue.push(ev);
         }
-
+        else if (pl->attack_speed_up == -1) {
+            ev.obj_id = client_id;
+            ev.start_time = chrono::system_clock::now() + 2s;
+            ev.ev = EVENT_PLAYER_ATTACK;
+            ev.target_id = client_id;
+            TimerManager::timer_queue.push(ev);
+        }
         if (pl->join_dungeon_room) {
             //int indun_id = pl->indun_id;
             Gaia* indun = m_ObjectManger->get_dungeon(pl->indun_id);
@@ -809,7 +815,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                             }
                             players[i]->state_lock.unlock();
                             if ((players[i]->get_x() >= pl->get_x() - 15 && players[i]->get_x() <= pl->get_x() + 15) && (players[i]->get_z() >= pl->get_z() - 15 && players[i]->get_z() <= pl->get_z() + 15)) {
-                                reinterpret_cast<Player*>(players[i])->attack_speed_up = true;
+                                reinterpret_cast<Player*>(players[i])->attack_speed_up = 1;
                                 send_buff_ui_packet(reinterpret_cast<Player*>(players[i]), 4);
                             }
                         }
@@ -817,7 +823,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                     else {
                         Gaia* indun = m_ObjectManger->get_dungeon(pl->get_indun_id());
                         for (int i = 0; i < GAIA_ROOM; ++i) {
-                            indun->get_party_palyer()[i]->attack_speed_up = true;
+                            indun->get_party_palyer()[i]->attack_speed_up = 1;
                             send_buff_ui_packet(indun->get_party_palyer()[i], 4);
                         }
                     }
@@ -843,7 +849,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 switch ((int)packet->skill_num)
                 {
 
-                case 0: // mpÈí¼ö 
+                case 0: // hpÈñ»ıÇØ »ó´ë hp¸¦ mp·Î Èí¼ö 
 
                     pl->set_hp(pl->get_hp() - 300);
                     send_status_change_packet(pl);
@@ -855,8 +861,6 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                             continue;
                         }
                         players[i]->state_lock.unlock();
-
-
 
                         if ((players[i]->get_x() >= pl->get_x() - 10 && players[i]->get_x() <= pl->get_x() + 10) && (players[i]->get_z() >= pl->get_z() - 10 && players[i]->get_z() <= pl->get_z() + 10)) {
 
@@ -883,27 +887,23 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                         }
                     }
                     break;
-                case 1:
-
+                case 1: {
                     send_play_shoot_packet(pl); // ½î¶ó°í º¸³»Áà¾ß ½îÀÚ 
 
                     pl->set_mp(pl->get_mp() - 1500);
                     send_status_change_packet(pl);
-
-                    Coord a = { pl->get_x() + pl->get_right_x() * -10, pl->get_z() + pl->get_right_z() * -10 };
-                    Coord b = { pl->get_x() + pl->get_right_x() * 10, pl->get_z() + pl->get_right_z() * 10 };
-                    Coord c = { (pl->get_x() + pl->get_right_x() * -10) + pl->get_look_x() * 100,
-                   (pl->get_z() + pl->get_right_z() * -10) + pl->get_look_z() * 100, };
-
-
-                    Coord d = { pl->get_x() + pl->get_right_x() * 10, pl->get_z() + pl->get_right_z() * 10 };
-                    Coord e = { (pl->get_x() + pl->get_right_x() * 10) + pl->get_look_x() * 100
-                        , (pl->get_z() + pl->get_right_z() * 10) + pl->get_look_x() * 100 };
-                    Coord f = { (pl->get_x() + pl->get_right_x() * -10) + pl->get_look_x() * 100,
-                   (pl->get_z() + pl->get_right_z() * -10) + pl->get_look_z() * 100, };
+                    //ÁÂ¿ì »ï°¢Çü µÎ°³·Î »ç°¢Çü ¹üÀ§ ?
+                    Coord a = { pl->get_x() + pl->get_right_x() * -30, pl->get_z() + pl->get_right_z() * -30 };
+                    Coord b = { pl->get_x() + pl->get_right_x() * 30, pl->get_z() + pl->get_right_z() * 30 };
+                    Coord c = { (pl->get_x() + pl->get_right_x() * -30) + pl->get_look_x() * 100,
+                   (pl->get_z() + pl->get_right_z() * -30) + pl->get_look_z() * 100, };
 
 
-
+                    Coord d = { pl->get_x() + pl->get_right_x() * 30, pl->get_z() + pl->get_right_z() * 30 };
+                    Coord e = { (pl->get_x() + pl->get_right_x() * 30) + pl->get_look_x() * 100
+                        , (pl->get_z() + pl->get_right_z() * 30) + pl->get_look_x() * 100 };
+                    Coord f = { (pl->get_x() + pl->get_right_x() * -30) + pl->get_look_x() * 100,
+                   (pl->get_z() + pl->get_right_z() * -30) + pl->get_look_z() * 100, };
 
                     for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
                         players[i]->state_lock.lock();
@@ -916,7 +916,6 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                         Coord n = { players[i]->get_x(), players[i]->get_z() };
                         //  players[i]->set_pos(players[i]->get_x() + pl->get_look_x() * 40 , players[i]->get_z() + pl->get_look_z() * 40);
 
-
                          //if (players[i]->get_x() < pl->get_x() + pl->get_look_x() * 20 &&  players[i]->get_z() < pl->get_z()  + pl->get_look_z() * 100) {
                         if (isInsideTriangle(a, b, c, n) || isInsideTriangle(d, e, f, n)) {
 
@@ -924,8 +923,6 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                             players[i]->set_target_id(pl->get_id());
                             pl->magical_skill_success(players[i], pl->get_skill_factor((int)packet->skill_type, (int)packet->skill_num));
                             send_play_effect_packet(pl, players[i]); // ÀÌÆåÆ® ÅÍÆ®¸± À§Ä¡ 
-
-
 
                             if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
                                 players[i]->set_active(true);
@@ -940,9 +937,25 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
 
                         }
                     }
-
                     break;
+                }
+                case 2: // ºö 
+                   // send_play_shoot_packet(pl); ´Ù¸¥ °É·Î 
+                    pl->set_mp(pl->get_mp() - 1500);
+                    send_status_change_packet(pl);
 
+                    Coord a1 = { pl->get_x() + pl->get_right_x() * -10, pl->get_z() + pl->get_right_z() * -10 };
+                    Coord b1 = { pl->get_x() + pl->get_right_x() * 10, pl->get_z() + pl->get_right_z() * 10 };
+                    Coord c1 = { (pl->get_x() + pl->get_right_x() * -10) + pl->get_look_x() * 50,
+                   (pl->get_z() + pl->get_right_z() * -10) + pl->get_look_z() * 50, };
+
+
+                    Coord d1 = { pl->get_x() + pl->get_right_x() * 10, pl->get_z() + pl->get_right_z() * 10 };
+                    Coord e1 = { (pl->get_x() + pl->get_right_x() * 10) + pl->get_look_x() * 50
+                        , (pl->get_z() + pl->get_right_z() * 10) + pl->get_look_x() * 50 };
+                    Coord f1 = { (pl->get_x() + pl->get_right_x() * -10) + pl->get_look_x() * 50,
+                   (pl->get_z() + pl->get_right_z() * -10) + pl->get_look_z() * 50, };
+                    break;
                 }
                 break;
             }
