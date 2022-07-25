@@ -576,7 +576,9 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 						 strcpy(pl_id,id.c_str());
 						 wstring2string(passwoird, PASSWORD_Str);
 						 strcpy(pl_password, passwoird.c_str());
-					//	 pl_job = 0;  //나중엔 db연결땐 빼야함 						
+					//	 pl_job = 0;  //나중엔 db연결땐 빼야함 			
+						 if (pl_job == -1) pl_job = 0;
+						 //if (pl_element == -1) pl_job = 0;
 						 send_login_packet(pl_id, pl_password, (JOB)pl_job, (ELEMENT)(0), pl_id);   //회원가입 확인 버튼 누르면 정보 싹다 보내고 db추가  
 						 Release_Login_Object();
 						 if (!Open_Build_Once) {

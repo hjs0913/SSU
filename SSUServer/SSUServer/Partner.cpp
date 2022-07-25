@@ -748,7 +748,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //스킬을 쿨타임 돌때마다 �
 		case 2: { // 공속 올리기 
 			running_pattern = true;
 			for (int i = 0; i < GAIA_ROOM; ++i) {
-				gaia->get_party_palyer()[i]->attack_speed_up = true;
+				gaia->get_party_palyer()[i]->attack_speed_up = 1;
 				send_buff_ui_packet(gaia->get_party_palyer()[i], 4); 
 			}
 			pa->set_mp(pa->get_mp() - 1000);

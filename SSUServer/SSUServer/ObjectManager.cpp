@@ -88,9 +88,9 @@ void ObjectManager::Initialize_Obstacle()
         float x, y, z;
         obstacles_read >> x >> y >> z;
         obstacles[i]->set_id(i);
-        obstacles[i]->set_x(0);
-        obstacles[i]->set_y(0);
-        obstacles[i]->set_z(0);
+        obstacles[i]->set_x(x);
+        obstacles[i]->set_y(y);
+        obstacles[i]->set_z(z);
     }
     obstacles_read.close();
 
@@ -414,25 +414,36 @@ void ObjectManager::worker()
             switch (players[client_id]->get_element())
             {
             case E_WATER:
-                if (players[exp_over->_target]->get_element() == E_FULLMETAL || players[exp_over->_target]->get_element() == E_FIRE
-                    || players[exp_over->_target]->get_element() == E_EARTH)
-                    players[exp_over->_target]->set_magical_attack(players[exp_over->_target]->get_magical_attack() / 10 * 9);
+                players[exp_over->_target]->set_magical_attack(players[exp_over->_target]->get_magical_attack() / 9 * 10);
                 break;
             case E_FULLMETAL:
+                players[client_id]->set_physical_defence(players[client_id]->get_physical_defence() / 11 * 10);
                 break;
             case E_WIND:
+                reinterpret_cast<Player*>(players[client_id])->attack_speed_up = 0;
                 break;
             case E_FIRE:
+                players[exp_over->_target]->set_hp(players[exp_over->_target]->get_hp() - players[exp_over->_target]->get_lv() * 10);
+                send_change_hp_packet(reinterpret_cast<Player*>(players[client_id]), players[exp_over->_target]);
+                ev.obj_id = client_id;
+                ev.start_time = chrono::system_clock::now() + 5s;
+                ev.ev = EVENT_ELEMENT_FIRE_COOLTIME;
+                ev.target_id = exp_over->_target;
+                TimerManager::timer_queue.push(ev);
                 break;
             case E_TREE:
+                players[exp_over->_target]->set_physical_attack(players[exp_over->_target]->get_physical_attack() / 9 * 10);
                 break;
             case E_EARTH:
+                players[client_id]->set_magical_defence(players[client_id]->get_magical_defence() / 11 * 10);
                 break;
             case E_ICE:
+                reinterpret_cast<Player*>(players[exp_over->_target])->attack_speed_up = 0;
                 break;
             default:
                 break;
             }
+            players[exp_over->_target]->set_element_cooltime(false);
             delete exp_over;
             break;
         }
@@ -530,7 +541,7 @@ void ObjectManager::worker()
             }
             case J_SUPPORTER: {
                 for (int i = 0; i < GAIA_ROOM; ++i) {
-                    dungeons[indun_id]->get_party_palyer()[i]->attack_speed_up = false;
+                    dungeons[indun_id]->get_party_palyer()[i]->attack_speed_up = 0;
                 }
                 break;
             }
@@ -700,12 +711,12 @@ void ObjectManager::worker()
                 case J_SUPPORTER: {   // 대상이 여러명일 때는 어떻게 다시 초기화할까 
                     if (dungeons[client_id]->start_game == false) {
                         for (int i = 0; i < MAX_USER; ++i) {
-                            reinterpret_cast<Player*>(players[i])->attack_speed_up = false;
+                            reinterpret_cast<Player*>(players[i])->attack_speed_up = 0;
                         }
                     }
                     else {
                         for (int i = 0; i < GAIA_ROOM; ++i) {
-                            dungeons[client_id]->get_party_palyer()[i]->attack_speed_up = false;
+                            dungeons[client_id]->get_party_palyer()[i]->attack_speed_up = 0;
                         }
                     }
                     break;
@@ -717,6 +728,14 @@ void ObjectManager::worker()
             reinterpret_cast<Player*>(players[client_id])->set_skill_active(exp_over->_target, false);
             break;
         }
+        case OP_ELEMENT_FIRE_COOLTIME:
+            players[exp_over->_target]->set_hp(players[exp_over->_target]->get_hp() - players[exp_over->_target]->get_lv() * 10);
+            send_change_hp_packet(reinterpret_cast<Player*>(players[client_id]), players[exp_over->_target]);
+           // players[client_id]->set_element_cooltime(false);
+            players[exp_over->_target]->set_element_cooltime(false);
+            delete exp_over;
+            break;
+
         }
 
     }

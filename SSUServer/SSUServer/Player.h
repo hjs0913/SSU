@@ -27,7 +27,7 @@ public:
     bool                superposition;
     bool                join_dungeon_room;
     int                 indun_id;
-    bool                attack_speed_up;
+    int                attack_speed_up;
 
 private:
     void return_npc_position() = delete;

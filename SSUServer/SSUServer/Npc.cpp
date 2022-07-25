@@ -28,8 +28,8 @@ Npc::Npc(int id)
 	superposition = false;
 	
 	_mon_species = static_cast<MONSTER_SPECIES>((_id - NPC_ID_START) / NPC_INTERVAL);
-
 	_target_id = -1;
+	burn_on = false;
 }
 
 Npc::Npc(int id, const char* name)
@@ -56,6 +56,7 @@ Npc::Npc(int id, const char* name)
 	_target_id = -1;
 	superposition = false;
 	_mon_species = static_cast<MONSTER_SPECIES>((_id - NPC_ID_START) / NPC_INTERVAL);
+	burn_on = false;
 }
 
 Npc::~Npc() 
@@ -694,10 +695,7 @@ void Npc::attack_element_judge(Npc* target)
 		case E_WIND:
 			if (target->get_element() == E_WATER || target->get_element() == E_EARTH
 				|| target->get_element() == E_FIRE) {
-				// Npc에는 없는 속성
-				// reinterpret_cast<Player*>(p)->attack_speed_up = true;
-
-				//공속  상승 , 쿨타임 감소 
+				reinterpret_cast<Player*>(target)->attack_speed_up = 1;
 				target->set_element_cooltime(true);
 			}
 			break;
@@ -726,6 +724,7 @@ void Npc::attack_element_judge(Npc* target)
 			if (target->get_element() == E_TREE || target->get_element() == E_WATER
 				|| target->get_element() == E_WIND) {
 				//동결 and  10초동안 공속, 시전속도, 이동속도 10프로감소 
+				reinterpret_cast<Player*>(target)->attack_speed_up = -1;
 				target->set_element_cooltime(true);
 			}
 			break;
