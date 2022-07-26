@@ -148,12 +148,12 @@ public:
 	CLoadedModelInfo					*pTreeModel3 = NULL;
 
 	// monster model
-	//CLoadedModelInfo* pChickenModel = NULL;
+	CLoadedModelInfo					*pSpiderModel = NULL;			// chicken 대신(임시)
 	CLoadedModelInfo					*pRabbitModel = NULL;
 	CLoadedModelInfo					*pFrogModel = NULL;
 	CLoadedModelInfo					*pMonkeyModel = NULL;
 	CLoadedModelInfo					*pWolfModel = NULL;
-	//CLoadedModelInfo* pTigerModel = NULL;
+	CLoadedModelInfo					*pPigModel = NULL;				// tiger 대신(임시)
 
 
 	int									player_anim_cnt = 0;
