@@ -4,27 +4,27 @@
 #include "TimerManager.h"
 #include "database.h"
 
-bool check_inside(Coord a, Coord b, Coord c, Coord n) {
-    Coord A, B, C;
-    A.x = b.x - a.x;
-    A.z = b.z - a.z;
-    B.x = c.x - a.x;
-    B.z = c.z - a.z;
-    C.x = n.x - a.x;
-    C.z = n.z - a.z;
-
-    if ((A.x * B.z - A.z * B.x) * (A.x * C.z - A.z * C.x) < 0)
-        return false;
-    return true;
-}
-
-bool isInsideTriangle(Coord a, Coord b, Coord c, Coord n)
-{
-    if (!check_inside(a, b, c, n)) return false;
-    if (!check_inside(b, c, a, n)) return false;
-    if (!check_inside(c, a, b, n)) return false;
-    return true;
-}
+//bool check_inside(Coord a, Coord b, Coord c, Coord n) {
+//    Coord A, B, C;
+//    A.x = b.x - a.x;
+//    A.z = b.z - a.z;
+//    B.x = c.x - a.x;
+//    B.z = c.z - a.z;
+//    C.x = n.x - a.x;
+//    C.z = n.z - a.z;
+//
+//    if ((A.x * B.z - A.z * B.x) * (A.x * C.z - A.z * C.x) < 0)
+//        return false;
+//    return true;
+//}
+//
+//bool isInsideTriangle(Coord a, Coord b, Coord c, Coord n)
+//{
+//    if (!check_inside(a, b, c, n)) return false;
+//    if (!check_inside(b, c, a, n)) return false;
+//    if (!check_inside(c, a, b, n)) return false;
+//    return true;
+//}
 
 PacketManager::PacketManager(ObjectManager* objectManager, SectorManager* sectorManager, HANDLE* iocp)
 {
