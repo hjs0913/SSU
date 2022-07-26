@@ -1,7 +1,7 @@
 my_id = 99999;
 my_element = 5;
 my_lv = 23;
-my_name = "타락한 바나나원숭이";
+my_name = "타락한 원숭이";
 my_hp = 160000;
 my_physical_attack = 250;
 my_magical_attck = 0;

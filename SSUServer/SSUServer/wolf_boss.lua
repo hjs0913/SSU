@@ -1,7 +1,7 @@
 my_id = 99999;
 my_element = 7;
 my_lv = 26;
-my_name = "期渠 辦舒該葬";
+my_name = "顫塊и 期渠";
 my_hp = 165000;
 my_physical_attack = 250;
 my_magical_attck = 0;
