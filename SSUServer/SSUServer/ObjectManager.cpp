@@ -207,14 +207,14 @@ void ObjectManager::Disconnect(int c_id)
     }
 
     // DB 연결
-    /*
+   
     if (players[c_id]->get_state() == ST_INGAME ||
         players[c_id]->get_state() == ST_DEAD) {
-        EnterCriticalSection(&cs);
+     //   EnterCriticalSection(&cs);
         Save_position(pl);
-        LeaveCriticalSection(&cs);
+     //   LeaveCriticalSection(&cs);
     }
-    */
+    
 
     // 이 파티원이 파티에 참가하고 있거나 레이드에 있으면 해제해주자
 
@@ -238,7 +238,7 @@ void ObjectManager::worker()
             int err_no = WSAGetLastError();
             error_display(err_no);
             Player* pl = reinterpret_cast<Player*>(players[client_id]);
-            Save_position(pl);// 차라리 disconnect 함수에 넣자 
+         //   Save_position(pl);// 차라리 disconnect 함수에 넣자 
             Disconnect(client_id);
             if (exp_over->_comp_op == OP_SEND)
                 delete exp_over;
