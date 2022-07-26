@@ -507,27 +507,14 @@ void process_packet(unsigned char* p)
 	case SC_PACKET_LOGIN_FAIL: {
 
 		sc_packet_login_fail* packet = reinterpret_cast<sc_packet_login_fail*>(p);
-		if (packet->reason == 1) {
+		if (packet->reason == 1) { //이유1: 없는 아이디나 비밀번호가 틀리다고 말해주자 
 			Fail_On = true;
-			Fail_Reason = packet->reason;
-			//cout << "로그인 실패(3초후 꺼집니다)" << endl;
-			//Sleep(3000);
-			//exit(0);
+			Fail_Reason = packet->reason; //이유에 따라서 다른 텍스트 
 		}
-		else if(packet->reason == 2)  //여기서는 없는 아이디나 비밀번호가 틀리다고 말해주자 
+		else if(packet->reason == 2)  ///이유2: 회원 중 이미 있는 아이디라 실패 
 		{
 			Fail_On = true;
 			Fail_Reason = packet->reason;
-			/*char nick_name[10];
-			cout << "새로운 아이디 입니다. 닉네임을 입력하세요: " << endl;
-			cin >> nick_name;
-			int job;
-			cout << "직업을 선택하세요(전사:0, 탱커:1, 마법사:2, 서포터:3): " << endl;
-			cin >> job;
-			int element;
-			cout << "속성을 선택하세요(물:1, 강철:2, 바람:3, 불:4, 나무:5, 땅:6, 얼음:7 ): " << endl;
-			cin >> element;
-			send_relogin_packet(pl_id, pl_password, nick_name, job, element);*/
 		}
 		break;
 	}
@@ -1052,17 +1039,6 @@ int netInit()
 	for (int i = 0; i < (MAX_USER / GAIA_ROOM); i++) {
 		m_party[i] = new Party(i);
 	}
-
-	/*
-	cout << "ID를 입력하세요 : ";
-	cin >> pl_id;
-	cout << "패스워드를 입력하세요 : ";
-	cin >> pl_password;
-	cout << "직업을 입력하세요 : ";
-	cin >> pl_job;
-
-	send_login_packet(pl_id, pl_password, (JOB)pl_job);*/
-
 	do_recv();
 }
 
@@ -1316,8 +1292,42 @@ void get_object_information(CGameObject* m_otherPlayer, int id)
 			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(3, 3);
 			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(3, true);
 			mPlayer[id]->m_net_attack = false;
+
+			//-사운드
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(3, true);
+			m_otherPlayer->m_pSkinnedAnimationController->SetCallbackKeys(3, 4);
+	
+
+#ifdef _WITH_SOUND_RESOURCE
+			m_otherPlayer->m_pSkinnedAnimationController->SetCallbackKey(3, 0.1f, _T("Animal_attack"));
+#else
+			if (MAX_USER < id &&  id < MAX_USER + 30) {
+				m_otherPlayer->m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.125f, _T("Sound/토끼_울음소리.wav"));
+			}
+			else if (MAX_USER + 30< id && id < MAX_USER + 60) {
+				m_otherPlayer->m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.125f, _T("Sound/거미_울음소리.wav"));
+			}
+			else if (MAX_USER + 60 < id && id < MAX_USER + 90) {
+				m_otherPlayer->m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.125f, _T("Sound/개구리_울음소리.wav"));
+			}
+			else if (MAX_USER + 90 < id && id < MAX_USER + 120) {
+				m_otherPlayer->m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.125f, _T("Sound/원숭이_울음소리.wav"));
+			}
+			else if (MAX_USER + 120 < id && id < MAX_USER + 150) {
+				m_otherPlayer->m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.125f, _T("Sound/늑대_울음소리.wav"));
+			}
+			else if (MAX_USER + 150 < id && id < MAX_USER + 180) {
+				m_otherPlayer->m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.125f, _T("Sound/맷돼지_울음소리.wav"));
+			}
+
 		}
+#endif
+		CAnimationCallbackHandler* pAnimationCallbackHandler = new CSoundCallbackHandler();
+		m_otherPlayer->m_pSkinnedAnimationController->SetAnimationCallbackHandler(3, pAnimationCallbackHandler);
+
 	}
+
 }
 
 // 나
@@ -1457,6 +1467,7 @@ void get_player_information(CGameObject* m_otherPlayer, int id)
 				m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
 				m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(2, true);
 				mPlayer[id]->m_net_attack = false;
+
 			}
 		}
 

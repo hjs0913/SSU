@@ -1059,8 +1059,8 @@ Fail_UI::~Fail_UI()
 
 void Fail_UI::UpdateLabels_Fail_Select()
 {
-    m_vTextBlocks[0] = { L"확인", D2D1::RectF(FRAME_BUFFER_WIDTH / 2  + 25, FRAME_BUFFER_HEIGHT / 2 + 200 ,
-        FRAME_BUFFER_WIDTH / 2 - 25 , FRAME_BUFFER_HEIGHT / 2 + 245), m_pdwTextFormat };
+    m_vTextBlocks[0] = { L"확인", D2D1::RectF(FRAME_BUFFER_WIDTH / 2  -50, FRAME_BUFFER_HEIGHT / 2 + 200 ,
+        FRAME_BUFFER_WIDTH / 2 + 50 , FRAME_BUFFER_HEIGHT / 2 + 245), m_pdwTextFormat };
 }
 void Fail_UI::Render(UINT nFrame)
 {

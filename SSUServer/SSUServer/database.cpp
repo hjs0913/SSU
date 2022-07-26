@@ -109,7 +109,6 @@ bool Add_DB(char* login_id, char* password, Player* pl, char* nick_name, int job
 
 bool Search_Id(Player* pl, char* login_id, char* password)
 {
-	// cout << atoi(login_id) << endl;
 	SQLRETURN retcode;
 	SQLINTEGER c_id, c_password, c_hp, c_exp, c_maxhp, c_mp, c_maxmp = 0;
 	SQLWCHAR c_name[MAX_NAME_SIZE];
@@ -120,14 +119,11 @@ bool Search_Id(Player* pl, char* login_id, char* password)
 	char temp[60];
 	
 	sprintf_s(temp, sizeof(temp), "EXEC Search_PLAYER %s, %s", login_id, password);
-	cout << temp << endl;
-	
-	//cout << exec << endl;
+
 	wchar_t* exec;
 	int strSize = MultiByteToWideChar(CP_ACP, 0, temp, -1, NULL, NULL);
 	exec = new WCHAR[strSize];
 	MultiByteToWideChar(CP_ACP, 0, temp, sizeof(temp) + 1, exec, strSize);
-	//wprintf(L"%s", exec);
 
 	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)exec, SQL_NTS);
 	//패스워드 넣어야하고 비교해서 접속하게 해야한다. 
@@ -170,93 +166,17 @@ bool Search_Id(Player* pl, char* login_id, char* password)
 			pl->set_mp(c_mp);
 			pl->set_maxmp(c_maxmp);
 			pl->set_element((ELEMENT)c_element);
-
-			cout << "ID: " << pl->get_id() << " 이름: " << pl->get_name() << " X: " << pl->get_x() <<" Y: " << pl->get_y() << " Z: " << pl->get_z() <<
-				" HP: " << pl->get_hp() << " LV: " << pl->get_lv() << " EXP: " << pl->get_exp() << " MP: " << pl->get_maxmp() <<" 직업: " << pl->get_job()
-				<< " 속성: " << pl->get_element() <<endl;
+;
 			SQLCancel(hstmt);
 			delete exec;
+			cout << "Search 성공" << endl;
 			return true;
 		}
-		else {   //없으면 만들어야지  -> 여기 아직
+		else {   
 			SQLCancel(hstmt);
 			delete exec;
+			cout << "Search 실패" << endl;
 			return false;
-		//	Add_DB(login_id, password, pl); //이거 하기전에 클라한테 로그인 실패했다고 하고 직업, 속성 입력 받아야해 
-				/*
-			SQLCancel(hstmt);
-			cout << "id 생성으로 간다" << endl;
-			// exec 다시 설정
-			char temp2[100];
-			sprintf_s(temp2, sizeof(temp2), "EXEC create_player %s, insert_%d", login_id, atoi(login_id));
-			int strSize2 = MultiByteToWideChar(CP_ACP, 0, temp2, -1, NULL, NULL);
-			wchar_t* exec2 = new WCHAR[strSize2];
-			cout << temp2 << endl;
-			MultiByteToWideChar(CP_ACP, 0, temp2, sizeof(temp2) + 1, exec2, strSize2);
-			wprintf(L"%s", exec2);
-			retcode = SQLExecDirect(hstmt, (SQLWCHAR*)exec2, SQL_NTS);
-			
-			if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
-				delete exec2;
-				if (retcode == SQL_ERROR || retcode == SQL_SUCCESS_WITH_INFO) {
-					HandleDiagnosticRecord(hstmt, SQL_HANDLE_STMT, retcode);
-					return false;
-				}
-				else {	// 생성이 되었으니 다시 읽자
-					Add_DB(login_id, password, pl);
-
-				
-					retcode = SQLExecDirect(hstmt, (SQLWCHAR*)exec, SQL_NTS);
-
-					if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
-						retcode = SQLBindCol(hstmt, 1, SQL_C_LONG, &c_id, 100, &cbP_id);
-						retcode = SQLBindCol(hstmt, 2, SQL_C_LONG, &c_password, 100, &cbP_password);
-						retcode = SQLBindCol(hstmt, 3, SQL_C_WCHAR, c_name, MAX_NAME_SIZE, &cbP_name);
-						retcode = SQLBindCol(hstmt, 4, SQL_C_SHORT, &c_x, 100, &cbP_x);
-						retcode = SQLBindCol(hstmt, 5, SQL_C_SHORT, &c_y, 100, &cbP_y);
-						retcode = SQLBindCol(hstmt, 6, SQL_C_SHORT, &c_z, 100, &cbP_z);
-						retcode = SQLBindCol(hstmt, 7, SQL_C_LONG, &c_hp, 100, &cbP_hp);
-						retcode = SQLBindCol(hstmt, 8, SQL_C_SHORT, &c_lv, 100, &cbP_lv);
-						retcode = SQLBindCol(hstmt, 9, SQL_C_LONG, &c_exp, 100, &cbP_exp);
-						retcode = SQLBindCol(hstmt, 10, SQL_C_LONG, &c_maxhp, 100, &cbP_maxhp);
-						retcode = SQLBindCol(hstmt, 11, SQL_C_SHORT, &c_job, 100, &cbP_job);
-						retcode = SQLBindCol(hstmt, 12, SQL_C_LONG, &c_mp, 100, &cbP_mp);
-						retcode = SQLBindCol(hstmt, 13, SQL_C_LONG, &c_maxmp, 100, &cbP_maxmp);
-						retcode = SQLBindCol(hstmt, 14, SQL_C_SHORT, &c_element, 100, &cbP_element);
-						// Fetch and print each row of data. On an error, display a message and exit.
-						retcode = SQLFetch(hstmt);
-						if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
-						{
-							//strcmp(clients[array_id].name, (const char*)c_name);
-							// pl->set_login_id(c_id); -> 현재 오류때문에 주석 넣음, DB처리할때는 풀어야함
-							strSize = WideCharToMultiByte(CP_ACP, 0, c_name, -1, NULL, 0, NULL, NULL);
-							WideCharToMultiByte(CP_ACP, 0, c_name, -1, pl->get_name(), strSize, 0, 0);
-							cout << pl->get_name() << endl;
-
-							pl->set_x(c_x);
-							pl->set_y(c_y);
-							pl->set_z(c_z);
-							pl->set_hp(c_hp);
-							pl->set_lv(c_lv);
-							pl->set_exp(c_exp);
-							pl->set_maxhp(c_maxhp);
-							pl->set_job((JOB)c_job);
-							pl->set_mp(c_mp);
-							pl->set_maxmp(c_maxmp);
-							pl->set_element((ELEMENT)c_element);
-							cout << pl->get_id() << endl;
-							SQLCancel(hstmt);
-							delete exec;
-							return true;
-						}
-						else {
-							cout << "id 생성 실패" << endl;
-							delete exec;
-							return false;
-						}
-					}
-				}
-			}*/
 		}
 	}
 	else {
@@ -267,17 +187,15 @@ bool Search_Id(Player* pl, char* login_id, char* password)
 
 void Save_position(Player* pl)
 {
-	if (DB_On == false)
+	if (DB_On == false || pl->get_state() != ST_INGAME)
 		return;
 
 	SQLRETURN retcode;
-	cout << pl->get_login_id() << endl;
 	char temp[100];
 	//여기도 패스워드, Z좌표, 직업,MP,MAXMP, 속성 를 추가로 넣어서 저장해야한다. 
 	sprintf_s(temp, sizeof(temp), "EXEC save_player_info %s, %d, %d, %d, %d, %d, %d, %d, %d, %d", 
 	pl->get_login_id(), (int)pl->get_x(), (int)pl->get_y(), (int)pl->get_z(), pl->get_hp(),
 	pl->get_lv(), pl->get_exp(), pl->get_maxhp(), pl->get_mp(), pl->get_maxmp() );  //	pl->get_login_id()
-	cout << temp << endl;
 	wchar_t* exec;
 	int strSize = MultiByteToWideChar(CP_ACP, 0, temp, -1, NULL, NULL);
 	exec = new WCHAR[strSize];
@@ -298,7 +216,6 @@ void Save_position(Player* pl)
 	else {
 		HandleDiagnosticRecord(hstmt, SQL_HANDLE_STMT, retcode);
 	}
-	
 	//SQLCancel(hstmt);
 }
 

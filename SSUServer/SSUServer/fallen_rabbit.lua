@@ -1,12 +1,12 @@
 my_id = 99999;
-my_element = 6;
-my_lv = 19;
+my_element = 5;  --1
+my_lv = 12;
 my_name = "타락한 토끼";
-my_hp = 120000;
-my_physical_attack = 180;
+my_hp = 100000;
+my_physical_attack = 140;
 my_magical_attck = 0;
-my_physical_defence = 300;
-my_magical_defence = 130;
+my_physical_defence = 250;
+my_magical_defence = 100;
 my_basic_attack_factor = 10;
 my_defence_factor = 0.0002;
 my_x = 0;
@@ -14,10 +14,10 @@ my_y = 0;
 my_z = 0;
 
 -- 초기 위치 잡을때 사용
-min_x = 1900;
-max_x = 2200;
-min_z = 3080;
-max_z = 3380;
+min_x = 2560;
+max_x = 2943;
+min_z = 1100;
+max_z = 1701;
 
 
 function set_uid(id, x, y, z)
@@ -25,13 +25,14 @@ function set_uid(id, x, y, z)
    my_x = x;
    my_y = y;
    my_z = z;
-   return my_element,my_lv, my_name, my_hp, my_physical_attack, my_magical_attck, 
+   return my_element, my_lv, my_name, my_hp, my_physical_attack, my_magical_attck, 
         my_physical_defence, my_magical_defence, my_basic_attack_factor, my_defence_factor;
 end
 
 function Initailize_position()
 	return min_x, max_x, min_z, max_z;
 end
+
 
 function event_npc_move(player)
    player_x = API_get_x(player);

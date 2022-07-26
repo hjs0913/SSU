@@ -1,12 +1,12 @@
 my_id = 99999;
-my_element = 4;
-my_lv = 29;
-my_name = "타락한 호랑이";
-my_hp = 170000;
-my_physical_attack = 270;
-my_magical_attck = 100;
-my_physical_defence = 400;
-my_magical_defence = 290;
+my_element = 6;
+my_lv = 19;
+my_name = "타락한 개구리";
+my_hp = 120000;
+my_physical_attack = 180;
+my_magical_attck = 0;
+my_physical_defence = 300;
+my_magical_defence = 130;
 my_basic_attack_factor = 10;
 my_defence_factor = 0.0002;
 my_x = 0;
@@ -14,10 +14,10 @@ my_y = 0;
 my_z = 0;
 
 -- 초기 위치 잡을때 사용
-min_x = 3020;
-max_x = 3320;
-min_z = 3622;
-max_z = 3922;
+min_x = 1900;
+max_x = 2200;
+min_z = 3080;
+max_z = 3380;
 
 
 function set_uid(id, x, y, z)

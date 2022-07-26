@@ -41,17 +41,17 @@ void ObjectManager::Initialize_Npc()
 
     for (int i = NPC_ID_START + interval*npc_num; i < NPC_ID_START + interval * (npc_num+1); i++) {
         players[i] = new Npc(i);
-        players[i]->Initialize_Lua("fallen_flog.lua");
-    }
-    npc_num++;
-    for (int i = NPC_ID_START + interval * npc_num; i < NPC_ID_START + interval * (npc_num + 1); i++) {
-        players[i] = new Npc(i);
-        players[i]->Initialize_Lua("fallen_chicken.lua");
-    }
-    npc_num++;
-    for (int i = NPC_ID_START + interval * npc_num; i < NPC_ID_START + interval * (npc_num + 1); i++) {
-        players[i] = new Npc(i);
         players[i]->Initialize_Lua("fallen_rabbit.lua");
+    }
+    npc_num++;
+    for (int i = NPC_ID_START + interval * npc_num; i < NPC_ID_START + interval * (npc_num + 1); i++) {
+        players[i] = new Npc(i);
+        players[i]->Initialize_Lua("fallen_spider.lua");
+    }
+    npc_num++;
+    for (int i = NPC_ID_START + interval * npc_num; i < NPC_ID_START + interval * (npc_num + 1); i++) {
+        players[i] = new Npc(i);
+        players[i]->Initialize_Lua("fallen_frog.lua");
     }
     npc_num++;
     for (int i = NPC_ID_START + interval * npc_num; i < NPC_ID_START + interval * (npc_num + 1); i++) {
@@ -66,7 +66,7 @@ void ObjectManager::Initialize_Npc()
     npc_num++;
     for (int i = NPC_ID_START + interval * npc_num; i < NPC_ID_START + interval * (npc_num + 1); i++) {
         players[i] = new Npc(i);
-        players[i]->Initialize_Lua("fallen_tiger.lua");
+        players[i]->Initialize_Lua("fallen_pig.lua");
     }
     npc_num++;
     cout << "NPC 초기화 완료" << endl;

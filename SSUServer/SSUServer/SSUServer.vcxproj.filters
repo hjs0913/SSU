@@ -146,19 +146,19 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="fallen_chicken.lua">
-      <Filter>Lua_Script\Monster</Filter>
-    </None>
-    <None Include="fallen_flog.lua">
-      <Filter>Lua_Script\Monster</Filter>
-    </None>
-    <None Include="fallen_monkey.lua">
+    <None Include="fallen_spider.lua">
       <Filter>Lua_Script\Monster</Filter>
     </None>
     <None Include="fallen_rabbit.lua">
       <Filter>Lua_Script\Monster</Filter>
     </None>
-    <None Include="fallen_tiger.lua">
+    <None Include="fallen_monkey.lua">
+      <Filter>Lua_Script\Monster</Filter>
+    </None>
+    <None Include="fallen_frog.lua">
+      <Filter>Lua_Script\Monster</Filter>
+    </None>
+    <None Include="fallen_pig.lua">
       <Filter>Lua_Script\Monster</Filter>
     </None>
     <None Include="wolf_boss.lua">
