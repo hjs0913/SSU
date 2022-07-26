@@ -44,10 +44,15 @@ struct timer_event {
 
 struct Coord
 {
+    Coord() : x(0), z(0) {}
+    Coord(float a, float b) : x(a), z(b) {}
     float x;
     float z;
 };
 
+bool check_inside(Coord a, Coord b, Coord c, Coord n);
+
+bool isInsideTriangle(Coord a, Coord b, Coord c, Coord n);
 
 typedef pair<int, int> pos;
 

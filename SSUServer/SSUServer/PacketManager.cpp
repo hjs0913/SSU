@@ -4,27 +4,27 @@
 #include "TimerManager.h"
 #include "database.h"
 
-bool check_inside(Coord a, Coord b, Coord c, Coord n) {
-    Coord A, B, C;
-    A.x = b.x - a.x;
-    A.z = b.z - a.z;
-    B.x = c.x - a.x;
-    B.z = c.z - a.z;
-    C.x = n.x - a.x;
-    C.z = n.z - a.z;
-
-    if ((A.x * B.z - A.z * B.x) * (A.x * C.z - A.z * C.x) < 0)
-        return false;
-    return true;
-}
-
-bool isInsideTriangle(Coord a, Coord b, Coord c, Coord n)
-{
-    if (!check_inside(a, b, c, n)) return false;
-    if (!check_inside(b, c, a, n)) return false;
-    if (!check_inside(c, a, b, n)) return false;
-    return true;
-}
+//bool check_inside(Coord a, Coord b, Coord c, Coord n) {
+//    Coord A, B, C;
+//    A.x = b.x - a.x;
+//    A.z = b.z - a.z;
+//    B.x = c.x - a.x;
+//    B.z = c.z - a.z;
+//    C.x = n.x - a.x;
+//    C.z = n.z - a.z;
+//
+//    if ((A.x * B.z - A.z * B.x) * (A.x * C.z - A.z * C.x) < 0)
+//        return false;
+//    return true;
+//}
+//
+//bool isInsideTriangle(Coord a, Coord b, Coord c, Coord n)
+//{
+//    if (!check_inside(a, b, c, n)) return false;
+//    if (!check_inside(b, c, a, n)) return false;
+//    if (!check_inside(c, a, b, n)) return false;
+//    return true;
+//}
 
 PacketManager::PacketManager(ObjectManager* objectManager, SectorManager* sectorManager, HANDLE* iocp)
 {
@@ -271,7 +271,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                             send_change_hp_packet(ps[i], bos);
                         }
 
-                        if (bos->get_hp() < 0) {
+                        if (bos->get_hp() <= 0) {
                             bos->set_hp(0);
                             indun->game_victory();
                         }
@@ -443,7 +443,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                 for (int i = 0; i < GAIA_ROOM; ++i) {
                                     send_change_hp_packet(indun->get_party_palyer()[i], indun->boss);
                                 }
-                                if (bos->get_hp() < 0) {
+                                if (bos->get_hp() <= 0) {
                                     bos->set_hp(0);
                                     indun->game_victory();
                                 }
@@ -516,7 +516,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                 for (int i = 0; i < GAIA_ROOM; ++i) {
                                     send_change_hp_packet(indun->get_party_palyer()[i], indun->boss);
                                 }
-                                if (bos->get_hp() < 0) {
+                                if (bos->get_hp() <= 0) {
                                     bos->set_hp(0);
                                     indun->game_victory();
                                 }
@@ -611,7 +611,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                     send_change_hp_packet(indun->get_party_palyer()[i], indun->boss);
                                 }
                                 send_status_change_packet(pl);
-                                if (bos->get_hp() < 0) {
+                                if (bos->get_hp() <= 0) {
                                     bos->set_hp(0);
                                     indun->game_victory();
                                 }

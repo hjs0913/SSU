@@ -1796,7 +1796,9 @@ void CGameFramework::ProcessInput()
 
 
 
-			if (first_skill_used == false) {
+			if (first_skill_used == false 
+				&& !m_pPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[4].m_bEnable
+				&& !m_pPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[5].m_bEnable) {
 				if ((pKeysBuffer[VK_NUMPAD1] & 0xF0) || (pKeysBuffer['1'] & 0xF0)) {
 					switch (my_job)
 					{
@@ -1825,7 +1827,9 @@ void CGameFramework::ProcessInput()
 					}
 				}
 			}
-			if (second_skill_used == false) {
+			if (second_skill_used == false
+				&& !m_pPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[3].m_bEnable
+				&& !m_pPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[5].m_bEnable) {
 				if ((pKeysBuffer[VK_NUMPAD2] & 0xF0) || (pKeysBuffer['2'] & 0xF0)) {     //
 					switch (my_job)
 					{
@@ -1854,7 +1858,9 @@ void CGameFramework::ProcessInput()
 					}
 				}
 			}
-			if (third_skill_used == false) {
+			if (third_skill_used == false
+				&& !m_pPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[3].m_bEnable
+				&& !m_pPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[4].m_bEnable) {
 				if ((pKeysBuffer[VK_NUMPAD3] & 0xF0) || (pKeysBuffer['3'] & 0xF0)) {     //   3
 					switch (my_job)
 					{
@@ -1939,7 +1945,10 @@ void CGameFramework::ProcessInput()
 				m_pPlayer->Move(dwDirection, /*12.25f*/moveSpeed, false);
 				
 			}
-			if (dwAttack) {
+			if (dwAttack
+				&& !m_pPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[3].m_bEnable
+				&& !m_pPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[4].m_bEnable
+				&& !m_pPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[5].m_bEnable) {
 				// m_pPlayer->Attack(true);
 				send_attack_packet(0);
 			}

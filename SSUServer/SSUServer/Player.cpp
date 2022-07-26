@@ -339,7 +339,7 @@ void Player::revive_indun(Gaia* dun)
         if (_tribe == PARTNER) {
             timer_event ev;
             ev.obj_id = _id;
-            ev.start_time = chrono::system_clock::now() + 10s;
+            ev.start_time = chrono::system_clock::now() + 1s;
             ev.ev = EVENT_PARTNER_MOVE;
             ev.target_id = 1;
 			TimerManager::timer_queue.push(ev);
