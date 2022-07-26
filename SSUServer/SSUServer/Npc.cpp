@@ -582,6 +582,14 @@ pos Npc::a_star(int t_x, int t_z, int x, int z, const array<Obstacle*, MAX_OBSTA
 		close_q.push(temp);
 
 		// 끝내는 조건
+		if (now.first == 0 || now.first == 24 || now.second == 0 || now.second == 24) {
+			while (now.first != 12 || now.second != 12) {
+				mon_load.push_back(now);
+				now = prior_point[now.first][now.second];
+			}
+			break;
+		}
+
 		if (abs((x + (now.first - 12) * REAL_DISTANCE) - t_x) <= 10 && abs((z + (now.second - 12) * REAL_DISTANCE) - t_z) <= 10) {
 			while (now.first != 12 || now.second != 12) {
 				mon_load.push_back(now);
