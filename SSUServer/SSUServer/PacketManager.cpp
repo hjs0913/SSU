@@ -271,7 +271,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                             send_change_hp_packet(ps[i], bos);
                         }
 
-                        if (bos->get_hp() < 0) {
+                        if (bos->get_hp() <= 0) {
                             bos->set_hp(0);
                             indun->game_victory();
                         }
@@ -443,7 +443,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                 for (int i = 0; i < GAIA_ROOM; ++i) {
                                     send_change_hp_packet(indun->get_party_palyer()[i], indun->boss);
                                 }
-                                if (bos->get_hp() < 0) {
+                                if (bos->get_hp() <= 0) {
                                     bos->set_hp(0);
                                     indun->game_victory();
                                 }
@@ -516,7 +516,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                 for (int i = 0; i < GAIA_ROOM; ++i) {
                                     send_change_hp_packet(indun->get_party_palyer()[i], indun->boss);
                                 }
-                                if (bos->get_hp() < 0) {
+                                if (bos->get_hp() <= 0) {
                                     bos->set_hp(0);
                                     indun->game_victory();
                                 }
@@ -611,7 +611,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                     send_change_hp_packet(indun->get_party_palyer()[i], indun->boss);
                                 }
                                 send_status_change_packet(pl);
-                                if (bos->get_hp() < 0) {
+                                if (bos->get_hp() <= 0) {
                                     bos->set_hp(0);
                                     indun->game_victory();
                                 }

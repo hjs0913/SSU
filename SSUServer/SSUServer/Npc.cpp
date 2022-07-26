@@ -192,6 +192,7 @@ void Npc::set_lv(short lv)
 void Npc::set_hp(int hp)
 {
 	_hp = hp;
+	if (_hp <= 0) _hp = 0;
 }
 
 void Npc::set_maxhp(int m_hp)

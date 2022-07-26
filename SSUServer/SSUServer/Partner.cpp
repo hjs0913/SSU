@@ -365,7 +365,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 					for (int i = 0; i < GAIA_ROOM; ++i) {
 						send_change_hp_packet(gaia->get_party_palyer()[i], gaia->boss);
 					}
-					if (gaia->boss->get_hp() < 0) {
+					if (gaia->boss->get_hp() <= 0) {
 						gaia->boss->set_hp(0);
 						gaia->game_victory();
 					}
@@ -407,7 +407,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 					for (int i = 0; i < GAIA_ROOM; ++i) {
 						send_change_hp_packet(gaia->get_party_palyer()[i], gaia->boss);
 					}
-					if (gaia->boss->get_hp() < 0) {
+					if (gaia->boss->get_hp() <= 0) {
 						gaia->boss->set_hp(0);
 						gaia->game_victory();
 					}
@@ -476,7 +476,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 						send_move_packet(gaia->get_party_palyer()[i], gaia->boss, 1);
 						send_change_hp_packet(gaia->get_party_palyer()[i], gaia->boss);
 					}
-					if (gaia->boss->get_hp() < 0) {
+					if (gaia->boss->get_hp() <= 0) {
 						gaia->boss->set_hp(0);
 						gaia->game_victory();
 					}
@@ -568,7 +568,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 						send_change_hp_packet(gaia->get_party_palyer()[i], gaia->boss);
 						send_change_hp_packet(gaia->get_party_palyer()[i], pa);
 					}
-					if (gaia->boss->get_hp() < 0) {
+					if (gaia->boss->get_hp() <= 0) {
 						gaia->boss->set_hp(0);
 						gaia->game_victory();
 					}
@@ -618,7 +618,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 
 					for (int i = 0; i < GAIA_ROOM; ++i)
 						send_play_effect_packet(gaia->get_party_palyer()[i], gaia->boss); // ÀÌÆåÆ® ÅÍÆ®¸± À§Ä¡ 
-					if (gaia->boss->get_hp() < 0) {
+					if (gaia->boss->get_hp() <= 0) {
 						gaia->boss->set_hp(0);
 						gaia->game_victory();
 					}
@@ -795,7 +795,7 @@ void Partner::attack_success(Partner* pa, Gaia* gaia, float atk_factor)
 		send_change_hp_packet(gaia->get_party_palyer()[i], gaia->boss);
 	}
 	//hp°¡ 0ÀÌµÇ´Â°Ç Ã³¸® ¾ÈÇØ³ð -> ÇÏ°íÀÖÀ½
-	if (gaia->boss->get_hp() < 0) {
+	if (gaia->boss->get_hp() <= 0) {
 		gaia->boss->set_hp(0);
 		gaia->game_victory();
 	}
