@@ -1292,8 +1292,42 @@ void get_object_information(CGameObject* m_otherPlayer, int id)
 			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAnimationSet(3, 3);
 			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(3, true);
 			mPlayer[id]->m_net_attack = false;
+
+			//-사운드
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
+			m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(3, true);
+			m_otherPlayer->m_pSkinnedAnimationController->SetCallbackKeys(3, 4);
+	
+
+#ifdef _WITH_SOUND_RESOURCE
+			m_otherPlayer->m_pSkinnedAnimationController->SetCallbackKey(3, 0.1f, _T("Animal_attack"));
+#else
+			if (MAX_USER < id &&  id < MAX_USER + 30) {
+				m_otherPlayer->m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.125f, _T("Sound/토끼_울음소리.wav"));
+			}
+			else if (MAX_USER + 30< id && id < MAX_USER + 60) {
+				m_otherPlayer->m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.125f, _T("Sound/거미_울음소리.wav"));
+			}
+			else if (MAX_USER + 60 < id && id < MAX_USER + 90) {
+				m_otherPlayer->m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.125f, _T("Sound/개구리_울음소리.wav"));
+			}
+			else if (MAX_USER + 90 < id && id < MAX_USER + 120) {
+				m_otherPlayer->m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.125f, _T("Sound/원숭이_울음소리.wav"));
+			}
+			else if (MAX_USER + 120 < id && id < MAX_USER + 150) {
+				m_otherPlayer->m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.125f, _T("Sound/늑대_울음소리.wav"));
+			}
+			else if (MAX_USER + 150 < id && id < MAX_USER + 180) {
+				m_otherPlayer->m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.125f, _T("Sound/맷돼지_울음소리.wav"));
+			}
+
 		}
+#endif
+		CAnimationCallbackHandler* pAnimationCallbackHandler = new CSoundCallbackHandler();
+		m_otherPlayer->m_pSkinnedAnimationController->SetAnimationCallbackHandler(3, pAnimationCallbackHandler);
+
 	}
+
 }
 
 // 나
@@ -1433,6 +1467,7 @@ void get_player_information(CGameObject* m_otherPlayer, int id)
 				m_otherPlayer->m_pSkinnedAnimationController->SetTrackAllDisable();
 				m_otherPlayer->m_pSkinnedAnimationController->SetTrackEnable(2, true);
 				mPlayer[id]->m_net_attack = false;
+
 			}
 		}
 
