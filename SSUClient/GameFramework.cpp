@@ -727,8 +727,8 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 			if (Fail_On && !Login_OK) {
 				if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 200)
 					&& CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 245)) {
-					if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - 25)  //확인 
-						&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 25)) {
+					if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - 50)  //확인 
+						&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 50)) {
 						Fail_On = false;
 						Fail_Reason = 0;
 					}
@@ -1223,7 +1223,7 @@ void CGameFramework::BuildObjects_login()
 		m_ppUILayer[40]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_FLOW_DIRECTION_TOP_TO_BOTTOM);
 		m_ppUILayer[41]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
-			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_FLOW_DIRECTION_LEFT_TO_RIGHT);
 
 		// UIBar Setting
 		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, m_nWndClientHeight / 5 - 2 * (m_nWndClientHeight / 22.5) - 20,
@@ -2436,7 +2436,7 @@ void CGameFramework::FrameAdvance()
 			if (Login_OK) break;
 			if (!Fail_On) break;
 			if(Fail_Reason == 1)
-				m_ppUILayer[i]->UpdateLabels(L"로그인 실패: 아이디나 비밀번호 정보가 잘못되었습니다.", FRAME_BUFFER_WIDTH / 2 - 250, FRAME_BUFFER_HEIGHT / 2 + 100, FRAME_BUFFER_WIDTH / 2.0 + 250, FRAME_BUFFER_HEIGHT / 2 + 300);
+				m_ppUILayer[i]->UpdateLabels(L"로그인 실패: 입력하신 아이디나 비밀번호 정보가 잘못되었습니다.", FRAME_BUFFER_WIDTH / 2 - 250, FRAME_BUFFER_HEIGHT / 2 + 100, FRAME_BUFFER_WIDTH / 2.0 + 250, FRAME_BUFFER_HEIGHT / 2 + 300);
 			else if (Fail_Reason == 2) {
 				Join_On = false;
 				m_ppUILayer[i]->UpdateLabels(L"회원가입 실패: 이미 존재하는 아이디 입니다.", FRAME_BUFFER_WIDTH / 2 - 250, FRAME_BUFFER_HEIGHT / 2 + 100, FRAME_BUFFER_WIDTH / 2.0 + 250, FRAME_BUFFER_HEIGHT / 2 + 300);
@@ -2446,7 +2446,7 @@ void CGameFramework::FrameAdvance()
 			if (Login_OK) break;
 			if (!Fail_On) break;
 			reinterpret_cast<Fail_UI*>(m_ppUILayer[i])->UpdateLabels_Fail_Select();
-			break;
+			break; 
 		}
 	}
 
