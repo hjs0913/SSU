@@ -12,6 +12,7 @@ class ObjectManager
 private:
 	array <Npc*, MAX_USER + MAX_NPC + MAX_AI> players;
 	array <Obstacle*, MAX_OBSTACLE> obstacles;
+	array <Obstacle*, 48> house_obstacles;
 	array <Gaia*, MAX_DUNGEONS> dungeons;
 
 	SectorManager* m_SectorManager;
