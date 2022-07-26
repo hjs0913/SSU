@@ -8,7 +8,7 @@
 
 int main()
 {
-   // Initialize_DB();
+    Initialize_DB();
 
     // 소켓, 네트워크 초기화
 	setlocale(LC_ALL, "korean");

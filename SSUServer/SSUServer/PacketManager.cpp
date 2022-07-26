@@ -88,7 +88,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
         if (DB_On) {
             login = Search_Id(pl, packet->id, packet->password);
             if (login == false) {
-                send_login_fail_packet(pl, 2);
+                send_login_fail_packet(pl, 1);  // 아이디 비번 일치 계정 없음! 보내줘! 
             }
         }
         else {
@@ -1488,9 +1488,9 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
         
         
         if (login == false) {
-            login = true;
+            //login = true; DB연결X 시 주석 빼자 
             if (DB_On == true) {
-                send_login_fail_packet(pl, 1);
+                send_login_fail_packet(pl, 2);
             }
         }
 
@@ -1564,6 +1564,9 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
         }
         if (login == true)
             send_login_ok_packet(pl);
+        else if (DB_On == false && login == false) {
+            send_login_ok_packet(pl);
+        }
         pl->state_lock.lock();
         pl->set_state(ST_INGAME);
         pl->state_lock.unlock();

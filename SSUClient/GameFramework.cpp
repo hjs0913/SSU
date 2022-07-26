@@ -580,11 +580,12 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 						 if (pl_job == -1) pl_job = 0;
 						 //if (pl_element == -1) pl_job = 0;
 						 send_login_packet(pl_id, pl_password, (JOB)pl_job, (ELEMENT)(0), pl_id);   //회원가입 확인 버튼 누르면 정보 싹다 보내고 db추가  
-						 Release_Login_Object();
-						 if (!Open_Build_Once) {
+						 /*if (Fail_Reason == 0)
+							 Release_Login_Object();
+						 if (!Open_Build_Once&& Fail_Reason == 0) {
 							 BuildObjects();
 							 Open_Build_Once = true;
-						 }
+						 }*/
 
 					 }
 				 }
@@ -706,24 +707,33 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 					//	send_login_packet(pl_id, pl_password, (JOB)pl_job, (ELEMENT)pl_element, pl_nickname);
 						send_relogin_packet(pl_id, pl_password, pl_nickname, (JOB)pl_job, (ELEMENT)pl_element);
 						Join_On = false;
-						Release_Login_Object();
-						if (!Open_Build_Once) {
+					/*	if (Fail_Reason == 0)
+							Release_Login_Object();
+						if (!Open_Build_Once && Fail_Reason == 0) {
 							BuildObjects();
 							Open_Build_Once = true;
-						}
+						}*/
 					}
 					if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 )  //취소 
 						&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 + 80)) {
 						Join_On = false;
-					
+						JOIN_ID_Str = L"";
+						JOIN_PASSWORD_Str = L"";
+						JOIN_NICKNAME_Str = L"";
 					}
 
 				}
 			}
-			
-			
-			
-
+			if (Fail_On && !Login_OK) {
+				if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 200)
+					&& CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 245)) {
+					if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - 25)  //확인 
+						&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 25)) {
+						Fail_On = false;
+						Fail_Reason = 0;
+					}
+				}
+			}
 			
 
 			if (f4_picking_possible) {
@@ -1068,6 +1078,9 @@ void CGameFramework::BuildObjects_login()
 		// 선택 직업과 속성 표시 
 		m_ppUILayer[38] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::SkyBlue, D2D1::ColorF::Black);
 		m_ppUILayer[39] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::SkyBlue, D2D1::ColorF::Black);
+		//로그인 실패창 
+		m_ppUILayer[40] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::GhostWhite, D2D1::ColorF::Black);
+		m_ppUILayer[41] = new Fail_UI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::DodgerBlue, D2D1::ColorF::Black);
 
 		m_ppUILayer[0]->setAlpha(0.5, 1.0);
 		m_ppUILayer[1]->setAlpha(0.5, 1.0);
@@ -1118,6 +1131,8 @@ void CGameFramework::BuildObjects_login()
 		m_ppUILayer[37]->setAlpha(1.0, 1.0);
 		m_ppUILayer[38]->setAlpha(1.0, 1.0);
 		m_ppUILayer[39]->setAlpha(1.0, 1.0);
+		m_ppUILayer[40]->setAlpha(0.5, 1.0);
+		m_ppUILayer[41]->setAlpha(1.0, 1.0);
 
 		m_ppUILayer[0]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_FAR);
@@ -1205,6 +1220,10 @@ void CGameFramework::BuildObjects_login()
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_FLOW_DIRECTION_LEFT_TO_RIGHT);
 		m_ppUILayer[39]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_FLOW_DIRECTION_LEFT_TO_RIGHT);
+		m_ppUILayer[40]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_FLOW_DIRECTION_TOP_TO_BOTTOM);
+		m_ppUILayer[41]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 		// UIBar Setting
 		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, m_nWndClientHeight / 5 - 2 * (m_nWndClientHeight / 22.5) - 20,
@@ -1328,7 +1347,10 @@ void CGameFramework::BuildObjects()
 		// 선택 직업과 속성 표시 
 		m_ppUILayer[38] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::SkyBlue, D2D1::ColorF::Black);
 		m_ppUILayer[39] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::SkyBlue, D2D1::ColorF::Black);
-
+		//로그인 실패창 
+		m_ppUILayer[40] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::GhostWhite, D2D1::ColorF::Black);
+		m_ppUILayer[41] = new Fail_UI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::DodgerBlue, D2D1::ColorF::Black);
+	
 		m_ppUILayer[0]->setAlpha(0.5, 1.0);
 		m_ppUILayer[1]->setAlpha(0.5, 1.0);
 
@@ -1378,6 +1400,9 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[37]->setAlpha(1.0, 1.0);
 		m_ppUILayer[38]->setAlpha(1.0, 1.0);
 		m_ppUILayer[39]->setAlpha(1.0, 1.0);
+		m_ppUILayer[40]->setAlpha(0.5, 1.0);
+		m_ppUILayer[41]->setAlpha(1.0, 1.0);
+
 
 		m_ppUILayer[0]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_FAR);
@@ -1465,7 +1490,10 @@ void CGameFramework::BuildObjects()
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_FLOW_DIRECTION_LEFT_TO_RIGHT);
 		m_ppUILayer[39]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_FLOW_DIRECTION_LEFT_TO_RIGHT);
-
+		m_ppUILayer[40]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_FLOW_DIRECTION_TOP_TO_BOTTOM);
+		m_ppUILayer[41]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		// UIBar Setting
 		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, m_nWndClientHeight / 5 - 2*(m_nWndClientHeight / 22.5) - 20,
 			20 + (m_nWndClientWidth / 10) * 3, m_nWndClientHeight / 5 - m_nWndClientHeight / 22.5 - 20);
@@ -1973,6 +2001,10 @@ void CGameFramework::FrameAdvance()
 
 	m_GameTimer.Tick(60.0f);
 
+	if (!Open_Build_Once && Fail_Reason == 0 && Login_OK)
+		Login_Check_And_Build();
+
+
 	get_basic_information(m_pPlayer, my_id);
 	m_pPlayer->SetPosition(return_myPosition());
 
@@ -2391,6 +2423,21 @@ void CGameFramework::FrameAdvance()
 			m_ppUILayer[i]->UpdateLabels(JOIN_ELEMENT_Str, FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 10 + FRAME_BUFFER_WIDTH / 360, FRAME_BUFFER_HEIGHT / 2 + 140 -70,
 				FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 10 + FRAME_BUFFER_WIDTH / 360 + FRAME_BUFFER_WIDTH / 22.5 + 50, FRAME_BUFFER_HEIGHT / 2 + 140 -70);
 			break;
+		case 40:
+			if (Login_OK) break;
+			if (!Fail_On) break;
+			if(Fail_Reason == 1)
+				m_ppUILayer[i]->UpdateLabels(L"로그인 실패: 아이디나 비밀번호 정보가 잘못되었습니다.", FRAME_BUFFER_WIDTH / 2 - 250, FRAME_BUFFER_HEIGHT / 2 + 100, FRAME_BUFFER_WIDTH / 2.0 + 250, FRAME_BUFFER_HEIGHT / 2 + 300);
+			else if (Fail_Reason == 2) {
+				Join_On = false;
+				m_ppUILayer[i]->UpdateLabels(L"회원가입 실패: 이미 존재하는 아이디 입니다.", FRAME_BUFFER_WIDTH / 2 - 250, FRAME_BUFFER_HEIGHT / 2 + 100, FRAME_BUFFER_WIDTH / 2.0 + 250, FRAME_BUFFER_HEIGHT / 2 + 300);
+			}
+			break;
+		case 41:
+			if (Login_OK) break;
+			if (!Fail_On) break;
+			reinterpret_cast<Fail_UI*>(m_ppUILayer[i])->UpdateLabels_Fail_Select();
+			break;
 		}
 	}
 
@@ -2422,7 +2469,8 @@ void CGameFramework::FrameAdvance()
 		if (i == 37 && !Join_On) continue;
 		if (i == 38 && !Join_On) continue;
 		if (i == 39 && !Join_On) continue;
-
+		if (i == 40 && !Fail_On) continue;
+		if (i == 41 && !Fail_On) continue;
 		m_ppUILayer[i]->Render(m_nSwapChainBufferIndex);
 	}
 	LeaveCriticalSection(&UI_cs);
@@ -2482,4 +2530,14 @@ void CGameFramework::FrameAdvance()
 	}
 
 	LeaveCriticalSection(&IndunCheck_cs);
+}
+
+void CGameFramework::Login_Check_And_Build()
+{
+	if (Fail_Reason == 0)
+		Release_Login_Object();
+	if (!Open_Build_Once && Fail_Reason == 0) {
+		BuildObjects();
+		Open_Build_Once = true;
+	}
 }

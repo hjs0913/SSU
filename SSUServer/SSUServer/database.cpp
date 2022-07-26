@@ -62,7 +62,7 @@ void Initialize_DB()
 
 bool Add_DB(char* login_id, char* password, Player* pl, char* nick_name, int job, int element)
 {
-	
+
 	SQLRETURN retcode;
 
 	char temp[100];
@@ -87,6 +87,7 @@ bool Add_DB(char* login_id, char* password, Player* pl, char* nick_name, int job
 
 			HandleDiagnosticRecord(hstmt, SQL_HANDLE_STMT, retcode);
 		}
+		
 		cout << "새 유저 정보를 DB에 추가했습니다." << endl;
 	
 	}

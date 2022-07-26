@@ -56,6 +56,8 @@ bool Login_OK = false;
 bool Login_Build_Once = false;;
 bool Open_Build_Once = false;;
 bool Join_On = false;
+bool Fail_On = false;
+extern int Fail_Reason = 0;
 bool JOIN_ID_On = false;
 bool JOIN_PASSWORD_On = false;
 bool JOIN_NICKNAME_On = false;
@@ -77,7 +79,7 @@ char pl_password[MAX_NAME_SIZE];
 char pl_nickname[MAX_NAME_SIZE];
 int pl_job = -1;
 int pl_element = 0;
-
+CGameFramework					gGameFramework;
 struct EXP_OVER {
 	WSAOVERLAPPED m_wsa_over;
 	WSABUF m_wsa_buf;
@@ -370,7 +372,11 @@ void process_packet(unsigned char* p)
 	int type = *(p + 1);
 	switch (type) {
 	case SC_PACKET_LOGIN_OK: {
+		//gGameFramework.Login_Check_And_Build();
+
 		Login_OK = true;
+	
+
 		// 플레이어의 모든 정보를 보내주자
 		cout << "로그인 성공" << endl;
 		sc_packet_login_ok* packet = reinterpret_cast<sc_packet_login_ok*>(p);
@@ -499,15 +505,20 @@ void process_packet(unsigned char* p)
 		break;
 	}
 	case SC_PACKET_LOGIN_FAIL: {
+
 		sc_packet_login_fail* packet = reinterpret_cast<sc_packet_login_fail*>(p);
 		if (packet->reason == 1) {
-			cout << "로그인 실패(3초후 꺼집니다)" << endl;
-			Sleep(3000);
-			exit(0);
+			Fail_On = true;
+			Fail_Reason = packet->reason;
+			//cout << "로그인 실패(3초후 꺼집니다)" << endl;
+			//Sleep(3000);
+			//exit(0);
 		}
 		else if(packet->reason == 2)  //여기서는 없는 아이디나 비밀번호가 틀리다고 말해주자 
 		{
-			char nick_name[10];
+			Fail_On = true;
+			Fail_Reason = packet->reason;
+			/*char nick_name[10];
 			cout << "새로운 아이디 입니다. 닉네임을 입력하세요: " << endl;
 			cin >> nick_name;
 			int job;
@@ -516,7 +527,7 @@ void process_packet(unsigned char* p)
 			int element;
 			cout << "속성을 선택하세요(물:1, 강철:2, 바람:3, 불:4, 나무:5, 땅:6, 얼음:7 ): " << endl;
 			cin >> element;
-			send_relogin_packet(pl_id, pl_password, nick_name, job, element);
+			send_relogin_packet(pl_id, pl_password, nick_name, job, element);*/
 		}
 		break;
 	}
