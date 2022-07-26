@@ -621,11 +621,15 @@ bool Npc::npc_attack_validation(Npc* target)
 	lua_lock.unlock();
 	if (m) {
 		// 공격처리
+		_look_x = target->get_x() - _x;
+		_look_z = target->get_z() - _z;
+
 		send_animation_attack(reinterpret_cast<Player*>(target), _id);
 		basic_attack_success(target);
 		return true;
 	}
 	else {
+
 		if (_active) {
 			// 공격은 실패했지만 계속(그렇지만 1초후) 공격시도
 			timer_event ev;
@@ -905,7 +909,7 @@ void Npc::do_npc_move(Npc* target, const array<Obstacle*, MAX_OBSTACLE>& obstacl
 	_target_id = target->get_id();
 
 	// 움직일 필요가 없다
-	if ((t_x >= x - 8 && t_x <= x + 8) && (t_z >= z - 8 && t_z <= z + 8)) {
+	if ((t_x >= x - REAL_DISTANCE*1.5 && t_x <= x + REAL_DISTANCE * 1.5) && (t_z >= z - REAL_DISTANCE * 1.5 && t_z <= z + REAL_DISTANCE * 1.5)) {
 		state_lock.lock();
 		if (_state != ST_INGAME) {
 			state_lock.unlock();
