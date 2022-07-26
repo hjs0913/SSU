@@ -1875,6 +1875,9 @@ void CGameFramework::ProcessInput()
 						send_skill_packet(2, 0);
 						break;
 					case J_MAGICIAN: //추후 스킬 하나 추가 
+						third_skill_used = true;
+						start_skill[2] = clock();
+						send_skill_packet(1, 2);
 						break;
 					case J_SUPPORTER:
 						third_skill_used = true;
