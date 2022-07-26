@@ -43,7 +43,8 @@ void SectorManager::player_move(Npc* p)
 	}
 	p->sector_lock.unlock();
 	check_sector_move(p, new_sector_id);
-	send_move_packet(reinterpret_cast<Player*>(p), p, 1);
+	if(p->get_tribe() == HUMAN)
+		send_move_packet(reinterpret_cast<Player*>(p), p, 1);
 }
 
 void SectorManager::player_remove(Npc* p, bool dead)
