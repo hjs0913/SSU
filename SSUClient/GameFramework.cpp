@@ -556,7 +556,7 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 				}
 				break;
 			}
-			if(!Login_OK) {
+			if(!Login_OK && !Join_On && !Fail_On) {
 				if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - 50) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 150)) {  //id
 					if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 200) && CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 245)){
 						PASSWORD_On = false;
@@ -597,7 +597,7 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 					 }
 				 }
 			}
-			if (Join_On && !Login_OK) {
+			if (Join_On && !Login_OK && !Fail_On) {
 				if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 ) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 200)) {  //id
 					if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 - 250) && CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 - 205)) {
 						JOIN_ID_On = true;
@@ -2371,7 +2371,6 @@ void CGameFramework::FrameAdvance()
 		case 36:  // JOB
 			if (!Join_On) break;
 			reinterpret_cast<AddAIUI*>(m_ppUILayer[i])->UpdateLabels_JOIN_JOB();
-			//reinterpret_cast<AddAIUI*>(m_ppUILayer[36])->m_pButtonBrush->SetColor(D2D1::ColorF(D2D1::ColorF::DarkBlue));  //m_pButtonBrush 4 배열로 만들자 
 			break;
 		case 37:  // element
 			if (!Join_On) break;
