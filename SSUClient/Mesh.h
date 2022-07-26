@@ -119,6 +119,7 @@ protected:
 	XMFLOAT4						*m_pxmf4Colors = NULL;
 	XMFLOAT2						*m_pxmf2TextureCoords0 = NULL;
 	XMFLOAT2						*m_pxmf2TextureCoords1 = NULL;
+	XMFLOAT2						*m_pxmf2TextureCoords2 = NULL;
 
 	ID3D12Resource					*m_pd3dColorBuffer = NULL;
 	ID3D12Resource					*m_pd3dColorUploadBuffer = NULL;
@@ -131,6 +132,10 @@ protected:
 	ID3D12Resource					*m_pd3dTextureCoord1Buffer = NULL;
 	ID3D12Resource					*m_pd3dTextureCoord1UploadBuffer = NULL;
 	D3D12_VERTEX_BUFFER_VIEW		m_d3dTextureCoord1BufferView;
+
+	ID3D12Resource					*m_pd3dTextureCoord2Buffer = NULL;
+	ID3D12Resource					*m_pd3dTextureCoord2UploadBuffer = NULL;
+	D3D12_VERTEX_BUFFER_VIEW		m_d3dTextureCoord2BufferView;
 
 public:
 	CHeightMapGridMesh(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *pd3dCommandList, int xStart, int zStart, int nWidth, int nLength, XMFLOAT3 xmf3Scale = XMFLOAT3(1.0f, 1.0f, 1.0f), XMFLOAT4 xmf4Color = XMFLOAT4(1.0f, 1.0f, 0.0f, 0.0f), void *pContext = NULL);
