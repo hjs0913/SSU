@@ -409,6 +409,15 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                             if ((players[i]->get_x() >= pl->get_x() - 10 && players[i]->get_x() <= pl->get_x() + 10) && (players[i]->get_z() >= pl->get_z() - 10 && players[i]->get_z() <= pl->get_z() + 10)) {
                                 pl->set_skill_factor(packet->skill_type, packet->skill_num);
                                 pl->phisical_skill_success(players[i], pl->get_skill_factor(packet->skill_type, packet->skill_num));
+
+                                players[i]->state_lock.lock();
+                                if (players[i]->get_state() == ST_DEAD) {
+                                    players[i]->state_lock.unlock();
+                                    m_SectorManager->player_remove(players[i], true, players[client_id]);
+                                }
+                                else players[i]->state_lock.unlock();
+
+
                                 players[i]->set_target_id(pl->get_id());
                                 //send_status_change_packet(pl);
                                 if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
@@ -482,6 +491,14 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                             if (isInsideTriangle(a, b, c, n)) {
                                 pl->set_skill_factor(packet->skill_type, packet->skill_num);
                                 pl->magical_skill_success(players[i], pl->get_skill_factor(packet->skill_type, packet->skill_num));
+
+                                players[i]->state_lock.lock();
+                                if (players[i]->get_state() == ST_DEAD) {
+                                    players[i]->state_lock.unlock();
+                                    m_SectorManager->player_remove(players[i], true, players[client_id]);
+                                }
+                                else players[i]->state_lock.unlock();
+
                                 players[i]->set_target_id(pl->get_id());
                                 //send_status_change_packet(pl);
                                 if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
@@ -575,6 +592,15 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                 pl->phisical_skill_success(players[i], pl->get_skill_factor(packet->skill_type, packet->skill_num));
 
                                 players[i]->set_pos(players[i]->get_x() + pl->get_look_x() * 40, players[i]->get_z() + pl->get_look_z() * 40);
+
+                                players[i]->state_lock.lock();
+                                if (players[i]->get_state() == ST_DEAD) {
+                                    players[i]->state_lock.unlock();
+                                    m_SectorManager->player_remove(players[i], true, players[client_id]);
+                                }
+                                else {
+                                    players[i]->state_lock.unlock();
+                                }
                                 send_move_packet(pl, players[i], 1);  //나중에 수정필요 
                                 //send_status_change_packet(pl);
                                 players[i]->set_target_id(pl->get_id());
@@ -871,6 +897,14 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
 
                             pl->set_skill_factor((int)packet->skill_type, (int)packet->skill_num);
                             pl->magical_skill_success(players[i], pl->get_skill_factor((int)packet->skill_type, (int)packet->skill_num));
+
+                            players[i]->state_lock.lock();
+                            if (players[i]->get_state() == ST_DEAD) {
+                                players[i]->state_lock.unlock();
+                                m_SectorManager->player_remove(players[i], true, players[client_id]);
+                            }
+                            else players[i]->state_lock.unlock();
+
                             players[i]->set_target_id(pl->get_id());
                             send_status_change_packet(pl);
                             send_status_change_packet(reinterpret_cast<Player*>(players[i]));
@@ -923,6 +957,15 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                             players[i]->set_target_id(pl->get_id());
                             pl->magical_skill_success(players[i], pl->get_skill_factor((int)packet->skill_type, (int)packet->skill_num));
                             send_play_effect_packet(pl, players[i]); // 이펙트 터트릴 위치 
+
+                            players[i]->state_lock.lock();
+                            if (players[i]->get_state() == ST_DEAD) {
+                                players[i]->state_lock.unlock();
+                                m_SectorManager->player_remove(players[i], true, players[client_id]);
+                            }
+                            else players[i]->state_lock.unlock();
+
+                            players[i]->set_target_id(pl->get_id());
 
                             if (players[i]->get_active() == false && players[i]->get_tribe() == MONSTER) {
                                 players[i]->set_active(true);

@@ -179,7 +179,9 @@ void Gaia::game_victory()
 			party[i]->set_exp(party[i]->get_exp() + 2000);
 			send_status_change_packet(party[i]);
 			// 가이아 없애주는 패킷 보내기
-
+			char mess[MAX_CHAT_SIZE];
+			sprintf_s(mess, MAX_CHAT_SIZE, "레이드 성공하였습니다, %d의 경험치를 획득합니다",2000);
+			send_chat_packet(party[i], party[i]->get_id(), mess);
 			send_notice(party[i], "레이드 성공.. 5초후 오픈월드로 되돌아 갑니다", 2);
 		}
 		timer_event ev;

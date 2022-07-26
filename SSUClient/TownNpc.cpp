@@ -9,7 +9,7 @@ float TownNpc::m_fTimeElapsed = 0.0f;
 
 void TownNpc::UpdateTime(float fTimeElapsed)
 {
-	m_fTimeElapsed += fTimeElapsed * 0.0005f;
+	m_fTimeElapsed += (fTimeElapsed/2) * 0.0007f;
 	if (m_fTimeElapsed >= round90 * 4) m_fTimeElapsed = 0.f;
 }
 
