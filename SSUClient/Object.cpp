@@ -1360,27 +1360,43 @@ CHeightMapTerrain::CHeightMapTerrain(ID3D12Device *pd3dDevice, ID3D12GraphicsCom
 
 	CTexture *pTerrainBaseTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
 	if(!InDungeon)
-		pTerrainBaseTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/Base_Texture_road_circle.dds", 0);
+		pTerrainBaseTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/Base_Texture_road_color_other.dds", 0);
 	else
 		pTerrainBaseTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/indun_base.dds", 0);
 
 	CTexture *pTerrainDetailTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
 	if (!InDungeon) {
-		pTerrainDetailTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Terrain/Detail_Texture_Ground.dds", 0);
+		pTerrainDetailTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Terrain/grass_field.dds", 0);
 	}
 	else
 		pTerrainDetailTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Image/indun_detail.dds", 0);
 
+	CTexture* pTerrainRoadTexture = new CTexture(1, RESOURCE_TEXTURE2D, 0);
+	if (!InDungeon) {
+		pTerrainRoadTexture->LoadTextureFromFile(pd3dDevice, pd3dCommandList, L"Terrain/stone_ground.dds", 0);
+	}
+	
 	CTerrainShader *pTerrainShader = new CTerrainShader();
 	pTerrainShader->CreateShader(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature);
 	pTerrainShader->CreateShaderVariables(pd3dDevice, pd3dCommandList);
 
 	CScene::CreateShaderResourceViews(pd3dDevice, pTerrainBaseTexture, 13, false);
 	CScene::CreateShaderResourceViews(pd3dDevice, pTerrainDetailTexture, 14, false);
+	if (!InDungeon)
+		CScene::CreateShaderResourceViews(pd3dDevice, pTerrainRoadTexture, 15, false);
 
-	CMaterial *pTerrainMaterial = new CMaterial(2);
+	int nMaterial = 0;
+	if (!InDungeon)
+		nMaterial = 3;
+	else
+		nMaterial = 2;
+
+	CMaterial *pTerrainMaterial = new CMaterial(nMaterial);
 	pTerrainMaterial->SetTexture(pTerrainBaseTexture, 0);
 	pTerrainMaterial->SetTexture(pTerrainDetailTexture, 1);
+	if (!InDungeon)
+		pTerrainMaterial->SetTexture(pTerrainRoadTexture, 2);
+
 	pTerrainMaterial->SetShader(pTerrainShader);
 
 	SetMaterial(0, pTerrainMaterial);

@@ -447,9 +447,9 @@ CTerrainPlayer::CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLi
 		m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[i]->m_nType = ANIMATION_TYPE_ONCE;
 	}
 
-	if (job == J_TANKER) {
+	/*if (job == J_TANKER) {
 		m_pSkinnedAnimationController->m_pAnimationTracks[5].m_fSpeed = 0.3f;
-	}
+	}*/
 
 
 	m_pSkinnedAnimationController->SetCallbackKeys(1, 2);

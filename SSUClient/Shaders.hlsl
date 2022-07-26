@@ -174,6 +174,7 @@ VS_STANDARD_OUTPUT VSSkinnedAnimationStandard(VS_SKINNED_STANDARD_INPUT input)
 //
 Texture2D gtxtTerrainBaseTexture : register(t1);
 Texture2D gtxtTerrainDetailTexture : register(t2);
+Texture2D gtxtTerrainRoadTexture : register(t3);
 
 struct VS_TERRAIN_INPUT
 {
@@ -181,6 +182,7 @@ struct VS_TERRAIN_INPUT
 	float4 color : COLOR;
 	float2 uv0 : TEXCOORD0;
 	float2 uv1 : TEXCOORD1;
+	float2 uv2 : TEXCOORD2;
 };
 
 struct VS_TERRAIN_OUTPUT
@@ -189,6 +191,7 @@ struct VS_TERRAIN_OUTPUT
 	float4 color : COLOR;
 	float2 uv0 : TEXCOORD0;
 	float2 uv1 : TEXCOORD1;
+	float2 uv2 : TEXCOORD2;
 };
 
 VS_TERRAIN_OUTPUT VSTerrain(VS_TERRAIN_INPUT input)
@@ -199,6 +202,7 @@ VS_TERRAIN_OUTPUT VSTerrain(VS_TERRAIN_INPUT input)
 	output.color = input.color;
 	output.uv0 = input.uv0;
 	output.uv1 = input.uv1;
+	output.uv2 = input.uv2;
 
 	return(output);
 }
@@ -207,8 +211,20 @@ float4 PSTerrain(VS_TERRAIN_OUTPUT input) : SV_TARGET
 {
 	float4 cBaseTexColor = gtxtTerrainBaseTexture.Sample(gssWrap, input.uv0);
 	float4 cDetailTexColor = gtxtTerrainDetailTexture.Sample(gssWrap, input.uv1);
+	float4 cRoadTexColor = gtxtTerrainRoadTexture.Sample(gssWrap, input.uv2);
 //	float4 cColor = saturate((cBaseTexColor * 0.5f) + (cDetailTexColor * 0.5f));
-	float4 cColor = input.color * saturate((cBaseTexColor * 0.5f) + (cDetailTexColor * 0.5f));
+	float4 cColor = input.color * saturate((cBaseTexColor * 0.6f) + (cDetailTexColor * 0.3f));
+
+	float4 field = float4(0.772f, 0.604f, 0.289f, 1.0f);
+	float4 city = float4(1.f, 1.0f, 1.0f, 1.0f);
+
+	if (cBaseTexColor.x == city.x && cBaseTexColor.y == city.y && cBaseTexColor.z == city.z)
+		cColor = saturate((cBaseTexColor * 0.2f) + (cRoadTexColor * 1.0f));
+
+	if (cBaseTexColor.x >= (field.x - 0.005f) && cBaseTexColor.x <= (field.x + 0.005f)
+		&& cBaseTexColor.y >= (field.y - 0.005f) && cBaseTexColor.y <= (field.y + 0.005f)
+		&& cBaseTexColor.z >= (field.z - 0.005f) && cBaseTexColor.z <= (field.z + 0.005f))
+		cColor = input.color * saturate((cBaseTexColor * 0.5f) + (cRoadTexColor * 1.0f));
 
 	return(cColor);
 }
