@@ -569,7 +569,7 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 						PASSWORD_On = true;
 					}
 				}
-				 if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 + 160) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 200)) {   //로그인 버튼
+				 if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 + 160) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 250)) {   //로그인 버튼
 					 if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 200) && CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 295)) {
 						 string id, passwoird;
 						 wstring2string(id, ID_Str);
@@ -587,7 +587,7 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 							 Open_Build_Once = true;
 						 }*/
 
-					 }
+					 } 
 				 }
 				 if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - 250) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 250)) {   //회원가입  버튼
 					 if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 300) && CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 330)) {
