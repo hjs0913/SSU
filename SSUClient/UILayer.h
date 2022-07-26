@@ -208,3 +208,21 @@ public:
     virtual void UpdateLabels_JOIN_ELEMENT();
     virtual void Render(UINT nFrame);
 };
+
+class Fail_UI : public UILayer
+{
+private:
+    IDWriteTextFormat* m_pdwTextFormat2 = NULL;
+    ID2D1SolidColorBrush* m_pTextLayoutBrush;
+
+public:
+    Fail_UI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor);
+    ~Fail_UI();
+
+
+    void UpdateLabels_Fail_Select();
+  
+
+    virtual void Render(UINT nFrame);
+    virtual void Resize(ID3D12Resource** ppd3dRenderTargets, UINT width, UINT height, UINT TextAlignment, UINT ParagraphAlignment);
+};

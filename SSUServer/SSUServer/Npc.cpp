@@ -2,6 +2,7 @@
 #include "Npc.h"
 #include "send.h"
 #include "LuaFunction.h"
+#include "ObjectManager.h"
 #include <queue>
 #include <random>
 
@@ -192,6 +193,7 @@ void Npc::set_lv(short lv)
 void Npc::set_hp(int hp)
 {
 	_hp = hp;
+	if (_hp <= 0) _hp = 0;
 }
 
 void Npc::set_maxhp(int m_hp)
@@ -473,13 +475,23 @@ bool Npc::check_move_alright(int x, int z, bool monster, const array<Obstacle*, 
 		}
 	}
 
+	for (int i = NPC_ID_START; i < NPC_ID_END; i++) {
+		if (i == _id) continue;
+		if ((static_ObjectManager::get_objManger()->get_player(i)->get_x() - size <= x &&
+			x <= static_ObjectManager::get_objManger()->get_player(i)->get_x() + size) &&
+			(static_ObjectManager::get_objManger()->get_player(i)->get_z() - size <= z && 
+				z <= static_ObjectManager::get_objManger()->get_player(i)->get_z() + size)) {
+			return false;
+		}
+	}
+
 	return true;
 }
 
 int Npc::huristic(int t_x, int t_z, int x, int z)
 {
-	int s_x = abs(t_x - x);
-	int s_z = abs(t_z - z);
+	int s_x = t_x - x;
+	int s_z = t_z - z;
 	int score = sqrt(pow(s_x, 2) + pow(s_z, 2));
 	return score;
 }
@@ -570,6 +582,14 @@ pos Npc::a_star(int t_x, int t_z, int x, int z, const array<Obstacle*, MAX_OBSTA
 		close_q.push(temp);
 
 		// 끝내는 조건
+		if (now.first == 0 || now.first == 24 || now.second == 0 || now.second == 24) {
+			while (now.first != 12 || now.second != 12) {
+				mon_load.push_back(now);
+				now = prior_point[now.first][now.second];
+			}
+			break;
+		}
+
 		if (abs((x + (now.first - 12) * REAL_DISTANCE) - t_x) <= 10 && abs((z + (now.second - 12) * REAL_DISTANCE) - t_z) <= 10) {
 			while (now.first != 12 || now.second != 12) {
 				mon_load.push_back(now);
@@ -601,11 +621,15 @@ bool Npc::npc_attack_validation(Npc* target)
 	lua_lock.unlock();
 	if (m) {
 		// 공격처리
+		_look_x = target->get_x() - _x;
+		_look_z = target->get_z() - _z;
+
 		send_animation_attack(reinterpret_cast<Player*>(target), _id);
 		basic_attack_success(target);
 		return true;
 	}
 	else {
+
 		if (_active) {
 			// 공격은 실패했지만 계속(그렇지만 1초후) 공격시도
 			timer_event ev;
@@ -850,7 +874,7 @@ void Npc::push_npc_move_event()
 {
 	timer_event ev;
 	ev.obj_id = _id;
-	ev.start_time = chrono::system_clock::now() + 1s;
+	ev.start_time = chrono::system_clock::now() + 500ms;
 	ev.ev = EVENT_NPC_MOVE;
 	ev.target_id = _target_id;
 	TimerManager::timer_queue.push(ev);
@@ -885,7 +909,7 @@ void Npc::do_npc_move(Npc* target, const array<Obstacle*, MAX_OBSTACLE>& obstacl
 	_target_id = target->get_id();
 
 	// 움직일 필요가 없다
-	if ((t_x >= x - 8 && t_x <= x + 8) && (t_z >= z - 8 && t_z <= z + 8)) {
+	if ((t_x >= x - REAL_DISTANCE*1.5 && t_x <= x + REAL_DISTANCE * 1.5) && (t_z >= z - REAL_DISTANCE * 1.5 && t_z <= z + REAL_DISTANCE * 1.5)) {
 		state_lock.lock();
 		if (_state != ST_INGAME) {
 			state_lock.unlock();
@@ -899,6 +923,7 @@ void Npc::do_npc_move(Npc* target, const array<Obstacle*, MAX_OBSTACLE>& obstacl
 
 	// A*알고리즘
 	pos mv = a_star(t_x, t_z, x, z, obstacles);
+
 	x = mv.first;
 	z = mv.second;
 

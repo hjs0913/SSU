@@ -94,6 +94,27 @@ void ObjectManager::Initialize_Obstacle()
     }
     obstacles_read.close();
 
+    fstream house_read("house_position.txt");
+    if (!house_read.is_open()) {
+        cout << "파일을 읽을 수 없습니다" << endl;
+        exit(0);
+    }
+
+    for (int i = 0; i < 48; i++) {
+        house_obstacles[i] = new Obstacle(i/4);
+    }
+
+    for (int i = 0; i < 48; i++) {
+        float x, z;
+        house_read >> x >> z;
+        house_obstacles[i]->set_id(i/4);
+        house_obstacles[i]->set_x(x);
+        house_obstacles[i]->set_y(0);
+        house_obstacles[i]->set_z(z);
+    }
+    house_read.close();
+
+
     cout << "장애물 초기화 완료" << endl;
 }
 
@@ -186,14 +207,14 @@ void ObjectManager::Disconnect(int c_id)
     }
 
     // DB 연결
-    /*
+   
     if (players[c_id]->get_state() == ST_INGAME ||
         players[c_id]->get_state() == ST_DEAD) {
-        EnterCriticalSection(&cs);
+     //   EnterCriticalSection(&cs);
         Save_position(pl);
-        LeaveCriticalSection(&cs);
+     //   LeaveCriticalSection(&cs);
     }
-    */
+    
 
     // 이 파티원이 파티에 참가하고 있거나 레이드에 있으면 해제해주자
 
@@ -217,7 +238,7 @@ void ObjectManager::worker()
             int err_no = WSAGetLastError();
             error_display(err_no);
             Player* pl = reinterpret_cast<Player*>(players[client_id]);
-            Save_position(pl);// 차라리 disconnect 함수에 넣자 
+         //   Save_position(pl);// 차라리 disconnect 함수에 넣자 
             Disconnect(client_id);
             if (exp_over->_comp_op == OP_SEND)
                 delete exp_over;
@@ -784,22 +805,56 @@ bool ObjectManager::is_near(int a, int b)
     return true;
 }
 
+bool check_inside(Coord a, Coord b, Coord c, Coord n) {
+    Coord A, B, C;
+    A.x = b.x - a.x;
+    A.z = b.z - a.z;
+    B.x = c.x - a.x;
+    B.z = c.z - a.z;
+    C.x = n.x - a.x;
+    C.z = n.z - a.z;
+
+    if ((A.x * B.z - A.z * B.x) * (A.x * C.z - A.z * C.x) < 0)
+        return false;
+    return true;
+}
+
+bool isInsideTriangle(Coord a, Coord b, Coord c, Coord n)
+{
+    if (!check_inside(a, b, c, n)) return false;
+    if (!check_inside(b, c, a, n)) return false;
+    if (!check_inside(c, a, b, n)) return false;
+    return true;
+}
+
 bool ObjectManager::check_move_alright(int x, int z, bool monster)
 {
     if (x <= 0 || WORLD_WIDTH <= x) return false;
-    if (z <= 0 || WORLD_HEIGHT <= z) return false;
+    if (z <= 67 || WORLD_HEIGHT <= z) return false;
 
-    if (z >= 940 && z <= 995) {
-        if (x <= 3124 || x >= 3275) return false;
+    // 성벽 충돌처리
+    if (z <= 1000) {
+        if (x <= 2369) return false;
     }
 
-    if ((x >= 3124 && x <= 3154) || (x >= 3245 && x <= 3275)) {
-        if (z <= 1000 && z >= 900) return false;
+    if (z <= 1000 && z >= 948) {
+        if (x <= 3164 || x >= 3223) return false;
     }
 
-    if (z <= (-0.95 * (x - 2764))) return false;
+    // 집 충돌처리
+    for (int i = 0; i < 12; i++) {
+        if (isInsideTriangle(Coord(house_obstacles[4 * i]->get_x(), house_obstacles[4 * i]->get_z()),
+            Coord(house_obstacles[4 * i + 1]->get_x(), house_obstacles[4 * i + 1]->get_z()),
+            Coord(house_obstacles[4 * i + 2]->get_x(), house_obstacles[4 * i + 2]->get_z()),
+            Coord(x, z))) return false;
+        if (isInsideTriangle(Coord(house_obstacles[4 * i + 2]->get_x(), house_obstacles[4 * i + 2]->get_z()),
+            Coord(house_obstacles[4 * i + 3]->get_x(), house_obstacles[4 * i + 3]->get_z()),
+            Coord(house_obstacles[4 * i]->get_x(), house_obstacles[4 * i]->get_z()),
+            Coord(x, z)))  return false;
+    }
 
-    if (sqrt(pow((x - 2265), 2) + pow((z - 962), 2)) < 68) return false;
+    // 우물
+    if (sqrt(pow(x - 3333, 2) + pow(z - 596, 2)) < 30) return false;
 
     int size = 0;
     if (monster) size = 15;

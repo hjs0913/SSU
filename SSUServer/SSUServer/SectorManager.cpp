@@ -43,27 +43,28 @@ void SectorManager::player_move(Npc* p)
 	}
 	p->sector_lock.unlock();
 	check_sector_move(p, new_sector_id);
-	send_move_packet(reinterpret_cast<Player*>(p), p, 1);
+	if(p->get_tribe() == HUMAN)
+		send_move_packet(reinterpret_cast<Player*>(p), p, 1);
 }
 
 void SectorManager::player_remove(Npc* p, bool dead)
 {
-	p->vl.lock();
+	p->sector_lock.lock();
 	int origin_sector_id = p->get_sector_id();
 	sectors[origin_sector_id]->erase_player(p->get_id());
 	p->set_sector_id(-1);
-	p->vl.unlock();
+	p->sector_lock.unlock();
 
 	check_sector_remove(p, origin_sector_id, dead);
 }
 
 void SectorManager::player_remove(Npc* p, bool dead, Npc* attacker)
 {
-	p->vl.lock();
+	p->sector_lock.lock();
 	int origin_sector_id = p->get_sector_id();
 	sectors[origin_sector_id]->erase_player(p->get_id());
 	p->set_sector_id(-1);
-	p->vl.unlock();
+	p->sector_lock.unlock();
 
 	// 본래 섹터와 관련이 있는 플레이어에게 delete send를 한다.
 	check_sector_remove(p, origin_sector_id, dead, attacker);

@@ -2,7 +2,7 @@
 
 #define FRAME_BUFFER_WIDTH		1800 //640
 #define FRAME_BUFFER_HEIGHT		900 //480
-#define UICOUNT 40
+#define UICOUNT 42
 
 #include "Timer.h"
 #include "Player.h"
@@ -77,6 +77,8 @@ public:
 
 	bool RaySphereIntersect(XMFLOAT3 rayOrigin, XMFLOAT3 rayDirection, float radius);
 	bool TestIntersection(int mouseX, int mouseY, CPlayer* obj);
+
+	void Login_Check_And_Build();
 
 private:
 	HINSTANCE					m_hInstance;
