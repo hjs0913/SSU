@@ -110,7 +110,8 @@ bool Add_DB(char* login_id, char* password, Player* pl, char* nick_name, int job
 bool Search_Id(Player* pl, char* login_id, char* password)
 {
 	SQLRETURN retcode;
-	SQLINTEGER c_id, c_password, c_hp, c_exp, c_maxhp, c_mp, c_maxmp = 0;
+	SQLINTEGER c_hp, c_exp, c_maxhp, c_mp, c_maxmp = 0;
+	SQLWCHAR c_id[MAX_NAME_SIZE], c_password[MAX_NAME_SIZE];
 	SQLWCHAR c_name[MAX_NAME_SIZE];
 	SQLSMALLINT c_x, c_y, c_z, c_lv, c_job, c_element;
 	SQLLEN cbP_name = 0, cbP_id = 0, cbP_password = 0, cbP_x = 0, cbP_y = 0, cbP_z = 0,
@@ -129,8 +130,8 @@ bool Search_Id(Player* pl, char* login_id, char* password)
 	//패스워드 넣어야하고 비교해서 접속하게 해야한다. 
 
 	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {  //있는  ID면 불러오고 
-		retcode = SQLBindCol(hstmt, 1, SQL_C_LONG, &c_id, 100, &cbP_id);
-		retcode = SQLBindCol(hstmt, 2, SQL_C_LONG, &c_password, 100, &cbP_password);
+		retcode = SQLBindCol(hstmt, 1, SQL_C_WCHAR, c_id, MAX_NAME_SIZE, &cbP_id);
+		retcode = SQLBindCol(hstmt, 2, SQL_C_WCHAR, c_password, MAX_NAME_SIZE, &cbP_password);
 		retcode = SQLBindCol(hstmt, 3, SQL_C_WCHAR, c_name, MAX_NAME_SIZE, &cbP_name);
 		retcode = SQLBindCol(hstmt, 4, SQL_C_SHORT, &c_x, 100, &cbP_x);
 		retcode = SQLBindCol(hstmt, 5, SQL_C_SHORT, &c_y, 100, &cbP_y);
