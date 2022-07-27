@@ -599,9 +599,11 @@ pos Npc::a_star(int t_x, int t_z, int x, int z, const array<Obstacle*, MAX_OBSTA
 		}
 	}
 
-	x += (mon_load.back().first - 12) * REAL_DISTANCE;
-	z += (mon_load.back().second - 12) * REAL_DISTANCE;
-	mon_load.pop_back();
+	if (mon_load.size() != 0) {
+		x += (mon_load.back().first - 12) * REAL_DISTANCE;
+		z += (mon_load.back().second - 12) * REAL_DISTANCE;
+		mon_load.pop_back();
+	}
 
 	return pos(x, z);
 }

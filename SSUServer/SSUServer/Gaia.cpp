@@ -179,7 +179,9 @@ void Gaia::game_victory()
 			party[i]->set_exp(party[i]->get_exp() + 2000);
 			send_status_change_packet(party[i]);
 			// 가이아 없애주는 패킷 보내기
-
+			char mess[MAX_CHAT_SIZE];
+			sprintf_s(mess, MAX_CHAT_SIZE, "레이드 성공하였습니다, %d의 경험치를 획득합니다",2000);
+			send_chat_packet(party[i], party[i]->get_id(), mess);
 			send_notice(party[i], "레이드 성공.. 5초후 오픈월드로 되돌아 갑니다", 2);
 		}
 		timer_event ev;
@@ -610,7 +612,7 @@ void Gaia::judge_pattern_two_rightup(Player* p, int pattern_number)
 		if (isInsideTriangle(rect[0], rect[1], rect[2], n) || isInsideTriangle(rect[0], rect[2], rect[3], n)) {
 			// 쳐 맞는 판정
 			p->set_hp(p->get_hp() - 3000);
-			if (p->get_hp() < 0) player_death(p);
+			if (p->get_hp() <= 0) player_death(p);
 			for (auto send_pl : party) {
 				send_change_hp_packet(send_pl, p);
 			}
@@ -647,7 +649,7 @@ void Gaia::judge_pattern_two_leftup(Player* p, int pattern_number)
 		if (isInsideTriangle(rect[0], rect[1], rect[2], n) || isInsideTriangle(rect[0], rect[2], rect[3], n)) {
 			// 쳐 맞는 판정
 			p->set_hp(p->get_hp() - 3000);
-			if (p->get_hp() < 0) player_death(p);
+			if (p->get_hp() <= 0) player_death(p);
 			for (auto send_pl : party) {
 				send_change_hp_packet(send_pl, p);
 			}
@@ -677,7 +679,7 @@ void Gaia::pattern_active(int pattern)
 
 				if (sqrt((p->get_x() - x) * (p->get_x() - x) + (p->get_z() - z) * (p->get_z() - z)) < 20) {
 					p->set_hp(p->get_hp() - 2000);
-					if (p->get_hp() < 0) player_death(p);
+					if (p->get_hp() <= 0) player_death(p);
 					// 패턴 맞은사람이 있으면 맞았다고 보내주자
 					for (auto send_pl : party) {
 						send_change_hp_packet(send_pl, p);
@@ -795,7 +797,7 @@ void Gaia::pattern_active(int pattern)
 				|| isInsideTriangle(rect[0], rect[2], rect[3], pos(p->get_x(), p->get_z()))) {
 				// 쳐 맞는 판정
 				p->set_hp(p->get_hp() - 100);
-				if (p->get_hp() < 0) player_death(p);
+				if (p->get_hp() <= 0) player_death(p);
 				for (auto send_pl : party) {
 					send_change_hp_packet(send_pl, p);
 				}
