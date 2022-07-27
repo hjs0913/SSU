@@ -32,9 +32,6 @@ UILayer::UILayer(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3d
     Initialize(pd3dDevice, pd3dCommandQueue, LayoutColor, TextColor);
 }
 
-
-
-
 void UILayer::Initialize(ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor)
 {
     UINT d3d11DeviceFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
@@ -1122,4 +1119,81 @@ void Fail_UI::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT nHei
     m_pd2dWriteFactory->CreateTextFormat(L"Arial", nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fSmallFontSize, L"en-us", &m_pdwTextFormat2);
     m_pdwTextFormat2->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
     m_pdwTextFormat2->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+}
+
+//-----------------
+BossSkillUI::BossSkillUI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor) 
+    : UIBitmap(nFrame, pd3dDevice, pd3dCommandQueue, LayoutColor, TextColor)
+{
+    Setup(L"\Image/BossSkill.png");
+    m_vTextBlocks.resize(2);
+}
+BossSkillUI::~BossSkillUI()
+{
+
+}
+
+void BossSkillUI::UpdateLabels(const std::wstring& strUIText, UINT LeftTop_x, UINT LeftTop_y, UINT RightBottom_x, UINT RightBottom_y)
+{
+    m_vTextBlocks[0] = { strUIText, D2D1::RectF(LeftTop_x, LeftTop_y, RightBottom_x, RightBottom_y), m_pdwTextFormat };
+}
+
+void BossSkillUI::Render(UINT nFrame)
+{
+    ID3D11Resource* ppResources[] = { m_vWrappedRenderTargets[nFrame] };
+
+    m_pd2dDeviceContext->SetTarget(m_vd2dRenderTargets[nFrame]);
+
+    m_pd3d11On12Device->AcquireWrappedResources(ppResources, _countof(ppResources));
+
+    m_pd2dDeviceContext->BeginDraw();
+    m_pd2dDeviceContext->FillRectangle(m_vTextBlocks[0].d2dLayoutRect, m_pBrush);
+    m_pd2dDeviceContext->DrawRectangle(m_vTextBlocks[0].d2dLayoutRect, m_pBrush);
+
+    m_pd2dDeviceContext->DrawBitmap(bitmap, m_vTextBlocks[1].d2dLayoutRect);
+    m_pd2dDeviceContext->DrawText(m_vTextBlocks[0].strText.c_str(), static_cast<UINT>(m_vTextBlocks[0].strText.length()),
+        m_vTextBlocks[0].pdwFormat, m_vTextBlocks[0].d2dLayoutRect, m_pd2dTextBrush);
+
+
+    m_pd2dDeviceContext->EndDraw();
+
+    m_pd3d11On12Device->ReleaseWrappedResources(ppResources, _countof(ppResources));
+    m_pd3d11DeviceContext->Flush();
+}
+
+void BossSkillUI::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT nHeight, UINT TextAlignment, UINT ParagraphAlignment)
+{
+    m_fWidth = static_cast<float>(nWidth);
+    m_fHeight = static_cast<float>(nHeight);
+
+    D2D1_BITMAP_PROPERTIES1 d2dBitmapProperties = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_CANNOT_DRAW, D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN, D2D1_ALPHA_MODE_PREMULTIPLIED));
+
+    for (UINT i = 0; i < GetRenderTargetsCount(); i++)
+    {
+
+        D3D11_RESOURCE_FLAGS d3d11Flags = { D3D11_BIND_RENDER_TARGET };
+        m_pd3d11On12Device->CreateWrappedResource(ppd3dRenderTargets[i], &d3d11Flags, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT, IID_PPV_ARGS(&m_vWrappedRenderTargets[i]));
+        IDXGISurface* pdxgiSurface = NULL;
+        m_vWrappedRenderTargets[i]->QueryInterface(__uuidof(IDXGISurface), (void**)&pdxgiSurface);
+
+
+        m_pd2dDeviceContext->CreateBitmapFromDxgiSurface(pdxgiSurface, &d2dBitmapProperties, &m_vd2dRenderTargets[i]);
+        pdxgiSurface->Release();
+    }
+
+    if (m_pd2dDeviceContext) m_pd2dDeviceContext->Release();
+    m_pd2dDevice->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, &m_pd2dDeviceContext);
+    m_pd2dDeviceContext->SetTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE);
+    if (m_pd2dTextBrush) m_pd2dTextBrush->Release();
+    m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(m_TextColor), &m_pd2dTextBrush);
+
+    const float fFontSize = m_fHeight / 12.5f;
+    const float fSmallFontSize = m_fHeight / 20.0f;
+
+    m_pd2dWriteFactory->CreateTextFormat(L"Rockwell", nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fSmallFontSize, L"en-us", &m_pdwTextFormat);
+
+    m_pdwTextFormat->SetTextAlignment(static_cast<DWRITE_TEXT_ALIGNMENT>(TextAlignment));
+    m_pdwTextFormat->SetParagraphAlignment(static_cast<DWRITE_PARAGRAPH_ALIGNMENT>(ParagraphAlignment));
+
+    m_vTextBlocks[1] = { L"", D2D1::RectF(FRAME_BUFFER_WIDTH - 200, FRAME_BUFFER_HEIGHT - 200, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT), m_pdwTextFormat };
 }

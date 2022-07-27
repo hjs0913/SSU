@@ -226,3 +226,15 @@ public:
     virtual void Render(UINT nFrame);
     virtual void Resize(ID3D12Resource** ppd3dRenderTargets, UINT width, UINT height, UINT TextAlignment, UINT ParagraphAlignment);
 };
+
+class BossSkillUI : public UIBitmap
+{
+private:
+    IWICImagingFactory* imagingFactory = {};
+public:
+    BossSkillUI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor);
+    ~BossSkillUI();
+    virtual void UpdateLabels(const std::wstring& strUIText, UINT LeftTop_x, UINT LeftTop_y, UINT RightBottom_x, UINT RightBottom_y);
+    virtual void Render(UINT nFrame);
+    virtual void Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT nHeight, UINT TextAlignment, UINT ParagraphAlignment);
+};

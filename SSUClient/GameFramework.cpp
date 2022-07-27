@@ -1082,6 +1082,9 @@ void CGameFramework::BuildObjects_login()
 		m_ppUILayer[40] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::GhostWhite, D2D1::ColorF::Black);
 		m_ppUILayer[41] = new Fail_UI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::DodgerBlue, D2D1::ColorF::Black);
 
+		// 레이드 보스 스킬 이펙트 창
+		m_ppUILayer[42] = new BossSkillUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::OrangeRed);
+
 		m_ppUILayer[0]->setAlpha(0.5, 1.0);
 		m_ppUILayer[1]->setAlpha(0.5, 1.0);
 
@@ -1133,6 +1136,8 @@ void CGameFramework::BuildObjects_login()
 		m_ppUILayer[39]->setAlpha(1.0, 1.0);
 		m_ppUILayer[40]->setAlpha(0.5, 1.0);
 		m_ppUILayer[41]->setAlpha(1.0, 1.0);
+
+		m_ppUILayer[42]->setAlpha(0.0, 1.0);
 
 		m_ppUILayer[0]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_FAR);
@@ -1224,6 +1229,8 @@ void CGameFramework::BuildObjects_login()
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_FLOW_DIRECTION_TOP_TO_BOTTOM);
 		m_ppUILayer[41]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_FLOW_DIRECTION_LEFT_TO_RIGHT);
+		m_ppUILayer[42]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 		// UIBar Setting
 		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, m_nWndClientHeight / 5 - 2 * (m_nWndClientHeight / 22.5) - 20,
@@ -1350,7 +1357,9 @@ void CGameFramework::BuildObjects()
 		//로그인 실패창 
 		m_ppUILayer[40] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::GhostWhite, D2D1::ColorF::Black);
 		m_ppUILayer[41] = new Fail_UI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::DodgerBlue, D2D1::ColorF::Black);
-	
+		// 레이드 보스 스킬 이펙트 창
+		m_ppUILayer[42] = new BossSkillUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::OrangeRed);
+
 		m_ppUILayer[0]->setAlpha(0.5, 1.0);
 		m_ppUILayer[1]->setAlpha(0.5, 1.0);
 
@@ -1402,6 +1411,8 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[39]->setAlpha(1.0, 1.0);
 		m_ppUILayer[40]->setAlpha(0.5, 1.0);
 		m_ppUILayer[41]->setAlpha(1.0, 1.0);
+
+		m_ppUILayer[42]->setAlpha(0.0, 1.0);
 
 
 		m_ppUILayer[0]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
@@ -1494,6 +1505,9 @@ void CGameFramework::BuildObjects()
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_FLOW_DIRECTION_TOP_TO_BOTTOM);
 		m_ppUILayer[41]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[42]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
 		// UIBar Setting
 		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, m_nWndClientHeight / 5 - 2*(m_nWndClientHeight / 22.5) - 20,
 			20 + (m_nWndClientWidth / 10) * 3, m_nWndClientHeight / 5 - m_nWndClientHeight / 22.5 - 20);
@@ -2214,7 +2228,6 @@ void CGameFramework::FrameAdvance()
 				(m_nWndClientWidth / 2) - (m_nWndClientWidth / 18) + (m_nWndClientWidth / 180) + (11 * (m_nWndClientWidth / 20) - 10) * bar_percent, (m_nWndClientHeight / 6) - 10);
 			break;
 		}
-
 		case 11: {
 			if (!InDungeon) break;
 			wstring party_info_str = L"파티원정보(DC : ";
@@ -2247,7 +2260,6 @@ void CGameFramework::FrameAdvance()
 				10 + (m_nWndClientWidth / 9 - 20) * ((float)get_hp_to_server(m_party_info->player_id[3]) / get_max_hp_to_server(m_party_info->player_id[3])), (m_nWndClientHeight / 2) + (m_nWndClientHeight / 9) - (m_nWndClientHeight / 90));
 			break;
 		}
-
 		case 17: {
 			if (!PartyUI_On) break;
 			if (!party_info_on) {
@@ -2379,7 +2391,7 @@ void CGameFramework::FrameAdvance()
 			if (!Join_On) break;
 			reinterpret_cast<JOIN_ELEMENT_UI*>(m_ppUILayer[i])->UpdateLabels_JOIN_ELEMENT();
 			break;
-		case 38:
+		case 38: {
 			if (!Join_On) break;
 			switch (pl_job)
 			{
@@ -2402,7 +2414,8 @@ void CGameFramework::FrameAdvance()
 			m_ppUILayer[i]->UpdateLabels(JOIN_JOB_Str, FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 10 + FRAME_BUFFER_WIDTH / 360, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20 - FRAME_BUFFER_HEIGHT / 22.5 - 50,
 				FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 10 + FRAME_BUFFER_WIDTH / 360 + FRAME_BUFFER_WIDTH / 22.5 + 50, FRAME_BUFFER_HEIGHT / 2 + FRAME_BUFFER_HEIGHT / 20 - 10 - 50);
 			break;
-		case 39:
+		}
+		case 39: {
 			if (!Join_On) break;
 			switch (pl_element)
 			{
@@ -2431,24 +2444,40 @@ void CGameFramework::FrameAdvance()
 				JOIN_ELEMENT_Str = L"속성: 얼음";
 				break;
 			}
-			m_ppUILayer[i]->UpdateLabels(JOIN_ELEMENT_Str, FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 10 + FRAME_BUFFER_WIDTH / 360, FRAME_BUFFER_HEIGHT / 2 + 140 -70,
-				FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 10 + FRAME_BUFFER_WIDTH / 360 + FRAME_BUFFER_WIDTH / 22.5 + 50, FRAME_BUFFER_HEIGHT / 2 + 140 -70);
+			m_ppUILayer[i]->UpdateLabels(JOIN_ELEMENT_Str, FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 10 + FRAME_BUFFER_WIDTH / 360, FRAME_BUFFER_HEIGHT / 2 + 140 - 70,
+				FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 10 + FRAME_BUFFER_WIDTH / 360 + FRAME_BUFFER_WIDTH / 22.5 + 50, FRAME_BUFFER_HEIGHT / 2 + 140 - 70);
 			break;
-		case 40:
+		}
+		case 40: {
 			if (Login_OK) break;
 			if (!Fail_On) break;
-			if(Fail_Reason == 1)
+			if (Fail_Reason == 1)
 				m_ppUILayer[i]->UpdateLabels(L"로그인 실패: 입력하신 아이디나 비밀번호 정보가 잘못되었습니다.", FRAME_BUFFER_WIDTH / 2 - 250, FRAME_BUFFER_HEIGHT / 2 + 100, FRAME_BUFFER_WIDTH / 2.0 + 250, FRAME_BUFFER_HEIGHT / 2 + 300);
 			else if (Fail_Reason == 2) {
 				Join_On = false;
 				m_ppUILayer[i]->UpdateLabels(L"회원가입 실패: 이미 존재하는 아이디 입니다.", FRAME_BUFFER_WIDTH / 2 - 250, FRAME_BUFFER_HEIGHT / 2 + 100, FRAME_BUFFER_WIDTH / 2.0 + 250, FRAME_BUFFER_HEIGHT / 2 + 300);
 			}
 			break;
-		case 41:
+		}
+		case 41: {
 			if (Login_OK) break;
 			if (!Fail_On) break;
 			reinterpret_cast<Fail_UI*>(m_ppUILayer[i])->UpdateLabels_Fail_Select();
-			break; 
+			break;
+		}
+		case 42: {
+			if (!InDungeon) break;
+			UINT width_pos = std::chrono::duration_cast<std::chrono::milliseconds>((chrono::system_clock::now() - BossSkillUiTimer)).count();
+			cout << width_pos << endl;
+			width_pos = width_pos;
+			if (width_pos >= 500) width_pos = 500;
+		
+			if(m_gaiaPattern.pattern_on[0] == true) m_ppUILayer[i]->UpdateLabels(L"올라와 상어!!", FRAME_BUFFER_WIDTH - width_pos, FRAME_BUFFER_HEIGHT - 400, FRAME_BUFFER_WIDTH + 500 - width_pos, FRAME_BUFFER_HEIGHT);
+			else if(m_gaiaPattern.pattern_on[1] == true) m_ppUILayer[i]->UpdateLabels(L"도와줘 상어!!", FRAME_BUFFER_WIDTH - width_pos, FRAME_BUFFER_HEIGHT - 400, FRAME_BUFFER_WIDTH + 500 - width_pos, FRAME_BUFFER_HEIGHT);
+			else if (m_gaiaPattern.pattern_on[4] == true) m_ppUILayer[i]->UpdateLabels(L"상어 돌진!!", FRAME_BUFFER_WIDTH - width_pos, FRAME_BUFFER_HEIGHT - 400, FRAME_BUFFER_WIDTH + 500 - width_pos, FRAME_BUFFER_HEIGHT);
+			else m_ppUILayer[i]->UpdateLabels(L"", FRAME_BUFFER_WIDTH - 500, FRAME_BUFFER_HEIGHT - 400, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
+			break;
+		}
 		}
 	}
 
@@ -2482,6 +2511,10 @@ void CGameFramework::FrameAdvance()
 		if (i == 39 && !Join_On) continue;
 		if (i == 40 && !Fail_On) continue;
 		if (i == 41 && !Fail_On) continue;
+		if (i == 42) {
+			if (!InDungeon) continue;
+			if (!m_gaiaPattern.pattern_on[0] && !m_gaiaPattern.pattern_on[1] && !m_gaiaPattern.pattern_on[4]) continue;
+		}
 		m_ppUILayer[i]->Render(m_nSwapChainBufferIndex);
 	}
 	LeaveCriticalSection(&UI_cs);
