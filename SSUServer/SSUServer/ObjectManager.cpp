@@ -62,11 +62,13 @@ void ObjectManager::Initialize_Npc()
     for (int i = NPC_ID_START + interval * npc_num; i < NPC_ID_START + interval * (npc_num + 1); i++) {
         players[i] = new Npc(i);
         players[i]->Initialize_Lua("wolf_boss.lua");
+        players[i]->set_tribe(AGRO);
     }
     npc_num++;
     for (int i = NPC_ID_START + interval * npc_num; i < NPC_ID_START + interval * (npc_num + 1); i++) {
         players[i] = new Npc(i);
         players[i]->Initialize_Lua("fallen_pig.lua");
+        players[i]->set_tribe(AGRO);
     }
     npc_num++;
     cout << "NPC 초기화 완료" << endl;
@@ -316,9 +318,11 @@ void ObjectManager::worker()
                 break;
             }
             players[client_id]->state_lock.unlock();
-            // 제자리로 돌아가는 것인가
+            // target이 있는가?
             if (exp_over->_target == -1) {
-                players[client_id]->return_npc_position(obstacles);
+                // 제자리로 돌아가는 것인가? 로밍인가?(npc_roming 함수에서 판단)
+                players[client_id]->npc_roming(obstacles);
+                //players[client_id]->return_npc_position(obstacles);
                 m_SectorManager->player_move(players[client_id]); // 섹터 변경시 상태확인
                 delete exp_over;
                 break;
@@ -417,6 +421,17 @@ void ObjectManager::worker()
             players[client_id]->revive();
             // 섹터 처리
             m_SectorManager->player_put(players[client_id]);
+            players[client_id]->vl.lock();
+            unordered_set<int>my_vl{ players[client_id]->viewlist };
+            players[client_id]->vl.unlock();
+
+            for (int i : my_vl) {
+                if (static_ObjectManager::get_objManger()->get_player(i)->get_tribe() == HUMAN) {
+                    players[client_id]->push_npc_move_event();
+                    players[client_id]->set_move_active(true);
+                    break;
+                }
+            }
             delete exp_over;
             break;
         }
@@ -595,7 +610,7 @@ void ObjectManager::worker()
             break;
         }
         case OP_GAMESTART_TIMER: {
-            cout << "들어오는가" << endl;
+            //cout << "들어오는가" << endl;
             Gaia* dun = dungeons[exp_over->_target];
             dun->game_start();
             dun->state_lock.lock();
@@ -749,14 +764,14 @@ void ObjectManager::worker()
             reinterpret_cast<Player*>(players[client_id])->set_skill_active(exp_over->_target, false);
             break;
         }
-        case OP_ELEMENT_FIRE_COOLTIME:
+        case OP_ELEMENT_FIRE_COOLTIME: {
             players[exp_over->_target]->set_hp(players[exp_over->_target]->get_hp() - players[exp_over->_target]->get_lv() * 10);
             send_change_hp_packet(reinterpret_cast<Player*>(players[client_id]), players[exp_over->_target]);
-           // players[client_id]->set_element_cooltime(false);
+            // players[client_id]->set_element_cooltime(false);
             players[exp_over->_target]->set_element_cooltime(false);
             delete exp_over;
             break;
-
+        }
         }
 
     }

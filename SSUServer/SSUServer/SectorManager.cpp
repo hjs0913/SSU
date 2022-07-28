@@ -286,6 +286,13 @@ void SectorManager::check_viewlist_put(Npc* p, int sector_id)
 		players[i]->viewlist.insert(p->get_id());
 		players[i]->vl.unlock();
 
+		if (p->get_tribe() == HUMAN && players[i]->get_tribe() != HUMAN) {
+			if (players[i]->get_move_active() == false) {
+				players[i]->push_npc_move_event();
+				players[i]->set_move_active(true);
+			}
+		}
+
 		if (!static_ObjectManager::get_objManger()->is_npc(p->get_id())) 
 			send_put_object_packet(reinterpret_cast<Player*>(p), players[i]);
 		if (!static_ObjectManager::get_objManger()->is_npc(i)) 
@@ -344,6 +351,13 @@ void SectorManager::check_viewlist_move(Npc* p, int sector_id)
 				players[i]->vl.lock();
 				players[i]->viewlist.insert(p->get_id());
 				players[i]->vl.unlock();
+
+				if (p->get_tribe()==HUMAN && players[i]->get_tribe() != HUMAN) {
+					if (players[i]->get_move_active() == false) {
+						players[i]->push_npc_move_event();
+						players[i]->set_move_active(true);
+					}
+				}
 
 				if (!static_ObjectManager::get_objManger()->is_npc(p->get_id()))
 					send_put_object_packet(reinterpret_cast<Player*>(p), players[i]);

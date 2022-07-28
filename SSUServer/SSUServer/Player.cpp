@@ -94,6 +94,7 @@ void Player::attack_dead_judge(Npc* target)
 		target->state_lock.unlock();
 
 		target->set_active(false);
+		target->set_move_active(false);
 		timer_event ev;
 		ev.obj_id = target->get_id();
 		ev.start_time = chrono::system_clock::now() + 30s;

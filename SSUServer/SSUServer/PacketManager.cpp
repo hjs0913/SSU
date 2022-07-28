@@ -315,7 +315,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                         ev.target_id = n->get_target_id();
                         TimerManager::timer_queue.push(ev);
                         // 몬스터의 이동도 넣어주자
-                        n->push_npc_move_event();
+                        //n->push_npc_move_event();
                     }
                 }
             }
@@ -429,7 +429,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                     ev.target_id = players[i]->get_target_id();
                                     TimerManager::timer_queue.push(ev);
 
-                                    players[i]->push_npc_move_event();
+                                    //players[i]->push_npc_move_event();
                                 }
                             }
                         }
@@ -509,7 +509,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                     ev.ev = EVENT_NPC_ATTACK;
                                     ev.target_id = players[i]->get_target_id();
                                     TimerManager::timer_queue.push(ev);
-                                    players[i]->push_npc_move_event();
+                                    //players[i]->push_npc_move_event();
                                 }
                             }
                         }
@@ -678,7 +678,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                     ev.ev = EVENT_NPC_ATTACK;
                                     ev.target_id = client_id;
                                     TimerManager::timer_queue.push(ev);
-                                    players[i]->push_npc_move_event();
+                                    //players[i]->push_npc_move_event();
                                 }
                             }
                         }
@@ -916,7 +916,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                 ev.ev = EVENT_NPC_ATTACK;
                                 ev.target_id = players[i]->get_target_id();
                                 TimerManager::timer_queue.push(ev);
-                                players[i]->push_npc_move_event();
+                                //players[i]->push_npc_move_event();
                             }
                         }
                     }
@@ -975,7 +975,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                 ev.ev = EVENT_NPC_ATTACK;
                                 ev.target_id = players[i]->get_target_id();
                                 TimerManager::timer_queue.push(ev);
-                                players[i]->push_npc_move_event();
+                                //players[i]->push_npc_move_event();
                             }
 
                         }
