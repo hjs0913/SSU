@@ -7,6 +7,8 @@
 #include <random>
 
 default_random_engine dre(std::chrono::system_clock::now().time_since_epoch().count());
+uniform_int_distribution<int> rng_move(-1000, 1000);
+uniform_int_distribution<int> rng_move_time(1000, 3000);
 
 Npc::Npc(int id)
 {
@@ -14,6 +16,7 @@ Npc::Npc(int id)
 	_tribe = MONSTER;
 	_state = ST_INGAME;
 	_active = false;
+	_move_active = false;
 
 	_x = 300;
 	_y = 0;
@@ -45,6 +48,7 @@ Npc::Npc(int id, const char* name)
 	_tribe = MONSTER;
 	_state = ST_INGAME;
 	_active = false;
+	_move_active = false;
 
 	_look_x = 0.0f;
 	_look_y = 0.0f;
@@ -86,7 +90,7 @@ void Npc::Initialize_Lua(const char* f_lua)
 	_z = rng_z(dre);
 
 	_look_x = (float)rng_look(dre)/1000.f;
-	_look_z = (1.f - abs(_look_x))*pow(-1, rng_look(dre)%2);
+	_look_z = (1.f - fabs(_look_x))*pow(-1, rng_look(dre)%2);
 
 	lua_getglobal(L, "set_uid");
 	lua_pushnumber(L, _id);
@@ -183,6 +187,10 @@ void Npc::set_active(bool act)
 	_active = act;
 }
 
+void Npc::set_move_active(bool mv_act)
+{
+	_move_active = mv_act;
+}
 
 void Npc::set_tribe(TRIBE tribe)
 {
@@ -279,6 +287,11 @@ STATE Npc::get_state()
 bool Npc::get_active()
 {
 	return _active;
+}
+
+bool Npc::get_move_active()
+{
+	return _move_active;
 }
 
 TRIBE Npc::get_tribe()
@@ -873,14 +886,16 @@ void Npc::return_npc_position(const array<Obstacle*, MAX_OBSTACLE>& obstacles)
 	_x = now_x;
 	_z = now_z;
 
-	if (my_pos_fail) push_npc_move_event(); // 더 움직여야돼
+	//if (my_pos_fail) push_npc_move_event(); // 더 움직여야돼
+	push_npc_move_event();
 }
 
 void Npc::push_npc_move_event()
 {
 	timer_event ev;
 	ev.obj_id = _id;
-	ev.start_time = chrono::system_clock::now() + 500ms;
+	if(_active) ev.start_time = chrono::system_clock::now() + 500s;
+	else ev.start_time = chrono::system_clock::now() + std::chrono::milliseconds(rng_move_time(dre));
 	ev.ev = EVENT_NPC_MOVE;
 	ev.target_id = _target_id;
 	TimerManager::timer_queue.push(ev);
@@ -949,6 +964,53 @@ void Npc::do_npc_move(Npc* target, const array<Obstacle*, MAX_OBSTACLE>& obstacl
 	push_npc_move_event();
 }
 
+void Npc::npc_roming(const array<Obstacle*, MAX_OBSTACLE>& obstacles)
+{
+	// 제자리로 돌아가는 것인가? 로밍인가?
+	lua_lock.lock();
+	lua_getglobal(L, "return_my_position");
+	int error = lua_pcall(L, 0, 3, 0);
+	if (error != 0) {
+		cout << "초기화 오류" << endl;
+	}
+	int my_x = lua_tonumber(L, -3);
+	int my_y = lua_tonumber(L, -2);
+	int my_z = lua_tonumber(L, -1);
+	lua_pop(L, 3);
+	lua_lock.unlock();
+
+	if (_x <= my_x - 20 || _x >= my_x + 20 || _z <= my_z - 20 || _z >= my_z + 20) {
+		return_npc_position(obstacles);
+		return;
+	}
+
+	float l_x = rng_move(dre) / 1000.f;
+	float l_z = (1.f - fabs(l_x)) * pow(-1, rng_move(dre) % 2);
+
+	int mv_x = _x + l_x * 10;
+	int mv_z = _z + l_z * 10;
+	
+	if (check_move_alright(mv_x, mv_z, true, obstacles)) {
+		_look_x = l_x;
+		_look_z = l_z;
+		_x = mv_x;
+		_z = mv_z;
+	}
+
+	vl.lock();
+	unordered_set<int>my_vl{ viewlist };
+	vl.unlock();
+
+	for (int i : my_vl) {
+		if (static_ObjectManager::get_objManger()->get_player(i)->get_tribe() == HUMAN) {
+			push_npc_move_event();
+			return;
+		}
+	}
+	_move_active = false;
+
+}
+
 void Npc::revive()
 {
 	// 상태 바꿔주고
@@ -968,6 +1030,6 @@ void Npc::revive()
 	_y = lua_tonumber(L, -3);
 	_z = lua_tonumber(L, -2);
 	_hp = lua_tointeger(L, -1);
-	lua_pop(L, 5);
+	lua_pop(L, 4);
 	lua_lock.unlock();
 }

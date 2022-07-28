@@ -316,9 +316,11 @@ void ObjectManager::worker()
                 break;
             }
             players[client_id]->state_lock.unlock();
-            // 제자리로 돌아가는 것인가
+            // target이 있는가?
             if (exp_over->_target == -1) {
-                players[client_id]->return_npc_position(obstacles);
+                // 제자리로 돌아가는 것인가? 로밍인가?(npc_roming 함수에서 판단)
+                players[client_id]->npc_roming(obstacles);
+                //players[client_id]->return_npc_position(obstacles);
                 m_SectorManager->player_move(players[client_id]); // 섹터 변경시 상태확인
                 delete exp_over;
                 break;
@@ -595,7 +597,7 @@ void ObjectManager::worker()
             break;
         }
         case OP_GAMESTART_TIMER: {
-            cout << "들어오는가" << endl;
+            //cout << "들어오는가" << endl;
             Gaia* dun = dungeons[exp_over->_target];
             dun->game_start();
             dun->state_lock.lock();
@@ -749,14 +751,14 @@ void ObjectManager::worker()
             reinterpret_cast<Player*>(players[client_id])->set_skill_active(exp_over->_target, false);
             break;
         }
-        case OP_ELEMENT_FIRE_COOLTIME:
+        case OP_ELEMENT_FIRE_COOLTIME: {
             players[exp_over->_target]->set_hp(players[exp_over->_target]->get_hp() - players[exp_over->_target]->get_lv() * 10);
             send_change_hp_packet(reinterpret_cast<Player*>(players[client_id]), players[exp_over->_target]);
-           // players[client_id]->set_element_cooltime(false);
+            // players[client_id]->set_element_cooltime(false);
             players[exp_over->_target]->set_element_cooltime(false);
             delete exp_over;
             break;
-
+        }
         }
 
     }
