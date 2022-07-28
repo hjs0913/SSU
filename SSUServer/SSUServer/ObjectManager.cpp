@@ -582,12 +582,44 @@ void ObjectManager::worker()
                 break;
             }
             case J_MAGICIAN: {
-                Partner* pl = reinterpret_cast<Partner*>(players[client_id]);
-                pl->partner_attack(pl, dungeons[pl->get_indun_id()]);
                 break;
             }
             }
+            Partner* pl = reinterpret_cast<Partner*>(players[client_id]);
+            pl->partner_attack(pl, dungeons[pl->get_indun_id()]);
             delete exp_over;
+            break;
+        }
+        case OP_PARTNER_SKILL_STOP: {
+            players[client_id]->state_lock.lock();
+            if (players[client_id]->get_state() != ST_INDUN) {
+                players[client_id]->state_lock.unlock();
+                break;
+            }
+            players[client_id]->state_lock.unlock();
+
+            int indun_id = reinterpret_cast<Player*>(players[client_id])->get_indun_id();  
+
+            for (int i = 0; i < GAIA_ROOM; ++i) {
+                if (dungeons[indun_id]->get_party_palyer()[i]->get_id() == exp_over->_target)
+                    reinterpret_cast<Partner*>(dungeons[indun_id]->get_party_palyer()[i])->running_pattern = false;
+            }
+            break;
+        }
+        case OP_PARTNER_ATTACK_STOP: {
+            players[client_id]->state_lock.lock();
+            if (players[client_id]->get_state() != ST_INDUN) {
+                players[client_id]->state_lock.unlock();
+                break;
+            }
+            players[client_id]->state_lock.unlock();
+
+            int indun_id = reinterpret_cast<Player*>(players[client_id])->get_indun_id();
+
+            for (int i = 0; i < GAIA_ROOM; ++i) {
+                if (dungeons[indun_id]->get_party_palyer()[i]->get_id() == exp_over->_target)
+                    reinterpret_cast<Partner*>(dungeons[indun_id]->get_party_palyer()[i])->running_attack = false;
+            }
             break;
         }
         case OP_PARTNER_NORMAL_ATTACK: {
@@ -606,6 +638,40 @@ void ObjectManager::worker()
             ev.ev = EVENT_PARTNER_NORMAL_ATTACK;
             ev.target_id = 1;
             TimerManager::timer_queue.push(ev);
+
+            pl->running_attack = true;
+            switch (pl->get_job())
+            {
+            case J_DILLER:
+                ev.obj_id = client_id;
+                ev.start_time = chrono::system_clock::now() + 1s + 3ms;
+                ev.ev = EVENT_PARTNER_ATTACK_STOP;
+                ev.target_id = client_id;
+                TimerManager::timer_queue.push(ev);
+                break;
+            case J_TANKER:
+                ev.obj_id = client_id;
+                ev.start_time = chrono::system_clock::now() + 2s + 2ms;
+                ev.ev = EVENT_PARTNER_ATTACK_STOP;
+                ev.target_id = client_id;
+                TimerManager::timer_queue.push(ev);
+                break;
+            case J_MAGICIAN:
+                ev.obj_id = client_id;
+                ev.start_time = chrono::system_clock::now() + 1s;
+                ev.ev = EVENT_PARTNER_ATTACK_STOP;
+                ev.target_id = client_id;
+                TimerManager::timer_queue.push(ev);
+                break;
+            case J_SUPPORTER:
+                ev.obj_id = client_id;
+                ev.start_time = chrono::system_clock::now() + 2s;
+                ev.ev = EVENT_PARTNER_ATTACK_STOP;
+                ev.target_id = client_id;
+                TimerManager::timer_queue.push(ev);
+                break;
+            }
+
             delete exp_over;
             break;
         }

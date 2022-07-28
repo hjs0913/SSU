@@ -62,6 +62,12 @@ COMP_OP TimerManager::EVtoOP(EVENT_TYPE ev) {
     case EVENT_ELEMENT_FIRE_COOLTIME:
         return OP_ELEMENT_FIRE_COOLTIME;
         break;
+    case EVENT_PARTNER_SKILL_STOP:
+        return OP_PARTNER_SKILL_STOP;
+        break;
+    case EVENT_PARTNER_ATTACK_STOP:
+        return OP_PARTNER_ATTACK_STOP;
+        break;
     }
 
 }

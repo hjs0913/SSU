@@ -24,8 +24,8 @@ const static int MAX_CLIENTS = MAX_TEST * 3;
 const static int INVALID_ID = -1;
 const static int MAX_PACKET_SIZE = 255;
 const static int MAX_BUFF_SIZE = 255;
-const static char* SERVER_IP = "127.0.0.1";
-
+//const static char* SERVER_IP = "127.0.0.1";
+const static char* SERVER_IP = "116.47.180.110";
 #pragma comment (lib, "ws2_32.lib")
 
 #//include "../../RealServer/Server/protocol.h"

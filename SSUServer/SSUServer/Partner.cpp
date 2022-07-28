@@ -13,14 +13,14 @@ Partner::Partner(int d_id) : Player(d_id)
 	join_dungeon_room = false;
 
 	running_pattern = false;
-
+	running_attack =  false;
 	pos nearest = { 0,0, };
 	float dis = 0.0;
 	int nearest_num = 0;
 	move_once = false;
 	
 	party_id = 0;
-
+	skill_check = false;
 }
 
 Partner::~Partner()
@@ -53,12 +53,14 @@ bool Partner::isInsideTriangle(pos a, pos b, pos c, pos n)
 
 void Partner::partner_move(Partner* pa, Gaia* gaia)  
 {
-	if (running_pattern) return;
+	if (running_pattern || running_attack) // && skill_check
+		return;
 
 	switch (pa->get_job()) // AIÀÇ Á÷¾÷À» º¸°í ¿òÁ÷ÀÓÀ» ³ª´©ÀÚ 
 	{
 	case J_DILLER: {      //Àü»ç·ù´Â ÀÏ´Ü º¸½º¸ó½ºÅÍ¸¦ µû¶ó°¡ÀÚ 
 		if (gaia->running_pattern == false) {   //º¸½º ÆÐÅÏÀ» ½ÇÇà ¾ÈÇÏ¸é ºÙ¾î
+			if (sqrt(pow((gaia->get_x() - pa->get_x()), 2) + pow((gaia->get_z() - pa->get_z()), 2)) < 10.0f) return;
 			target_id = gaia->get_dungeon_id();
 			pos mv = pa->non_a_star(gaia->boss->get_x(), gaia->boss->get_z(), pa->get_x(), pa->get_z());
 			if (static_ObjectManager::get_objManger()->check_move_alright_indun(mv.first, mv.second)) {
@@ -123,6 +125,7 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 	}
 	case J_TANKER: {
 		if (gaia->running_pattern == false) {   //º¸½º ÆÐÅÏÀ» ½ÇÇà ¾ÈÇÏ¸é ºÙ¾î
+			if (sqrt(pow((gaia->get_x() - pa->get_x()), 2) + pow((gaia->get_z() - pa->get_z()), 2)) < 10.0f) return;
 			target_id = gaia->get_dungeon_id();
 			pos mv = pa->non_a_star(gaia->boss->get_x(), gaia->boss->get_z(), pa->get_x(), pa->get_z());
 			if (static_ObjectManager::get_objManger()->check_move_alright_indun(mv.first, mv.second)) {
@@ -189,6 +192,7 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 	}
 	case J_MAGICIAN: {
 		if (gaia->running_pattern == false) {   //º¸½º ÆÐÅÏÀ» ½ÇÇà ¾ÈÇØµµ ±×·¡µµ ÀÏÁ¤±â¸®´Â À¯ÁöÇØ   // ÀÏ´Ü º¸½º°¡ ¹Ù¶óº¸´Â ¹Ý´ë¹æÇâ?
+			if (sqrt(pow((gaia->get_x() - pa->get_x()), 2) + pow((gaia->get_z() - pa->get_z()), 2)) > 100.0f) return;
 			target_id = gaia->get_dungeon_id();
 			pos mv = pa->non_a_star(gaia->boss->get_x() - gaia->boss->get_look_x() * 100, gaia->boss->get_z() + gaia->boss->get_look_z() * 100, pa->get_x(), pa->get_z());
 			if (static_ObjectManager::get_objManger()->check_move_alright_indun(mv.first, mv.second)) {
@@ -256,6 +260,7 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 	}
 	case J_SUPPORTER: {
 		if (gaia->running_pattern == false) {   //º¸½º ÆÐÅÏÀ» ½ÇÇà ¾ÈÇØµµ ±×·¡µµ ÀÏÁ¤±â¸®´Â À¯ÁöÇØ 
+			if (sqrt(pow((gaia->get_x() - pa->get_x()), 2) + pow((gaia->get_z() - pa->get_z()), 2)) > 100.0f) return;
 			target_id = gaia->get_dungeon_id();
 			pos mv = pa->non_a_star(gaia->boss->get_x() - gaia->boss->get_look_x() * 100, gaia->boss->get_z() + gaia->boss->get_look_z() * 100, pa->get_x(), pa->get_z());
 			if (static_ObjectManager::get_objManger()->check_move_alright_indun(mv.first, mv.second)) {
@@ -328,29 +333,35 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 
 void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °è¼Ó ¾²µµ·Ï ÇÏÀÚ     //  ¼­Æ÷Å¸°¡ ¿À·ùÀÎ°¡?
 {
-
+	
 	random_device rd;
 	mt19937 gen(rd());
 	uniform_int_distribution<int> pattern(0, 99);
 	timer_event ev;
-
+	if (gaia->running_pattern == false) {
+		ev.obj_id = _id;
+		ev.start_time = chrono::system_clock::now() + 5s;
+		ev.ev = EVENT_PARTNER_SKILL;
+		ev.target_id = _id;
+		TimerManager::timer_queue.push(ev);
+		running_pattern = false;
+		return;
+	}
 	int p = pattern(gen) % 3;
 
 	Player** party_player = gaia->get_party_palyer();
 
-	bool skill_check = false;
-
-	//ÀÏ´Ü Á÷¾÷¿¡ µû¶ó¼­ ´Ù½Ã ºÐ·ù ÇÕ½Ã´Ù.
-	//±×¸®°í ai´Â ÇÇÅ·ÀÌ ÇÊ¿ä¾ø°Ô ÇÏÀÚ // **Á÷¾÷ÀÌ¶û hp, mpÈ®ÀÎÈÄ Á¦ÀÏ ÇÊ¿äÇÑ »ç¶÷¿¡°Ô ¹öÇÁ ÁÖ°í ¹öÇÁ uiÆÐÅ¶µµ º¸³»ÀÚ 
 	switch (pa->get_job()) // AIÀÇ Á÷¾÷À» º¸°í ¿òÁ÷ÀÓÀ» ³ª´©ÀÚ 
 	{
 	case J_DILLER: {
 		switch (p)
 		{
 		case 0: {
-			running_pattern = true;
+
 			pa->set_mp(pa->get_mp() - 1000);
-			if ((gaia->boss->get_x() >= pa->get_x() - 10 && gaia->boss->get_x() <= pa->get_x() + 10) && (gaia->boss->get_z() >= pa->get_z() - 10 && gaia->boss->get_z() <= pa->get_z() + 10)) {
+			if ((gaia->boss->get_x() >= pa->get_x() - 30 && gaia->boss->get_x() <= pa->get_x() + 30) && (gaia->boss->get_z() >= pa->get_z() - 30 && gaia->boss->get_z() <= pa->get_z() + 30)) {
+				cout << "È¸ÀüÈ¸¿À¸®" << endl;
+				skill_check = true;
 				pa->set_skill_factor(0, 0);
 
 				float give_damage = pa->get_physical_attack() * pa->get_skill_factor(0, 0);
@@ -371,19 +382,27 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 					}
 				}
 
-				skill_check = true;
+		
 			}
 
 			ev.obj_id = _id;
-			ev.start_time = chrono::system_clock::now() + 3s;
+			ev.start_time = chrono::system_clock::now() + 5s;
 			ev.ev = EVENT_PARTNER_SKILL;
 			ev.target_id = _id;
 			TimerManager::timer_queue.push(ev);
-			running_pattern = false;
+
+			ev.obj_id = _id;
+			ev.start_time = chrono::system_clock::now() + 2s + 6ms;  //ÄðÅ¸ÀÓ
+			ev.ev = EVENT_PARTNER_SKILL_STOP;
+			ev.target_id = _id;
+			TimerManager::timer_queue.push(ev);
+
+			running_pattern = true;
 			break;
 		}
 		case 1: {
-			running_pattern = true;
+
+
 			pos a = { pa->get_x(), pa->get_z() };    //ÇÃ·¹ÀÌ¾î ±âÁØ Àü¹æ »ï°¢Çü ¹üÀ§ 
 			pos b = { pa->get_x() - pa->get_right_x() * 40 + pa->get_look_x() * 100,
 				pa->get_z() - pa->get_right_z() * 40 + pa->get_look_z() * 100 };  // ¿ÞÂÊ À§
@@ -396,6 +415,8 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 
 
 			if (isInsideTriangle(a, b, c, n)) {
+				cout << "ÃÖÈÄÀÇ ÀÏ°Ý" << endl;
+				skill_check = true;
 				pa->set_skill_factor(1, 0);
 				float give_damage = pa->get_magical_attack() * pa->get_skill_factor(1, 0);
 				float defence_damage = (gaia->boss->get_defence_factor() *
@@ -412,18 +433,26 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 						gaia->game_victory();
 					}
 				}
-				skill_check = true;
+	
 			}
 			ev.obj_id = _id;
-			ev.start_time = chrono::system_clock::now() + 3s;  //ÄðÅ¸ÀÓ
+			ev.start_time = chrono::system_clock::now() + 5s;  //ÄðÅ¸ÀÓ
 			ev.ev = EVENT_PARTNER_SKILL;
 			ev.target_id = _id;
 			TimerManager::timer_queue.push(ev);
-			running_pattern = false;
+			running_pattern = true;
+
+			ev.obj_id = _id;
+			ev.start_time = chrono::system_clock::now() + 1s + 8ms;
+			ev.ev = EVENT_PARTNER_SKILL_STOP;
+			ev.target_id = _id;
+			TimerManager::timer_queue.push(ev);
 			break;
 		}
 		case 2: {
-			running_pattern = true;
+			cout << "µé²ú´Â ÇÇ" << endl;
+
+			skill_check = true;
 			pa->set_mp(pa->get_mp() - 1000);
 
 			pa->set_physical_attack(0.6 * pa->get_lv() * pa->get_lv() + 10 * pa->get_lv()); //ÀÏ´Ü µÎ¹è 
@@ -431,12 +460,17 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			//send_status_change_packet(pl);
 
 			ev.obj_id = _id;
-			ev.start_time = chrono::system_clock::now() + 3s;  //ÄðÅ¸ÀÓ
+			ev.start_time = chrono::system_clock::now() + 5s;  //ÄðÅ¸ÀÓ
 			ev.ev = EVENT_PARTNER_SKILL;
 			ev.target_id = _id;
 			TimerManager::timer_queue.push(ev);
-			running_pattern = false;
-			// skill_check = true;
+
+			ev.obj_id = _id;
+			ev.start_time = chrono::system_clock::now() + 1s + 2ms;;
+			ev.ev = EVENT_PARTNER_SKILL_STOP;
+			ev.target_id = _id;
+			TimerManager::timer_queue.push(ev);
+			running_pattern = true;
 			break;
 		}
 		default:
@@ -448,6 +482,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 				if (party_player[i]->get_tribe() == HUMAN)
 					send_animation_skill(party_player[i], pa->get_id(), p);
 			}
+			skill_check = false;
 		}
 		
 		break;
@@ -456,12 +491,12 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 		switch (p)
 		{
 		case 0: {   //¹Ð¾î³»±â °ø°Ý 
-			running_pattern = true;
-		
+
 			pa->set_mp(pa->get_mp() - 1000);
 
-			if ((gaia->boss->get_x() >= pa->get_x() - 15 && gaia->boss->get_x() <= pa->get_x() + 15) && (gaia->boss->get_z() >= pa->get_z() - 15 && gaia->boss->get_z() <= pa->get_z() + 15)) {
-	
+			if ((gaia->boss->get_x() >= pa->get_x() - 30 && gaia->boss->get_x() <= pa->get_x() + 30) && (gaia->boss->get_z() >= pa->get_z() - 30 && gaia->boss->get_z() <= pa->get_z() + 30)) {
+				cout << "¹æÆÐ ¹ÐÄ¡±â" << endl;
+				skill_check = true;
 				pa->set_skill_factor(0, 0);
 				float give_damage = pa->get_physical_attack() * pa->get_skill_factor(0, 0);
 				float defence_damage = (gaia->boss->get_defence_factor() *
@@ -481,39 +516,52 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 						gaia->game_victory();
 					}
 				}
-				skill_check = true;
 			}
 			ev.obj_id = _id;
-			ev.start_time = chrono::system_clock::now() + 3s;  //ÄðÅ¸ÀÓ
+			ev.start_time = chrono::system_clock::now() + 5s;  //ÄðÅ¸ÀÓ
 			ev.ev = EVENT_PARTNER_SKILL;
 			ev.target_id = _id;
 			TimerManager::timer_queue.push(ev);
-			running_pattern = false;
+
+
+			ev.obj_id = _id;
+			ev.start_time = chrono::system_clock::now() + 1s + 6ms;
+			ev.ev = EVENT_PARTNER_SKILL_STOP;
+			ev.target_id = _id;
+			TimerManager::timer_queue.push(ev);
+			running_pattern = true;
 			break;
 		}
 		case 1: {  //¾î±×·Î ²ø±â 
-			running_pattern = true;
-	
+
 			pa->set_mp(pa->get_mp() - 1000);
 	
 			if ((gaia->boss->get_x() >= pa->get_x() - 40 && gaia->boss->get_x() <= pa->get_x() + 40) && (gaia->boss->get_z() >= pa->get_z() - 40 && gaia->boss->get_z() <= pa->get_z() + 40)) {
+				cout << "³ª¸¦ µû¸£¶ó" << endl;
+				skill_check = true;
 				pa->set_skill_factor(1, 0);
 				gaia->target_id = pa->get_indun_id();
-				skill_check = true;
 				//send_status_change_packet(pl);
 			} 
 		
 			ev.obj_id = _id;      // ÇØÁ¦´Â ³ªÁß¿¡ ´Ù½Ã 
-			ev.start_time = chrono::system_clock::now() + 7s;
+			ev.start_time = chrono::system_clock::now() + 5s;
 			ev.ev = EVENT_PARTNER_SKILL;
 			ev.target_id = _id;
 			TimerManager::timer_queue.push(ev);
-			running_pattern = false;
+
+			ev.obj_id = _id;
+			ev.start_time = chrono::system_clock::now() + 2s;
+			ev.ev = EVENT_PARTNER_SKILL_STOP;
+			ev.target_id = _id;
+			TimerManager::timer_queue.push(ev);
+			running_pattern = true;
 			break;
 		}
 		case 2: {  //ÀÚ±â ¹æ¾î·Â Áõ°¡ 
-			running_pattern = true;
+			cout << "°©¿Ê µÐ°©" << endl;
 
+			skill_check = true;
 			pa->set_mp(pa->get_mp() - 1000);
 			pa->set_physical_defence(0.54 * pa->get_lv() * pa->get_lv() + 10 * pa->get_lv()); //ÀÏ´Ü µÎ¹è 
 			pa->set_magical_defence(0.4 * pa->get_lv() * pa->get_lv() + 10 * pa->get_lv());
@@ -521,12 +569,17 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			
 		            // ÇØÁ¦´Â ³ªÁß¿¡ ´Ù½Ã 
 			ev.obj_id = _id;
-			ev.start_time = chrono::system_clock::now() + 10s;  //ÄðÅ¸ÀÓ
+			ev.start_time = chrono::system_clock::now() + 5s;  //ÄðÅ¸ÀÓ
 			ev.ev = EVENT_PARTNER_SKILL;
 			ev.target_id = _id;
 			TimerManager::timer_queue.push(ev);
-			running_pattern = false;
-			//skill_check = true;
+
+			ev.obj_id = _id;
+			ev.start_time = chrono::system_clock::now()  + 3ms;
+			ev.ev = EVENT_PARTNER_SKILL_STOP;
+			ev.target_id = _id;
+			TimerManager::timer_queue.push(ev);
+			running_pattern = true;
 			break;
 		}
 		default:
@@ -537,6 +590,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 				if (party_player[i]->get_tribe() == HUMAN)
 					send_animation_skill(party_player[i], pa->get_id(), p);
 			}
+			skill_check = false;
 		}
 		break;
 	}
@@ -544,12 +598,12 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 		switch (p)
 		{
 		case 0: {  //³» ÇÇ ÁÙÀÌ°í ½ºÅ³ »ç¿ëÇØ ¸ó½ºÅÍ hp¸¦ ±ð¾Æ ³» mp¸¦ Ã¤¿ò  
-			running_pattern = true;
-		
+
 			pa->set_hp(pa->get_hp() - 300);
 
 			if ((gaia->boss->get_x() >= pa->get_x() - 30 && gaia->boss->get_x() <= pa->get_x() + 30) && (gaia->boss->get_z() >= pa->get_z() - 30 && gaia->boss->get_z() <= pa->get_z() + 30)) {
-				
+				cout << "¸¶³ª µå·¹ÀÎ" << endl;
+				skill_check = true;
 				pa->set_mp(pa->get_mp() + gaia->boss->get_hp() / 10);
 				if (pa->get_mp() > pa->get_maxmp())
 					pa->set_mp(pa->get_maxmp());
@@ -573,8 +627,6 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 						gaia->game_victory();
 					}
 				}
-
-				skill_check = true;
 			}
 		
 			ev.obj_id = _id;
@@ -582,11 +634,18 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			ev.ev = EVENT_PARTNER_SKILL;
 			ev.target_id = _id;
 			TimerManager::timer_queue.push(ev);
-			running_pattern = false;
+
+			ev.obj_id = _id;
+			ev.start_time = chrono::system_clock::now() + 3s + 3ms;
+			ev.ev = EVENT_PARTNER_SKILL_STOP;
+			ev.target_id = _id;
+			TimerManager::timer_queue.push(ev);
+			running_pattern = true;
 			break;
 		}
 		case 1: {  // ¸ÞÅ×¿À, ¿¡³ÊÁöº¼? 
-			running_pattern = true;
+
+
 
 			pa->set_mp(pa->get_mp() - 1500);
 
@@ -607,6 +666,8 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			pos n = {gaia->boss->get_x(), gaia->boss->get_z()};
 
 			if (isInsideTriangle(a, b, c, n) || isInsideTriangle(d, e, f, n)) {
+				cout << "¸ÞÅ×¿À" << endl;
+				skill_check = true;
 				pa->set_skill_factor(1, 1);
 				float give_damage = pa->get_magical_attack() * pa->get_skill_factor(1, 0);
 				float defence_damage = (gaia->boss->get_defence_factor() *
@@ -623,16 +684,21 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 						gaia->game_victory();
 					}
 				}
-
-				skill_check = true;
 			}
 		
 			ev.obj_id = _id;
-			ev.start_time = chrono::system_clock::now() + 10s;
+			ev.start_time = chrono::system_clock::now() + 5s;
 			ev.ev = EVENT_PARTNER_SKILL;
 			ev.target_id = _id;
 			TimerManager::timer_queue.push(ev);
-			running_pattern = false;
+
+
+			ev.obj_id = _id;
+			ev.start_time = chrono::system_clock::now() + 2s + 7ms;
+			ev.ev = EVENT_PARTNER_SKILL_STOP;
+			ev.target_id = _id;
+			TimerManager::timer_queue.push(ev);
+			running_pattern = true;
 			break;
 		}
 		default:
@@ -643,6 +709,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 				if (party_player[i]->get_tribe() == HUMAN)
 					send_animation_skill(party_player[i], pa->get_id(), p);
 			}
+			skill_check = false;
 		}
 		break;
 	}
@@ -650,7 +717,9 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 		switch (p)
 		{
 		case 0: {  //hp È¸º¹ 
-			running_pattern = true;
+			cout << "Ãµ»çÀÇ Ä¡À¯" << endl;
+
+		
 			if (gaia->get_party_palyer()[0]->get_maxhp() == gaia->get_party_palyer()[0]->get_hp() &&
 				gaia->get_party_palyer()[1]->get_maxhp() == gaia->get_party_palyer()[1]->get_hp() &&
 				gaia->get_party_palyer()[2]->get_maxhp() == gaia->get_party_palyer()[2]->get_hp()) {
@@ -659,7 +728,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 				ev.ev = EVENT_PARTNER_SKILL;
 				ev.target_id = 0;
 				TimerManager::timer_queue.push(ev);
-				running_pattern = false;
+				running_pattern = true;
 				return;
 			}
 				
@@ -678,6 +747,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 					}
 				}
 			}
+			skill_check = true;
 			pa->set_mp(pa->get_mp() - 1000);
 			send_buff_ui_packet(gaia->get_party_palyer()[target_player], 2); //ui
 
@@ -688,18 +758,26 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			for (int i = 0; i < GAIA_ROOM; ++i) {
 				send_change_hp_packet(gaia->get_party_palyer()[i], gaia->get_party_palyer()[target_player]);
 			}
-			skill_check = true;
 
 			ev.obj_id = _id;
 			ev.start_time = chrono::system_clock::now() + 5s;  //ÄðÅ¸ÀÓ
 			ev.ev = EVENT_PARTNER_SKILL;
 			ev.target_id = _id;
 			TimerManager::timer_queue.push(ev);
-			running_pattern = false;
+
+
+			ev.obj_id = _id;
+			ev.start_time = chrono::system_clock::now() + 2s;
+			ev.ev = EVENT_PARTNER_SKILL_STOP;
+			ev.target_id = _id;
+			TimerManager::timer_queue.push(ev);
+			running_pattern = true;
 			break;
 		}
 		case 1: { //mp È¸º¹   //¿©±âÀÌ»ó 
-			running_pattern = true;
+			cout << "¿äÁ¤ÀÇ Ãàº¹" << endl;
+
+
 			if (gaia->get_party_palyer()[0]->get_maxmp() == gaia->get_party_palyer()[0]->get_mp() &&
 				gaia->get_party_palyer()[1]->get_maxmp() == gaia->get_party_palyer()[1]->get_mp() &&
 				gaia->get_party_palyer()[2]->get_maxmp() == gaia->get_party_palyer()[2]->get_mp()) {
@@ -708,7 +786,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 				ev.ev = EVENT_PARTNER_SKILL;
 				ev.target_id = 0;
 				TimerManager::timer_queue.push(ev);
-				running_pattern = false;
+				running_pattern = true;
 				return;
 			}
 			int tmp_mp = 0;
@@ -725,6 +803,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 					}
 				}
 			}
+			skill_check = true;
 			pa->set_mp(pa->get_mp() - 1000);
 			send_buff_ui_packet(gaia->get_party_palyer()[target_player], 0); //ui
 			if(gaia->get_party_palyer()[target_player]->get_mp() + gaia->get_party_palyer()[target_player]->get_maxmp() / 10 >= gaia->get_party_palyer()[target_player]->get_maxmp())
@@ -735,32 +814,43 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			for (int i = 0; i < GAIA_ROOM; ++i) {
 				send_change_mp_packet(gaia->get_party_palyer()[i], gaia->get_party_palyer()[target_player]); 
 			}
-			skill_check = true;
 
 			ev.obj_id = _id;
 			ev.start_time = chrono::system_clock::now() + 5s;  //ÄðÅ¸ÀÓ
 			ev.ev = EVENT_PARTNER_SKILL;
 			ev.target_id = _id;
 			TimerManager::timer_queue.push(ev);
-			running_pattern = false;
+
+			ev.obj_id = _id;
+			ev.start_time = chrono::system_clock::now() + 1s + 8ms;
+			ev.ev = EVENT_PARTNER_SKILL_STOP;
+			ev.target_id = _id;
+			TimerManager::timer_queue.push(ev);
+			running_pattern = true;
 			break;
 		}
 		case 2: { // °ø¼Ó ¿Ã¸®±â 
-			running_pattern = true;
+			cout << "Àü±¤¼®È­" << endl;
+
+			skill_check = true;
 			for (int i = 0; i < GAIA_ROOM; ++i) {
 				gaia->get_party_palyer()[i]->attack_speed_up = 1;
 				send_buff_ui_packet(gaia->get_party_palyer()[i], 4); 
 			}
 			pa->set_mp(pa->get_mp() - 1000);
 
-			skill_check = true;
-
 			ev.obj_id = _id;
 			ev.start_time = chrono::system_clock::now() + 5s;  //ÄðÅ¸ÀÓ
 			ev.ev = EVENT_PARTNER_SKILL;   // ÆÄÆ®³Ê (¹öÇÁ) ½ºÅ³ ÀÌº¥Æ®¸¦ µû·Î ¸¸µéÁö »ý°¢ÇØº¸ÀÚ 
 			ev.target_id = _id;  // ÀÏ´Ü ÀÌ°É·Î ±¸ºÐ 
 			TimerManager::timer_queue.push(ev);
-			running_pattern = false;
+
+			ev.obj_id = _id;
+			ev.start_time = chrono::system_clock::now() + 1s + 8ms;
+			ev.ev = EVENT_PARTNER_SKILL_STOP;
+			ev.target_id = _id;
+			TimerManager::timer_queue.push(ev);
+			running_pattern = true;
 			break;
 		}
 		default:
@@ -771,6 +861,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 				if (party_player[i]->get_tribe() == HUMAN)
 					send_animation_skill(party_player[i], pa->get_id(), p);
 			}
+			skill_check = false;
 		}
 		break;
 	}
@@ -825,4 +916,8 @@ void Partner::partner_normal_attack(Partner* pa, Gaia* gaia)
 int Partner::get_party_id()
 {
 	return party_id;
+}
+void Partner::set_party_id(int id)
+{
+	party_id = id;
 }

@@ -594,6 +594,8 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 					Join_On = true;
 					ID_On = false;
 					PASSWORD_On = false;
+					ID_Str = L"";
+					PASSWORD_Str = L"";
 				}
 			}
 		}
@@ -731,6 +733,11 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 					&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 50)) {
 					Fail_On = false;
 					Fail_Reason = 0;
+					ID_Str = L"";
+					PASSWORD_Str = L"";
+					JOIN_ID_Str = L"";
+					JOIN_PASSWORD_Str = L"";
+					JOIN_NICKNAME_Str = L"";
 				}
 			}
 		}
