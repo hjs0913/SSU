@@ -1488,9 +1488,10 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
             // 이 방에 이 플레이어를 집어 넣는다
             dun->partner_cnt++;
             dun->join_player(reinterpret_cast<Player*>(players[new_id]));
+           // dun->player_cnt
 
             // 이 방에 대한 정보를 보내준다
-            Player** party_players = dun->get_party_palyer();
+            Player** party_players = dun->get_party_palyer();     
             for (int i = 0; i < dun->player_cnt; i++) {
                 if (party_players[i]->get_tribe() == HUMAN)
                     send_party_room_info_packet(party_players[i], dun->get_party_palyer(), dun->player_cnt, dun->get_dungeon_id());
