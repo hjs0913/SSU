@@ -36,8 +36,8 @@ wstring JOIN_ELEMENT_Str = L"";
 bool Chatting_On = false;
 bool Mouse_On = false;
 bool PartyUI_On = false;
- bool ID_On = false;
- bool PASSWORD_On = false;
+bool ID_On = false;
+bool PASSWORD_On = false;
 
 int effect_x = 0;
 int effect_y = 0;
@@ -147,8 +147,8 @@ bool CGameFramework::TestIntersection(int mouseX, int mouseY, CPlayer* obj)
 	direction.z = (pointX * inverseViewMatrix4._13) + (pointY * inverseViewMatrix4._23) + inverseViewMatrix4._33;
 
 	// 카메라의 위치 인 picking ray의 원점을 가져옵니다.
-	origin = m_pPlayer ->GetPosition();
-	
+	origin = m_pPlayer->GetPosition();
+
 	// 세계 행렬을 가져와 구의 위치로 변환합니다.  //.여기 다시 보자 
 	F3_worldMatrix = m_pCamera->GetLookAtPosition();
 
@@ -195,7 +195,7 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 	CoInitialize(NULL);
 
 
-		//BuildObjects();
+	//BuildObjects();
 
 	BuildObjects_login();
 	return(true);
@@ -231,7 +231,7 @@ void CGameFramework::CreateSwapChain()
 	dxgiSwapChainFullScreenDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 	dxgiSwapChainFullScreenDesc.Windowed = TRUE;
 
-	HRESULT hResult = m_pdxgiFactory->CreateSwapChainForHwnd(m_pd3dCommandQueue, m_hWnd, &dxgiSwapChainDesc, &dxgiSwapChainFullScreenDesc, NULL, (IDXGISwapChain1 **)&m_pdxgiSwapChain);
+	HRESULT hResult = m_pdxgiFactory->CreateSwapChainForHwnd(m_pd3dCommandQueue, m_hWnd, &dxgiSwapChainDesc, &dxgiSwapChainFullScreenDesc, NULL, (IDXGISwapChain1**)&m_pdxgiSwapChain);
 #else
 	DXGI_SWAP_CHAIN_DESC dxgiSwapChainDesc;
 	::ZeroMemory(&dxgiSwapChainDesc, sizeof(dxgiSwapChainDesc));
@@ -249,7 +249,7 @@ void CGameFramework::CreateSwapChain()
 	dxgiSwapChainDesc.Windowed = TRUE;
 	dxgiSwapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
-	HRESULT hResult = m_pdxgiFactory->CreateSwapChain(m_pd3dCommandQueue, &dxgiSwapChainDesc, (IDXGISwapChain **)&m_pdxgiSwapChain);
+	HRESULT hResult = m_pdxgiFactory->CreateSwapChain(m_pd3dCommandQueue, &dxgiSwapChainDesc, (IDXGISwapChain**)&m_pdxgiSwapChain);
 #endif
 	m_nSwapChainBufferIndex = m_pdxgiSwapChain->GetCurrentBackBufferIndex();
 
@@ -266,8 +266,8 @@ void CGameFramework::CreateDirect3DDevice()
 
 	UINT nDXGIFactoryFlags = 0;
 #if defined(_DEBUG)
-	ID3D12Debug *pd3dDebugController = NULL;
-	hResult = D3D12GetDebugInterface(__uuidof(ID3D12Debug), (void **)&pd3dDebugController);
+	ID3D12Debug* pd3dDebugController = NULL;
+	hResult = D3D12GetDebugInterface(__uuidof(ID3D12Debug), (void**)&pd3dDebugController);
 	if (pd3dDebugController)
 	{
 		pd3dDebugController->EnableDebugLayer();
@@ -276,22 +276,22 @@ void CGameFramework::CreateDirect3DDevice()
 	nDXGIFactoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
 #endif
 
-	hResult = ::CreateDXGIFactory2(nDXGIFactoryFlags, __uuidof(IDXGIFactory4), (void **)&m_pdxgiFactory);
+	hResult = ::CreateDXGIFactory2(nDXGIFactoryFlags, __uuidof(IDXGIFactory4), (void**)&m_pdxgiFactory);
 
-	IDXGIAdapter1 *pd3dAdapter = NULL;
+	IDXGIAdapter1* pd3dAdapter = NULL;
 
 	for (UINT i = 0; DXGI_ERROR_NOT_FOUND != m_pdxgiFactory->EnumAdapters1(i, &pd3dAdapter); i++)
 	{
 		DXGI_ADAPTER_DESC1 dxgiAdapterDesc;
 		pd3dAdapter->GetDesc1(&dxgiAdapterDesc);
 		if (dxgiAdapterDesc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) continue;
-		if (SUCCEEDED(D3D12CreateDevice(pd3dAdapter, D3D_FEATURE_LEVEL_12_0, _uuidof(ID3D12Device), (void **)&m_pd3dDevice))) break;
+		if (SUCCEEDED(D3D12CreateDevice(pd3dAdapter, D3D_FEATURE_LEVEL_12_0, _uuidof(ID3D12Device), (void**)&m_pd3dDevice))) break;
 	}
 
 	if (!pd3dAdapter)
 	{
-		m_pdxgiFactory->EnumWarpAdapter(_uuidof(IDXGIFactory4), (void **)&pd3dAdapter);
-		hResult = D3D12CreateDevice(pd3dAdapter, D3D_FEATURE_LEVEL_12_0, _uuidof(ID3D12Device), (void **)&m_pd3dDevice);
+		m_pdxgiFactory->EnumWarpAdapter(_uuidof(IDXGIFactory4), (void**)&pd3dAdapter);
+		hResult = D3D12CreateDevice(pd3dAdapter, D3D_FEATURE_LEVEL_12_0, _uuidof(ID3D12Device), (void**)&m_pd3dDevice);
 	}
 
 	D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS d3dMsaaQualityLevels;
@@ -303,7 +303,7 @@ void CGameFramework::CreateDirect3DDevice()
 	m_nMsaa4xQualityLevels = d3dMsaaQualityLevels.NumQualityLevels;
 	m_bMsaa4xEnable = (m_nMsaa4xQualityLevels > 1) ? true : false;
 
-	hResult = m_pd3dDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, __uuidof(ID3D12Fence), (void **)&m_pd3dFence);
+	hResult = m_pd3dDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, __uuidof(ID3D12Fence), (void**)&m_pd3dFence);
 	for (UINT i = 0; i < m_nSwapChainBuffers; i++) m_nFenceValues[i] = 0;
 
 	m_hFenceEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
@@ -323,11 +323,11 @@ void CGameFramework::CreateCommandQueueAndList()
 	::ZeroMemory(&d3dCommandQueueDesc, sizeof(D3D12_COMMAND_QUEUE_DESC));
 	d3dCommandQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 	d3dCommandQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-	hResult = m_pd3dDevice->CreateCommandQueue(&d3dCommandQueueDesc, _uuidof(ID3D12CommandQueue), (void **)&m_pd3dCommandQueue);
+	hResult = m_pd3dDevice->CreateCommandQueue(&d3dCommandQueueDesc, _uuidof(ID3D12CommandQueue), (void**)&m_pd3dCommandQueue);
 
-	hResult = m_pd3dDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, __uuidof(ID3D12CommandAllocator), (void **)&m_pd3dCommandAllocator);
+	hResult = m_pd3dDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, __uuidof(ID3D12CommandAllocator), (void**)&m_pd3dCommandAllocator);
 
-	hResult = m_pd3dDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_pd3dCommandAllocator, NULL, __uuidof(ID3D12GraphicsCommandList), (void **)&m_pd3dCommandList);
+	hResult = m_pd3dDevice->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_pd3dCommandAllocator, NULL, __uuidof(ID3D12GraphicsCommandList), (void**)&m_pd3dCommandList);
 	hResult = m_pd3dCommandList->Close();
 }
 
@@ -339,12 +339,12 @@ void CGameFramework::CreateRtvAndDsvDescriptorHeaps()
 	d3dDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 	d3dDescriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	d3dDescriptorHeapDesc.NodeMask = 0;
-	HRESULT hResult = m_pd3dDevice->CreateDescriptorHeap(&d3dDescriptorHeapDesc, __uuidof(ID3D12DescriptorHeap), (void **)&m_pd3dRtvDescriptorHeap);
+	HRESULT hResult = m_pd3dDevice->CreateDescriptorHeap(&d3dDescriptorHeapDesc, __uuidof(ID3D12DescriptorHeap), (void**)&m_pd3dRtvDescriptorHeap);
 	::gnRtvDescriptorIncrementSize = m_pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
 	d3dDescriptorHeapDesc.NumDescriptors = 1;
 	d3dDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
-	hResult = m_pd3dDevice->CreateDescriptorHeap(&d3dDescriptorHeapDesc, __uuidof(ID3D12DescriptorHeap), (void **)&m_pd3dDsvDescriptorHeap);
+	hResult = m_pd3dDevice->CreateDescriptorHeap(&d3dDescriptorHeapDesc, __uuidof(ID3D12DescriptorHeap), (void**)&m_pd3dDsvDescriptorHeap);
 	::gnDsvDescriptorIncrementSize = m_pd3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 }
 
@@ -353,7 +353,7 @@ void CGameFramework::CreateRenderTargetViews()
 	D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle = m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 	for (UINT i = 0; i < m_nSwapChainBuffers; i++)
 	{
-		m_pdxgiSwapChain->GetBuffer(i, __uuidof(ID3D12Resource), (void **)&m_ppd3dSwapChainBackBuffers[i]);
+		m_pdxgiSwapChain->GetBuffer(i, __uuidof(ID3D12Resource), (void**)&m_ppd3dSwapChainBackBuffers[i]);
 		m_pd3dDevice->CreateRenderTargetView(m_ppd3dSwapChainBackBuffers[i], NULL, d3dRtvCPUDescriptorHandle);
 		d3dRtvCPUDescriptorHandle.ptr += ::gnRtvDescriptorIncrementSize;
 	}
@@ -387,7 +387,7 @@ void CGameFramework::CreateDepthStencilView()
 	d3dClearValue.DepthStencil.Depth = 1.0f;
 	d3dClearValue.DepthStencil.Stencil = 0;
 
-	m_pd3dDevice->CreateCommittedResource(&d3dHeapProperties, D3D12_HEAP_FLAG_NONE, &d3dResourceDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &d3dClearValue, __uuidof(ID3D12Resource), (void **)&m_pd3dDepthStencilBuffer);
+	m_pd3dDevice->CreateCommittedResource(&d3dHeapProperties, D3D12_HEAP_FLAG_NONE, &d3dResourceDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &d3dClearValue, __uuidof(ID3D12Resource), (void**)&m_pd3dDepthStencilBuffer);
 
 	D3D12_DEPTH_STENCIL_VIEW_DESC d3dDepthStencilViewDesc;
 	::ZeroMemory(&d3dDepthStencilViewDesc, sizeof(D3D12_DEPTH_STENCIL_VIEW_DESC));
@@ -445,346 +445,346 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 	}
 	switch (nMessageID)
 	{
-		case WM_LBUTTONDOWN: {
-			::SetCapture(hWnd);
-			::GetCursorPos(&m_ptOldCursorPos);
-			POINT CursorPosInClient = m_ptOldCursorPos;
-			ScreenToClient(hWnd, &CursorPosInClient);
-			if (InvitationCardUI_On) {
-				if (CursorPosInClient.y >= (m_nWndClientHeight - m_nWndClientHeight / 10) && CursorPosInClient.y <= (m_nWndClientHeight - 10)) {
-					if (CursorPosInClient.x >= (m_nWndClientWidth - m_nWndClientWidth / 6 - m_nWndClientWidth / 60 - m_nWndClientWidth / 9)
-						&& CursorPosInClient.x <= (m_nWndClientWidth - m_nWndClientWidth / 6 - m_nWndClientWidth / 60)) {
-						send_party_invitation_reply(1);
-						InvitationCardUI_On = false;
-					}
-					if (CursorPosInClient.x >= (m_nWndClientWidth - m_nWndClientWidth / 6 + m_nWndClientWidth / 60)
-						&& CursorPosInClient.x <= (m_nWndClientWidth - m_nWndClientWidth / 6 + m_nWndClientWidth / 60 + m_nWndClientWidth / 9)) {
-						send_party_invitation_reply(0);
-						InvitationCardUI_On = false;
-					}
+	case WM_LBUTTONDOWN: {
+		::SetCapture(hWnd);
+		::GetCursorPos(&m_ptOldCursorPos);
+		POINT CursorPosInClient = m_ptOldCursorPos;
+		ScreenToClient(hWnd, &CursorPosInClient);
+		if (InvitationCardUI_On) {
+			if (CursorPosInClient.y >= (m_nWndClientHeight - m_nWndClientHeight / 10) && CursorPosInClient.y <= (m_nWndClientHeight - 10)) {
+				if (CursorPosInClient.x >= (m_nWndClientWidth - m_nWndClientWidth / 6 - m_nWndClientWidth / 60 - m_nWndClientWidth / 9)
+					&& CursorPosInClient.x <= (m_nWndClientWidth - m_nWndClientWidth / 6 - m_nWndClientWidth / 60)) {
+					send_party_invitation_reply(1);
+					InvitationCardUI_On = false;
+				}
+				if (CursorPosInClient.x >= (m_nWndClientWidth - m_nWndClientWidth / 6 + m_nWndClientWidth / 60)
+					&& CursorPosInClient.x <= (m_nWndClientWidth - m_nWndClientWidth / 6 + m_nWndClientWidth / 60 + m_nWndClientWidth / 9)) {
+					send_party_invitation_reply(0);
+					InvitationCardUI_On = false;
 				}
 			}
+		}
 
-			if (PartyUI_On) {
-				if (PartyInviteUI_ON) {
-					break;
-				}
-
-				if (AddAIUI_On) {
-					if (CursorPosInClient.y >= (m_nWndClientHeight / 2 + m_nWndClientHeight / 20 - m_nWndClientHeight / 22.5)
-						&& CursorPosInClient.y <= (m_nWndClientHeight / 2 + m_nWndClientHeight / 20 - 10)) {
-						if (CursorPosInClient.x >= (m_nWndClientWidth / 2 - m_nWndClientWidth / 10 + m_nWndClientWidth / 360)
-							&& CursorPosInClient.x <= (m_nWndClientWidth / 2 - m_nWndClientWidth / 10 + m_nWndClientWidth / 360 + m_nWndClientWidth / 22.5)) {
-							send_party_add_partner(J_DILLER);
-							AddAIUI_On = false;
-						}
-						if (CursorPosInClient.x >= (m_nWndClientWidth / 2 - m_nWndClientWidth / 360 - m_nWndClientWidth / 22.5)
-							&& CursorPosInClient.x <= (m_nWndClientWidth / 2 - m_nWndClientWidth / 360)) {
-							send_party_add_partner(J_TANKER);
-							AddAIUI_On = false;
-						}
-						if (CursorPosInClient.x >= (m_nWndClientWidth / 2 + m_nWndClientWidth / 360)
-							&& CursorPosInClient.x <= (m_nWndClientWidth / 2 + m_nWndClientWidth / 360 + m_nWndClientWidth / 22.5)) {
-							send_party_add_partner(J_MAGICIAN);
-							AddAIUI_On = false;
-						}
-						if (CursorPosInClient.x >= (m_nWndClientWidth / 2 + m_nWndClientWidth / 10 - m_nWndClientWidth / 360 - m_nWndClientWidth / 22.5)
-							&& CursorPosInClient.x <= (m_nWndClientWidth / 2 + m_nWndClientWidth / 10 - m_nWndClientWidth / 360)) {
-							send_party_add_partner(J_SUPPORTER);
-							AddAIUI_On = false;
-						}
-					}
-					break;
-				}
-
-				if (CursorPosInClient.y >= (m_nWndClientHeight/2 + m_nWndClientHeight / 3 - m_nWndClientHeight / 10)
-					&& CursorPosInClient.y <= (m_nWndClientHeight / 2 + m_nWndClientHeight / 3 - 10)) {
-					if (CursorPosInClient.x >= (m_nWndClientWidth / 4 + m_nWndClientWidth / 90) 
-						&& CursorPosInClient.x <= (m_nWndClientWidth / 4 + m_nWndClientWidth / 90 + m_nWndClientWidth / 9)) {
-						if (!party_enter) send_party_room_make();
-					}
-					if (CursorPosInClient.x >= (m_nWndClientWidth / 2 - m_nWndClientWidth / 180 - m_nWndClientWidth / 9)
-						&& CursorPosInClient.x <= (m_nWndClientWidth / 2 - m_nWndClientWidth / 180)) {
-						if (!party_info_on) break;
-						if (party_enter == false) send_party_room_enter_request();
-						else send_party_room_quit_request();
-					}
-					if (CursorPosInClient.x >= (m_nWndClientWidth / 2 + m_nWndClientWidth / 180)
-						&& CursorPosInClient.x <= (m_nWndClientWidth / 2 + m_nWndClientWidth / 180 + m_nWndClientWidth / 9)) {
-						if (party_enter) {
-							PartyInviteUI_ON = true;
-							Invite_Str = L"";
-						}
-					}
-					if (CursorPosInClient.x >= (m_nWndClientWidth - m_nWndClientWidth / 4 - m_nWndClientWidth / 90 - m_nWndClientWidth / 9)
-						&& CursorPosInClient.x <= (m_nWndClientWidth - m_nWndClientWidth / 4 - m_nWndClientWidth / 90)) {
-						if (party_enter) {
-							AddAIUI_On = true;
-						}
-					}
-				}
-				else {
-					if (party_enter) break;
-					if (CursorPosInClient.x >= (m_nWndClientWidth / 4 + m_nWndClientWidth / 90)
-						&& CursorPosInClient.x <= (m_nWndClientWidth / 2 - m_nWndClientWidth / 180)) {
-						if (CursorPosInClient.y >= (m_nWndClientHeight / 2 - m_nWndClientHeight / 3 + m_nWndClientHeight / 90)
-							&& CursorPosInClient.y <= (m_nWndClientHeight / 2 - m_nWndClientHeight / 3 + m_nWndClientHeight / 10)
-							&& robby_cnt >= 1) {
-							send_party_room_info_request(party_id_index_vector[0]);
-						}
-						if (CursorPosInClient.y >= (m_nWndClientHeight / 2 - m_nWndClientHeight / 3 + m_nWndClientHeight / 90 + m_nWndClientHeight / 10)
-							&& CursorPosInClient.y <= (m_nWndClientHeight / 2 - m_nWndClientHeight / 3 + (m_nWndClientHeight / 10) * 2)
-							&& robby_cnt >= 2) {
-							send_party_room_info_request(party_id_index_vector[1]);
-						}
-						if (CursorPosInClient.y >= (m_nWndClientHeight / 2 - m_nWndClientHeight / 3 + m_nWndClientHeight / 90 + (m_nWndClientHeight / 10)*2)
-							&& CursorPosInClient.y <= (m_nWndClientHeight / 2 - m_nWndClientHeight / 3 + (m_nWndClientHeight / 10)*3)
-							&& robby_cnt >= 3) {
-							send_party_room_info_request(party_id_index_vector[2]);
-						}
-						if (CursorPosInClient.y >= (m_nWndClientHeight / 2 - m_nWndClientHeight / 3 + m_nWndClientHeight / 90 + (m_nWndClientHeight / 10) * 3)
-							&& CursorPosInClient.y <= (m_nWndClientHeight / 2 - m_nWndClientHeight / 3 + (m_nWndClientHeight / 10) * 4)
-							&& robby_cnt >= 4) {
-							send_party_room_info_request(party_id_index_vector[3]);
-						}
-						if (CursorPosInClient.y >= (m_nWndClientHeight / 2 - m_nWndClientHeight / 3 + m_nWndClientHeight / 90 + (m_nWndClientHeight / 10) * 4)
-							&& CursorPosInClient.y <= (m_nWndClientHeight / 2 - m_nWndClientHeight / 3 + (m_nWndClientHeight / 10) * 5)
-							&& robby_cnt >= 5) {
-							send_party_room_info_request(party_id_index_vector[4]);
-						}
-					}
-				}
+		if (PartyUI_On) {
+			if (PartyInviteUI_ON) {
 				break;
 			}
-			if(!Login_OK && !Join_On && !Fail_On) {
-				if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - 50) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 150)) {  //id
-					if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 200) && CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 245)){
-						PASSWORD_On = false;
-						ID_On = true;
-					}
-				}
-				 if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - 50) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 150)) {   //password
-					if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 250) && CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 295)) {
-						ID_On = false;
-						PASSWORD_On = true;
-					}
-				}
-				 if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 + 160) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 250)) {   //로그인 버튼
-					 if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 200) && CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 295)) {
-						 string id, passwoird;
-						 wstring2string(id, ID_Str);
-						 strcpy(pl_id,id.c_str());
-						 wstring2string(passwoird, PASSWORD_Str);
-						 strcpy(pl_password, passwoird.c_str());
-					//	 pl_job = 0;  //나중엔 db연결땐 빼야함 			
-						 if (pl_job == -1) pl_job = 0;
-						 //if (pl_element == -1) pl_job = 0;
-						 send_login_packet(pl_id, pl_password, (JOB)pl_job, (ELEMENT)(0), pl_id);   //회원가입 확인 버튼 누르면 정보 싹다 보내고 db추가  
-						 /*if (Fail_Reason == 0)
-							 Release_Login_Object();
-						 if (!Open_Build_Once&& Fail_Reason == 0) {
-							 BuildObjects();
-							 Open_Build_Once = true;
-						 }*/
 
-					 } 
-				 }
-				 if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - 250) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 250)) {   //회원가입  버튼
-					 if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 300) && CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 330)) {
-						 Join_On = true;
-						 ID_On = false;
-						 PASSWORD_On = false;
-					 }
-				 }
-			}
-			if (Join_On && !Login_OK && !Fail_On) {
-				if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 ) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 200)) {  //id
-					if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 - 250) && CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 - 205)) {
-						JOIN_ID_On = true;
-						JOIN_PASSWORD_On = false;
-						JOIN_NICKNAME_On = false;
-					}
-				}
-				if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 200)) {  //password
-					if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2  -195) && CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 - 150)) {
-						JOIN_ID_On = false;
-						JOIN_PASSWORD_On = true;
-						JOIN_NICKNAME_On = false;
-					}
-				}
-				if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 200)) {  //nickname
-					if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 - 140) && CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 - 95)) {
-						JOIN_ID_On = false;
-						JOIN_PASSWORD_On = false;
-						JOIN_NICKNAME_On = true;
-					}
-				}
-
+			if (AddAIUI_On) {
 				if (CursorPosInClient.y >= (m_nWndClientHeight / 2 + m_nWndClientHeight / 20 - m_nWndClientHeight / 22.5)
 					&& CursorPosInClient.y <= (m_nWndClientHeight / 2 + m_nWndClientHeight / 20 - 10)) {
 					if (CursorPosInClient.x >= (m_nWndClientWidth / 2 - m_nWndClientWidth / 10 + m_nWndClientWidth / 360)
 						&& CursorPosInClient.x <= (m_nWndClientWidth / 2 - m_nWndClientWidth / 10 + m_nWndClientWidth / 360 + m_nWndClientWidth / 22.5)) {
-						JOIN_DILLER_On = true; 		JOIN_TANKER_On = false; 		JOIN_MAGICIAN_On = false;		JOIN_SUPPORTER_On = false;  //굳이 필요?
-						pl_job = 0;
-						JOIN_ID_On = false;
-						JOIN_PASSWORD_On = false;
-						JOIN_NICKNAME_On = false;
+						send_party_add_partner(J_DILLER);
+						AddAIUI_On = false;
 					}
 					if (CursorPosInClient.x >= (m_nWndClientWidth / 2 - m_nWndClientWidth / 360 - m_nWndClientWidth / 22.5)
 						&& CursorPosInClient.x <= (m_nWndClientWidth / 2 - m_nWndClientWidth / 360)) {
-						JOIN_DILLER_On = false; 		JOIN_TANKER_On = true; 		JOIN_MAGICIAN_On = false;		JOIN_SUPPORTER_On = false;
-						pl_job = 1;
-						JOIN_ID_On = false;
-						JOIN_PASSWORD_On = false;
-						JOIN_NICKNAME_On = false;
+						send_party_add_partner(J_TANKER);
+						AddAIUI_On = false;
 					}
 					if (CursorPosInClient.x >= (m_nWndClientWidth / 2 + m_nWndClientWidth / 360)
 						&& CursorPosInClient.x <= (m_nWndClientWidth / 2 + m_nWndClientWidth / 360 + m_nWndClientWidth / 22.5)) {
-						JOIN_DILLER_On = false; 		JOIN_TANKER_On = false; 		JOIN_MAGICIAN_On = true;		JOIN_SUPPORTER_On = false;  
-						pl_job = 2;
-						JOIN_ID_On = false;
-						JOIN_PASSWORD_On = false;
-						JOIN_NICKNAME_On = false;
+						send_party_add_partner(J_MAGICIAN);
+						AddAIUI_On = false;
 					}
 					if (CursorPosInClient.x >= (m_nWndClientWidth / 2 + m_nWndClientWidth / 10 - m_nWndClientWidth / 360 - m_nWndClientWidth / 22.5)
 						&& CursorPosInClient.x <= (m_nWndClientWidth / 2 + m_nWndClientWidth / 10 - m_nWndClientWidth / 360)) {
-						JOIN_DILLER_On = false; 		JOIN_TANKER_On = false; 		JOIN_MAGICIAN_On = false;		JOIN_SUPPORTER_On = true;
-						pl_job = 3;
-						JOIN_ID_On = false;
-						JOIN_PASSWORD_On = false;
-						JOIN_NICKNAME_On = false;
+						send_party_add_partner(J_SUPPORTER);
+						AddAIUI_On = false;
 					}
 				}
-				if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 100)  //위 속성 4개 
-					&& CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 130)) {
-					if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - 175)  //물 
-						&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 - 175 + 80)) {
-						pl_element = 1;
-					}
-					if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 360 - FRAME_BUFFER_WIDTH / 22.5) //강철 
-						&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 360)) {
-						pl_element = 2;
-					}
-					if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360)
-						&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 + FRAME_BUFFER_WIDTH / 22.5)) { //바람 
-						pl_element = 3;
-					}
-					if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 10 - FRAME_BUFFER_WIDTH / 360 - FRAME_BUFFER_WIDTH / 22.5) //불 
-						&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 10 - FRAME_BUFFER_WIDTH / 360)) {
-						pl_element = 4;
-					}
-				}
-				if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 140)//아래 속성 3개 
-					&& CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 170)) {
-					if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - 175)  //나무
-						&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 - 175 + 80)) {
-						pl_element = 5;
-					}
-					if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 360 - FRAME_BUFFER_WIDTH / 22.5) //땅
-						&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 360)) {
-						pl_element = 6;
-					}
-					if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360)
-						&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 + FRAME_BUFFER_WIDTH / 22.5)) { //얼음
-						pl_element = 7;
-					}
-				}
-			
-				if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 220)
-					&& CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 270)) {
-					if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 - 100)  //확인 
-						&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 - 20)) {
-				
-						string id, passwoird, nickname;
-						wstring2string(id, JOIN_ID_Str);
-						strcpy(pl_id, id.c_str());
+				break;
+			}
 
-						wstring2string(passwoird, JOIN_PASSWORD_Str);
-						strcpy(pl_password, passwoird.c_str());
+			if (CursorPosInClient.y >= (m_nWndClientHeight / 2 + m_nWndClientHeight / 3 - m_nWndClientHeight / 10)
+				&& CursorPosInClient.y <= (m_nWndClientHeight / 2 + m_nWndClientHeight / 3 - 10)) {
+				if (CursorPosInClient.x >= (m_nWndClientWidth / 4 + m_nWndClientWidth / 90)
+					&& CursorPosInClient.x <= (m_nWndClientWidth / 4 + m_nWndClientWidth / 90 + m_nWndClientWidth / 9)) {
+					if (!party_enter) send_party_room_make();
+				}
+				if (CursorPosInClient.x >= (m_nWndClientWidth / 2 - m_nWndClientWidth / 180 - m_nWndClientWidth / 9)
+					&& CursorPosInClient.x <= (m_nWndClientWidth / 2 - m_nWndClientWidth / 180)) {
+					if (!party_info_on) break;
+					if (party_enter == false) send_party_room_enter_request();
+					else send_party_room_quit_request();
+				}
+				if (CursorPosInClient.x >= (m_nWndClientWidth / 2 + m_nWndClientWidth / 180)
+					&& CursorPosInClient.x <= (m_nWndClientWidth / 2 + m_nWndClientWidth / 180 + m_nWndClientWidth / 9)) {
+					if (party_enter) {
+						PartyInviteUI_ON = true;
+						Invite_Str = L"";
+					}
+				}
+				if (CursorPosInClient.x >= (m_nWndClientWidth - m_nWndClientWidth / 4 - m_nWndClientWidth / 90 - m_nWndClientWidth / 9)
+					&& CursorPosInClient.x <= (m_nWndClientWidth - m_nWndClientWidth / 4 - m_nWndClientWidth / 90)) {
+					if (party_enter) {
+						AddAIUI_On = true;
+					}
+				}
+			}
+			else {
+				if (party_enter) break;
+				if (CursorPosInClient.x >= (m_nWndClientWidth / 4 + m_nWndClientWidth / 90)
+					&& CursorPosInClient.x <= (m_nWndClientWidth / 2 - m_nWndClientWidth / 180)) {
+					if (CursorPosInClient.y >= (m_nWndClientHeight / 2 - m_nWndClientHeight / 3 + m_nWndClientHeight / 90)
+						&& CursorPosInClient.y <= (m_nWndClientHeight / 2 - m_nWndClientHeight / 3 + m_nWndClientHeight / 10)
+						&& robby_cnt >= 1) {
+						send_party_room_info_request(party_id_index_vector[0]);
+					}
+					if (CursorPosInClient.y >= (m_nWndClientHeight / 2 - m_nWndClientHeight / 3 + m_nWndClientHeight / 90 + m_nWndClientHeight / 10)
+						&& CursorPosInClient.y <= (m_nWndClientHeight / 2 - m_nWndClientHeight / 3 + (m_nWndClientHeight / 10) * 2)
+						&& robby_cnt >= 2) {
+						send_party_room_info_request(party_id_index_vector[1]);
+					}
+					if (CursorPosInClient.y >= (m_nWndClientHeight / 2 - m_nWndClientHeight / 3 + m_nWndClientHeight / 90 + (m_nWndClientHeight / 10) * 2)
+						&& CursorPosInClient.y <= (m_nWndClientHeight / 2 - m_nWndClientHeight / 3 + (m_nWndClientHeight / 10) * 3)
+						&& robby_cnt >= 3) {
+						send_party_room_info_request(party_id_index_vector[2]);
+					}
+					if (CursorPosInClient.y >= (m_nWndClientHeight / 2 - m_nWndClientHeight / 3 + m_nWndClientHeight / 90 + (m_nWndClientHeight / 10) * 3)
+						&& CursorPosInClient.y <= (m_nWndClientHeight / 2 - m_nWndClientHeight / 3 + (m_nWndClientHeight / 10) * 4)
+						&& robby_cnt >= 4) {
+						send_party_room_info_request(party_id_index_vector[3]);
+					}
+					if (CursorPosInClient.y >= (m_nWndClientHeight / 2 - m_nWndClientHeight / 3 + m_nWndClientHeight / 90 + (m_nWndClientHeight / 10) * 4)
+						&& CursorPosInClient.y <= (m_nWndClientHeight / 2 - m_nWndClientHeight / 3 + (m_nWndClientHeight / 10) * 5)
+						&& robby_cnt >= 5) {
+						send_party_room_info_request(party_id_index_vector[4]);
+					}
+				}
+			}
+			break;
+		}
+		if (!Login_OK && !Join_On && !Fail_On) {
+			if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - 50) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 150)) {  //id
+				if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 200) && CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 245)) {
+					PASSWORD_On = false;
+					ID_On = true;
+				}
+			}
+			if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - 50) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 150)) {   //password
+				if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 250) && CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 295)) {
+					ID_On = false;
+					PASSWORD_On = true;
+				}
+			}
+			if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 + 160) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 250)) {   //로그인 버튼
+				if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 200) && CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 295)) {
+					string id, passwoird;
+					wstring2string(id, ID_Str);
+					strcpy(pl_id, id.c_str());
+					wstring2string(passwoird, PASSWORD_Str);
+					strcpy(pl_password, passwoird.c_str());
+					//	 pl_job = 0;  //나중엔 db연결땐 빼야함 			
+					if (pl_job == -1) pl_job = 0;
+					//if (pl_element == -1) pl_job = 0;
+					send_login_packet(pl_id, pl_password, (JOB)pl_job, (ELEMENT)(0), pl_id);   //회원가입 확인 버튼 누르면 정보 싹다 보내고 db추가  
+					/*if (Fail_Reason == 0)
+						Release_Login_Object();
+					if (!Open_Build_Once&& Fail_Reason == 0) {
+						BuildObjects();
+						Open_Build_Once = true;
+					}*/
 
-						wstring2string(nickname, JOIN_NICKNAME_Str);
-						strcpy(pl_nickname, nickname.c_str());
+				}
+			}
+			if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - 250) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 250)) {   //회원가입  버튼
+				if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 300) && CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 330)) {
+					Join_On = true;
+					ID_On = false;
+					PASSWORD_On = false;
+				}
+			}
+		}
+		if (Join_On && !Login_OK && !Fail_On) {
+			if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 200)) {  //id
+				if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 - 250) && CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 - 205)) {
+					JOIN_ID_On = true;
+					JOIN_PASSWORD_On = false;
+					JOIN_NICKNAME_On = false;
+				}
+			}
+			if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 200)) {  //password
+				if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 - 195) && CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 - 150)) {
+					JOIN_ID_On = false;
+					JOIN_PASSWORD_On = true;
+					JOIN_NICKNAME_On = false;
+				}
+			}
+			if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2) && CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 200)) {  //nickname
+				if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 - 140) && CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 - 95)) {
+					JOIN_ID_On = false;
+					JOIN_PASSWORD_On = false;
+					JOIN_NICKNAME_On = true;
+				}
+			}
+
+			if (CursorPosInClient.y >= (m_nWndClientHeight / 2 + m_nWndClientHeight / 20 - m_nWndClientHeight / 22.5)
+				&& CursorPosInClient.y <= (m_nWndClientHeight / 2 + m_nWndClientHeight / 20 - 10)) {
+				if (CursorPosInClient.x >= (m_nWndClientWidth / 2 - m_nWndClientWidth / 10 + m_nWndClientWidth / 360)
+					&& CursorPosInClient.x <= (m_nWndClientWidth / 2 - m_nWndClientWidth / 10 + m_nWndClientWidth / 360 + m_nWndClientWidth / 22.5)) {
+					JOIN_DILLER_On = true; 		JOIN_TANKER_On = false; 		JOIN_MAGICIAN_On = false;		JOIN_SUPPORTER_On = false;  //굳이 필요?
+					pl_job = 0;
+					JOIN_ID_On = false;
+					JOIN_PASSWORD_On = false;
+					JOIN_NICKNAME_On = false;
+				}
+				if (CursorPosInClient.x >= (m_nWndClientWidth / 2 - m_nWndClientWidth / 360 - m_nWndClientWidth / 22.5)
+					&& CursorPosInClient.x <= (m_nWndClientWidth / 2 - m_nWndClientWidth / 360)) {
+					JOIN_DILLER_On = false; 		JOIN_TANKER_On = true; 		JOIN_MAGICIAN_On = false;		JOIN_SUPPORTER_On = false;
+					pl_job = 1;
+					JOIN_ID_On = false;
+					JOIN_PASSWORD_On = false;
+					JOIN_NICKNAME_On = false;
+				}
+				if (CursorPosInClient.x >= (m_nWndClientWidth / 2 + m_nWndClientWidth / 360)
+					&& CursorPosInClient.x <= (m_nWndClientWidth / 2 + m_nWndClientWidth / 360 + m_nWndClientWidth / 22.5)) {
+					JOIN_DILLER_On = false; 		JOIN_TANKER_On = false; 		JOIN_MAGICIAN_On = true;		JOIN_SUPPORTER_On = false;
+					pl_job = 2;
+					JOIN_ID_On = false;
+					JOIN_PASSWORD_On = false;
+					JOIN_NICKNAME_On = false;
+				}
+				if (CursorPosInClient.x >= (m_nWndClientWidth / 2 + m_nWndClientWidth / 10 - m_nWndClientWidth / 360 - m_nWndClientWidth / 22.5)
+					&& CursorPosInClient.x <= (m_nWndClientWidth / 2 + m_nWndClientWidth / 10 - m_nWndClientWidth / 360)) {
+					JOIN_DILLER_On = false; 		JOIN_TANKER_On = false; 		JOIN_MAGICIAN_On = false;		JOIN_SUPPORTER_On = true;
+					pl_job = 3;
+					JOIN_ID_On = false;
+					JOIN_PASSWORD_On = false;
+					JOIN_NICKNAME_On = false;
+				}
+			}
+			if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 100)  //위 속성 4개 
+				&& CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 130)) {
+				if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - 175)  //물 
+					&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 - 175 + 80)) {
+					pl_element = 1;
+				}
+				if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 360 - FRAME_BUFFER_WIDTH / 22.5) //강철 
+					&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 360)) {
+					pl_element = 2;
+				}
+				if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360)
+					&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 + FRAME_BUFFER_WIDTH / 22.5)) { //바람 
+					pl_element = 3;
+				}
+				if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 10 - FRAME_BUFFER_WIDTH / 360 - FRAME_BUFFER_WIDTH / 22.5) //불 
+					&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 10 - FRAME_BUFFER_WIDTH / 360)) {
+					pl_element = 4;
+				}
+			}
+			if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 140)//아래 속성 3개 
+				&& CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 170)) {
+				if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - 175)  //나무
+					&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 - 175 + 80)) {
+					pl_element = 5;
+				}
+				if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 360 - FRAME_BUFFER_WIDTH / 22.5) //땅
+					&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 - FRAME_BUFFER_WIDTH / 360)) {
+					pl_element = 6;
+				}
+				if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360)
+					&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 + FRAME_BUFFER_WIDTH / 22.5)) { //얼음
+					pl_element = 7;
+				}
+			}
+
+			if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 220)
+				&& CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 270)) {
+				if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 - 100)  //확인 
+					&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 - 20)) {
+
+					string id, passwoird, nickname;
+					wstring2string(id, JOIN_ID_Str);
+					strcpy(pl_id, id.c_str());
+
+					wstring2string(passwoird, JOIN_PASSWORD_Str);
+					strcpy(pl_password, passwoird.c_str());
+
+					wstring2string(nickname, JOIN_NICKNAME_Str);
+					strcpy(pl_nickname, nickname.c_str());
 					//	send_login_packet(pl_id, pl_password, (JOB)pl_job, (ELEMENT)pl_element, pl_nickname);
-						send_relogin_packet(pl_id, pl_password, pl_nickname, (JOB)pl_job, (ELEMENT)pl_element);
-						Join_On = false;
+					send_relogin_packet(pl_id, pl_password, pl_nickname, (JOB)pl_job, (ELEMENT)pl_element);
+					Join_On = false;
 					/*	if (Fail_Reason == 0)
 							Release_Login_Object();
 						if (!Open_Build_Once && Fail_Reason == 0) {
 							BuildObjects();
 							Open_Build_Once = true;
 						}*/
-					}
-					if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 )  //취소 
-						&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 + 80)) {
-						Join_On = false;
-						JOIN_ID_Str = L"";
-						JOIN_PASSWORD_Str = L"";
-						JOIN_NICKNAME_Str = L"";
-					}
-
 				}
-			}
-			if (Fail_On && !Login_OK) {
-				if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 200)
-					&& CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 245)) {
-					if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - 50)  //확인 
-						&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 50)) {
-						Fail_On = false;
-						Fail_Reason = 0;
-					}
+				if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360)  //취소 
+					&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 + 80)) {
+					Join_On = false;
+					JOIN_ID_Str = L"";
+					JOIN_PASSWORD_Str = L"";
+					JOIN_NICKNAME_Str = L"";
 				}
+
 			}
-			
-
-			if (f4_picking_possible) {
-				//cRay r; 
-				//r.RayAtWorldSpace(LOWORD(lParam), HIWORD(lParam));
-				for (int i = 0; i < MAX_USER; ++i) {  //9615  for (int i = 10615; i < 10795; i++) 
-					//if(r.isPicked(m_ppObjects[i])){
-					if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, mPlayer[i])) {
-						send_picking_skill_packet(0, 0, i);
-					//	m_ppObjects[i]->SetMesh(0, pOtherPlayerMesh[1]);  //피킹 확인위해 색상변경 
-						f4_picking_possible = false;
-						cout << "f4 보내기" << endl;
-					}
-				}
-			}
-
-			if (f5_picking_possible) {
-				for (int i = 0; i < MAX_USER; ++i) { 
-					if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, mPlayer[i])) {
-						send_picking_skill_packet(1, 0, i);
-						f5_picking_possible = false;
-						cout << "f5 보내기" << endl;
-					}
-				}
-			}
-
-			if (f6_picking_possible) {
-				for (int i = 0; i < MAX_USER; ++i) { 
-					if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, mPlayer[i])) {
-						send_picking_skill_packet(2, 0, i);
-						f6_picking_possible = false;
-						cout << "f6 보내기" << endl;
-					}
-				}
-			}
-
-
-
 		}
-		case WM_RBUTTONDOWN:
-			::SetCapture(hWnd);
-			::GetCursorPos(&m_ptOldCursorPos);
-			break;
-		case WM_LBUTTONUP:
-		case WM_RBUTTONUP:
-			::ReleaseCapture();
-			break;
-		case WM_MOUSEMOVE:
-			break;
-		default:
-			break;
+		if (Fail_On && !Login_OK) {
+			if (CursorPosInClient.y >= (FRAME_BUFFER_HEIGHT / 2 + 200)
+				&& CursorPosInClient.y <= (FRAME_BUFFER_HEIGHT / 2 + 245)) {
+				if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 - 50)  //확인 
+					&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + 50)) {
+					Fail_On = false;
+					Fail_Reason = 0;
+				}
+			}
+		}
+
+
+		if (f4_picking_possible) {
+			//cRay r; 
+			//r.RayAtWorldSpace(LOWORD(lParam), HIWORD(lParam));
+			for (int i = 0; i < MAX_USER; ++i) {  //9615  for (int i = 10615; i < 10795; i++) 
+				//if(r.isPicked(m_ppObjects[i])){
+				if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, mPlayer[i])) {
+					send_picking_skill_packet(0, 0, i);
+					//	m_ppObjects[i]->SetMesh(0, pOtherPlayerMesh[1]);  //피킹 확인위해 색상변경 
+					f4_picking_possible = false;
+					cout << "f4 보내기" << endl;
+				}
+			}
+		}
+
+		if (f5_picking_possible) {
+			for (int i = 0; i < MAX_USER; ++i) {
+				if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, mPlayer[i])) {
+					send_picking_skill_packet(1, 0, i);
+					f5_picking_possible = false;
+					cout << "f5 보내기" << endl;
+				}
+			}
+		}
+
+		if (f6_picking_possible) {
+			for (int i = 0; i < MAX_USER; ++i) {
+				if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, mPlayer[i])) {
+					send_picking_skill_packet(2, 0, i);
+					f6_picking_possible = false;
+					cout << "f6 보내기" << endl;
+				}
+			}
+		}
+
+
+
+	}
+	case WM_RBUTTONDOWN:
+		::SetCapture(hWnd);
+		::GetCursorPos(&m_ptOldCursorPos);
+		break;
+	case WM_LBUTTONUP:
+	case WM_RBUTTONUP:
+		::ReleaseCapture();
+		break;
+	case WM_MOUSEMOVE:
+		break;
+	default:
+		break;
 	}
 }
 
@@ -803,141 +803,141 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 
 	switch (nMessageID)
 	{
-		case WM_KEYUP:
-			switch (wParam)
-			{
-				case VK_ESCAPE:
-					::PostQuitMessage(0);
-					break;
-				case VK_RETURN: {
-					if (PartyInviteUI_ON) {
-						PartyInviteUI_ON = false;
-						len = 1 + Invite_Str.length();
-						send_str = new char[len * 4];
-						temp = Invite_Str.c_str();
-						wcstombs(send_str, temp, MAX_NAME_SIZE);
-						send_party_invite(send_str);
-						delete send_str;
-						break;
-					}
-
-					Chatting_On = !Chatting_On;
-					if (Chatting_On == false) {
-						len = 1 + Chatting_Str.length();
-						send_str = new char[len * 4];
-						temp = Chatting_Str.c_str();
-						wcstombs(send_str, temp, MAX_CHAT_SIZE);
-						send_chat_packet(send_str);
-						Chatting_Str = L"";
-						delete send_str;
-					}
-
-					if (!Login_OK && ID_On) {
-						len = 1 + ID_Str.length();
-						send_str = new char[len * 4];
-						temp = ID_Str.c_str();
-						wcstombs(send_str, temp, MAX_NAME_SIZE);
-						//send_party_invite(send_str);
-						delete send_str;
-						break;
-					}
-					if (!Login_OK && PASSWORD_On) {
-						len = 1 + PASSWORD_Str.length();
-						send_str = new char[len * 4];
-						temp = PASSWORD_Str.c_str();
-						wcstombs(send_str, temp, MAX_NAME_SIZE);
-						//send_party_invite(send_str);
-						delete send_str;
-						break;
-					}
-					//회원가입 
-					if (!Login_OK && JOIN_ID_On && Join_On) {
-						len = 1 + JOIN_ID_Str.length();
-						send_str = new char[len * 4];
-						temp = JOIN_ID_Str.c_str();
-						wcstombs(send_str, temp, MAX_NAME_SIZE);
-						delete send_str;
-						break;
-					}
-					if (!Login_OK && JOIN_PASSWORD_On && Join_On) {
-						len = 1 + JOIN_PASSWORD_Str.length();
-						send_str = new char[len * 4];
-						temp = JOIN_PASSWORD_Str.c_str();
-						wcstombs(send_str, temp, MAX_NAME_SIZE);
-						delete send_str;
-						break;
-					}
-					if (!Login_OK && JOIN_NICKNAME_On && Join_On) {
-						len = 1 + JOIN_NICKNAME_Str.length();
-						send_str = new char[len * 4];
-						temp = JOIN_NICKNAME_Str.c_str();
-						wcstombs(send_str, temp, MAX_NAME_SIZE);
-						delete send_str;
-						break;
-					}
-					break;
-				}
-				case VK_F1: {
-					switch (my_job)
-					{
-					case J_DILLER:
-						my_job = J_TANKER;
-						break;
-					case J_TANKER:
-						my_job = J_MAGICIAN;
-						break;
-					case J_MAGICIAN:
-						my_job = J_SUPPORTER;
-						break;
-					case J_SUPPORTER:
-						my_job = J_DILLER;
-						break;
-					default:
-						break;
-					}
-
-					send_change_job_packet(my_job);
-					break;
-				}
-				case VK_F2: {
-					break;
-				}
-				case VK_F3:
-					m_pCamera = m_pPlayer->ChangeCamera((DWORD)(wParam - VK_F1 + 1), m_GameTimer.GetTimeElapsed());
-					break;
-				case VK_F4:
-					if(m_pPlayer->m_mp >= 1000)
-						f4_picking_possible = true;
-					break;
-				case VK_F5:
-					if (m_pPlayer->m_mp >= 1000)
-						f5_picking_possible = true;
-					break;
-				case VK_F6:
-					if (m_pPlayer->m_mp >= 1000)
-						f6_picking_possible = true;
-					break;
-				case VK_F9:
-					ChangeSwapChainState();
-					break;
-				case 0x50: {	// p key
-					if (InDungeon) break;
-					if (PartyInviteUI_ON || Chatting_On) break;
-					PartyUI_On = !PartyUI_On;
-					if (PartyUI_On) send_party_room_packet();
-					else {
-						party_id_index_vector.clear();
-						robby_cnt = 0;
-					}
-					break;
-				}
-				default:
-					break;
-			}
-			m_pPlayer->dwDir = 0;
+	case WM_KEYUP:
+		switch (wParam)
+		{
+		case VK_ESCAPE:
+			::PostQuitMessage(0);
 			break;
+		case VK_RETURN: {
+			if (PartyInviteUI_ON) {
+				PartyInviteUI_ON = false;
+				len = 1 + Invite_Str.length();
+				send_str = new char[len * 4];
+				temp = Invite_Str.c_str();
+				wcstombs(send_str, temp, MAX_NAME_SIZE);
+				send_party_invite(send_str);
+				delete send_str;
+				break;
+			}
+
+			Chatting_On = !Chatting_On;
+			if (Chatting_On == false) {
+				len = 1 + Chatting_Str.length();
+				send_str = new char[len * 4];
+				temp = Chatting_Str.c_str();
+				wcstombs(send_str, temp, MAX_CHAT_SIZE);
+				send_chat_packet(send_str);
+				Chatting_Str = L"";
+				delete send_str;
+			}
+
+			if (!Login_OK && ID_On) {
+				len = 1 + ID_Str.length();
+				send_str = new char[len * 4];
+				temp = ID_Str.c_str();
+				wcstombs(send_str, temp, MAX_NAME_SIZE);
+				//send_party_invite(send_str);
+				delete send_str;
+				break;
+			}
+			if (!Login_OK && PASSWORD_On) {
+				len = 1 + PASSWORD_Str.length();
+				send_str = new char[len * 4];
+				temp = PASSWORD_Str.c_str();
+				wcstombs(send_str, temp, MAX_NAME_SIZE);
+				//send_party_invite(send_str);
+				delete send_str;
+				break;
+			}
+			//회원가입 
+			if (!Login_OK && JOIN_ID_On && Join_On) {
+				len = 1 + JOIN_ID_Str.length();
+				send_str = new char[len * 4];
+				temp = JOIN_ID_Str.c_str();
+				wcstombs(send_str, temp, MAX_NAME_SIZE);
+				delete send_str;
+				break;
+			}
+			if (!Login_OK && JOIN_PASSWORD_On && Join_On) {
+				len = 1 + JOIN_PASSWORD_Str.length();
+				send_str = new char[len * 4];
+				temp = JOIN_PASSWORD_Str.c_str();
+				wcstombs(send_str, temp, MAX_NAME_SIZE);
+				delete send_str;
+				break;
+			}
+			if (!Login_OK && JOIN_NICKNAME_On && Join_On) {
+				len = 1 + JOIN_NICKNAME_Str.length();
+				send_str = new char[len * 4];
+				temp = JOIN_NICKNAME_Str.c_str();
+				wcstombs(send_str, temp, MAX_NAME_SIZE);
+				delete send_str;
+				break;
+			}
+			break;
+		}
+		case VK_F1: {
+			switch (my_job)
+			{
+			case J_DILLER:
+				my_job = J_TANKER;
+				break;
+			case J_TANKER:
+				my_job = J_MAGICIAN;
+				break;
+			case J_MAGICIAN:
+				my_job = J_SUPPORTER;
+				break;
+			case J_SUPPORTER:
+				my_job = J_DILLER;
+				break;
+			default:
+				break;
+			}
+
+			send_change_job_packet(my_job);
+			break;
+		}
+		case VK_F2: {
+			break;
+		}
+		case VK_F3:
+			m_pCamera = m_pPlayer->ChangeCamera((DWORD)(wParam - VK_F1 + 1), m_GameTimer.GetTimeElapsed());
+			break;
+		case VK_F4:
+			if (m_pPlayer->m_mp >= 1000)
+				f4_picking_possible = true;
+			break;
+		case VK_F5:
+			if (m_pPlayer->m_mp >= 1000)
+				f5_picking_possible = true;
+			break;
+		case VK_F6:
+			if (m_pPlayer->m_mp >= 1000)
+				f6_picking_possible = true;
+			break;
+		case VK_F9:
+			ChangeSwapChainState();
+			break;
+		case 0x50: {	// p key
+			if (InDungeon) break;
+			if (PartyInviteUI_ON || Chatting_On) break;
+			PartyUI_On = !PartyUI_On;
+			if (PartyUI_On) send_party_room_packet();
+			else {
+				party_id_index_vector.clear();
+				robby_cnt = 0;
+			}
+			break;
+		}
 		default:
 			break;
+		}
+		m_pPlayer->dwDir = 0;
+		break;
+	default:
+		break;
 	}
 }
 
@@ -945,32 +945,32 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 {
 	switch (nMessageID)
 	{
-		case WM_ACTIVATE:
-		{
-			if (LOWORD(wParam) == WA_INACTIVE) m_GameTimer.Stop();
-			else m_GameTimer.Start();
-			break;
-		}
-		case WM_SIZE:
-			break;
-		case WM_LBUTTONDOWN:
-        case WM_RBUTTONDOWN:
-        case WM_LBUTTONUP:
-        case WM_RBUTTONUP:
-        case WM_MOUSEMOVE:
-			OnProcessingMouseMessage(hWnd, nMessageID, wParam, lParam);
-            break;
-        case WM_KEYDOWN:
-        case WM_KEYUP:
-			OnProcessingKeyboardMessage(hWnd, nMessageID, wParam, lParam);
-			break;
+	case WM_ACTIVATE:
+	{
+		if (LOWORD(wParam) == WA_INACTIVE) m_GameTimer.Stop();
+		else m_GameTimer.Start();
+		break;
+	}
+	case WM_SIZE:
+		break;
+	case WM_LBUTTONDOWN:
+	case WM_RBUTTONDOWN:
+	case WM_LBUTTONUP:
+	case WM_RBUTTONUP:
+	case WM_MOUSEMOVE:
+		OnProcessingMouseMessage(hWnd, nMessageID, wParam, lParam);
+		break;
+	case WM_KEYDOWN:
+	case WM_KEYUP:
+		OnProcessingKeyboardMessage(hWnd, nMessageID, wParam, lParam);
+		break;
 	}
 	return(0);
 }
 
 void CGameFramework::OnDestroy()
 {
-    ReleaseObjects();
+	ReleaseObjects();
 
 	::CloseHandle(m_hFenceEvent);
 
@@ -988,12 +988,12 @@ void CGameFramework::OnDestroy()
 
 	m_pdxgiSwapChain->SetFullscreenState(FALSE, NULL);
 	if (m_pdxgiSwapChain) m_pdxgiSwapChain->Release();
-    if (m_pd3dDevice) m_pd3dDevice->Release();
+	if (m_pd3dDevice) m_pd3dDevice->Release();
 	if (m_pdxgiFactory) m_pdxgiFactory->Release();
 
 #if defined(_DEBUG)
-	IDXGIDebug1	*pdxgiDebug = NULL;
-	DXGIGetDebugInterface1(0, __uuidof(IDXGIDebug1), (void **)&pdxgiDebug);
+	IDXGIDebug1* pdxgiDebug = NULL;
+	DXGIGetDebugInterface1(0, __uuidof(IDXGIDebug1), (void**)&pdxgiDebug);
 	HRESULT hResult = pdxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_DETAIL);
 	pdxgiDebug->Release();
 #endif
@@ -1081,9 +1081,11 @@ void CGameFramework::BuildObjects_login()
 		//로그인 실패창 
 		m_ppUILayer[40] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::GhostWhite, D2D1::ColorF::Black);
 		m_ppUILayer[41] = new Fail_UI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::DodgerBlue, D2D1::ColorF::Black);
+		//스킬 이름
+		m_ppUILayer[42] = new Skill_Name_UI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::GhostWhite, D2D1::ColorF::Black);
 
 		// 레이드 보스 스킬 이펙트 창
-		m_ppUILayer[42] = new BossSkillUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::OrangeRed);
+		m_ppUILayer[43] = new BossSkillUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::OrangeRed);
 
 		m_ppUILayer[0]->setAlpha(0.5, 1.0);
 		m_ppUILayer[1]->setAlpha(0.5, 1.0);
@@ -1115,9 +1117,9 @@ void CGameFramework::BuildObjects_login()
 
 		m_ppUILayer[22]->setAlpha(0.5, 1.0);
 		m_ppUILayer[23]->setAlpha(0.5, 1.0);
-		m_ppUILayer[24]->setAlpha(0.8, 0.0); //글씨 없음 
-		m_ppUILayer[25]->setAlpha(0.8, 0.0); //글씨 없음 
-		m_ppUILayer[26]->setAlpha(0.8, 0.0); //글씨 없음 
+		m_ppUILayer[24]->setAlpha(0.8, 1.0); //글씨 없음 
+		m_ppUILayer[25]->setAlpha(0.8, 1.0); //글씨 없음 
+		m_ppUILayer[26]->setAlpha(0.8, 1.0); //글씨 없음 
 
 		m_ppUILayer[27]->setAlpha(0.8, 1.0);  //배경
 		m_ppUILayer[28]->setAlpha(0.8, 1.0);  //입력
@@ -1136,8 +1138,9 @@ void CGameFramework::BuildObjects_login()
 		m_ppUILayer[39]->setAlpha(1.0, 1.0);
 		m_ppUILayer[40]->setAlpha(0.5, 1.0);
 		m_ppUILayer[41]->setAlpha(1.0, 1.0);
-
 		m_ppUILayer[42]->setAlpha(0.0, 1.0);
+
+		m_ppUILayer[43]->setAlpha(0.0, 1.0);
 
 		m_ppUILayer[0]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_FAR);
@@ -1193,8 +1196,8 @@ void CGameFramework::BuildObjects_login()
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		m_ppUILayer[24]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-		m_ppUILayer[25]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
-			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[25]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight, 
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_FLOW_DIRECTION_LEFT_TO_RIGHT);
 		m_ppUILayer[26]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
@@ -1229,7 +1232,9 @@ void CGameFramework::BuildObjects_login()
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_FLOW_DIRECTION_TOP_TO_BOTTOM);
 		m_ppUILayer[41]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_FLOW_DIRECTION_LEFT_TO_RIGHT);
-		m_ppUILayer[42]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+		reinterpret_cast<Skill_Name_UI*>(m_ppUILayer[42])->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[43]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 		// UIBar Setting
@@ -1339,9 +1344,9 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[28] = new PartyInviteUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::SkyBlue, D2D1::ColorF::Black);
 		m_ppUILayer[29] = new PartyInviteUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::SkyBlue, D2D1::ColorF::Black);
 		// 로그인 버튼
-		m_ppUILayer[30] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::RoyalBlue, D2D1::ColorF::Black); 
+		m_ppUILayer[30] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::RoyalBlue, D2D1::ColorF::Black);
 		// 회원가입 버튼
-		m_ppUILayer[31] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::DodgerBlue, D2D1::ColorF::Black); 
+		m_ppUILayer[31] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::DodgerBlue, D2D1::ColorF::Black);
 		//JOIN 상자와   id/ password/nickname
 		m_ppUILayer[32] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::GhostWhite, D2D1::ColorF::Black);
 		m_ppUILayer[33] = new Title_UI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::DodgerBlue, D2D1::ColorF::Black);
@@ -1357,8 +1362,12 @@ void CGameFramework::BuildObjects()
 		//로그인 실패창 
 		m_ppUILayer[40] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::GhostWhite, D2D1::ColorF::Black);
 		m_ppUILayer[41] = new Fail_UI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::DodgerBlue, D2D1::ColorF::Black);
+
+		//스킬 이름
+		m_ppUILayer[42] = new Skill_Name_UI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::GhostWhite, D2D1::ColorF::Black);
+
 		// 레이드 보스 스킬 이펙트 창
-		m_ppUILayer[42] = new BossSkillUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::OrangeRed);
+		m_ppUILayer[43] = new BossSkillUI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::Red, D2D1::ColorF::OrangeRed);
 
 		m_ppUILayer[0]->setAlpha(0.5, 1.0);
 		m_ppUILayer[1]->setAlpha(0.5, 1.0);
@@ -1390,17 +1399,17 @@ void CGameFramework::BuildObjects()
 
 		m_ppUILayer[22]->setAlpha(0.5, 1.0);
 		m_ppUILayer[23]->setAlpha(0.5, 1.0);
-		m_ppUILayer[24]->setAlpha(0.8, 0.0); //글씨 없음 
-		m_ppUILayer[25]->setAlpha(0.8, 0.0); //글씨 없음 
-		m_ppUILayer[26]->setAlpha(0.8, 0.0); //글씨 없음 
+		m_ppUILayer[24]->setAlpha(0.8, 1.0); //글씨 없음 
+		m_ppUILayer[25]->setAlpha(0.8, 1.0); //글씨 없음 
+		m_ppUILayer[26]->setAlpha(0.8, 1.0); //글씨 없음 
 
 		m_ppUILayer[27]->setAlpha(0.8, 1.0);  //배경
 		m_ppUILayer[28]->setAlpha(0.8, 1.0);  //입력
 		m_ppUILayer[29]->setAlpha(0.8, 1.0);   //입력 
 		m_ppUILayer[30]->setAlpha(1.0, 1.0);   //입력 
-		m_ppUILayer[31]->setAlpha(1.0, 1.0);   
+		m_ppUILayer[31]->setAlpha(1.0, 1.0);
 
-		m_ppUILayer[32]->setAlpha(0.5, 1.0);  
+		m_ppUILayer[32]->setAlpha(0.5, 1.0);
 		m_ppUILayer[33]->setAlpha(1.0, 1.0);   //입력 
 		m_ppUILayer[34]->setAlpha(1.0, 1.0);
 		m_ppUILayer[35]->setAlpha(1.0, 1.0);
@@ -1414,6 +1423,7 @@ void CGameFramework::BuildObjects()
 
 		m_ppUILayer[42]->setAlpha(0.0, 1.0);
 
+		m_ppUILayer[43]->setAlpha(0.0, 1.0);
 
 		m_ppUILayer[0]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_FAR);
@@ -1470,7 +1480,7 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[24]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		m_ppUILayer[25]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
-			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_FLOW_DIRECTION_LEFT_TO_RIGHT);
 		m_ppUILayer[26]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
@@ -1505,13 +1515,17 @@ void CGameFramework::BuildObjects()
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_FLOW_DIRECTION_TOP_TO_BOTTOM);
 		m_ppUILayer[41]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-		m_ppUILayer[42]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+
+		reinterpret_cast<Skill_Name_UI*>(m_ppUILayer[42])->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+		m_ppUILayer[43]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 		// UIBar Setting
-		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, m_nWndClientHeight / 5 - 2*(m_nWndClientHeight / 22.5) - 20,
+		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, m_nWndClientHeight / 5 - 2 * (m_nWndClientHeight / 22.5) - 20,
 			20 + (m_nWndClientWidth / 10) * 3, m_nWndClientHeight / 5 - m_nWndClientHeight / 22.5 - 20);
-		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetColorBrush(D2D1::ColorF::Red, 1.0, 20, m_nWndClientHeight / 5 - 2*(m_nWndClientHeight / 22.5) - 20,
+		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetColorBrush(D2D1::ColorF::Red, 1.0, 20, m_nWndClientHeight / 5 - 2 * (m_nWndClientHeight / 22.5) - 20,
 			20 + (m_nWndClientWidth / 10) * 3, m_nWndClientHeight / 5 - m_nWndClientHeight / 22.5 - 20);
 		reinterpret_cast<UIBar*>(m_ppUILayer[4])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, m_nWndClientHeight / 5 - m_nWndClientHeight / 22.5 - 10,
 			20 + (m_nWndClientWidth / 10) * 3, m_nWndClientHeight / 5 - 10);
@@ -1526,13 +1540,13 @@ void CGameFramework::BuildObjects()
 		reinterpret_cast<UIBar*>(m_ppUILayer[8])->SetColorBrush(D2D1::ColorF::Red, 1.0, (m_nWndClientWidth / 2) - ((m_nWndClientWidth / 10) - 10), (m_nWndClientHeight / 6) - 20 - m_nWndClientHeight / 22.5,
 			(m_nWndClientWidth / 2) + ((m_nWndClientWidth / 10) - 10), (m_nWndClientHeight / 6) - 20);
 		reinterpret_cast<UIBar*>(m_ppUILayer[10])->SetBehindBrush(D2D1::ColorF::Black, 1.0, (m_nWndClientWidth / 2) - (m_nWndClientWidth / 18) + (m_nWndClientWidth / 180), (m_nWndClientHeight / 6) - (m_nWndClientHeight / 12.5),
-			(m_nWndClientWidth) - 10, (m_nWndClientHeight / 6) - 10);
+			(m_nWndClientWidth)-10, (m_nWndClientHeight / 6) - 10);
 		reinterpret_cast<UIBar*>(m_ppUILayer[10])->SetColorBrush(D2D1::ColorF::Red, 1.0, (m_nWndClientWidth / 2) - (m_nWndClientWidth / 18) + (m_nWndClientWidth / 180), (m_nWndClientHeight / 6) - (m_nWndClientHeight / 12.5),
-			(m_nWndClientWidth)- 10, (m_nWndClientHeight / 6) - 10);
+			(m_nWndClientWidth)-10, (m_nWndClientHeight / 6) - 10);
 
 		reinterpret_cast<UIBar*>(m_ppUILayer[12])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 10, (m_nWndClientHeight / 2) - (m_nWndClientHeight / 9) + (m_nWndClientHeight / 90),
 			10 + (m_nWndClientWidth / 9 - 20), (m_nWndClientHeight / 2) - (m_nWndClientHeight / 9) + (m_nWndClientHeight / 90) + (m_nWndClientHeight / 22.5));
-		reinterpret_cast<UIBar*>(m_ppUILayer[12])->SetColorBrush(D2D1::ColorF::Red, 1.0, 10,  (m_nWndClientHeight / 2) - (m_nWndClientHeight / 9) + (m_nWndClientHeight / 90),
+		reinterpret_cast<UIBar*>(m_ppUILayer[12])->SetColorBrush(D2D1::ColorF::Red, 1.0, 10, (m_nWndClientHeight / 2) - (m_nWndClientHeight / 9) + (m_nWndClientHeight / 90),
 			10 + (m_nWndClientWidth / 9 - 20), (m_nWndClientHeight / 2) - (m_nWndClientHeight / 9) + (m_nWndClientHeight / 90) + (m_nWndClientHeight / 22.5));
 		reinterpret_cast<UIBar*>(m_ppUILayer[13])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 10, (m_nWndClientHeight / 2) - (m_nWndClientHeight / 180) - (m_nWndClientHeight / 22.5),
 			10 + (m_nWndClientWidth / 9 - 20), (m_nWndClientHeight / 2) - (m_nWndClientHeight / 180));
@@ -1617,7 +1631,7 @@ void CGameFramework::Create_OpenWorld_Object()
 		break;
 	}
 	}
-	if(!Login_OK)
+	if (!Login_OK)
 		reinterpret_cast<UIBitmap*>(m_ppUILayer[27])->Setup(L"\Image/Title.png");
 
 	reinterpret_cast<SkillUI*>(m_ppUILayer[23])->Setup(); //아래 스킬 ui
@@ -1810,7 +1824,7 @@ void CGameFramework::ProcessInput()
 
 
 
-			if (first_skill_used == false 
+			if (first_skill_used == false
 				&& !m_pPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[4].m_bEnable
 				&& !m_pPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[5].m_bEnable) {
 				if ((pKeysBuffer[VK_NUMPAD1] & 0xF0) || (pKeysBuffer['1'] & 0xF0)) {
@@ -1954,13 +1968,13 @@ void CGameFramework::ProcessInput()
 					m_pPlayer->Rotate(cyDelta, 0.0f, -cxDelta);
 				else
 					m_pPlayer->Rotate(cyDelta, cxDelta, 0.0f);
-				
+
 				send_look_packet(m_pPlayer->GetLookVector(), m_pPlayer->GetRightVector());
 			}
 			if (dwDirection) {
 				float moveSpeed = (60.0f / static_cast<float>(m_GameTimer.GetFrameRate())) * 1.1f;
 				m_pPlayer->Move(dwDirection, /*12.25f*/moveSpeed, false);
-				
+
 			}
 			if (dwAttack
 				&& !m_pPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[3].m_bEnable
@@ -2079,7 +2093,7 @@ void CGameFramework::FrameAdvance()
 #endif
 
 	if (m_pPlayer) m_pPlayer->Render(m_pd3dCommandList, m_pCamera);
-	
+
 	d3dResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	d3dResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 	d3dResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
@@ -2465,7 +2479,26 @@ void CGameFramework::FrameAdvance()
 			reinterpret_cast<Fail_UI*>(m_ppUILayer[i])->UpdateLabels_Fail_Select();
 			break;
 		}
-		case 42: {
+		case 42:{
+			if (!Login_OK) break;
+			switch (mPlayer[my_id]->m_job)
+			{
+			case 0:
+				reinterpret_cast<Skill_Name_UI*>(m_ppUILayer[i])->UpdateLabels(L"회전 회오리", L"최후의 일격", L"들끓는 피");
+				break;
+			case 1:
+				reinterpret_cast<Skill_Name_UI*>(m_ppUILayer[i])->UpdateLabels(L"방패 밀치기", L"나를 따르라", L"방패 둔갑");
+				break;
+			case 2:
+				reinterpret_cast<Skill_Name_UI*>(m_ppUILayer[i])->UpdateLabels(L"마나 드레인", L"메테오 낙하", L"에너지 볼");
+				break;
+			case 3:
+				reinterpret_cast<Skill_Name_UI*>(m_ppUILayer[i])->UpdateLabels(L"천사의 치유", L"요정의 축복", L"전광석화");
+				break;
+			}
+			break;
+		}
+		case 43: {
 			if (!InDungeon) break;
 			UINT width_pos = std::chrono::duration_cast<std::chrono::milliseconds>((chrono::system_clock::now() - BossSkillUiTimer)).count();
 			cout << width_pos << endl;
@@ -2488,7 +2521,7 @@ void CGameFramework::FrameAdvance()
 		}
 		if (i >= 9 && i <= 15) {
 			if (!InDungeon) continue;
-}
+		}
 		if (i == 17 && !PartyUI_On) {
 			continue;
 		}
@@ -2511,7 +2544,8 @@ void CGameFramework::FrameAdvance()
 		if (i == 39 && !Join_On) continue;
 		if (i == 40 && !Fail_On) continue;
 		if (i == 41 && !Fail_On) continue;
-		if (i == 42) {
+		if (i == 42 && !Login_OK) continue;
+		if (i == 43) {
 			if (!InDungeon) continue;
 			if (!m_gaiaPattern.pattern_on[0] && !m_gaiaPattern.pattern_on[1] && !m_gaiaPattern.pattern_on[4]) continue;
 		}
