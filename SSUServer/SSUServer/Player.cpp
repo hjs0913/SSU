@@ -300,11 +300,20 @@ void Player::revive()
     state_lock.unlock();
 
     // 플레이어 죽은 후 초기화 설정
-    _hp = _maxhp;
-    _x = 3210;
-    _y = 0;
-    _z = 940;
-    _exp = _exp / 2;
+	if (strcmp(_login_id, "admin") == 0) {
+		// stress Test teleport
+		_hp = _maxhp;
+		_x = rand() % 4000;
+		_y = 0;
+		_z = rand() % 4000;
+	}
+	else {
+		_hp = _maxhp;
+		_x = 3210;
+		_y = 0;
+		_z = 940;
+		_exp = _exp / 2;
+	}
     send_status_change_packet(this);
 
     send_revive_packet(this, this);
