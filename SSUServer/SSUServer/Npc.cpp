@@ -78,11 +78,15 @@ void Npc::Initialize_Lua(const char* f_lua)
 	error = lua_pcall(L, 0, 4, 0);
 	uniform_int_distribution<int> rng_x(lua_tointeger(L, -4), lua_tointeger(L, -3));
 	uniform_int_distribution<int> rng_z(lua_tointeger(L, -2), lua_tointeger(L, -1));
+	uniform_int_distribution<int> rng_look(-1000, 1000);
 	lua_pop(L, 5);
 
 	// 위치 잡기
 	_x = rng_x(dre);
 	_z = rng_z(dre);
+
+	_look_x = (float)rng_look(dre)/1000.f;
+	_look_z = (1.f - abs(_look_x))*pow(-1, rng_look(dre)%2);
 
 	lua_getglobal(L, "set_uid");
 	lua_pushnumber(L, _id);

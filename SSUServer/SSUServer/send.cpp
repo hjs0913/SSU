@@ -49,6 +49,7 @@ void send_put_object_packet(Player* pl, Npc* target)
     packet.y = target->get_y();
     packet.z = target->get_z();
     packet.look_x = target->get_look_x();
+    cout << packet.look_x << endl;
     packet.look_y = target->get_look_y();
     packet.look_z = target->get_look_z();
 
