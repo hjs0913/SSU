@@ -35,7 +35,7 @@ enum DUNGEON_STATE{DUN_ST_FREE, DUN_ST_ROBBY, DUN_ST_START};
 
 const int BUFSIZE = 256;
 const int RANGE = 450;	//600
-const int AGRORANGE = 5;
+const int AGRORANGE = 200;
 const int MAX_OBSTACLE = 609;
 const float PLAYER_VELOCITY = 0.5f;
 const int GAMESTART_TIMER = 5;
