@@ -1235,7 +1235,7 @@ void CGameFramework::BuildObjects_login()
 		reinterpret_cast<Skill_Name_UI*>(m_ppUILayer[42])->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		m_ppUILayer[43]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
-			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 
 		// UIBar Setting
 		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, m_nWndClientHeight / 5 - 2 * (m_nWndClientHeight / 22.5) - 20,
@@ -2501,10 +2501,9 @@ void CGameFramework::FrameAdvance()
 		case 43: {
 			if (!InDungeon) break;
 			UINT width_pos = std::chrono::duration_cast<std::chrono::milliseconds>((chrono::system_clock::now() - BossSkillUiTimer)).count();
-			cout << width_pos << endl;
 			width_pos = width_pos;
 			if (width_pos >= 500) width_pos = 500;
-		
+			
 			if(m_gaiaPattern.pattern_on[0] == true) m_ppUILayer[i]->UpdateLabels(L"올라와 상어!!", FRAME_BUFFER_WIDTH - width_pos, FRAME_BUFFER_HEIGHT - 400, FRAME_BUFFER_WIDTH + 500 - width_pos, FRAME_BUFFER_HEIGHT);
 			else if(m_gaiaPattern.pattern_on[1] == true) m_ppUILayer[i]->UpdateLabels(L"도와줘 상어!!", FRAME_BUFFER_WIDTH - width_pos, FRAME_BUFFER_HEIGHT - 400, FRAME_BUFFER_WIDTH + 500 - width_pos, FRAME_BUFFER_HEIGHT);
 			else if (m_gaiaPattern.pattern_on[4] == true) m_ppUILayer[i]->UpdateLabels(L"상어 돌진!!", FRAME_BUFFER_WIDTH - width_pos, FRAME_BUFFER_HEIGHT - 400, FRAME_BUFFER_WIDTH + 500 - width_pos, FRAME_BUFFER_HEIGHT);
@@ -2548,6 +2547,7 @@ void CGameFramework::FrameAdvance()
 		if (i == 43) {
 			if (!InDungeon) continue;
 			if (!m_gaiaPattern.pattern_on[0] && !m_gaiaPattern.pattern_on[1] && !m_gaiaPattern.pattern_on[4]) continue;
+			if (std::chrono::duration_cast<std::chrono::milliseconds>((chrono::system_clock::now() - BossSkillUiTimer)).count() > 1500) continue;
 		}
 		m_ppUILayer[i]->Render(m_nSwapChainBufferIndex);
 	}

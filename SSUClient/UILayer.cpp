@@ -1219,8 +1219,6 @@ void Skill_Name_UI::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UIN
 
 
 }
-///----
-}
 
 //-----------------
 BossSkillUI::BossSkillUI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor) 
@@ -1251,10 +1249,9 @@ void BossSkillUI::Render(UINT nFrame)
     m_pd2dDeviceContext->FillRectangle(m_vTextBlocks[0].d2dLayoutRect, m_pBrush);
     m_pd2dDeviceContext->DrawRectangle(m_vTextBlocks[0].d2dLayoutRect, m_pBrush);
 
-    m_pd2dDeviceContext->DrawBitmap(bitmap, m_vTextBlocks[1].d2dLayoutRect);
     m_pd2dDeviceContext->DrawText(m_vTextBlocks[0].strText.c_str(), static_cast<UINT>(m_vTextBlocks[0].strText.length()),
         m_vTextBlocks[0].pdwFormat, m_vTextBlocks[0].d2dLayoutRect, m_pd2dTextBrush);
-
+    m_pd2dDeviceContext->DrawBitmap(bitmap, m_vTextBlocks[1].d2dLayoutRect);
 
     m_pd2dDeviceContext->EndDraw();
 
@@ -1288,13 +1285,13 @@ void BossSkillUI::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT 
     if (m_pd2dTextBrush) m_pd2dTextBrush->Release();
     m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(m_TextColor), &m_pd2dTextBrush);
 
-    const float fFontSize = m_fHeight / 12.5f;
-    const float fSmallFontSize = m_fHeight / 20.0f;
+    const float fFontSize = m_fHeight / 10.0f;  //25
+    const float fSmallFontSize = m_fHeight / 16.0f; //40
 
-    m_pd2dWriteFactory->CreateTextFormat(L"Rockwell", nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fSmallFontSize, L"en-us", &m_pdwTextFormat);
+    m_pd2dWriteFactory->CreateTextFormat(L"한컴 말랑말랑", nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fSmallFontSize, L"en-us", &m_pdwTextFormat);
 
     m_pdwTextFormat->SetTextAlignment(static_cast<DWRITE_TEXT_ALIGNMENT>(TextAlignment));
     m_pdwTextFormat->SetParagraphAlignment(static_cast<DWRITE_PARAGRAPH_ALIGNMENT>(ParagraphAlignment));
 
-    m_vTextBlocks[1] = { L"", D2D1::RectF(FRAME_BUFFER_WIDTH - 200, FRAME_BUFFER_HEIGHT - 200, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT), m_pdwTextFormat };
+    m_vTextBlocks[1] = { L"", D2D1::RectF(FRAME_BUFFER_WIDTH - 300, FRAME_BUFFER_HEIGHT - 400, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT), m_pdwTextFormat };
 }
