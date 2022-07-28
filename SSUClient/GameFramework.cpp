@@ -1084,6 +1084,9 @@ void CGameFramework::BuildObjects_login()
 		//스킬 이름
 		m_ppUILayer[42] = new Skill_Name_UI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::GhostWhite, D2D1::ColorF::Black);
 
+		// 데미지
+		m_ppUILayer[43] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::GhostWhite, D2D1::ColorF::Red);
+
 		m_ppUILayer[0]->setAlpha(0.5, 1.0);
 		m_ppUILayer[1]->setAlpha(0.5, 1.0);
 
@@ -1136,6 +1139,8 @@ void CGameFramework::BuildObjects_login()
 		m_ppUILayer[40]->setAlpha(0.5, 1.0);
 		m_ppUILayer[41]->setAlpha(1.0, 1.0);
 		m_ppUILayer[42]->setAlpha(0.0, 1.0);
+		
+		m_ppUILayer[43]->setAlpha(0.0, 1.0);
 
 		m_ppUILayer[0]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_FAR);
@@ -1229,6 +1234,10 @@ void CGameFramework::BuildObjects_login()
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_FLOW_DIRECTION_LEFT_TO_RIGHT);
 		reinterpret_cast<Skill_Name_UI*>(m_ppUILayer[42])->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		m_ppUILayer[43]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_FLOW_DIRECTION_LEFT_TO_RIGHT);
+
+		
 		// UIBar Setting
 		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, m_nWndClientHeight / 5 - 2 * (m_nWndClientHeight / 22.5) - 20,
 			20 + (m_nWndClientWidth / 10) * 3, m_nWndClientHeight / 5 - m_nWndClientHeight / 22.5 - 20);
@@ -1358,6 +1367,10 @@ void CGameFramework::BuildObjects()
 		//스킬 이름
 		m_ppUILayer[42] = new Skill_Name_UI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::GhostWhite, D2D1::ColorF::Black);
 
+		// 데미지
+		m_ppUILayer[43] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::GhostWhite, D2D1::ColorF::Red);
+
+
 		m_ppUILayer[0]->setAlpha(0.5, 1.0);
 		m_ppUILayer[1]->setAlpha(0.5, 1.0);
 
@@ -1411,6 +1424,7 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[41]->setAlpha(1.0, 1.0);
 
 		m_ppUILayer[42]->setAlpha(0.0, 1.0);
+		m_ppUILayer[43]->setAlpha(0.0, 1.0);
 
 
 		m_ppUILayer[0]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
@@ -1506,6 +1520,11 @@ void CGameFramework::BuildObjects()
 
 		reinterpret_cast<Skill_Name_UI*>(m_ppUILayer[42])->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+		m_ppUILayer[43]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+
 
 		// UIBar Setting
 		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, m_nWndClientHeight / 5 - 2 * (m_nWndClientHeight / 22.5) - 20,
@@ -2481,9 +2500,16 @@ void CGameFramework::FrameAdvance()
 			}
 
 			break;
+		case 43:
+			if (!Damage_On) break;
+
+			XMFLOAT2 xmf2Screen = CalcWorldToViewPort(m_pScene->m_ppHierarchicalGameObjects, DamageID);
+			m_ppUILayer[i]->m_DamageTime = 30;
+			m_ppUILayer[i]->UpdateLabels(to_wstring(Damage), xmf2Screen.x - 100.0f, xmf2Screen.y - 150.0f, xmf2Screen.x + 100.0f, xmf2Screen.y - 120.0f);
+
+			break;
 		}
 	}
-
 
 	for (int i = 0; i < UICOUNT; i++) {
 		if ((i == 7 || i == 8)) {
@@ -2515,8 +2541,11 @@ void CGameFramework::FrameAdvance()
 		if (i == 40 && !Fail_On) continue;
 		if (i == 41 && !Fail_On) continue;
 		if (i == 42 && !Login_OK) continue;
+		if (i == 43 && !Damage_On) continue;
+		
 		m_ppUILayer[i]->Render(m_nSwapChainBufferIndex);
 	}
+
 	LeaveCriticalSection(&UI_cs);
 
 #ifdef _WITH_PRESENT_PARAMETERS
@@ -2584,4 +2613,17 @@ void CGameFramework::Login_Check_And_Build()
 		BuildObjects();
 		Open_Build_Once = true;
 	}
+}
+
+XMFLOAT2 CGameFramework::CalcWorldToViewPort(CGameObject** obj, int index)
+{
+	if (obj[index]->GetPosition().x != 0 && obj[index]->GetPosition().z != 0) {
+		XMFLOAT3 xmf3ViewProj = Vector3::TransformCoord(Vector3::TransformCoord(obj[index]->GetPosition(), m_pPlayer->GetCamera()->GetViewMatrix()), m_pPlayer->GetCamera()->GetProjectionMatrix());
+
+		float fScreenX = xmf3ViewProj.x * (FRAME_BUFFER_WIDTH / 2) + FRAME_BUFFER_WIDTH / 2;
+		float fScreenY = -xmf3ViewProj.y * (FRAME_BUFFER_HEIGHT / 2) + FRAME_BUFFER_HEIGHT / 2;
+
+		return XMFLOAT2(fScreenX, fScreenY);
+	}
+	else return XMFLOAT2(0, 0);
 }

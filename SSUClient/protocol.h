@@ -8,14 +8,16 @@ enum COMP_OP {
 	OP_NPC_ATTACK, OP_AUTO_PLAYER_HP, OP_PLAYER_REVIVE, OP_NPC_REVIVE,
 	OP_PLAYER_ATTACK, OP_NPC_AGRO, OP_ELEMENT_COOLTIME,
 	OP_BOSS_MOVE, OP_BOSS_ATTACK, OP_GAIA_PATTERN,
-	OP_PARTNER_MOVE, OP_PARTNER_ATTACK, OP_PARTNER_PATTERN, OP_GAMESTART_TIMER
+	OP_PARTNER_MOVE, OP_PARTNER_SKILL, OP_PARTNER_NORMAL_ATTACK, OP_GAMESTART_TIMER,
+	OP_FINISH_RAID, OP_SKILL_COOLTIME, OP_ELEMENT_FIRE_COOLTIME
 };
 enum EVENT_TYPE {
 	EVENT_NPC_MOVE, EVENT_NPC_ATTACK, EVENT_AUTO_PLAYER_HP,
 	EVENT_PLAYER_REVIVE, EVENT_NPC_REVIVE, EVENT_PLAYER_ATTACK,
 	EVENT_SKILL_COOLTIME, EVENT_NPC_AGRO, EVENT_ELEMENT_COOLTIME,
 	EVENT_BOSS_MOVE, EVENT_BOSS_ATTACK, EVENT_GAIA_PATTERN,
-	EVENT_PARTNER_MOVE, EVENT_PARTNER_ATTACK, EVENT_PARTNER_PATTERN, EVENT_GAMESTART_TIMER
+	EVENT_PARTNER_MOVE, EVENT_PARTNER_SKILL, EVENT_PARTNER_NORMAL_ATTACK, EVENT_GAMESTART_TIMER,
+	EVENT_FINISH_RAID, EVENT_ELEMENT_FIRE_COOLTIME
 };
 enum TRIBE { HUMAN, MONSTER, AGRO, BOSS, OBSTACLE, PARTNER};
 enum BUF_TYPE {
@@ -32,7 +34,7 @@ enum DUNGEON_STATE{DUN_ST_FREE, DUN_ST_ROBBY, DUN_ST_START};
 
 
 const int BUFSIZE = 256;
-const int RANGE = 600;
+const int RANGE = 450;	//600
 const int AGRORANGE = 5;
 const int MAX_OBSTACLE = 609;
 const float PLAYER_VELOCITY = 0.5f;
@@ -45,11 +47,21 @@ const int  WORLD_HEIGHT = 4000;
 const int  WORLD_WIDTH = 4000;
 const int  MAX_NAME_SIZE = 20;
 const int  MAX_CHAT_SIZE = 100;
-const int  MAX_USER = 1000;
+const int  MAX_USER = 6000;
 // const int  MAX_NPC = 200000;
 const int  MAX_NPC = 180;		// 디버깅 용
+const int  MAX_DUNGEONS = 1000;
+constexpr int MAX_AI = MAX_DUNGEONS * 3;
+
 constexpr int NPC_ID_START = MAX_USER;
 constexpr int NPC_ID_END = MAX_USER + MAX_NPC - 1;
+
+constexpr int AI_ID_START = MAX_USER + MAX_NPC;
+constexpr int AI_ID_END = MAX_USER + MAX_NPC + MAX_AI;
+
+const int NPC_INTERVAL = 30;
+constexpr int GAIA_ID = MAX_USER + MAX_NPC + MAX_AI;
+
 const int GAIA_ROOM = 4;
 
 
@@ -74,7 +86,7 @@ const char CS_PACKET_PARTY_ROOM_QUIT_REQUEST = 18;
 const char CS_PACKET_PARTY_INVITE = 19;
 const char CS_PACKET_PARTY_INVITATION_REPLY = 20;
 const char CS_PACKET_PARTY_ADD_PARTNER = 21;
-
+const char CS_PACKET_RE_LOGIN = 22;
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -116,6 +128,17 @@ const char SC_PACKET_PARTY_INVITATION = 34;
 const char SC_PACKET_PARTY_INVITATION_FAILED = 35;
 const char SC_PACKET_PARTY_ROOM_DESTROY = 36;
 
+const char SC_PACKET_NOTICE = 37;
+const char SC_PACKET_CHANGE_MP = 38;
+
+const char SC_PACKET_MOVE_OPENWORLD = 39;
+
+const char SC_PACKET_ANIMATION_ATTACK = 101;
+const char SC_PACKET_ANIMATION_MOVE = 102;
+const char SC_PACKET_ANIMATION_DEAD = 103;
+const char SC_PACKET_ANIMATION_SKILL = 104;
+// const char SC_PACKET_ANIMATION_IDLE = 101;
+
 //---------------------------------------------------
 #pragma pack (push, 1)
 struct cs_packet_login {
@@ -123,6 +146,10 @@ struct cs_packet_login {
 	char	type;
 	char	id[MAX_NAME_SIZE];
 	char	name[MAX_NAME_SIZE];
+	char	job;
+	char    password[MAX_NAME_SIZE];
+	char	nickname[MAX_NAME_SIZE];
+	char	element;
 };
 
 struct cs_packet_move {
@@ -241,6 +268,7 @@ struct cs_packet_party_add_partner {
 	unsigned char size;
 	char type;
 	unsigned char room_id;
+	unsigned char job;
 };
 
 
@@ -265,7 +293,9 @@ struct sc_packet_move {
 	char type;
 	int		id;
 	float  x, y, z;
+	float  lx, ly, lz;
 	int		move_time;
+	unsigned char move_right;		// 0 : 위치 수정, 1 : 유효성 올바름
 };
 
 struct sc_packet_put_object {
@@ -355,6 +385,7 @@ struct sc_packet_change_hp {
 	unsigned char size;
 	char type;
 	int id;
+	int damage;
 	int hp;
 };
 
@@ -362,6 +393,13 @@ struct sc_packet_combat_id {
 	unsigned char size;
 	char type;
 	int id;
+};
+
+struct sc_packet_change_mp {
+	unsigned char size;
+	char type;
+	int id;
+	int mp;
 };
 
 struct cs_packet_picking_skill {
@@ -481,6 +519,32 @@ struct sc_packet_party_room_destroy {
 	unsigned char size;
 	char type;
 	unsigned char room_id;
+};
+
+struct sc_packet_notice {
+	unsigned char size;
+	char type;
+	char message[MAX_CHAT_SIZE];
+	unsigned char raid_enter;	// 0 : 레이드 입장 시간초, 1: 사망 공지사항, 2 : 나머지 공지사항
+};
+
+struct sc_packet_move_openworld {
+	unsigned char size;
+	char type;
+	float	x, y, z;
+};
+
+struct sc_packet_animation_attack {
+	unsigned char size;
+	char type;
+	int id;
+};
+
+struct sc_packet_animation_skill {
+	unsigned char size;
+	char type;
+	int id;
+	unsigned char animation_skill;
 };
 
 #pragma pack(pop)

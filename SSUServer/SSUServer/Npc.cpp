@@ -675,7 +675,7 @@ void Npc::attack_dead_judge(Npc* target)
 		// send_status_change_packet(reinterpret_cast<Player*>(players[target]));
 
 		// 플레이어의 ViewList에 있는 플레이어들에게 보내주자
-		send_change_hp_packet(reinterpret_cast<Player*>(target), target);
+		send_change_hp_packet(reinterpret_cast<Player*>(target), target, 0);
 
 		// hp가 깎이였으므로 hp자동회복을 해주도록 하자
 		if (reinterpret_cast<Player*>(target)->_auto_hp == false) {

@@ -385,6 +385,7 @@ struct sc_packet_change_hp {
 	unsigned char size;
 	char type;
 	int id;
+	float damage;
 	int hp;
 };
 

@@ -21,7 +21,7 @@ void send_revive_packet(Player* pl, Npc* reviver);
 
 void send_look_packet(Player* pl, Npc* changer);
 
-void send_change_hp_packet(Player* pl, Npc* victim);
+void send_change_hp_packet(Player* pl, Npc* victim, float fDamage);
 
 void send_change_mp_packet(Player* pl, Npc* victim);
 

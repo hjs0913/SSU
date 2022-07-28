@@ -49,7 +49,7 @@ public:
     void ReleaseResources();
     void setAlpha(float Layout_a, float Text_a);
 
- 
+    int m_DamageTime = -1;
 
 protected:
     UINT GetRenderTargetsCount() { return static_cast<UINT>(m_vWrappedRenderTargets.size()); }
@@ -241,4 +241,16 @@ public:
 
     virtual void Render(UINT nFrame);
     virtual void Resize(ID3D12Resource** ppd3dRenderTargets, UINT width, UINT height, UINT TextAlignment, UINT ParagraphAlignment);
+};
+
+class Damage_UI : public UILayer
+{
+public:
+    Damage_UI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor);
+    ~Damage_UI();
+
+    // 
+    void UpdateLabels();
+
+    virtual void Render(UINT nFrame);
 };

@@ -105,6 +105,11 @@ void UILayer::UpdateLabels(const std::wstring& strUIText, UINT LeftTop_x, UINT L
 
 void UILayer::Render(UINT nFrame)
 {
+    --m_DamageTime;
+    if (m_DamageTime == 0) {
+        Damage_On = false;
+        return;
+    }
 
     ID3D11Resource* ppResources[] = { m_vWrappedRenderTargets[nFrame] };
 

@@ -58,6 +58,9 @@ bool Open_Build_Once = false;;
 bool Join_On = false;
 bool Fail_On = false;
 extern int Fail_Reason = 0;
+bool Damage_On = false;
+int Damage = 0;
+int DamageID = 0;
 bool JOIN_ID_On = false;
 bool JOIN_PASSWORD_On = false;
 bool JOIN_NICKNAME_On = false;
@@ -608,6 +611,14 @@ void process_packet(unsigned char* p)
 	case SC_PACKET_CHANGE_HP: {
 		sc_packet_change_hp* packet = reinterpret_cast<sc_packet_change_hp*>(p);
 		mPlayer[packet->id]->m_hp = packet->hp;
+		
+		if (packet->id <= NPC_ID_START)			// packet->id가 NPC_ID_START보다 클떄(몬스터 일때) 만 데미지 띄워주기
+			break;
+
+		Damage = packet->damage;
+		if (Damage)		// Damage가 0이 아니면
+			Damage_On = true;
+		DamageID = packet->id - NPC_ID_START + 3;	// (서버ID) - NPC_ID_START + 3(HierarchicalGameObject 몬스터 시작);
 		break;
 	}
 	case SC_PACKET_COMBAT_ID: {

@@ -395,7 +395,7 @@ void ObjectManager::worker()
                 ev.target_id = 0;
                 TimerManager::timer_queue.push(ev);
             }
-            send_change_hp_packet(pl, pl);
+            send_change_hp_packet(pl, pl, 0);
             //send_status_change_packet(pl);
             break;
         }
@@ -445,7 +445,7 @@ void ObjectManager::worker()
                 break;
             case E_FIRE:
                 players[exp_over->_target]->set_hp(players[exp_over->_target]->get_hp() - players[exp_over->_target]->get_lv() * 10);
-                send_change_hp_packet(reinterpret_cast<Player*>(players[client_id]), players[exp_over->_target]);
+                send_change_hp_packet(reinterpret_cast<Player*>(players[client_id]), players[exp_over->_target], players[exp_over->_target]->get_lv() * 10);
                 ev.obj_id = client_id;
                 ev.start_time = chrono::system_clock::now() + 5s;
                 ev.ev = EVENT_ELEMENT_FIRE_COOLTIME;
@@ -751,7 +751,7 @@ void ObjectManager::worker()
         }
         case OP_ELEMENT_FIRE_COOLTIME:
             players[exp_over->_target]->set_hp(players[exp_over->_target]->get_hp() - players[exp_over->_target]->get_lv() * 10);
-            send_change_hp_packet(reinterpret_cast<Player*>(players[client_id]), players[exp_over->_target]);
+            send_change_hp_packet(reinterpret_cast<Player*>(players[client_id]), players[exp_over->_target], players[exp_over->_target]->get_lv() * 10);
            // players[client_id]->set_element_cooltime(false);
             players[exp_over->_target]->set_element_cooltime(false);
             delete exp_over;
