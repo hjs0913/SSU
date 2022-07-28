@@ -609,7 +609,7 @@ void CTerrainPlayer::Update(float fTimeElapsed)
 			if (m_pSkinnedAnimationController->m_pAnimationTracks[2].m_bEnable) {	// 일반 공격 시
 				m_pSkinnedAnimationController->SetTrackEnable(0, false);
 				m_pSkinnedAnimationController->SetTrackEnable(3, false);
-				cout << m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[2]->m_fLength << endl;
+				
 			}
 
 			if (m_pSkinnedAnimationController->m_pAnimationTracks[3].m_bEnable

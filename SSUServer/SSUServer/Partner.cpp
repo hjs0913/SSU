@@ -338,7 +338,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 	mt19937 gen(rd());
 	uniform_int_distribution<int> pattern(0, 99);
 	timer_event ev;
-	if (gaia->running_pattern == false) {
+	if (gaia->running_pattern == false || pa->get_mp() < 1000) {
 		ev.obj_id = _id;
 		ev.start_time = chrono::system_clock::now() + 5s;
 		ev.ev = EVENT_PARTNER_SKILL;
@@ -392,7 +392,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			TimerManager::timer_queue.push(ev);
 
 			ev.obj_id = _id;
-			ev.start_time = chrono::system_clock::now() + 2s + 6ms;  //ÄðÅ¸ÀÓ
+			ev.start_time = chrono::system_clock::now() + 2s + 600ms;  //ÄðÅ¸ÀÓ
 			ev.ev = EVENT_PARTNER_SKILL_STOP;
 			ev.target_id = _id;
 			TimerManager::timer_queue.push(ev);
@@ -443,7 +443,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			running_pattern = true;
 
 			ev.obj_id = _id;
-			ev.start_time = chrono::system_clock::now() + 1s + 8ms;
+			ev.start_time = chrono::system_clock::now() + 1s + 800ms;
 			ev.ev = EVENT_PARTNER_SKILL_STOP;
 			ev.target_id = _id;
 			TimerManager::timer_queue.push(ev);
@@ -466,7 +466,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			TimerManager::timer_queue.push(ev);
 
 			ev.obj_id = _id;
-			ev.start_time = chrono::system_clock::now() + 1s + 2ms;;
+			ev.start_time = chrono::system_clock::now() + 1s + 200ms;;
 			ev.ev = EVENT_PARTNER_SKILL_STOP;
 			ev.target_id = _id;
 			TimerManager::timer_queue.push(ev);
@@ -525,7 +525,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 
 
 			ev.obj_id = _id;
-			ev.start_time = chrono::system_clock::now() + 1s + 6ms;
+			ev.start_time = chrono::system_clock::now() + 1s + 600ms;
 			ev.ev = EVENT_PARTNER_SKILL_STOP;
 			ev.target_id = _id;
 			TimerManager::timer_queue.push(ev);
@@ -575,7 +575,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			TimerManager::timer_queue.push(ev);
 
 			ev.obj_id = _id;
-			ev.start_time = chrono::system_clock::now()  + 3ms;
+			ev.start_time = chrono::system_clock::now()  + 300ms;
 			ev.ev = EVENT_PARTNER_SKILL_STOP;
 			ev.target_id = _id;
 			TimerManager::timer_queue.push(ev);
@@ -636,7 +636,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			TimerManager::timer_queue.push(ev);
 
 			ev.obj_id = _id;
-			ev.start_time = chrono::system_clock::now() + 3s + 3ms;
+			ev.start_time = chrono::system_clock::now() + 3s + 300ms;
 			ev.ev = EVENT_PARTNER_SKILL_STOP;
 			ev.target_id = _id;
 			TimerManager::timer_queue.push(ev);
@@ -694,7 +694,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 
 
 			ev.obj_id = _id;
-			ev.start_time = chrono::system_clock::now() + 2s + 7ms;
+			ev.start_time = chrono::system_clock::now() + 2s + 700ms;
 			ev.ev = EVENT_PARTNER_SKILL_STOP;
 			ev.target_id = _id;
 			TimerManager::timer_queue.push(ev);
@@ -822,7 +822,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			TimerManager::timer_queue.push(ev);
 
 			ev.obj_id = _id;
-			ev.start_time = chrono::system_clock::now() + 1s + 8ms;
+			ev.start_time = chrono::system_clock::now() + 1s + 800ms;
 			ev.ev = EVENT_PARTNER_SKILL_STOP;
 			ev.target_id = _id;
 			TimerManager::timer_queue.push(ev);
@@ -846,7 +846,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			TimerManager::timer_queue.push(ev);
 
 			ev.obj_id = _id;
-			ev.start_time = chrono::system_clock::now() + 1s + 8ms;
+			ev.start_time = chrono::system_clock::now() + 1s + 800ms;
 			ev.ev = EVENT_PARTNER_SKILL_STOP;
 			ev.target_id = _id;
 			TimerManager::timer_queue.push(ev);

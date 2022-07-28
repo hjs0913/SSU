@@ -538,6 +538,11 @@ void CAnimationController::UpdateShaderVariables(ID3D12GraphicsCommandList *pd3d
 
 void CAnimationController::AdvanceTime(float fTimeElapsed, CGameObject *pRootGameObject) 
 {
+	if (buff_ui_num[4] == 4)
+		m_pAnimationTracks[2].m_fSpeed = 1.3f;
+	else
+		m_pAnimationTracks[2].m_fSpeed = 1.0f;
+
 	if (m_pAnimationTracks)
 	{
 		//for (int k = 0; k < m_nAnimationTracks; k++) m_pAnimationTracks[k].m_fPosition += (fTimeElapsed * m_pAnimationTracks[k].m_fSpeed);
@@ -554,7 +559,6 @@ void CAnimationController::AdvanceTime(float fTimeElapsed, CGameObject *pRootGam
 				}
 			}
 		}
-		
 			
 
 		for (int j = 0; j < m_pAnimationSets->m_nAnimatedBoneFrames; j++)
