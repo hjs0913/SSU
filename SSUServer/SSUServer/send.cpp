@@ -1,4 +1,5 @@
 #include "send.h"
+#include "TimerManager.h"
 
 void send_login_ok_packet(Player* pl)
 {
@@ -24,6 +25,7 @@ void send_login_ok_packet(Player* pl)
 
 void send_move_packet(Player* pl, Npc* mover, int right)
 {
+    if (!send_move_timer) return;
     sc_packet_move packet;
     packet.id = mover->get_id();
     packet.size = sizeof(packet);

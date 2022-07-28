@@ -1,6 +1,8 @@
 #pragma once
 #include "stdafx.h"
 #include "EXP_OVER.h"
+
+extern atomic_bool send_move_timer;
 class TimerManager
 {
 private:

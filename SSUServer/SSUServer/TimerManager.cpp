@@ -1,10 +1,17 @@
 #include "TimerManager.h"
 
 concurrency::concurrent_priority_queue<timer_event> TimerManager::timer_queue;
+atomic_bool send_move_timer = true;
 
 TimerManager::TimerManager(HANDLE* iocp)
 {
     h_iocp = iocp;
+
+    timer_event ev;
+    ev.obj_id = 0;
+    ev.start_time = chrono::system_clock::now() + 100ms;
+    ev.ev = EVENT_SEND_MOVE_TIMER;
+    ev.target_id = 0;
 }
 
 COMP_OP TimerManager::EVtoOP(EVENT_TYPE ev) {
@@ -62,6 +69,15 @@ COMP_OP TimerManager::EVtoOP(EVENT_TYPE ev) {
     case EVENT_ELEMENT_FIRE_COOLTIME:
         return OP_ELEMENT_FIRE_COOLTIME;
         break;
+    case EVENT_SEND_MOVE_TIMER: {
+        send_move_timer = !send_move_timer;
+        timer_event ev;
+        ev.obj_id = 0;
+        ev.start_time = chrono::system_clock::now() + 200ms;
+        ev.ev = EVENT_SEND_MOVE_TIMER;
+        ev.target_id = 0;
+        break;
+    }
     }
 
 }
