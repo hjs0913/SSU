@@ -338,7 +338,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //스킬을 쿨타임 돌때마다 �
 	mt19937 gen(rd());
 	uniform_int_distribution<int> pattern(0, 99);
 	timer_event ev;
-	if (gaia->running_pattern == false) {
+	if (gaia->running_pattern == false || pa->get_mp() < 1000) {
 		ev.obj_id = _id;
 		ev.start_time = chrono::system_clock::now() + 5s;
 		ev.ev = EVENT_PARTNER_SKILL;
