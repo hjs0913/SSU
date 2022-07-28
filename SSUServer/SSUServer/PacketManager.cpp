@@ -243,14 +243,14 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
         }
         else if (pl->attack_speed_up == 1) {
             ev.obj_id = client_id;
-            ev.start_time = chrono::system_clock::now() + 50ms;
+            ev.start_time = chrono::system_clock::now() + 770ms;
             ev.ev = EVENT_PLAYER_ATTACK;
             ev.target_id = client_id;
             TimerManager::timer_queue.push(ev);
         }
         else if (pl->attack_speed_up == -1) {
             ev.obj_id = client_id;
-            ev.start_time = chrono::system_clock::now() + 2s;
+            ev.start_time = chrono::system_clock::now() + 1s + 300ms;
             ev.ev = EVENT_PLAYER_ATTACK;
             ev.target_id = client_id;
             TimerManager::timer_queue.push(ev);

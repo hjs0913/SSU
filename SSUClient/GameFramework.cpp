@@ -709,6 +709,9 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 					//	send_login_packet(pl_id, pl_password, (JOB)pl_job, (ELEMENT)pl_element, pl_nickname);
 					send_relogin_packet(pl_id, pl_password, pl_nickname, (JOB)pl_job, (ELEMENT)pl_element);
 					Join_On = false;
+					JOIN_ID_Str = L"";
+					JOIN_PASSWORD_Str = L"";
+					JOIN_NICKNAME_Str = L"";
 					/*	if (Fail_Reason == 0)
 							Release_Login_Object();
 						if (!Open_Build_Once && Fail_Reason == 0) {
@@ -807,12 +810,15 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 	else {
 		if (m_pRaid_Scene) m_pRaid_Scene->OnProcessingKeyboardMessage(hWnd, nMessageID, wParam, lParam);
 	}
-
+	DWORD dwAttack = 0;
 	switch (nMessageID)
 	{
 	case WM_KEYUP:
 		switch (wParam)
 		{
+		case VK_SPACE:
+			//	dwAttack |= 0x30;
+			break;
 		case VK_ESCAPE:
 			::PostQuitMessage(0);
 			break;
@@ -945,6 +951,18 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 		break;
 	default:
 		break;
+	}
+	if ((dwAttack != 0))
+	{
+
+		if (dwAttack
+			&& !m_pPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[3].m_bEnable
+			&& !m_pPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[4].m_bEnable
+			&& !m_pPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[5].m_bEnable) {
+			// m_pPlayer->Attack(true);
+			send_attack_packet(0);
+		}
+		//if (dwSkill) m_pPlayer->Skill(1);
 	}
 }
 

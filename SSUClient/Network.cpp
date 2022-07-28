@@ -750,7 +750,7 @@ void process_packet(unsigned char* p)
 			buff_ui_num[3] = packet->buff_num;
 			start_buff_3 = clock();
 			break;
-		case 4:
+		case 4:  //¿©±â m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[2].m_fSpeed = 1.3f
 			buff_ui_num[4] = packet->buff_num;
 			start_buff_4 = clock();
 			break;
