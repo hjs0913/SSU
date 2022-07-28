@@ -1252,7 +1252,6 @@ void get_object_information(CGameObject* m_otherPlayer, int id)
 	if (mPlayer[id]->GetPosition().x != m_otherPlayer->GetPosition().x || mPlayer[id]->GetPosition().z != m_otherPlayer->GetPosition().z) {
 		if (abs(m_otherPlayer->GetPosition().x - mPlayer[id]->GetPosition().x) >= 100 ||
 			abs(m_otherPlayer->GetPosition().z - mPlayer[id]->GetPosition().z) >= 100) {	// 좌표 이상 -> 강제 수정
-			cout << "이상함 : " << id << endl;
 			m_otherPlayer->SetPosition(get_position_to_server(id));
 		}
 		else {

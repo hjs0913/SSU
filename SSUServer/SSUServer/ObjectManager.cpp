@@ -62,11 +62,13 @@ void ObjectManager::Initialize_Npc()
     for (int i = NPC_ID_START + interval * npc_num; i < NPC_ID_START + interval * (npc_num + 1); i++) {
         players[i] = new Npc(i);
         players[i]->Initialize_Lua("wolf_boss.lua");
+        players[i]->set_tribe(AGRO);
     }
     npc_num++;
     for (int i = NPC_ID_START + interval * npc_num; i < NPC_ID_START + interval * (npc_num + 1); i++) {
         players[i] = new Npc(i);
         players[i]->Initialize_Lua("fallen_pig.lua");
+        players[i]->set_tribe(AGRO);
     }
     npc_num++;
     cout << "NPC 초기화 완료" << endl;

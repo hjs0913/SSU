@@ -894,7 +894,7 @@ void Npc::push_npc_move_event()
 {
 	timer_event ev;
 	ev.obj_id = _id;
-	if(_active) ev.start_time = chrono::system_clock::now() + 500s;
+	if(_active) ev.start_time = chrono::system_clock::now() + 500ms;
 	else ev.start_time = chrono::system_clock::now() + std::chrono::milliseconds(rng_move_time(dre));
 	ev.ev = EVENT_NPC_MOVE;
 	ev.target_id = _target_id;
@@ -917,6 +917,7 @@ void Npc::do_npc_move(Npc* target, const array<Obstacle*, MAX_OBSTACLE>& obstacl
 	lua_lock.unlock();
 	if (!m) {
 		_active = false;
+		_target_id = -1;
 		return_npc_position(obstacles);
 		return;
 	}
@@ -979,6 +980,40 @@ void Npc::npc_roming(const array<Obstacle*, MAX_OBSTACLE>& obstacles)
 	lua_pop(L, 3);
 	lua_lock.unlock();
 
+	// viewlist따오기
+	vl.lock();
+	unordered_set<int>my_vl{ viewlist };
+	vl.unlock();
+
+	if (_tribe == AGRO) {
+		// 범위 지정(가까운 얘를 따라가도록 하자) 
+		// -> 애초에 처음 한번이다 2명이 갑자기 들어올 확률이 적다 그냥 바로 따라가주도록 하자
+		for (int i : my_vl) {
+			if (static_ObjectManager::get_objManger()->get_player(i)->get_tribe() == HUMAN) {
+				// 범위 측정
+				int h_x = static_ObjectManager::get_objManger()->get_player(i)->get_x();
+				int h_z = static_ObjectManager::get_objManger()->get_player(i)->get_z();
+
+				if (sqrt(pow((_x - h_x), 2) + pow((_z - h_z), 2)) <= AGRORANGE) {
+					_active = true;
+					_target_id = i;
+
+					// 공격 넣어주기
+					timer_event ev;
+					ev.obj_id = _id;
+					ev.start_time = chrono::system_clock::now() + 1s;
+					ev.ev = EVENT_NPC_ATTACK;
+					ev.target_id = _target_id;
+					TimerManager::timer_queue.push(ev);
+
+					// 이동 넣어주기
+					push_npc_move_event();
+					return;
+				}
+			}
+		}
+	}
+
 	if (_x <= my_x - 20 || _x >= my_x + 20 || _z <= my_z - 20 || _z >= my_z + 20) {
 		return_npc_position(obstacles);
 		return;
@@ -996,10 +1031,6 @@ void Npc::npc_roming(const array<Obstacle*, MAX_OBSTACLE>& obstacles)
 		_x = mv_x;
 		_z = mv_z;
 	}
-
-	vl.lock();
-	unordered_set<int>my_vl{ viewlist };
-	vl.unlock();
 
 	for (int i : my_vl) {
 		if (static_ObjectManager::get_objManger()->get_player(i)->get_tribe() == HUMAN) {
