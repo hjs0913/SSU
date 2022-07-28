@@ -419,6 +419,17 @@ void ObjectManager::worker()
             players[client_id]->revive();
             // 섹터 처리
             m_SectorManager->player_put(players[client_id]);
+            players[client_id]->vl.lock();
+            unordered_set<int>my_vl{ players[client_id]->viewlist };
+            players[client_id]->vl.unlock();
+
+            for (int i : my_vl) {
+                if (static_ObjectManager::get_objManger()->get_player(i)->get_tribe() == HUMAN) {
+                    players[client_id]->push_npc_move_event();
+                    players[client_id]->set_move_active(true);
+                    break;
+                }
+            }
             delete exp_over;
             break;
         }
