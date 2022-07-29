@@ -216,6 +216,11 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 
 	}
 
+	// Magicial Skill Model Load
+	pMagicainSkillModel1 = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Building_5.bin", NULL);
+	pMagicainSkillModel2 = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Building_5.bin", NULL);
+	
+	// Tree Model Load and setPosition
 	pTreeModel1 = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Tree1.bin", NULL);
 	pTreeModel2 = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Tree2.bin", NULL);
 	pTreeModel3 = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Tree3.bin", NULL);
@@ -448,6 +453,27 @@ void CScene::ReleaseObjects()
 	if (pTankerModel) delete pTankerModel;
 	if (pSupporterModel) delete pSupporterModel;
 	if (pMagicianModel) delete pMagicianModel;
+
+	if (vMagicianSkillModel1p.size() != 0) {
+		vector<CMagicianSKillObject*>::iterator iter = vMagicianSkillModel1p.begin();
+		vector<CMagicianSKillObject*>::iterator enditer = vMagicianSkillModel1p.end();
+		for (; iter != enditer; ++iter) {
+			delete (*iter);
+		}
+		vMagicianSkillModel1p.clear();
+	}
+	if (vMagicianSkillModel2p.size() != 0) {
+		vector<CMagicianSKillObject*>::iterator iter = vMagicianSkillModel2p.begin();
+		vector<CMagicianSKillObject*>::iterator enditer = vMagicianSkillModel2p.end();
+		for (; iter != enditer; ++iter) {
+			delete (*iter);
+		}
+		vMagicianSkillModel2p.clear();
+	}
+
+	if (pMagicainSkillModel1) delete pMagicainSkillModel1;
+	if (pMagicainSkillModel2) delete pMagicainSkillModel2;
+
 }
 
 ID3D12RootSignature *CScene::CreateGraphicsRootSignature(ID3D12Device *pd3dDevice)
@@ -859,6 +885,7 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 
 void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, int i)
 {
+	// Monster Position Look vector
 	if (i >= 3 && i < 3+MAX_NPC) {
 		get_object_information(m_ppHierarchicalGameObjects[i], NPC_ID_START + (i - 3));
 		m_ppHierarchicalGameObjects[i]->SetPosition(
@@ -869,6 +896,36 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 		);
 	}
 
+	// Magician Skill Position Look vector
+	for (int i = 0; i < vMagicianSkillModel1p.size(); i++) {
+		// 포지션 잡기
+		if (vMagicianSkillModel1p[i]->skillModel->GetPosition().y != -100) { // Skill active
+			if (vMagicianSkillModel1p[i]->skillModel->GetPosition().y <= 0) {
+				vMagicianSkillModel1p[i]->skillModel->SetPosition(0, -100, 0);
+			}
+			else {
+				XMFLOAT3 temp_pos = vMagicianSkillModel1p[i]->skillModel->GetPosition();
+				XMFLOAT3 temp_look = vMagicianSkillModel1p[i]->skillModel->GetLook();
+				temp_pos.x += m_fElapsedTime * 0.05 * temp_look.x;
+				temp_pos.y += m_fElapsedTime * 0.05 * temp_look.y;
+				temp_pos.z += m_fElapsedTime * 0.05 * temp_look.z;
+				vMagicianSkillModel1p[i]->skillModel->SetPosition(temp_pos);
+			}
+		}
+		else {
+			if (mPlayer[vMagicianSkillModel1p[i]->_id - (3 + MAX_NPC)]->m_net_skill_animation[1]) {
+				XMFLOAT3 temp_pos = m_ppHierarchicalGameObjects[vMagicianSkillModel1p[i]->_id]->GetPosition();
+				temp_pos.y += 30;
+				vMagicianSkillModel1p[i]->skillModel->SetPosition(temp_pos);
+				XMFLOAT3 temp_look = m_ppHierarchicalGameObjects[vMagicianSkillModel1p[i]->_id]->GetLook();
+				temp_look.y = -0.75;
+				temp_look = Vector3::Normalize(temp_look);
+				vMagicianSkillModel1p[i]->skillModel->SetLook(temp_look);
+			}
+		}
+	}
+
+	// Other Player Position Look vector
 	if (i >= 3 + MAX_NPC && i < 3 + MAX_NPC + NUM_PLAYER) {
 		if (mPlayer[i - (3+MAX_NPC)]->GetUse() == true && m_ppHierarchicalGameObjects[i]->GetPosition().x == 0.f) {
 			switch (mPlayer[i- (3 + MAX_NPC)]->m_job) {
@@ -932,6 +989,17 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 					m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[j]->m_nType = ANIMATION_TYPE_ONCE;
 				}
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
+
+				// Skill Model 추가
+				CMagicianSKillObject* skill_model1 = new CMagicianSKillObject(m_pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMagicainSkillModel1, 0, i);
+				skill_model1->skillModel->SetPosition(0, -100, 0);
+				skill_model1->skillModel->SetScale(1.0f, 1.0f, 1.0f);
+				vMagicianSkillModel1p.push_back(skill_model1);
+				CMagicianSKillObject* skill_model2 = new CMagicianSKillObject(m_pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMagicainSkillModel2, 0, i);
+				skill_model2->skillModel->SetPosition(0, -100, 0);
+				skill_model2->skillModel->SetScale(1.0f, 1.0f, 1.0f);
+				vMagicianSkillModel1p.push_back(skill_model2);
+
 				break;
 			}
 
@@ -961,6 +1029,7 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 		);
 	}
 	
+	// Town Npc Position Loock vector
 	TownNpc::UpdateTime(m_fElapsedTime);
 	if (i >= 3 + MAX_NPC + NUM_PLAYER && i < 3 + MAX_NPC + NUM_PLAYER + NUM_TOWN_NPC) {
 		int temp_i = i - (3 + MAX_NPC + NUM_PLAYER);
@@ -982,6 +1051,22 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 
 	if (!m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController) m_ppHierarchicalGameObjects[i]->UpdateTransform(NULL);
 	m_ppHierarchicalGameObjects[i]->Render(pd3dCommandList, pCamera);
+
+	for (int i = 0; i < vMagicianSkillModel1p.size(); i++) {
+		vMagicianSkillModel1p[i]->Animate(m_fElapsedTime);
+		vMagicianSkillModel1p[i]->UpdateTransform(NULL);
+		vMagicianSkillModel1p[i]->Render(pd3dCommandList, pCamera);
+	}
+
+	for (int i = 0; i < vMagicianSkillModel2p.size(); i++) {
+		// 포지션잡기
+
+
+		vMagicianSkillModel2p[i]->Animate(m_fElapsedTime);
+		vMagicianSkillModel2p[i]->UpdateTransform(NULL);
+		vMagicianSkillModel2p[i]->Render(pd3dCommandList, pCamera);
+	}
+
 }
 
 void CScene::Raid_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, int i)

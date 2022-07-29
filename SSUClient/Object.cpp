@@ -1671,4 +1671,30 @@ CCastleObject::~CCastleObject()
 {
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+CMagicianSKillObject::CMagicianSKillObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks, int id)
+{
+	skillModel = new CCastleObject(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, pModel, nAnimationTracks);
+	_id = id;
+}
 
+CMagicianSKillObject::~CMagicianSKillObject()
+{
+	delete skillModel;
+}
+
+void CMagicianSKillObject::Animate(float fTimeElapsed) 
+{
+	skillModel->Animate(fTimeElapsed);
+}
+
+void CMagicianSKillObject::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
+{
+	skillModel->UpdateTransform(pxmf4x4Parent);
+}
+
+void CMagicianSKillObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+{
+	skillModel->Render(pd3dCommandList, pCamera);
+}

@@ -610,4 +610,18 @@ public:
 	CCastleObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks);
 	virtual ~CCastleObject();
 };
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+class CMagicianSKillObject {
+public:
+	CGameObject* skillModel;
+	int _id;	//Scene에서 m_ppHierachicalGameObjects의 인덱스 번호
 
+
+	CMagicianSKillObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks, int id);
+	~CMagicianSKillObject();
+
+	void Animate(float fTimeElapsed);
+	void UpdateTransform(XMFLOAT4X4* pxmf4x4Parent);
+	void Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera);
+};

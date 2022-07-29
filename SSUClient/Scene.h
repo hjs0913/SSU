@@ -142,6 +142,12 @@ public:
 	CLoadedModelInfo					*pSupporterModel = NULL;
 	CLoadedModelInfo					*pMagicianModel = NULL;
 
+	// magicial Skill model(1 : 메테오, 2 : 파이어볼)
+	CLoadedModelInfo					*pMagicainSkillModel1 = NULL;
+	vector<CMagicianSKillObject*>		vMagicianSkillModel1p;
+	CLoadedModelInfo					*pMagicainSkillModel2 = NULL;
+	vector<CMagicianSKillObject*>		vMagicianSkillModel2p;
+
 	// object model
 	CLoadedModelInfo					*pTreeModel1 = NULL;
 	CLoadedModelInfo					*pTreeModel2 = NULL;
