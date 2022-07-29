@@ -665,7 +665,7 @@ bool Npc::npc_attack_validation(Npc* target)
 void Npc::attack_dead_judge(Npc* target)
 {
 	int target_hp = target->get_hp();
-	if (target_hp <= -1111110) {
+	if (target_hp <= 0) {
 		target->state_lock.lock();
 		if (target->get_state() != ST_INGAME) {
 			target->state_lock.unlock();
