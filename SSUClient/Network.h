@@ -92,6 +92,12 @@ extern int Fail_Reason;
 extern bool Damage_On;
 extern int Damage;
 extern int DamageID;
+extern struct DamageInfo {
+	XMFLOAT2 pos;
+	float damage;
+	int time;
+};
+extern map<int, DamageInfo> mapDamageInfo;
 extern char pl_id[MAX_NAME_SIZE];
 extern char pl_password[MAX_NAME_SIZE];
 extern char pl_nickname[MAX_NAME_SIZE];

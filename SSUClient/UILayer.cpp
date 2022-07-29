@@ -105,12 +105,6 @@ void UILayer::UpdateLabels(const std::wstring& strUIText, UINT LeftTop_x, UINT L
 
 void UILayer::Render(UINT nFrame)
 {
-    --m_DamageTime;
-    if (m_DamageTime == 0) {
-        Damage_On = false;
-        return;
-    }
-
     ID3D11Resource* ppResources[] = { m_vWrappedRenderTargets[nFrame] };
 
     m_pd2dDeviceContext->SetTarget(m_vd2dRenderTargets[nFrame]);
@@ -1227,4 +1221,51 @@ void Skill_Name_UI::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UIN
 
 
 }
-///----
+
+///-----------------------------------------------------------------------
+Damage_UI::Damage_UI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor) : UILayer(nFrame, pd3dDevice, pd3dCommandQueue, LayoutColor, TextColor)
+{
+    m_vTextBlocks.resize(nFrame);
+
+    m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(LayoutColor), (ID2D1SolidColorBrush**)&m_pTextLayoutBrush);
+    m_pTextLayoutBrush->SetColor(D2D1::ColorF(TextColor));
+    m_pTextLayoutBrush->SetOpacity(1.0f);
+
+}
+
+Damage_UI::~Damage_UI()
+{
+
+}
+
+void Damage_UI::UpdateLabels(const std::wstring& strUIText, UINT LeftTop_x, UINT LeftTop_y, UINT RightBottom_x, UINT RightBottom_y, int textIndex)
+{
+    ++m_DamageTime;
+    m_vTextBlocks[0] = { strUIText, D2D1::RectF(LeftTop_x, LeftTop_y - m_DamageTime  , RightBottom_x , RightBottom_y - m_DamageTime), m_pdwTextFormat };
+}
+
+void Damage_UI::Render(UINT nFrame)
+{
+    if (m_DamageTime == 30) {
+        Damage_On = false;
+        m_DamageTime = 0;
+        return;
+    }
+    ID3D11Resource* ppResources[] = { m_vWrappedRenderTargets[nFrame] };
+
+    m_pd2dDeviceContext->SetTarget(m_vd2dRenderTargets[nFrame]);
+
+    m_pd3d11On12Device->AcquireWrappedResources(ppResources, _countof(ppResources));
+
+    m_pd2dDeviceContext->BeginDraw();
+
+    m_pd2dDeviceContext->FillRectangle(m_vTextBlocks[0].d2dLayoutRect, m_pBrush);
+    m_pd2dDeviceContext->DrawRectangle(m_vTextBlocks[0].d2dLayoutRect, m_pBrush);
+    m_pd2dDeviceContext->DrawText(m_vTextBlocks[0].strText.c_str(), static_cast<UINT>(m_vTextBlocks[0].strText.length()),
+        m_vTextBlocks[0].pdwFormat, m_vTextBlocks[0].d2dLayoutRect, m_pd2dTextBrush);
+
+    m_pd2dDeviceContext->EndDraw();
+
+    m_pd3d11On12Device->ReleaseWrappedResources(ppResources, _countof(ppResources));
+    m_pd3d11DeviceContext->Flush();
+}

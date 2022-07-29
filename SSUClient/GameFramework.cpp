@@ -1085,7 +1085,7 @@ void CGameFramework::BuildObjects_login()
 		m_ppUILayer[42] = new Skill_Name_UI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::GhostWhite, D2D1::ColorF::Black);
 
 		// 데미지
-		m_ppUILayer[43] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::GhostWhite, D2D1::ColorF::Red);
+		m_ppUILayer[43] = new Damage_UI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::GhostWhite, D2D1::ColorF::Red);
 
 		m_ppUILayer[0]->setAlpha(0.5, 1.0);
 		m_ppUILayer[1]->setAlpha(0.5, 1.0);
@@ -1368,7 +1368,7 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[42] = new Skill_Name_UI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::GhostWhite, D2D1::ColorF::Black);
 
 		// 데미지
-		m_ppUILayer[43] = new UILayer(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::GhostWhite, D2D1::ColorF::Red);
+		m_ppUILayer[43] = new Damage_UI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::GhostWhite, D2D1::ColorF::Red);
 
 
 		m_ppUILayer[0]->setAlpha(0.5, 1.0);
@@ -2125,6 +2125,7 @@ void CGameFramework::FrameAdvance()
 	// 서버 연결X 용
 
 	EnterCriticalSection(&UI_cs);
+
 	for (int i = 0; i < UICOUNT; i++) {
 		switch (i) {
 		case 0: {
@@ -2504,8 +2505,10 @@ void CGameFramework::FrameAdvance()
 			if (!Damage_On) break;
 
 			XMFLOAT2 xmf2Screen = CalcWorldToViewPort(m_pScene->m_ppHierarchicalGameObjects, DamageID);
-			m_ppUILayer[i]->m_DamageTime = 30;
-			m_ppUILayer[i]->UpdateLabels(to_wstring(Damage), xmf2Screen.x - 100.0f, xmf2Screen.y - 150.0f, xmf2Screen.x + 100.0f, xmf2Screen.y - 120.0f);
+			DamageInfo tempDamageInfo{ xmf2Screen, Damage, 30};
+			mapDamageInfo[DamageID] = tempDamageInfo;
+
+			reinterpret_cast<Damage_UI*>(m_ppUILayer[i])->UpdateLabels(to_wstring(Damage), xmf2Screen.x - 100.0f, xmf2Screen.y - 200.0f, xmf2Screen.x + 100.0f, xmf2Screen.y - 180.0f, 0);
 
 			break;
 		}
@@ -2591,6 +2594,7 @@ void CGameFramework::FrameAdvance()
 				Notice_str = L"사망했습니다. ";
 				Notice_str.append(to_wstring(chrono::duration_cast<chrono::seconds>(t).count()));
 				Notice_str.append(L"초 후 부활합니다");
+				Damage_On = false;
 			}
 
 			if (RaidEnterNotice) {
@@ -2617,8 +2621,9 @@ void CGameFramework::Login_Check_And_Build()
 
 XMFLOAT2 CGameFramework::CalcWorldToViewPort(CGameObject** obj, int index)
 {
-	if (obj[index]->GetPosition().x != 0 && obj[index]->GetPosition().z != 0) {
-		XMFLOAT3 xmf3ViewProj = Vector3::TransformCoord(Vector3::TransformCoord(obj[index]->GetPosition(), m_pPlayer->GetCamera()->GetViewMatrix()), m_pPlayer->GetCamera()->GetProjectionMatrix());
+	if (/*obj[index]->GetPosition().x != 0 && obj[index]->GetPosition().z != 0*/mPlayer[NPC_ID_START + index - 3]->GetUse()) {
+		//XMFLOAT3 xmf3ViewProj = Vector3::TransformCoord(Vector3::TransformCoord(obj[index]->GetPosition(), m_pPlayer->GetCamera()->GetViewMatrix()), m_pPlayer->GetCamera()->GetProjectionMatrix());
+		XMFLOAT3 xmf3ViewProj = Vector3::TransformCoord(Vector3::TransformCoord(mPlayer[NPC_ID_START + index - 3]->GetPosition(), m_pPlayer->GetCamera()->GetViewMatrix()), m_pPlayer->GetCamera()->GetProjectionMatrix());
 
 		float fScreenX = xmf3ViewProj.x * (FRAME_BUFFER_WIDTH / 2) + FRAME_BUFFER_WIDTH / 2;
 		float fScreenY = -xmf3ViewProj.y * (FRAME_BUFFER_HEIGHT / 2) + FRAME_BUFFER_HEIGHT / 2;

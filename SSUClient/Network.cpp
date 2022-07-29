@@ -61,6 +61,9 @@ extern int Fail_Reason = 0;
 bool Damage_On = false;
 int Damage = 0;
 int DamageID = 0;
+
+map<int, DamageInfo> mapDamageInfo;
+
 bool JOIN_ID_On = false;
 bool JOIN_PASSWORD_On = false;
 bool JOIN_NICKNAME_On = false;
