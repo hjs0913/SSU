@@ -466,8 +466,12 @@ void ObjectManager::worker()
                 reinterpret_cast<Player*>(players[client_id])->attack_speed_up = 0;
                 break;
             case E_FIRE:
+                if ((players[exp_over->_target]->get_hp() - players[exp_over->_target]->get_lv() * 10) <= 0)
+                    break;
                 players[exp_over->_target]->set_hp(players[exp_over->_target]->get_hp() - players[exp_over->_target]->get_lv() * 10);
                 send_change_hp_packet(reinterpret_cast<Player*>(players[client_id]), players[exp_over->_target]);
+                if ((players[exp_over->_target]->get_hp() - players[exp_over->_target]->get_lv() * 10) <= 0)
+                    break;
                 ev.obj_id = client_id;
                 ev.start_time = chrono::system_clock::now() + 5s;
                 ev.ev = EVENT_ELEMENT_FIRE_COOLTIME;
@@ -651,14 +655,14 @@ void ObjectManager::worker()
             {
             case J_DILLER:
                 ev.obj_id = client_id;
-                ev.start_time = chrono::system_clock::now() + 1s + 3ms;
+                ev.start_time = chrono::system_clock::now() +3ms;
                 ev.ev = EVENT_PARTNER_ATTACK_STOP;
                 ev.target_id = client_id;
                 TimerManager::timer_queue.push(ev);
                 break;
             case J_TANKER:
                 ev.obj_id = client_id;
-                ev.start_time = chrono::system_clock::now() + 2s + 2ms;
+                ev.start_time = chrono::system_clock::now() +  2s + 2ms;
                 ev.ev = EVENT_PARTNER_ATTACK_STOP;
                 ev.target_id = client_id;
                 TimerManager::timer_queue.push(ev);
@@ -672,7 +676,7 @@ void ObjectManager::worker()
                 break;
             case J_SUPPORTER:
                 ev.obj_id = client_id;
-                ev.start_time = chrono::system_clock::now() + 2s;
+                ev.start_time = chrono::system_clock::now() +  2s;
                 ev.ev = EVENT_PARTNER_ATTACK_STOP;
                 ev.target_id = client_id;
                 TimerManager::timer_queue.push(ev);
@@ -837,9 +841,13 @@ void ObjectManager::worker()
             break;
         }
         case OP_ELEMENT_FIRE_COOLTIME: {
+            if ((players[exp_over->_target]->get_hp() - players[exp_over->_target]->get_lv() * 10) <= 0)
+                break;
             players[exp_over->_target]->set_hp(players[exp_over->_target]->get_hp() - players[exp_over->_target]->get_lv() * 10);
             send_change_hp_packet(reinterpret_cast<Player*>(players[client_id]), players[exp_over->_target]);
             // players[client_id]->set_element_cooltime(false);
+            if ((players[exp_over->_target]->get_hp() - players[exp_over->_target]->get_lv() * 10) <= 0)
+                break;
             players[exp_over->_target]->set_element_cooltime(false);
             delete exp_over;
             break;

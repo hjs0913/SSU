@@ -1970,23 +1970,6 @@ void CGameFramework::ProcessInput()
 				}
 			}*/
 		}
-		if (pKeysBuffer['T'] & 0xF0) {
-			point_light_bool = true;
-		//m_pScene->m_pLights[0].m_xmf4Diffuse.x += 100.0f;
-			//m_pScene->m_pLights[0].m_xmf4Diffuse.y += 100.0f;
-			//m_pScene->m_pLights[0].m_xmf4Diffuse.z += 100.0f;
-		//	m_pScene->m_pLights[0].m_xmf3Direction = m_pPlayer->GetLookVector();
-			
-		
-			/*
-			XMFLOAT3 Light_pos = m_pPlayer->GetPosition();
-			//m_pLights[0].m_xmf3Direction = m_pPlayer->GetLookVector();
-			Light_pos.z -= 5;			Light_pos.z -= 5;
-			m_pScene->m_pLights[0].m_xmf3Position = XMFLOAT3(Light_pos.x, Light_pos.y + 10.0f, Light_pos.z);
-			m_pScene->m_pLights[0].m_xmf3Direction = m_pPlayer->GetLookVector();
-			//m_pScene->m_pLights[0].m_xmf3Position.z = m_pPlayer->GetPosition().z + m_pPlayer->GetLook().z * 30;*/
-
-		}
 		if (pKeysBuffer['L'] & 0xF0) {
 			m_pScene->m_pLights[1].m_xmf4Diffuse.x += 0.1f;
 			m_pScene->m_pLights[1].m_xmf4Diffuse.y += 0.1f;
@@ -2524,6 +2507,8 @@ void CGameFramework::FrameAdvance()
 		}
 		case 42:{
 			if (!Login_OK) break;
+			if (mPlayer[my_id]->m_job > 4 || mPlayer[my_id]->m_job < 0)
+				mPlayer[my_id]->m_job = (JOB)0;
 			switch (mPlayer[my_id]->m_job)
 			{
 			case 0:
