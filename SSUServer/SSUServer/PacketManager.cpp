@@ -949,7 +949,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                             Npc* bos = indun->boss;
                             pl->magical_skill_success(bos, pl->get_skill_factor(1, 0));
                             for (int i = 0; i < GAIA_ROOM; ++i) {
-                                send_change_hp_packet(indun->get_party_palyer()[i], indun->boss);
+                                send_change_hp_packet(indun->get_party_palyer()[i], indun->boss, 0);
                             }
                             if (bos->get_hp() <= 0) {
                                 bos->set_hp(0);
@@ -1033,7 +1033,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                             send_play_effect_packet(pl, bos); // 이펙트 터트릴 위치 
 
                             for (int i = 0; i < GAIA_ROOM; ++i) {
-                                send_change_hp_packet(indun->get_party_palyer()[i], indun->boss);
+                                send_change_hp_packet(indun->get_party_palyer()[i], indun->boss, 0);
                             }
                             if (bos->get_hp() <= 0) {
                                 bos->set_hp(0);
@@ -1118,7 +1118,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                             send_play_effect_packet(pl, bos); // 이펙트 터트릴 위치 
 
                             for (int i = 0; i < GAIA_ROOM; ++i) {
-                                send_change_hp_packet(indun->get_party_palyer()[i], indun->boss);
+                                send_change_hp_packet(indun->get_party_palyer()[i], indun->boss, 0);
                             }
                             if (bos->get_hp() <= 0) {
                                 bos->set_hp(0);

@@ -256,7 +256,6 @@ public:
     virtual void Render(UINT nFrame);
     virtual void Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT nHeight, UINT TextAlignment, UINT ParagraphAlignment);
 };
-};
 
 class Damage_UI : public UILayer
 {
