@@ -188,8 +188,9 @@ void Player::attack_element_judge(Npc* target)
 		case E_FIRE:
 			if (target->get_element() == E_ICE || target->get_element() == E_TREE
 				|| target->get_element() == E_FULLMETAL) {
+				target->set_element_cooltime(true);
 				//10초 공격력 10프로의 화상 피해 
-				
+				/*
 				timer_event ev;
 				//if (reinterpret_cast<Player*>(target)->burn_on == false) {
 					ev.obj_id = _id;
@@ -197,7 +198,7 @@ void Player::attack_element_judge(Npc* target)
 					ev.ev = EVENT_ELEMENT_FIRE_COOLTIME;
 					ev.target_id = target->get_id();
 					TimerManager::timer_queue.push(ev);
-					target->set_element_cooltime(true);
+					target->set_element_cooltime(true);*/
 				//}
 			}
 			break;
