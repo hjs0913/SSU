@@ -54,6 +54,7 @@ bool f5_picking_possible = false;
 bool f6_picking_possible = false;
 float skill_cool_rect[] = { (FRAME_BUFFER_WIDTH) / 30.0f ,(FRAME_BUFFER_WIDTH) / 30.0f , (FRAME_BUFFER_WIDTH) / 30.0f };
 
+
 CGameFramework::CGameFramework()
 {
 	m_pdxgiFactory = NULL;
@@ -1868,12 +1869,12 @@ void CGameFramework::ProcessInput()
 					case J_MAGICIAN:
 						first_skill_used = true;
 						start_skill[0] = clock();
-						send_skill_packet(1, 0);
+						send_skill_packet(0, 0);
 						break;
 					case J_SUPPORTER:
 						first_skill_used = true;
 						start_skill[0] = clock();
-						send_skill_packet(2, 0);
+						send_skill_packet(0, 0);
 						break;
 					default:
 						break;
@@ -1899,12 +1900,12 @@ void CGameFramework::ProcessInput()
 					case J_MAGICIAN:
 						second_skill_used = true;
 						start_skill[1] = clock();
-						send_skill_packet(1, 1);
+						send_skill_packet(1, 0);
 						break;
 					case J_SUPPORTER:
 						second_skill_used = true;
 						start_skill[1] = clock();
-						send_skill_packet(2, 1);
+						send_skill_packet(1, 0);
 						break;
 					default:
 						break;
@@ -1930,12 +1931,12 @@ void CGameFramework::ProcessInput()
 					case J_MAGICIAN: //추후 스킬 하나 추가 
 						third_skill_used = true;
 						start_skill[2] = clock();
-						send_skill_packet(1, 2);
+						send_skill_packet(2, 0);
 						break;
 					case J_SUPPORTER:
 						third_skill_used = true;
 						start_skill[2] = clock();
-						send_skill_packet(2, 2);
+						send_skill_packet(2, 0);
 						break;
 					default:
 						break;
@@ -1968,6 +1969,23 @@ void CGameFramework::ProcessInput()
 					IsFire[bulletidx - 2] = true;
 				}
 			}*/
+		}
+		if (pKeysBuffer['T'] & 0xF0) {
+			point_light_bool = true;
+		//m_pScene->m_pLights[0].m_xmf4Diffuse.x += 100.0f;
+			//m_pScene->m_pLights[0].m_xmf4Diffuse.y += 100.0f;
+			//m_pScene->m_pLights[0].m_xmf4Diffuse.z += 100.0f;
+		//	m_pScene->m_pLights[0].m_xmf3Direction = m_pPlayer->GetLookVector();
+			
+		
+			/*
+			XMFLOAT3 Light_pos = m_pPlayer->GetPosition();
+			//m_pLights[0].m_xmf3Direction = m_pPlayer->GetLookVector();
+			Light_pos.z -= 5;			Light_pos.z -= 5;
+			m_pScene->m_pLights[0].m_xmf3Position = XMFLOAT3(Light_pos.x, Light_pos.y + 10.0f, Light_pos.z);
+			m_pScene->m_pLights[0].m_xmf3Direction = m_pPlayer->GetLookVector();
+			//m_pScene->m_pLights[0].m_xmf3Position.z = m_pPlayer->GetPosition().z + m_pPlayer->GetLook().z * 30;*/
+
 		}
 		if (pKeysBuffer['L'] & 0xF0) {
 			m_pScene->m_pLights[1].m_xmf4Diffuse.x += 0.1f;
