@@ -23,7 +23,7 @@
     <ClCompile Include="dummy.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\RealServer\Server\protocol.h" />
+    <ClInclude Include="..\..\SSUServer\SSUServer\protocol.h" />
     <ClInclude Include="dummy.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
