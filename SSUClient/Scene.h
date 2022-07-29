@@ -144,8 +144,14 @@ public:
 
 	// magicial Skill model(1 : 메테오, 2 : 파이어볼)
 	CLoadedModelInfo					*pMagicainSkillModel1 = NULL;
-	vector<CMagicianSKillObject*>		vMagicianSkillModel1p;
 	CLoadedModelInfo					*pMagicainSkillModel2 = NULL;
+
+	// My magical Skill
+	CGameObject							*pMagicainSkill1 = NULL;
+	CGameObject							*pMagicainSkill2 = NULL;
+
+	// Other player magicial Skill
+	vector<CMagicianSKillObject*>		vMagicianSkillModel1p;
 	vector<CMagicianSKillObject*>		vMagicianSkillModel2p;
 
 	// object model

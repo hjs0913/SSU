@@ -1129,6 +1129,7 @@ Skill_Name_UI::Skill_Name_UI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12Comman
     m_pTextLayoutBrush->SetColor(D2D1::ColorF(D2D1::ColorF::White));
     m_pTextLayoutBrush->SetOpacity(1.0f);
 
+    UpdateLabels(L"", L"", L"");
 }
 
 Skill_Name_UI::~Skill_Name_UI()

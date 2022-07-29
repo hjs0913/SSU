@@ -231,6 +231,19 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	if (pTreeModel3) delete pTreeModel2;
 	if (pTreeModel2) delete pTreeModel3;
 
+	if (my_job == J_MAGICIAN) {
+		if (!pMagicainSkill1) {
+			pMagicainSkill1 = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMagicainSkillModel1, 0);
+			pMagicainSkill1->SetPosition(0.f, -100.f, 0.f);
+			pMagicainSkill1->SetScale(1.0f, 1.0f, 1.0f);
+		}
+		if (!pMagicainSkill2) {
+			pMagicainSkill2 = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMagicainSkillModel2, 0);
+			pMagicainSkill2->SetPosition(0.f, -100.f, 0.f);
+			pMagicainSkill2->SetScale(1.0f, 1.0f, 1.0f);
+		}
+	}
+
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
 
@@ -257,6 +270,7 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	m_ppHierarchicalGameObjects = new CGameObject * [m_nHierarchicalGameObjects];
 	//for (int i = 0; i < m_nHierarchicalGameObjects; ++i) m_ppHierarchicalGameObjects[i] = NULL;
 
+	// Character Model Load
 	pBastardModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Bastard_Warrior.bin", NULL);
 	player_anim_cnt = pBastardModel->m_pAnimationSets->m_nAnimationSets;
 
@@ -265,6 +279,10 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	pSupporterModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Priestess.bin", NULL);
 	
 	pMagicianModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Wizard_Girl.bin", NULL);
+
+	// Magicial Skill Model Load
+	pMagicainSkillModel1 = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Building_5.bin", NULL);
+	pMagicainSkillModel2 = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Building_5.bin", NULL);
 
 	for (int i = 0; i < GAIA_ROOM - 1; i++) {
 		switch (get_job(i)) {
@@ -311,6 +329,16 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 				m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[j].m_fSpeed = 1.0f;
 			}
 			m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
+
+			// Skill Model 추가
+			CMagicianSKillObject* skill_model1 = new CMagicianSKillObject(m_pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMagicainSkillModel1, 0, i);
+			skill_model1->skillModel->SetPosition(0, -100, 0);
+			skill_model1->skillModel->SetScale(1.0f, 1.0f, 1.0f);
+			vMagicianSkillModel1p.push_back(skill_model1);
+			CMagicianSKillObject* skill_model2 = new CMagicianSKillObject(m_pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMagicainSkillModel2, 0, i);
+			skill_model2->skillModel->SetPosition(0, -100, 0);
+			skill_model2->skillModel->SetScale(1.0f, 1.0f, 1.0f);
+			vMagicianSkillModel2p.push_back(skill_model2);
 			break;
 		}
 		default: {
@@ -390,8 +418,22 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 	for (int i = 0; i < 4; i++) get_raid_initialize_position(m_ppHierarchicalGameObjects[i], i);
 
+	if (my_job == J_MAGICIAN) {
+		if (!pMagicainSkill1) {
+			pMagicainSkill1 = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMagicainSkillModel1, 0);
+			pMagicainSkill1->SetPosition(0.f, -100.f, 0.f);
+			pMagicainSkill1->SetScale(1.0f, 1.0f, 1.0f);
+		}
+		if (!pMagicainSkill2) {
+			pMagicainSkill2 = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMagicainSkillModel2, 0);
+			pMagicainSkill2->SetPosition(0.f, -100.f, 0.f);
+			pMagicainSkill2->SetScale(1.0f, 1.0f, 1.0f);
+		}
+	}
+
 	CreateShaderVariables(pd3dDevice, pd3dCommandList);
 }
+
 void CScene::BuildObjects_Login(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList)
 {
 	m_pd3dDevice = pd3dDevice;
@@ -470,6 +512,9 @@ void CScene::ReleaseObjects()
 		}
 		vMagicianSkillModel2p.clear();
 	}
+
+	if (pMagicainSkill1) delete pMagicainSkill1;
+	if (pMagicainSkill2) delete pMagicainSkill2;
 
 	if (pMagicainSkillModel1) delete pMagicainSkillModel1;
 	if (pMagicainSkillModel2) delete pMagicainSkillModel2;
@@ -864,6 +909,7 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	for (int i = 0; i < m_nGameObjects; i++) if (m_ppGameObjects[i]) m_ppGameObjects[i]->Render(pd3dCommandList, pCamera);
 	for (int i = 0; i < m_nShaders; i++) if (m_ppShaders[i]) m_ppShaders[i]->Render(pd3dCommandList, pCamera);
 
+	// other Modle Position Render
 	for (int i = 0; i < m_nHierarchicalGameObjects; i++)
 	{
 		if (m_ppHierarchicalGameObjects[i])
@@ -881,6 +927,126 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 			}
 		}
 	}
+
+	// Magician Skill(메테오)(My) Position Look vector
+	if(pMagicainSkill1){
+		// 포지션 잡기
+		if (pMagicainSkill1->GetPosition().y != -100) { // Skill active
+			if (pMagicainSkill1->GetPosition().y <= 
+				m_pTerrain->GetHeight(pMagicainSkill1->GetPosition().x, pMagicainSkill1->GetPosition().z)) {
+				pMagicainSkill1->SetPosition(0, -100, 0);
+			}
+			else {
+				XMFLOAT3 temp_pos = pMagicainSkill1->GetPosition();
+				XMFLOAT3 temp_look = pMagicainSkill1->GetLook();
+				temp_pos.x += m_fElapsedTime * 30 * temp_look.x;
+				temp_pos.y += m_fElapsedTime * 30 * temp_look.y;
+				temp_pos.z += m_fElapsedTime * 30 * temp_look.z;
+				pMagicainSkill1->SetPosition(temp_pos);
+			}
+		}
+		else {
+			if (m_pPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[4].m_bEnable && 
+				m_pPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[4]->m_fPosition <= 0.1f) {
+				XMFLOAT3 temp_pos = m_pPlayer->GetPosition();
+				temp_pos.y += 30;
+				pMagicainSkill1->SetPosition(temp_pos);
+				XMFLOAT3 temp_look = m_pPlayer->GetLook();
+				temp_look.y = -0.75;
+				temp_look = Vector3::Normalize(temp_look);
+				pMagicainSkill1->SetLook(temp_look);
+			}
+		}
+
+		pMagicainSkill1->Animate(m_fElapsedTime);
+		pMagicainSkill1->UpdateTransform(NULL);
+		pMagicainSkill1->Render(pd3dCommandList, pCamera);
+	}
+
+	// Magician Skill(메테오)(Other) Position Look vector
+	for (int j = 0; j < vMagicianSkillModel1p.size(); j++) {
+		if (!InDungeon) {
+			if (mPlayer[vMagicianSkillModel1p[j]->_id - (3 + MAX_NPC)]->GetUse() == false) {
+				vMagicianSkillModel1p.erase(vMagicianSkillModel1p.begin() + j);
+				j--;
+				continue;
+			}
+		}
+
+		// 포지션 잡기
+		if (vMagicianSkillModel1p[j]->skillModel->GetPosition().y != -100) { // Skill active
+			if (vMagicianSkillModel1p[j]->skillModel->GetPosition().y <= 
+				m_pTerrain->GetHeight(vMagicianSkillModel1p[j]->skillModel->GetPosition().x, vMagicianSkillModel1p[j]->skillModel->GetPosition().z)) {
+				vMagicianSkillModel1p[j]->skillModel->SetPosition(0, -100, 0);
+			}
+			else {
+				XMFLOAT3 temp_pos = vMagicianSkillModel1p[j]->skillModel->GetPosition();
+				XMFLOAT3 temp_look = vMagicianSkillModel1p[j]->skillModel->GetLook();
+				temp_pos.x += m_fElapsedTime * 30 * temp_look.x;
+				temp_pos.y += m_fElapsedTime * 30 * temp_look.y;
+				temp_pos.z += m_fElapsedTime * 30 * temp_look.z;
+				vMagicianSkillModel1p[j]->skillModel->SetPosition(temp_pos);
+			}
+		}
+		else {
+			if (m_ppHierarchicalGameObjects[vMagicianSkillModel1p[j]->_id]->m_pSkinnedAnimationController->m_pAnimationTracks[4].m_bEnable &&
+				m_ppHierarchicalGameObjects[vMagicianSkillModel1p[j]->_id]->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[4]->m_fPosition <= 0.1f) {
+				XMFLOAT3 temp_pos = m_ppHierarchicalGameObjects[vMagicianSkillModel1p[j]->_id]->GetPosition();
+				temp_pos.y += 30;
+				vMagicianSkillModel1p[j]->skillModel->SetPosition(temp_pos);
+				XMFLOAT3 temp_look = m_ppHierarchicalGameObjects[vMagicianSkillModel1p[j]->_id]->GetLook();
+				temp_look.y = -0.75;
+				temp_look = Vector3::Normalize(temp_look);
+				vMagicianSkillModel1p[j]->skillModel->SetLook(temp_look);
+			}
+		}
+
+		vMagicianSkillModel1p[j]->Animate(m_fElapsedTime);
+		vMagicianSkillModel1p[j]->UpdateTransform(NULL);
+		vMagicianSkillModel1p[j]->Render(pd3dCommandList, pCamera);
+	}
+
+	// Magician Skill(파이어볼)(Other) Position Look vector
+	for (int j = 0; j < vMagicianSkillModel2p.size(); j++) {
+		if (!InDungeon) {
+			if (mPlayer[vMagicianSkillModel2p[j]->_id - (3 + MAX_NPC)]->GetUse() == false) {
+				vMagicianSkillModel2p.erase(vMagicianSkillModel2p.begin() + j);
+				j--;
+				continue;
+			}
+		}
+
+		// 포지션 잡기
+		if (vMagicianSkillModel2p[j]->skillModel->GetPosition().y != -100) { // Skill active
+			if (vMagicianSkillModel2p[j]->skillModel->GetPosition().y <= 0) {
+				vMagicianSkillModel2p[j]->skillModel->SetPosition(0, -100, 0);
+			}
+			else {
+				XMFLOAT3 temp_pos = vMagicianSkillModel2p[j]->skillModel->GetPosition();
+				XMFLOAT3 temp_look = vMagicianSkillModel2p[j]->skillModel->GetLook();
+				temp_pos.x += m_fElapsedTime * temp_look.x;
+				temp_pos.y += m_fElapsedTime * temp_look.y;
+				temp_pos.z += m_fElapsedTime * temp_look.z;
+				vMagicianSkillModel2p[j]->skillModel->SetPosition(temp_pos);
+			}
+		}
+		else {
+			if (m_ppHierarchicalGameObjects[vMagicianSkillModel1p[j]->_id]->m_pSkinnedAnimationController->m_pAnimationTracks[5].m_bEnable &&
+				m_ppHierarchicalGameObjects[vMagicianSkillModel1p[j]->_id]->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[5]->m_fPosition <= 0.1f) {
+				XMFLOAT3 temp_pos = m_ppHierarchicalGameObjects[vMagicianSkillModel2p[j]->_id]->GetPosition();
+				temp_pos.y += 30;
+				vMagicianSkillModel2p[j]->skillModel->SetPosition(temp_pos);
+				XMFLOAT3 temp_look = m_ppHierarchicalGameObjects[vMagicianSkillModel2p[j]->_id]->GetLook();
+				temp_look.y = -0.75;
+				temp_look = Vector3::Normalize(temp_look);
+				vMagicianSkillModel2p[j]->skillModel->SetLook(temp_look);
+			}
+		}
+
+		vMagicianSkillModel2p[j]->Animate(m_fElapsedTime);
+		vMagicianSkillModel2p[j]->UpdateTransform(NULL);
+		vMagicianSkillModel2p[j]->Render(pd3dCommandList, pCamera);
+	}
 }
 
 void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera, int i)
@@ -894,35 +1060,6 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 				m_ppHierarchicalGameObjects[i]->GetPosition().z
 			)
 		);
-	}
-
-	// Magician Skill Position Look vector
-	for (int i = 0; i < vMagicianSkillModel1p.size(); i++) {
-		// 포지션 잡기
-		if (vMagicianSkillModel1p[i]->skillModel->GetPosition().y != -100) { // Skill active
-			if (vMagicianSkillModel1p[i]->skillModel->GetPosition().y <= 0) {
-				vMagicianSkillModel1p[i]->skillModel->SetPosition(0, -100, 0);
-			}
-			else {
-				XMFLOAT3 temp_pos = vMagicianSkillModel1p[i]->skillModel->GetPosition();
-				XMFLOAT3 temp_look = vMagicianSkillModel1p[i]->skillModel->GetLook();
-				temp_pos.x += m_fElapsedTime * 0.05 * temp_look.x;
-				temp_pos.y += m_fElapsedTime * 0.05 * temp_look.y;
-				temp_pos.z += m_fElapsedTime * 0.05 * temp_look.z;
-				vMagicianSkillModel1p[i]->skillModel->SetPosition(temp_pos);
-			}
-		}
-		else {
-			if (mPlayer[vMagicianSkillModel1p[i]->_id - (3 + MAX_NPC)]->m_net_skill_animation[1]) {
-				XMFLOAT3 temp_pos = m_ppHierarchicalGameObjects[vMagicianSkillModel1p[i]->_id]->GetPosition();
-				temp_pos.y += 30;
-				vMagicianSkillModel1p[i]->skillModel->SetPosition(temp_pos);
-				XMFLOAT3 temp_look = m_ppHierarchicalGameObjects[vMagicianSkillModel1p[i]->_id]->GetLook();
-				temp_look.y = -0.75;
-				temp_look = Vector3::Normalize(temp_look);
-				vMagicianSkillModel1p[i]->skillModel->SetLook(temp_look);
-			}
-		}
 	}
 
 	// Other Player Position Look vector
@@ -1051,21 +1188,6 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 
 	if (!m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController) m_ppHierarchicalGameObjects[i]->UpdateTransform(NULL);
 	m_ppHierarchicalGameObjects[i]->Render(pd3dCommandList, pCamera);
-
-	for (int i = 0; i < vMagicianSkillModel1p.size(); i++) {
-		vMagicianSkillModel1p[i]->Animate(m_fElapsedTime);
-		vMagicianSkillModel1p[i]->UpdateTransform(NULL);
-		vMagicianSkillModel1p[i]->Render(pd3dCommandList, pCamera);
-	}
-
-	for (int i = 0; i < vMagicianSkillModel2p.size(); i++) {
-		// 포지션잡기
-
-
-		vMagicianSkillModel2p[i]->Animate(m_fElapsedTime);
-		vMagicianSkillModel2p[i]->UpdateTransform(NULL);
-		vMagicianSkillModel2p[i]->Render(pd3dCommandList, pCamera);
-	}
 
 }
 
