@@ -60,9 +60,10 @@ bool Fail_On = false;
 extern int Fail_Reason = 0;
 bool Damage_On = false;
 int Damage = 0;
-int DamageID = 0;
 
-map<int, DamageInfo> mapDamageInfo;
+vector<int> vectorDamageID1;
+vector<int> vectorDamageID2;
+vector<int> vectorDamageID3;
 
 bool JOIN_ID_On = false;
 bool JOIN_PASSWORD_On = false;
@@ -617,11 +618,29 @@ void process_packet(unsigned char* p)
 		
 		if (packet->id <= NPC_ID_START)			// packet->id가 NPC_ID_START보다 클떄(몬스터 일때) 만 데미지 띄워주기
 			break;
+		Damage = round(packet->damage);
+		if (mPlayer[packet->id]->m_hp <= 0)		// hp <= 0
+			break;
 
-		Damage = packet->damage;
-		if (Damage)		// Damage가 0이 아니면
-			Damage_On = true;
-		DamageID = packet->id - NPC_ID_START + 3;	// (서버ID) - NPC_ID_START + 3(HierarchicalGameObject 몬스터 시작);
+		Damage_On = true;
+		switch (mPlayer[packet->id]->m_nDamageCnt) {
+		case 0:
+			vectorDamageID1.emplace_back(packet->id);
+			++mPlayer[packet->id]->m_nDamageCnt;
+			break;
+		case 1:
+			vectorDamageID2.emplace_back(packet->id);
+			++mPlayer[packet->id]->m_nDamageCnt;
+			break;
+		case 2:
+			vectorDamageID3.emplace_back(packet->id);
+			mPlayer[packet->id]->m_nDamageCnt = 0;
+			break;
+		}
+
+		mPlayer[packet->id]->m_nDamageTime = 0;
+		mPlayer[packet->id]->m_nDamage = Damage;
+
 		break;
 	}
 	case SC_PACKET_COMBAT_ID: {

@@ -476,7 +476,6 @@ CTerrainPlayer::CTerrainPlayer(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandLi
 	SetPosition(XMFLOAT3(3500.0f, pTerrain->GetHeight(3500.0f, 590.0f), 590.0f));
 
 	//SetScale(XMFLOAT3(10.0f, 10.0f, 10.0f));
-
 	if (pAngrybotModel) delete pAngrybotModel;
 }
 

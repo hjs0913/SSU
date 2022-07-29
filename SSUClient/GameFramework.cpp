@@ -1085,7 +1085,6 @@ void CGameFramework::BuildObjects_login()
 		m_ppUILayer[42] = new Skill_Name_UI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::GhostWhite, D2D1::ColorF::Black);
 
 		// 데미지
-		m_ppUILayer[43] = new Damage_UI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::GhostWhite, D2D1::ColorF::Red);
 
 		m_ppUILayer[0]->setAlpha(0.5, 1.0);
 		m_ppUILayer[1]->setAlpha(0.5, 1.0);
@@ -1140,8 +1139,6 @@ void CGameFramework::BuildObjects_login()
 		m_ppUILayer[41]->setAlpha(1.0, 1.0);
 		m_ppUILayer[42]->setAlpha(0.0, 1.0);
 		
-		m_ppUILayer[43]->setAlpha(0.0, 1.0);
-
 		m_ppUILayer[0]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_FAR);
 		m_ppUILayer[1]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
@@ -1234,9 +1231,6 @@ void CGameFramework::BuildObjects_login()
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_FLOW_DIRECTION_LEFT_TO_RIGHT);
 		reinterpret_cast<Skill_Name_UI*>(m_ppUILayer[42])->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-		m_ppUILayer[43]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
-			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_FLOW_DIRECTION_LEFT_TO_RIGHT);
-
 		
 		// UIBar Setting
 		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, m_nWndClientHeight / 5 - 2 * (m_nWndClientHeight / 22.5) - 20,
@@ -1367,9 +1361,7 @@ void CGameFramework::BuildObjects()
 		//스킬 이름
 		m_ppUILayer[42] = new Skill_Name_UI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::GhostWhite, D2D1::ColorF::Black);
 
-		// 데미지
-		m_ppUILayer[43] = new Damage_UI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::GhostWhite, D2D1::ColorF::Red);
-
+		// 데미지 UI
 
 		m_ppUILayer[0]->setAlpha(0.5, 1.0);
 		m_ppUILayer[1]->setAlpha(0.5, 1.0);
@@ -1424,7 +1416,6 @@ void CGameFramework::BuildObjects()
 		m_ppUILayer[41]->setAlpha(1.0, 1.0);
 
 		m_ppUILayer[42]->setAlpha(0.0, 1.0);
-		m_ppUILayer[43]->setAlpha(0.0, 1.0);
 
 
 		m_ppUILayer[0]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
@@ -1520,10 +1511,6 @@ void CGameFramework::BuildObjects()
 
 		reinterpret_cast<Skill_Name_UI*>(m_ppUILayer[42])->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-
-		m_ppUILayer[43]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
-			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-
 
 
 		// UIBar Setting
@@ -1640,6 +1627,17 @@ void CGameFramework::Create_OpenWorld_Object()
 
 	reinterpret_cast<SkillUI*>(m_ppUILayer[23])->Setup(); //아래 스킬 ui
 	reinterpret_cast<BuffUI*>(m_ppUILayer[16])->Setup();  //위에 버프 ui
+
+
+	m_nDamageLayer = 3;
+	m_pPlayer->m_ppUILayer = new UILayer * [m_nDamageLayer];
+
+	for (int i = 0; i < m_nDamageLayer; ++i) {
+		m_pPlayer->m_ppUILayer[i] = new Damage_UI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::GhostWhite, D2D1::ColorF::Red);
+		m_pPlayer->m_ppUILayer[i]->Resize(m_ppd3dSwapChainBackBuffers, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_FLOW_DIRECTION_TOP_TO_BOTTOM);
+		m_pPlayer->m_ppUILayer[i]->setAlpha(0.0, 1.0);
+	}
 
 }
 
@@ -2499,18 +2497,6 @@ void CGameFramework::FrameAdvance()
 				reinterpret_cast<Skill_Name_UI*>(m_ppUILayer[i])->UpdateLabels(L"천사의 치유", L"요정의 축복", L"전광석화");
 				break;
 			}
-
-			break;
-		case 43:
-			if (!Damage_On) break;
-
-			XMFLOAT2 xmf2Screen = CalcWorldToViewPort(m_pScene->m_ppHierarchicalGameObjects, DamageID);
-			DamageInfo tempDamageInfo{ xmf2Screen, Damage, 30};
-			mapDamageInfo[DamageID] = tempDamageInfo;
-
-			reinterpret_cast<Damage_UI*>(m_ppUILayer[i])->UpdateLabels(to_wstring(Damage), xmf2Screen.x - 100.0f, xmf2Screen.y - 200.0f, xmf2Screen.x + 100.0f, xmf2Screen.y - 180.0f, 0);
-
-			break;
 		}
 	}
 
@@ -2544,9 +2530,45 @@ void CGameFramework::FrameAdvance()
 		if (i == 40 && !Fail_On) continue;
 		if (i == 41 && !Fail_On) continue;
 		if (i == 42 && !Login_OK) continue;
-		if (i == 43 && !Damage_On) continue;
-		
+
 		m_ppUILayer[i]->Render(m_nSwapChainBufferIndex);
+	}
+
+	if (!vectorDamageID1.empty()) {	// 비어있지 않으면
+		if (++(m_pPlayer->m_ppUILayer[0]->m_DamageTime) < 30) {
+			reinterpret_cast<Damage_UI*>(m_pPlayer->m_ppUILayer[0])->Resize(vectorDamageID1.size());
+			reinterpret_cast<Damage_UI*>(m_pPlayer->m_ppUILayer[0])->UpdateLabels(m_pCamera, vectorDamageID1);
+			m_pPlayer->m_ppUILayer[0]->Render(m_nSwapChainBufferIndex);
+		}
+		else {
+			m_pPlayer->m_ppUILayer[0]->m_DamageTime = 0;
+			vectorDamageID1.clear();
+			vectorDamageID1.shrink_to_fit();
+		}
+	}
+	if (!vectorDamageID2.empty()) {	// 비어있지 않으면
+		if (++(m_pPlayer->m_ppUILayer[1]->m_DamageTime) < 30) {
+			reinterpret_cast<Damage_UI*>(m_pPlayer->m_ppUILayer[1])->Resize(vectorDamageID2.size());
+			reinterpret_cast<Damage_UI*>(m_pPlayer->m_ppUILayer[1])->UpdateLabels(m_pCamera, vectorDamageID2);
+			m_pPlayer->m_ppUILayer[1]->Render(m_nSwapChainBufferIndex);
+		}
+		else {
+			m_pPlayer->m_ppUILayer[1]->m_DamageTime = 0;
+			vectorDamageID2.clear();
+			vectorDamageID2.shrink_to_fit();
+		}
+	}
+	if (!vectorDamageID3.empty()) {	// 비어있지 않으면
+		if (++(m_pPlayer->m_ppUILayer[2]->m_DamageTime) < 30) {
+			reinterpret_cast<Damage_UI*>(m_pPlayer->m_ppUILayer[2])->Resize(vectorDamageID3.size());
+			reinterpret_cast<Damage_UI*>(m_pPlayer->m_ppUILayer[2])->UpdateLabels(m_pCamera, vectorDamageID3);
+			m_pPlayer->m_ppUILayer[2]->Render(m_nSwapChainBufferIndex);
+		}
+		else {
+			m_pPlayer->m_ppUILayer[2]->m_DamageTime = 0;
+			vectorDamageID3.clear();
+			vectorDamageID3.shrink_to_fit();
+		}
 	}
 
 	LeaveCriticalSection(&UI_cs);
@@ -2617,18 +2639,4 @@ void CGameFramework::Login_Check_And_Build()
 		BuildObjects();
 		Open_Build_Once = true;
 	}
-}
-
-XMFLOAT2 CGameFramework::CalcWorldToViewPort(CGameObject** obj, int index)
-{
-	if (/*obj[index]->GetPosition().x != 0 && obj[index]->GetPosition().z != 0*/mPlayer[NPC_ID_START + index - 3]->GetUse()) {
-		//XMFLOAT3 xmf3ViewProj = Vector3::TransformCoord(Vector3::TransformCoord(obj[index]->GetPosition(), m_pPlayer->GetCamera()->GetViewMatrix()), m_pPlayer->GetCamera()->GetProjectionMatrix());
-		XMFLOAT3 xmf3ViewProj = Vector3::TransformCoord(Vector3::TransformCoord(mPlayer[NPC_ID_START + index - 3]->GetPosition(), m_pPlayer->GetCamera()->GetViewMatrix()), m_pPlayer->GetCamera()->GetProjectionMatrix());
-
-		float fScreenX = xmf3ViewProj.x * (FRAME_BUFFER_WIDTH / 2) + FRAME_BUFFER_WIDTH / 2;
-		float fScreenY = -xmf3ViewProj.y * (FRAME_BUFFER_HEIGHT / 2) + FRAME_BUFFER_HEIGHT / 2;
-
-		return XMFLOAT2(fScreenX, fScreenY);
-	}
-	else return XMFLOAT2(0, 0);
 }

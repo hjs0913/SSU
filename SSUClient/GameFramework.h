@@ -2,7 +2,7 @@
 
 #define FRAME_BUFFER_WIDTH		1800 //640
 #define FRAME_BUFFER_HEIGHT		900 //480
-#define UICOUNT 44
+#define UICOUNT 43
 
 #include "Timer.h"
 #include "Player.h"
@@ -80,8 +80,7 @@ public:
 
 	void Login_Check_And_Build();
 
-	XMFLOAT2 CalcWorldToViewPort(CGameObject** obj, int index);
-
+	int m_nDamageLayer = 0;
 private:
 	HINSTANCE					m_hInstance;
 	HWND						m_hWnd; 
