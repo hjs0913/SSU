@@ -644,14 +644,14 @@ void ObjectManager::worker()
             {
             case J_DILLER:
                 ev.obj_id = client_id;
-                ev.start_time = chrono::system_clock::now() + 1s + 3ms;
+                ev.start_time = chrono::system_clock::now() +3ms;
                 ev.ev = EVENT_PARTNER_ATTACK_STOP;
                 ev.target_id = client_id;
                 TimerManager::timer_queue.push(ev);
                 break;
             case J_TANKER:
                 ev.obj_id = client_id;
-                ev.start_time = chrono::system_clock::now() + 2s + 2ms;
+                ev.start_time = chrono::system_clock::now() +  2s + 2ms;
                 ev.ev = EVENT_PARTNER_ATTACK_STOP;
                 ev.target_id = client_id;
                 TimerManager::timer_queue.push(ev);
@@ -665,7 +665,7 @@ void ObjectManager::worker()
                 break;
             case J_SUPPORTER:
                 ev.obj_id = client_id;
-                ev.start_time = chrono::system_clock::now() + 2s;
+                ev.start_time = chrono::system_clock::now() +  2s;
                 ev.ev = EVENT_PARTNER_ATTACK_STOP;
                 ev.target_id = client_id;
                 TimerManager::timer_queue.push(ev);

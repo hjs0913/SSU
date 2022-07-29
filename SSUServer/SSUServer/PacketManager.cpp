@@ -972,15 +972,15 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                     //좌우 삼각형 두개로 사각형 범위 ?
                     Coord a = { pl->get_x() + pl->get_right_x() * -30, pl->get_z() + pl->get_right_z() * -30 };
                     Coord b = { pl->get_x() + pl->get_right_x() * 30, pl->get_z() + pl->get_right_z() * 30 };
-                    Coord c = { (pl->get_x() + pl->get_right_x() * -30) + pl->get_look_x() * 100,
-                   (pl->get_z() + pl->get_right_z() * -30) + pl->get_look_z() * 100, };
+                    Coord c = { (pl->get_x() + pl->get_right_x() * -30) + pl->get_look_x() * 140,
+                   (pl->get_z() + pl->get_right_z() * -30) + pl->get_look_z() * 140, };
 
 
                     Coord d = { pl->get_x() + pl->get_right_x() * 30, pl->get_z() + pl->get_right_z() * 30 };
-                    Coord e = { (pl->get_x() + pl->get_right_x() * 30) + pl->get_look_x() * 100
-                        , (pl->get_z() + pl->get_right_z() * 30) + pl->get_look_x() * 100 };
-                    Coord f = { (pl->get_x() + pl->get_right_x() * -30) + pl->get_look_x() * 100,
-                   (pl->get_z() + pl->get_right_z() * -30) + pl->get_look_z() * 100, };
+                    Coord e = { (pl->get_x() + pl->get_right_x() * 30) + pl->get_look_x() * 140
+                        , (pl->get_z() + pl->get_right_z() * 30) + pl->get_look_x() * 140 };
+                    Coord f = { (pl->get_x() + pl->get_right_x() * -30) + pl->get_look_x() * 140,
+                   (pl->get_z() + pl->get_right_z() * -30) + pl->get_look_z() * 140, };
 
                     if (!pl->join_dungeon_room) {
                         for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
@@ -994,7 +994,6 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                             Coord n = { players[i]->get_x(), players[i]->get_z() };
 
                             if (isInsideTriangle(a, b, c, n) || isInsideTriangle(d, e, f, n)) {
-
                                 pl->set_skill_factor(1, 1);
                                 players[i]->set_target_id(pl->get_id());
                                 pl->magical_skill_success(players[i], pl->get_skill_factor(1, 1));
@@ -1028,6 +1027,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                         Npc* bos = indun->boss;
                         Coord gaia_pos = { bos->get_x(),bos->get_z() };
                         if (isInsideTriangle(a, b, c, gaia_pos) || isInsideTriangle(d, e, f, gaia_pos)) {
+                            cout << "플레이어 멤테오 " << endl;
                             pl->set_skill_factor(1, 1);
                             pl->magical_skill_success(bos, pl->get_skill_factor(1, 1));
                             send_play_effect_packet(pl, bos); // 이펙트 터트릴 위치 
@@ -1057,15 +1057,15 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
 
                     Coord a1 = { pl->get_x() + pl->get_right_x() * -10, pl->get_z() + pl->get_right_z() * -10 };
                     Coord b1 = { pl->get_x() + pl->get_right_x() * 10, pl->get_z() + pl->get_right_z() * 10 };
-                    Coord c1 = { (pl->get_x() + pl->get_right_x() * -10) + pl->get_look_x() * 50,
-                   (pl->get_z() + pl->get_right_z() * -10) + pl->get_look_z() * 50, };
+                    Coord c1 = { (pl->get_x() + pl->get_right_x() * -10) + pl->get_look_x() * 140,
+                   (pl->get_z() + pl->get_right_z() * -10) + pl->get_look_z() * 140, };
 
 
                     Coord d1 = { pl->get_x() + pl->get_right_x() * 10, pl->get_z() + pl->get_right_z() * 10 };
-                    Coord e1 = { (pl->get_x() + pl->get_right_x() * 10) + pl->get_look_x() * 50
+                    Coord e1 = { (pl->get_x() + pl->get_right_x() * 10) + pl->get_look_x() * 140
                         , (pl->get_z() + pl->get_right_z() * 10) + pl->get_look_x() * 50 };
-                    Coord f1 = { (pl->get_x() + pl->get_right_x() * -10) + pl->get_look_x() * 50,
-                   (pl->get_z() + pl->get_right_z() * -10) + pl->get_look_z() * 50, };
+                    Coord f1 = { (pl->get_x() + pl->get_right_x() * -10) + pl->get_look_x() * 140,
+                   (pl->get_z() + pl->get_right_z() * -10) + pl->get_look_z() * 140, };
 
                     if (!pl->join_dungeon_room) {
                         for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {

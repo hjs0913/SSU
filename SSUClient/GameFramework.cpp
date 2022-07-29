@@ -2507,6 +2507,8 @@ void CGameFramework::FrameAdvance()
 		}
 		case 42:{
 			if (!Login_OK) break;
+			if (mPlayer[my_id]->m_job > 4 || mPlayer[my_id]->m_job < 0)
+				mPlayer[my_id]->m_job = (JOB)0;
 			switch (mPlayer[my_id]->m_job)
 			{
 			case 0:
