@@ -609,6 +609,7 @@ void CTerrainPlayer::Update(float fTimeElapsed)
 			if (m_pSkinnedAnimationController->m_pAnimationTracks[2].m_bEnable) {	// 일반 공격 시
 				m_pSkinnedAnimationController->SetTrackEnable(0, false);
 				m_pSkinnedAnimationController->SetTrackEnable(3, false);
+				
 			}
 
 			if (m_pSkinnedAnimationController->m_pAnimationTracks[3].m_bEnable
@@ -637,7 +638,6 @@ void CTerrainPlayer::Update(float fTimeElapsed)
 
 		if (m_pSkinnedAnimationController->m_pAnimationTracks[3].m_bEnable) {
 			float playTime = m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[3]->m_fLength - m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[3]->m_fPosition;
-
 			if (playTime <= 0.049) {
 				m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[3]->m_fPosition = 0.0f;
 				m_pSkinnedAnimationController->SetTrackEnable(0, true);
@@ -656,7 +656,6 @@ void CTerrainPlayer::Update(float fTimeElapsed)
 
 		if (m_pSkinnedAnimationController->m_pAnimationTracks[5].m_bEnable) {
 			float playTime = m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[5]->m_fLength - m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[5]->m_fPosition;
-
 			if (playTime <= 0.049) {
 				m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[5]->m_fPosition = 0.0f;
 				m_pSkinnedAnimationController->SetTrackEnable(0, true);
@@ -664,6 +663,9 @@ void CTerrainPlayer::Update(float fTimeElapsed)
 			}
 		}
 	}
+
+
+
 }
 
 void CTerrainPlayer::Attack(bool isAttack)

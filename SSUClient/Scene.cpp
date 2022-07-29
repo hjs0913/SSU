@@ -20,6 +20,8 @@ D3D12_GPU_DESCRIPTOR_HANDLE	CScene::m_d3dCbvGPUDescriptorNextHandle;
 D3D12_CPU_DESCRIPTOR_HANDLE	CScene::m_d3dSrvCPUDescriptorNextHandle;
 D3D12_GPU_DESCRIPTOR_HANDLE	CScene::m_d3dSrvGPUDescriptorNextHandle;
 
+bool point_light_bool = false;
+
 CScene::CScene()
 {
 }
@@ -144,6 +146,8 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		}
 		m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackEnable(1, true);
 		m_ppHierarchicalGameObjects[i]->SetPosition(0.f, -100.f, 0.f);
+		m_ppHierarchicalGameObjects[i]->SetPosition(0.f, -100.f, 0.f);
+	
 
 		if (temp_id / NPC_INTERVAL == 0)		// 토끼
 			m_ppHierarchicalGameObjects[i]->SetScale(15.0f, 15.0f, 15.0f);
@@ -809,7 +813,8 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	if (m_pLights)
 	{
 		XMFLOAT3 Light_pos = m_pPlayer->GetPosition();
-		m_pLights[0].m_xmf3Position = XMFLOAT3(Light_pos.x, Light_pos.y + 10.0f, Light_pos.z);
+		m_pLights[0].m_xmf3Position = XMFLOAT3(Light_pos.x, Light_pos.y, Light_pos.z);
+		
 		m_pLights[0].m_xmf3Direction = m_pPlayer->GetLookVector();
 	}
 }
@@ -970,6 +975,8 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 		if (m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[1].m_bEnable) {
 		}
 	}
+
+
 
 	m_ppHierarchicalGameObjects[i]->Animate(m_fElapsedTime);
 

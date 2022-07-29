@@ -33,6 +33,9 @@ extern wstring JOIN_PASSWORD_Str;
 extern wstring JOIN_NICKNAME_Str;
 extern wstring JOIN_JOB_Str;
 extern wstring JOIN_ELEMENT_Str;
+
+extern bool point_light_bool;
+
 class CGameFramework
 {
 public:
