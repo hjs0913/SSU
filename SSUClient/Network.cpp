@@ -75,6 +75,7 @@ bool JOIN_SUPPORTER_On = false;
 wstring Notice_str = L"";
 chrono::system_clock::time_point InvitationCardTimer = chrono::system_clock::now();
 chrono::system_clock::time_point NoticeTimer = chrono::system_clock::now();
+chrono::system_clock::time_point BossSkillUiTimer = chrono::system_clock::now();
 int InvitationRoomId;
 int InvitationUser;
 
@@ -715,6 +716,7 @@ void process_packet(unsigned char* p)
 	}
 	case SC_PACKET_GAIA_PATTERN_ONE: {
 		sc_packet_gaia_pattern_one* packet = reinterpret_cast<sc_packet_gaia_pattern_one*>(p);
+		if(m_gaiaPattern.pattern_on[0] == false) BossSkillUiTimer = chrono::system_clock::now();
 		m_gaiaPattern.pattern_on[0] = true;
 		m_gaiaPattern.set_pattern_one(packet->point_x, packet->point_z);
 		break;
@@ -726,6 +728,7 @@ void process_packet(unsigned char* p)
 	}
 	case SC_PACKET_GAIA_PATTERN_TWO: {
 		sc_packet_gaia_pattern_two* packet = reinterpret_cast<sc_packet_gaia_pattern_two*>(p);
+		if (m_gaiaPattern.pattern_on[1] == false) BossSkillUiTimer = chrono::system_clock::now();
 		m_gaiaPattern.pattern_on[1] = true;
 		m_gaiaPattern.set_pattern_two(packet->point_x, packet->point_z);
 		switch ((int)packet->pattern_number) {
@@ -746,6 +749,7 @@ void process_packet(unsigned char* p)
 	}
 	case SC_PACKET_GAIA_PATTERN_FIVE: {
 		sc_packet_gaia_pattern_five* packet = reinterpret_cast<sc_packet_gaia_pattern_five*>(p);
+		if (m_gaiaPattern.pattern_on[4] == false) BossSkillUiTimer = chrono::system_clock::now();
 		m_gaiaPattern.pattern_on[4] = true;
 		m_gaiaPattern.pattern_five = XMFLOAT3(packet->point_x, 20.0f, packet->point_z);
 		m_gaiaPattern.pattern_five_look = XMFLOAT3(mPlayer[GAIA_ID]->GetLook());
@@ -779,7 +783,7 @@ void process_packet(unsigned char* p)
 			buff_ui_num[3] = packet->buff_num;
 			start_buff_3 = clock();
 			break;
-		case 4:
+		case 4:  //¿©±â m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[2].m_fSpeed = 1.3f
 			buff_ui_num[4] = packet->buff_num;
 			start_buff_4 = clock();
 			break;

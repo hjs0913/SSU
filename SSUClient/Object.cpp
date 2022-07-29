@@ -538,6 +538,11 @@ void CAnimationController::UpdateShaderVariables(ID3D12GraphicsCommandList *pd3d
 
 void CAnimationController::AdvanceTime(float fTimeElapsed, CGameObject *pRootGameObject) 
 {
+	if (buff_ui_num[4] == 4)
+		m_pAnimationTracks[2].m_fSpeed = 1.3f;
+	else
+		m_pAnimationTracks[2].m_fSpeed = 1.0f;
+
 	if (m_pAnimationTracks)
 	{
 		//for (int k = 0; k < m_nAnimationTracks; k++) m_pAnimationTracks[k].m_fPosition += (fTimeElapsed * m_pAnimationTracks[k].m_fSpeed);
@@ -554,7 +559,6 @@ void CAnimationController::AdvanceTime(float fTimeElapsed, CGameObject *pRootGam
 				}
 			}
 		}
-		
 			
 
 		for (int j = 0; j < m_pAnimationSets->m_nAnimatedBoneFrames; j++)
@@ -1667,4 +1671,30 @@ CCastleObject::~CCastleObject()
 {
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+CMagicianSKillObject::CMagicianSKillObject(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, ID3D12RootSignature* pd3dGraphicsRootSignature, CLoadedModelInfo* pModel, int nAnimationTracks, int id)
+{
+	skillModel = new CCastleObject(pd3dDevice, pd3dCommandList, pd3dGraphicsRootSignature, pModel, nAnimationTracks);
+	_id = id;
+}
 
+CMagicianSKillObject::~CMagicianSKillObject()
+{
+	delete skillModel;
+}
+
+void CMagicianSKillObject::Animate(float fTimeElapsed) 
+{
+	skillModel->Animate(fTimeElapsed);
+}
+
+void CMagicianSKillObject::UpdateTransform(XMFLOAT4X4* pxmf4x4Parent)
+{
+	skillModel->UpdateTransform(pxmf4x4Parent);
+}
+
+void CMagicianSKillObject::Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pCamera)
+{
+	skillModel->Render(pd3dCommandList, pCamera);
+}

@@ -19,18 +19,16 @@ private:
     int nearest_num = 0;
     pos move;
     bool move_once;
-    bool running_pattern;
+    bool skill_check;
 
 protected:
     char	_name[MAX_NAME_SIZE];
-
-
-
     int     party_id;	//서버(파티)에서의 파티원 id
 public:
-    bool    start_game;
+    bool running_pattern;  // -1,0,1  데미지들어가기 전에 -1 상태에선 이동, 공격 불가능, 애니메이션 패킷 보내면 0 으로 바꿔서 가능// 
+    bool    start_game;    //애니메이션 하라고 보내면(상태 1 ) 공격과 이동을 멈춰야해// 쿨타임 지나면 -1로 바꾸고  
     bool    join_dungeon_room;
-
+    bool running_attack;
     Partner(int id);
 
     ~Partner();
@@ -44,4 +42,5 @@ public:
     bool isInsideTriangle(pos a, pos b, pos c, pos n);
 
     int get_party_id();
+    void set_party_id(int id);
 };

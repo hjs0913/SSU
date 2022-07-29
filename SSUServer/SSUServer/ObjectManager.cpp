@@ -62,11 +62,13 @@ void ObjectManager::Initialize_Npc()
     for (int i = NPC_ID_START + interval * npc_num; i < NPC_ID_START + interval * (npc_num + 1); i++) {
         players[i] = new Npc(i);
         players[i]->Initialize_Lua("wolf_boss.lua");
+        players[i]->set_tribe(AGRO);
     }
     npc_num++;
     for (int i = NPC_ID_START + interval * npc_num; i < NPC_ID_START + interval * (npc_num + 1); i++) {
         players[i] = new Npc(i);
         players[i]->Initialize_Lua("fallen_pig.lua");
+        players[i]->set_tribe(AGRO);
     }
     npc_num++;
     cout << "NPC 초기화 완료" << endl;
@@ -316,9 +318,11 @@ void ObjectManager::worker()
                 break;
             }
             players[client_id]->state_lock.unlock();
-            // 제자리로 돌아가는 것인가
+            // target이 있는가?
             if (exp_over->_target == -1) {
-                players[client_id]->return_npc_position(obstacles);
+                // 제자리로 돌아가는 것인가? 로밍인가?(npc_roming 함수에서 판단)
+                players[client_id]->npc_roming(obstacles);
+                //players[client_id]->return_npc_position(obstacles);
                 m_SectorManager->player_move(players[client_id]); // 섹터 변경시 상태확인
                 delete exp_over;
                 break;
@@ -331,6 +335,7 @@ void ObjectManager::worker()
             if (players[target_id]->get_state() != ST_INGAME) {
                 players[target_id]->state_lock.unlock();
                 players[client_id]->set_active(false);
+                players[client_id]->set_target_id(-1);
                 players[client_id]->return_npc_position(obstacles);
                 m_SectorManager->player_move(players[client_id]); // 섹터 변경시 상태확인
                 delete exp_over;
@@ -357,6 +362,10 @@ void ObjectManager::worker()
             }
             players[client_id]->state_lock.unlock();
 
+            if (exp_over->_target < 0) {
+                delete exp_over;
+                break;
+            }
             if (players[client_id]->npc_attack_validation(players[exp_over->_target])) {
                 // 공격 성공
 
@@ -417,6 +426,17 @@ void ObjectManager::worker()
             players[client_id]->revive();
             // 섹터 처리
             m_SectorManager->player_put(players[client_id]);
+            players[client_id]->vl.lock();
+            unordered_set<int>my_vl{ players[client_id]->viewlist };
+            players[client_id]->vl.unlock();
+
+            for (int i : my_vl) {
+                if (static_ObjectManager::get_objManger()->get_player(i)->get_tribe() == HUMAN) {
+                    players[client_id]->push_npc_move_event();
+                    players[client_id]->set_move_active(true);
+                    break;
+                }
+            }
             delete exp_over;
             break;
         }
@@ -432,6 +452,8 @@ void ObjectManager::worker()
             }
             players[client_id]->state_lock.unlock();
 
+            if (exp_over->_target < 0) { delete exp_over; break; }
+
             switch (players[client_id]->get_element())
             {
             case E_WATER:
@@ -444,8 +466,12 @@ void ObjectManager::worker()
                 reinterpret_cast<Player*>(players[client_id])->attack_speed_up = 0;
                 break;
             case E_FIRE:
+                if ((players[exp_over->_target]->get_hp() - players[exp_over->_target]->get_lv() * 10) <= 0)
+                    break;
                 players[exp_over->_target]->set_hp(players[exp_over->_target]->get_hp() - players[exp_over->_target]->get_lv() * 10);
                 send_change_hp_packet(reinterpret_cast<Player*>(players[client_id]), players[exp_over->_target], players[exp_over->_target]->get_lv() * 10);
+                if ((players[exp_over->_target]->get_hp() - players[exp_over->_target]->get_lv() * 10) <= 0)
+                    break;
                 ev.obj_id = client_id;
                 ev.start_time = chrono::system_clock::now() + 5s;
                 ev.ev = EVENT_ELEMENT_FIRE_COOLTIME;
@@ -567,12 +593,44 @@ void ObjectManager::worker()
                 break;
             }
             case J_MAGICIAN: {
-                Partner* pl = reinterpret_cast<Partner*>(players[client_id]);
-                pl->partner_attack(pl, dungeons[pl->get_indun_id()]);
                 break;
             }
             }
+            Partner* pl = reinterpret_cast<Partner*>(players[client_id]);
+            pl->partner_attack(pl, dungeons[pl->get_indun_id()]);
             delete exp_over;
+            break;
+        }
+        case OP_PARTNER_SKILL_STOP: {
+            players[client_id]->state_lock.lock();
+            if (players[client_id]->get_state() != ST_INDUN) {
+                players[client_id]->state_lock.unlock();
+                break;
+            }
+            players[client_id]->state_lock.unlock();
+
+            int indun_id = reinterpret_cast<Player*>(players[client_id])->get_indun_id();  
+
+            for (int i = 0; i < GAIA_ROOM; ++i) {
+                if (dungeons[indun_id]->get_party_palyer()[i]->get_id() == exp_over->_target)
+                    reinterpret_cast<Partner*>(dungeons[indun_id]->get_party_palyer()[i])->running_pattern = false;
+            }
+            break;
+        }
+        case OP_PARTNER_ATTACK_STOP: {
+            players[client_id]->state_lock.lock();
+            if (players[client_id]->get_state() != ST_INDUN) {
+                players[client_id]->state_lock.unlock();
+                break;
+            }
+            players[client_id]->state_lock.unlock();
+
+            int indun_id = reinterpret_cast<Player*>(players[client_id])->get_indun_id();
+
+            for (int i = 0; i < GAIA_ROOM; ++i) {
+                if (dungeons[indun_id]->get_party_palyer()[i]->get_id() == exp_over->_target)
+                    reinterpret_cast<Partner*>(dungeons[indun_id]->get_party_palyer()[i])->running_attack = false;
+            }
             break;
         }
         case OP_PARTNER_NORMAL_ATTACK: {
@@ -591,11 +649,45 @@ void ObjectManager::worker()
             ev.ev = EVENT_PARTNER_NORMAL_ATTACK;
             ev.target_id = 1;
             TimerManager::timer_queue.push(ev);
+
+            pl->running_attack = true;
+            switch (pl->get_job())
+            {
+            case J_DILLER:
+                ev.obj_id = client_id;
+                ev.start_time = chrono::system_clock::now() +3ms;
+                ev.ev = EVENT_PARTNER_ATTACK_STOP;
+                ev.target_id = client_id;
+                TimerManager::timer_queue.push(ev);
+                break;
+            case J_TANKER:
+                ev.obj_id = client_id;
+                ev.start_time = chrono::system_clock::now() +  2s + 2ms;
+                ev.ev = EVENT_PARTNER_ATTACK_STOP;
+                ev.target_id = client_id;
+                TimerManager::timer_queue.push(ev);
+                break;
+            case J_MAGICIAN:
+                ev.obj_id = client_id;
+                ev.start_time = chrono::system_clock::now() + 1s;
+                ev.ev = EVENT_PARTNER_ATTACK_STOP;
+                ev.target_id = client_id;
+                TimerManager::timer_queue.push(ev);
+                break;
+            case J_SUPPORTER:
+                ev.obj_id = client_id;
+                ev.start_time = chrono::system_clock::now() +  2s;
+                ev.ev = EVENT_PARTNER_ATTACK_STOP;
+                ev.target_id = client_id;
+                TimerManager::timer_queue.push(ev);
+                break;
+            }
+
             delete exp_over;
             break;
         }
         case OP_GAMESTART_TIMER: {
-            cout << "들어오는가" << endl;
+            //cout << "들어오는가" << endl;
             Gaia* dun = dungeons[exp_over->_target];
             dun->game_start();
             dun->state_lock.lock();
@@ -649,7 +741,6 @@ void ObjectManager::worker()
             int human_player = 0;
             for (int i = 0; i < (GAIA_ROOM - human_player); i++) {
                 if (party_players[i]->get_tribe() == HUMAN) {
-                    cout << i << endl;
                     party_players[i]->join_dungeon_room == false;
                     // 원래는 DB에서 받아와야 하는 정보를 기본 정보로 대체
                     party_players[i]->set_x(3210);
@@ -749,14 +840,18 @@ void ObjectManager::worker()
             reinterpret_cast<Player*>(players[client_id])->set_skill_active(exp_over->_target, false);
             break;
         }
-        case OP_ELEMENT_FIRE_COOLTIME:
+        case OP_ELEMENT_FIRE_COOLTIME: {
+            if ((players[exp_over->_target]->get_hp() - players[exp_over->_target]->get_lv() * 10) <= 0)
+                break;
             players[exp_over->_target]->set_hp(players[exp_over->_target]->get_hp() - players[exp_over->_target]->get_lv() * 10);
             send_change_hp_packet(reinterpret_cast<Player*>(players[client_id]), players[exp_over->_target], players[exp_over->_target]->get_lv() * 10);
-           // players[client_id]->set_element_cooltime(false);
+            // players[client_id]->set_element_cooltime(false);
+            if ((players[exp_over->_target]->get_hp() - players[exp_over->_target]->get_lv() * 10) <= 0)
+                break;
             players[exp_over->_target]->set_element_cooltime(false);
             delete exp_over;
             break;
-
+        }
         }
 
     }

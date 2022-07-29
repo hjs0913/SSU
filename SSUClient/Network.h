@@ -63,6 +63,7 @@ extern bool PartyInviteUI_ON;
 extern bool InvitationCardUI_On;
 extern chrono::system_clock::time_point InvitationCardTimer;
 extern chrono::system_clock::time_point NoticeTimer;
+extern chrono::system_clock::time_point BossSkillUiTimer;
 extern int InvitationRoomId;
 extern int InvitationUser;
 

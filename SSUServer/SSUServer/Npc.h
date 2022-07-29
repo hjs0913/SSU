@@ -33,7 +33,8 @@ protected:
 	float	_right_x, _right_y, _right_z;
 	bool superposition;
 	STATE	_state;
-	atomic_bool	_active;		// NPC가 가만히 안있고 움직일때
+	atomic_bool	_active;		// NPC가 공격하는지 아닌지 판단
+	atomic_bool _move_active;	// NPC가 움직이는지 아닌지 판단
 
 	//skill
 	float _skill_factors[3][10];
@@ -60,6 +61,7 @@ public:
 	void set_name(const char* name);
 
 	void set_active(bool act);
+	void set_move_active(bool mv_act);
 	void set_tribe(TRIBE tribe);
 	void set_lv(short lv);
 	void set_hp(int hp);
@@ -85,6 +87,7 @@ public:
 	char* get_name();
 	STATE get_state();
 	bool get_active();
+	bool get_move_active();
 	TRIBE get_tribe();
 	short get_lv();
 	int get_hp();
@@ -131,6 +134,7 @@ public:
 	void push_npc_move_event();
 	void return_npc_position(const array<Obstacle*, MAX_OBSTACLE> &obstacles);
 	void do_npc_move(Npc* target, const array<Obstacle*, MAX_OBSTACLE>& obstacles);
+	void npc_roming(const array<Obstacle*, MAX_OBSTACLE>& obstacles);
 
 	// attack
 	bool npc_attack_validation(Npc* target);

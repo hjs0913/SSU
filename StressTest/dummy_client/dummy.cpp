@@ -19,13 +19,13 @@ using namespace chrono;
 
 extern HWND		hWnd;
 
-const static int MAX_TEST = 2000;
+const static int MAX_TEST = 5000;
 const static int MAX_CLIENTS = MAX_TEST * 3;
 const static int INVALID_ID = -1;
 const static int MAX_PACKET_SIZE = 255;
 const static int MAX_BUFF_SIZE = 255;
-const static char* SERVER_IP = "127.0.0.1";
-
+//const static char* SERVER_IP = "127.0.0.1";
+const static char* SERVER_IP = "116.47.180.110";
 #pragma comment (lib, "ws2_32.lib")
 
 #//include "../../RealServer/Server/protocol.h"
@@ -185,7 +185,14 @@ void ProcessPacket(int ci, unsigned char packet[])
 	case SC_PACKET_LOOK: break;
 	case SC_PACKET_BUFF_UI: break;
 	case SC_PACKET_NOTICE: break;
-	default: MessageBox(hWnd, L"Unknown Packet Type", L"ERROR", 0);
+	case SC_PACKET_ANIMATION_ATTACK: break;
+	case SC_PACKET_ANIMATION_MOVE: break;
+	case SC_PACKET_ANIMATION_DEAD: break;
+	case SC_PACKET_ANIMATION_SKILL: break;
+	case SC_PACKET_CHANGE_HP: break;
+	default: {
+		MessageBox(hWnd, L"Unknown Packet Type : %d", L"ERROR", 0);
+	}
 		while (true);
 	}
 }

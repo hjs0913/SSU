@@ -35,7 +35,7 @@ void SectorManager::player_move(Npc* p)
 	int new_sector_id = check_sector_id(p->get_x(), p->get_z());
 	p->sector_lock.lock();
 	int origin_sector_id = p->get_sector_id();
-	if (origin_sector_id != new_sector_id) {
+	if (origin_sector_id != new_sector_id && origin_sector_id != -1) {
 		sectors[new_sector_id]->add_player(p->get_id());
 		// 원래있던 섹터에서 플레이어 id를 뺀다
 		sectors[origin_sector_id]->erase_player(p->get_id());
@@ -51,8 +51,10 @@ void SectorManager::player_remove(Npc* p, bool dead)
 {
 	p->sector_lock.lock();
 	int origin_sector_id = p->get_sector_id();
-	sectors[origin_sector_id]->erase_player(p->get_id());
-	p->set_sector_id(-1);
+	if (origin_sector_id != -1) {
+		sectors[origin_sector_id]->erase_player(p->get_id());
+		p->set_sector_id(-1);
+	}
 	p->sector_lock.unlock();
 
 	check_sector_remove(p, origin_sector_id, dead);
@@ -62,8 +64,10 @@ void SectorManager::player_remove(Npc* p, bool dead, Npc* attacker)
 {
 	p->sector_lock.lock();
 	int origin_sector_id = p->get_sector_id();
-	sectors[origin_sector_id]->erase_player(p->get_id());
-	p->set_sector_id(-1);
+	if (origin_sector_id != -1) {
+		sectors[origin_sector_id]->erase_player(p->get_id());
+		p->set_sector_id(-1);
+	}
 	p->sector_lock.unlock();
 
 	// 본래 섹터와 관련이 있는 플레이어에게 delete send를 한다.
@@ -286,6 +290,13 @@ void SectorManager::check_viewlist_put(Npc* p, int sector_id)
 		players[i]->viewlist.insert(p->get_id());
 		players[i]->vl.unlock();
 
+		if (p->get_tribe() == HUMAN && players[i]->get_tribe() != HUMAN) {
+			if (players[i]->get_move_active() == false) {
+				players[i]->push_npc_move_event();
+				players[i]->set_move_active(true);
+			}
+		}
+
 		if (!static_ObjectManager::get_objManger()->is_npc(p->get_id())) 
 			send_put_object_packet(reinterpret_cast<Player*>(p), players[i]);
 		if (!static_ObjectManager::get_objManger()->is_npc(i)) 
@@ -344,6 +355,13 @@ void SectorManager::check_viewlist_move(Npc* p, int sector_id)
 				players[i]->vl.lock();
 				players[i]->viewlist.insert(p->get_id());
 				players[i]->vl.unlock();
+
+				if (p->get_tribe()==HUMAN && players[i]->get_tribe() != HUMAN) {
+					if (players[i]->get_move_active() == false) {
+						players[i]->push_npc_move_event();
+						players[i]->set_move_active(true);
+					}
+				}
 
 				if (!static_ObjectManager::get_objManger()->is_npc(p->get_id()))
 					send_put_object_packet(reinterpret_cast<Player*>(p), players[i]);
