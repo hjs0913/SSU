@@ -655,7 +655,7 @@ bool Npc::npc_attack_validation(Npc* target)
 			ev.obj_id = _id;
 			ev.start_time = chrono::system_clock::now() + 1s;
 			ev.ev = EVENT_NPC_ATTACK;
-			ev.target_id = target->get_id();
+			ev.target_id = _target_id;
 			TimerManager::timer_queue.push(ev);
 		}
 		return false;
@@ -710,7 +710,7 @@ void Npc::attack_dead_judge(Npc* target)
 		ev.obj_id = _id;
 		ev.start_time = chrono::system_clock::now() + 3s;
 		ev.ev = EVENT_NPC_ATTACK;
-		ev.target_id = target->get_id();
+		ev.target_id = _target_id;
 		TimerManager::timer_queue.push(ev);
 	}
 }
@@ -841,9 +841,9 @@ void Npc::magical_skill_success(Npc* target, float skill_factor)
 void Npc::return_npc_position(const array<Obstacle*, MAX_OBSTACLE>& obstacles)
 {
 	// 여기서는 이동만 시킨다
-	_target_id = -1;
 
 	if (_active == true) {
+		if (_move_active) push_npc_move_event();
 		return;
 	}
 

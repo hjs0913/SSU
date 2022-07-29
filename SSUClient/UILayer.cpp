@@ -1129,6 +1129,7 @@ Skill_Name_UI::Skill_Name_UI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12Comman
     m_pTextLayoutBrush->SetColor(D2D1::ColorF(D2D1::ColorF::White));
     m_pTextLayoutBrush->SetOpacity(1.0f);
 
+    UpdateLabels(L"", L"", L"");
 }
 
 Skill_Name_UI::~Skill_Name_UI()
@@ -1209,7 +1210,6 @@ void Skill_Name_UI::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UIN
 
     //m_pd2dWriteFactory->CreateTextFormat(L"궁서체", nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fFontSize, L"en-us", &m_pdwTextFormat);
     m_pd2dWriteFactory->CreateTextFormat(L"Arial", nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fSmallFontSize, L"en-us", &m_pdwTextFormat);
-
     m_pdwTextFormat->SetTextAlignment(static_cast<DWRITE_TEXT_ALIGNMENT>(TextAlignment));
     m_pdwTextFormat->SetParagraphAlignment(static_cast<DWRITE_PARAGRAPH_ALIGNMENT>(ParagraphAlignment));
 

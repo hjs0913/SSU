@@ -2571,22 +2571,12 @@ void CGameFramework::FrameAdvance()
 		if (i == 19 && !InvitationCardUI_On) continue;
 		if (i == 20 && !AddAIUI_On) continue;
 		if (i == 21 && !NoticeUI_On) continue;
-		if (i == 27 && Login_OK) continue;
-		if (i == 28 && Login_OK) continue;
-		if (i == 29 && Login_OK) continue;
-		if (i == 30 && Login_OK) continue;
-		if (i == 31 && Login_OK) continue;
-		if (i == 32 && !Join_On) continue;
-		if (i == 33 && !Join_On) continue;
-		if (i == 34 && !Join_On) continue;
-		if (i == 35 && !Join_On) continue;
-		if (i == 36 && !Join_On) continue;
-		if (i == 37 && !Join_On) continue;
-		if (i == 38 && !Join_On) continue;
-		if (i == 39 && !Join_On) continue;
+		if ((i >= 27 && i <= 31) && Login_OK) continue;
+		if ((i >= 32 && i <= 39) && !Join_On) continue;
 		if (i == 40 && !Fail_On) continue;
 		if (i == 41 && !Fail_On) continue;
 		if (i == 42 && !Login_OK) continue;
+		//if (i == 42) continue;
 		if (i == 43) {
 			if (!InDungeon) continue;
 			if (!m_gaiaPattern.pattern_on[0] && !m_gaiaPattern.pattern_on[1] && !m_gaiaPattern.pattern_on[4]) continue;
