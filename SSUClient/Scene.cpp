@@ -967,15 +967,15 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 	if (pMagicainSkill2) {
 		// 포지션 잡기
 		if (pMagicainSkill2->GetPosition().y != -100) { // Skill active
-			if (chrono::duration_cast<chrono::seconds>(chrono::system_clock::now() - MagicainSkill2_start_time).count() >= 5) {
+			if (chrono::duration_cast<chrono::seconds>(chrono::system_clock::now() - MagicainSkill2_start_time).count() >= 3) {
 				pMagicainSkill2->SetPosition(0, -100, 0);
 			}
 			else {
 				XMFLOAT3 temp_pos = pMagicainSkill2->GetPosition();
 				XMFLOAT3 temp_look = pMagicainSkill2->GetLook();
-				temp_pos.x += m_fElapsedTime * temp_look.x;
-				temp_pos.y += m_fElapsedTime * temp_look.y;
-				temp_pos.z += m_fElapsedTime * temp_look.z;
+				temp_pos.x += m_fElapsedTime * temp_look.x * 100;
+				temp_pos.y += m_fElapsedTime * temp_look.y * 100;
+				temp_pos.z += m_fElapsedTime * temp_look.z * 100;
 				pMagicainSkill2->SetPosition(temp_pos);
 			}
 		}
@@ -1052,15 +1052,15 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 
 		// 포지션 잡기
 		if (vMagicianSkillModel2p[j]->skillModel->GetPosition().y != -100) { // Skill active
-			if (chrono::duration_cast<chrono::seconds>( chrono::system_clock::now() - vMagicianSkillModel2p[j]->start_time).count() >= 5) {
+			if (chrono::duration_cast<chrono::seconds>( chrono::system_clock::now() - vMagicianSkillModel2p[j]->start_time).count() >= 3) {
 				vMagicianSkillModel2p[j]->skillModel->SetPosition(0, -100, 0);
 			}
 			else {
 				XMFLOAT3 temp_pos = vMagicianSkillModel2p[j]->skillModel->GetPosition();
 				XMFLOAT3 temp_look = vMagicianSkillModel2p[j]->skillModel->GetLook();
-				temp_pos.x += m_fElapsedTime * temp_look.x;
-				temp_pos.y += m_fElapsedTime * temp_look.y;
-				temp_pos.z += m_fElapsedTime * temp_look.z;
+				temp_pos.x += m_fElapsedTime * temp_look.x * 100;
+				temp_pos.y += m_fElapsedTime * temp_look.y * 100;
+				temp_pos.z += m_fElapsedTime * temp_look.z * 100;
 				vMagicianSkillModel2p[j]->skillModel->SetPosition(temp_pos);
 			}
 		}
