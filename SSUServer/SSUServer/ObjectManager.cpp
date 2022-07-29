@@ -490,8 +490,10 @@ void ObjectManager::worker()
             default:
                 break;
             }
-            players[exp_over->_target]->set_element_cooltime(false);
-            delete exp_over;
+            if (players[client_id]->get_element() != E_FIRE) 
+                players[exp_over->_target]->set_element_cooltime(false);
+                delete exp_over;
+            
             break;
         }
         case OP_BOSS_MOVE: {
