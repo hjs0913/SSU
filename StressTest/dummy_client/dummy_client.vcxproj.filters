@@ -26,7 +26,7 @@
     <ClInclude Include="dummy.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\RealServer\Server\protocol.h">
+    <ClInclude Include="..\..\SSUServer\SSUServer\protocol.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

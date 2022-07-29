@@ -335,6 +335,7 @@ void ObjectManager::worker()
             if (players[target_id]->get_state() != ST_INGAME) {
                 players[target_id]->state_lock.unlock();
                 players[client_id]->set_active(false);
+                players[client_id]->set_target_id(-1);
                 players[client_id]->return_npc_position(obstacles);
                 m_SectorManager->player_move(players[client_id]); // 섹터 변경시 상태확인
                 delete exp_over;
@@ -361,6 +362,10 @@ void ObjectManager::worker()
             }
             players[client_id]->state_lock.unlock();
 
+            if (exp_over->_target < 0) {
+                delete exp_over;
+                break;
+            }
             if (players[client_id]->npc_attack_validation(players[exp_over->_target])) {
                 // 공격 성공
 
@@ -446,6 +451,8 @@ void ObjectManager::worker()
                 break;
             }
             players[client_id]->state_lock.unlock();
+
+            if (exp_over->_target < 0) { delete exp_over; break; }
 
             switch (players[client_id]->get_element())
             {

@@ -142,6 +142,19 @@ public:
 	CLoadedModelInfo					*pSupporterModel = NULL;
 	CLoadedModelInfo					*pMagicianModel = NULL;
 
+	// magicial Skill model(1 : 메테오, 2 : 파이어볼)
+	CLoadedModelInfo					*pMagicainSkillModel1 = NULL;
+	CLoadedModelInfo					*pMagicainSkillModel2 = NULL;
+
+	// My magical Skill
+	CGameObject							*pMagicainSkill1 = NULL;
+	CGameObject							*pMagicainSkill2 = NULL;
+	chrono::system_clock::time_point	MagicainSkill2_start_time;
+
+	// Other player magicial Skill
+	vector<CMagicianSKillObject*>		vMagicianSkillModel1p;
+	vector<CMagicianSKillObject*>		vMagicianSkillModel2p;
+
 	// object model
 	CLoadedModelInfo					*pTreeModel1 = NULL;
 	CLoadedModelInfo					*pTreeModel2 = NULL;
