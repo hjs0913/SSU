@@ -20,6 +20,8 @@ D3D12_GPU_DESCRIPTOR_HANDLE	CScene::m_d3dCbvGPUDescriptorNextHandle;
 D3D12_CPU_DESCRIPTOR_HANDLE	CScene::m_d3dSrvCPUDescriptorNextHandle;
 D3D12_GPU_DESCRIPTOR_HANDLE	CScene::m_d3dSrvGPUDescriptorNextHandle;
 
+bool point_light_bool = false;
+
 CScene::CScene()
 {
 }
@@ -811,7 +813,8 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	if (m_pLights)
 	{
 		XMFLOAT3 Light_pos = m_pPlayer->GetPosition();
-		m_pLights[0].m_xmf3Position = XMFLOAT3(Light_pos.x, Light_pos.y + 10.0f, Light_pos.z);
+		m_pLights[0].m_xmf3Position = XMFLOAT3(Light_pos.x, Light_pos.y, Light_pos.z);
+		
 		m_pLights[0].m_xmf3Direction = m_pPlayer->GetLookVector();
 	}
 }
