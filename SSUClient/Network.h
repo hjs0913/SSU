@@ -90,6 +90,13 @@ extern bool JOIN_MAGICIAN_On;
 extern bool JOIN_SUPPORTER_On;
 extern bool Fail_On;
 extern int Fail_Reason;
+
+extern bool Damage_On;
+extern int Damage;
+
+extern vector<int> vectorDamageID1;
+extern vector<int> vectorDamageID2;
+extern vector<int> vectorDamageID3;
 extern char pl_id[MAX_NAME_SIZE];
 extern char pl_password[MAX_NAME_SIZE];
 extern char pl_nickname[MAX_NAME_SIZE];

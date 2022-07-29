@@ -81,9 +81,11 @@ void Player::CloseSocketPlayer()
     closesocket(_socket);
 }
 
-void Player::attack_dead_judge(Npc* target)
+void Player::attack_dead_judge(Npc* target, float fDamage)
 {
 	int target_hp = target->get_hp();
+	send_change_hp_packet(this, target, fDamage);
+
 	if (target_hp <= 0) {
 		target->state_lock.lock();
 		if (target->get_state() != ST_INGAME) {
@@ -147,13 +149,13 @@ void Player::attack_dead_judge(Npc* target)
 		//		}
 		//	}
 		//}
-		send_change_hp_packet(this, target);
 		sc_packet_combat_id packet;
 		packet.size = sizeof(packet);
 		packet.type = SC_PACKET_COMBAT_ID;
 		packet.id = target->get_id();
 		do_send(sizeof(packet), &packet);
 	}
+
 }
 
 void Player::attack_element_judge(Npc* target)
@@ -253,7 +255,7 @@ void Player::basic_attack_success(Npc* target)
 
 	attack_element_judge(target);
 
-	attack_dead_judge(target);
+	attack_dead_judge(target, damage);
 }
 
 void Player::phisical_skill_success(Npc* target, float skill_factor)
@@ -270,7 +272,7 @@ void Player::phisical_skill_success(Npc* target, float skill_factor)
 
 	attack_element_judge(target);
 
-	attack_dead_judge(target);
+	attack_dead_judge(target, damage);
 }
 
 void Player::magical_skill_success(Npc* target, float skill_factor)
@@ -287,7 +289,7 @@ void Player::magical_skill_success(Npc* target, float skill_factor)
 
 	attack_element_judge(target);
 
-	attack_dead_judge(target);
+	attack_dead_judge(target, damage);
 }
 
 void Player::revive()
@@ -343,7 +345,7 @@ void Player::revive_indun(Gaia* dun)
         Player** partys = dun->get_party_palyer();
         for (int i = 0; i < 4; i++) {
             if (partys[i]->get_tribe() != HUMAN) continue;
-            send_change_hp_packet(partys[i], this);
+            send_change_hp_packet(partys[i], this, 0);
             send_revive_packet(partys[i], this);
         }
 

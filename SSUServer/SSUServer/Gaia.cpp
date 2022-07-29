@@ -503,7 +503,7 @@ void Gaia::player_death(Player* p)
 		// 시야처리
 		int tmp_hp = 0;
 		for (int i = 0; i < GAIA_ROOM; i++) {
-			send_change_hp_packet(party[i], p);
+			send_change_hp_packet(party[i], p, 0);
 			send_change_death_count_packet(party[i], player_death_count);
 			send_dead_packet(party[i], boss, p);
 			//if (p->get_id() != party[i]->get_id()) {
@@ -533,7 +533,7 @@ void Gaia::player_death(Player* p)
 		int nDeathParty = 0;
 		int tmp_hp = 0;
 		for (int i = 0; i < GAIA_ROOM; i++) {
-			send_change_hp_packet(party[i], p);
+			send_change_hp_packet(party[i], p, 0);
 			send_dead_packet(party[i], boss, p);
 			//if (p->get_id() != party[i]->get_id()) {
 			//	//send_remove_object_packet(party[i], p);
@@ -614,7 +614,7 @@ void Gaia::judge_pattern_two_rightup(Player* p, int pattern_number)
 			p->set_hp(p->get_hp() - 3000);
 			if (p->get_hp() <= 0) player_death(p);
 			for (auto send_pl : party) {
-				send_change_hp_packet(send_pl, p);
+				send_change_hp_packet(send_pl, p, 0);
 			}
 		}
 	}
@@ -651,7 +651,7 @@ void Gaia::judge_pattern_two_leftup(Player* p, int pattern_number)
 			p->set_hp(p->get_hp() - 3000);
 			if (p->get_hp() <= 0) player_death(p);
 			for (auto send_pl : party) {
-				send_change_hp_packet(send_pl, p);
+				send_change_hp_packet(send_pl, p, 0);
 			}
 		}
 	}
@@ -682,7 +682,7 @@ void Gaia::pattern_active(int pattern)
 					if (p->get_hp() <= 0) player_death(p);
 					// 패턴 맞은사람이 있으면 맞았다고 보내주자
 					for (auto send_pl : party) {
-						send_change_hp_packet(send_pl, p);
+						send_change_hp_packet(send_pl, p, 0);
 					}
 				}
 			}
@@ -799,7 +799,7 @@ void Gaia::pattern_active(int pattern)
 				p->set_hp(p->get_hp() - 100);
 				if (p->get_hp() <= 0) player_death(p);
 				for (auto send_pl : party) {
-					send_change_hp_packet(send_pl, p);
+					send_change_hp_packet(send_pl, p, 0);
 				}
 			}
 		}

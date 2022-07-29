@@ -83,6 +83,7 @@ public:
 
 	void Login_Check_And_Build();
 
+	int m_nDamageLayer = 0;
 private:
 	HINSTANCE					m_hInstance;
 	HWND						m_hWnd; 
