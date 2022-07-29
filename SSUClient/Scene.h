@@ -149,6 +149,7 @@ public:
 	// My magical Skill
 	CGameObject							*pMagicainSkill1 = NULL;
 	CGameObject							*pMagicainSkill2 = NULL;
+	chrono::system_clock::time_point	MagicainSkill2_start_time;
 
 	// Other player magicial Skill
 	vector<CMagicianSKillObject*>		vMagicianSkillModel1p;

@@ -963,6 +963,40 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 		pMagicainSkill1->Render(pd3dCommandList, pCamera);
 	}
 
+	// Magician Skill(파이어볼)(My) Position Look vector
+	if (pMagicainSkill2) {
+		// 포지션 잡기
+		if (pMagicainSkill2->GetPosition().y != -100) { // Skill active
+			if (chrono::duration_cast<chrono::seconds>(chrono::system_clock::now() - MagicainSkill2_start_time).count() >= 5) {
+				pMagicainSkill2->SetPosition(0, -100, 0);
+			}
+			else {
+				XMFLOAT3 temp_pos = pMagicainSkill2->GetPosition();
+				XMFLOAT3 temp_look = pMagicainSkill2->GetLook();
+				temp_pos.x += m_fElapsedTime * temp_look.x;
+				temp_pos.y += m_fElapsedTime * temp_look.y;
+				temp_pos.z += m_fElapsedTime * temp_look.z;
+				pMagicainSkill2->SetPosition(temp_pos);
+			}
+		}
+		else {
+			if (m_pPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[5].m_bEnable &&
+				m_pPlayer->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[5]->m_fPosition <= 0.1f) {
+				XMFLOAT3 temp_pos = m_pPlayer->GetPosition();
+				temp_pos.y += 10;
+				pMagicainSkill2->SetPosition(temp_pos);
+				XMFLOAT3 temp_look = m_pPlayer->GetLook();
+				temp_look = Vector3::Normalize(temp_look);
+				pMagicainSkill2->SetLook(temp_look);
+				MagicainSkill2_start_time = chrono::system_clock::now();
+			}
+		}
+
+		pMagicainSkill2->Animate(m_fElapsedTime);
+		pMagicainSkill2->UpdateTransform(NULL);
+		pMagicainSkill2->Render(pd3dCommandList, pCamera);
+	}
+
 	// Magician Skill(메테오)(Other) Position Look vector
 	for (int j = 0; j < vMagicianSkillModel1p.size(); j++) {
 		if (!InDungeon) {
@@ -1018,7 +1052,7 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 
 		// 포지션 잡기
 		if (vMagicianSkillModel2p[j]->skillModel->GetPosition().y != -100) { // Skill active
-			if (vMagicianSkillModel2p[j]->skillModel->GetPosition().y <= 0) {
+			if (chrono::duration_cast<chrono::seconds>( chrono::system_clock::now() - vMagicianSkillModel2p[j]->start_time).count() >= 5) {
 				vMagicianSkillModel2p[j]->skillModel->SetPosition(0, -100, 0);
 			}
 			else {
@@ -1034,12 +1068,12 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 			if (m_ppHierarchicalGameObjects[vMagicianSkillModel1p[j]->_id]->m_pSkinnedAnimationController->m_pAnimationTracks[5].m_bEnable &&
 				m_ppHierarchicalGameObjects[vMagicianSkillModel1p[j]->_id]->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[5]->m_fPosition <= 0.1f) {
 				XMFLOAT3 temp_pos = m_ppHierarchicalGameObjects[vMagicianSkillModel2p[j]->_id]->GetPosition();
-				temp_pos.y += 30;
+				temp_pos.y += 10;
 				vMagicianSkillModel2p[j]->skillModel->SetPosition(temp_pos);
 				XMFLOAT3 temp_look = m_ppHierarchicalGameObjects[vMagicianSkillModel2p[j]->_id]->GetLook();
-				temp_look.y = -0.75;
 				temp_look = Vector3::Normalize(temp_look);
 				vMagicianSkillModel2p[j]->skillModel->SetLook(temp_look);
+				vMagicianSkillModel2p[j]->start_time = chrono::system_clock::now();
 			}
 		}
 
@@ -1135,7 +1169,7 @@ void CScene::OpenWorld_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamer
 				CMagicianSKillObject* skill_model2 = new CMagicianSKillObject(m_pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMagicainSkillModel2, 0, i);
 				skill_model2->skillModel->SetPosition(0, -100, 0);
 				skill_model2->skillModel->SetScale(1.0f, 1.0f, 1.0f);
-				vMagicianSkillModel1p.push_back(skill_model2);
+				vMagicianSkillModel2p.push_back(skill_model2);
 
 				break;
 			}

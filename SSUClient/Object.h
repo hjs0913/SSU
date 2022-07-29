@@ -615,6 +615,7 @@ public:
 class CMagicianSKillObject {
 public:
 	CGameObject* skillModel;
+	chrono::system_clock::time_point start_time;
 	int _id;	//Scene에서 m_ppHierachicalGameObjects의 인덱스 번호
 
 

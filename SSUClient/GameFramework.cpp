@@ -2575,8 +2575,8 @@ void CGameFramework::FrameAdvance()
 		if ((i >= 32 && i <= 39) && !Join_On) continue;
 		if (i == 40 && !Fail_On) continue;
 		if (i == 41 && !Fail_On) continue;
-		//if (i == 42 && !Login_OK) continue;
-		if (i == 42) continue;
+		if (i == 42 && !Login_OK) continue;
+		//if (i == 42) continue;
 		if (i == 43) {
 			if (!InDungeon) continue;
 			if (!m_gaiaPattern.pattern_on[0] && !m_gaiaPattern.pattern_on[1] && !m_gaiaPattern.pattern_on[4]) continue;
