@@ -1248,7 +1248,7 @@ void BossSkillUI::Render(UINT nFrame)
     m_pd2dDeviceContext->BeginDraw();
     m_pd2dDeviceContext->FillRectangle(m_vTextBlocks[0].d2dLayoutRect, m_pBrush);
     m_pd2dDeviceContext->DrawRectangle(m_vTextBlocks[0].d2dLayoutRect, m_pBrush);
-
+    
     m_pd2dDeviceContext->DrawText(m_vTextBlocks[0].strText.c_str(), static_cast<UINT>(m_vTextBlocks[0].strText.length()),
         m_vTextBlocks[0].pdwFormat, m_vTextBlocks[0].d2dLayoutRect, m_pd2dTextBrush);
     m_pd2dDeviceContext->DrawBitmap(bitmap, m_vTextBlocks[1].d2dLayoutRect);
@@ -1287,8 +1287,8 @@ void BossSkillUI::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT 
 
     const float fFontSize = m_fHeight / 10.0f;  //25
     const float fSmallFontSize = m_fHeight / 16.0f; //40
-
-    m_pd2dWriteFactory->CreateTextFormat(L"한컴 말랑말랑", nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fSmallFontSize, L"en-us", &m_pdwTextFormat);
+    
+    m_pd2dWriteFactory->CreateTextFormat(L"한컴 말랑말랑", nullptr, DWRITE_FONT_WEIGHT_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fSmallFontSize, L"en-us", &m_pdwTextFormat);
 
     m_pdwTextFormat->SetTextAlignment(static_cast<DWRITE_TEXT_ALIGNMENT>(TextAlignment));
     m_pdwTextFormat->SetParagraphAlignment(static_cast<DWRITE_PARAGRAPH_ALIGNMENT>(ParagraphAlignment));
@@ -1335,6 +1335,10 @@ void Damage_UI::UpdateLabels(CCamera* camera, vector<int> vector)
             raidY = 1300;
             uiUp = 380.0f;
         }
+        if (mPlayer[0]->m_job == J_MAGICIAN) {
+            uiUp = 250.0f;
+        }
+        
         XMFLOAT3 xmf3ObjectPos = XMFLOAT3(mPlayer[vec]->GetPosition().x, mPlayer[vec]->GetPosition().y + raidY, mPlayer[vec]->GetPosition().z);
         XMFLOAT3 xmf3ViewProj = Vector3::TransformCoord(Vector3::TransformCoord(xmf3ObjectPos, camera->GetViewMatrix()), camera->GetProjectionMatrix());
 

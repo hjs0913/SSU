@@ -1038,8 +1038,8 @@ int netInit()
 {
 	const char* SERVERIP;
 	char tempIP[16];
-	//SERVERIP = "127.0.0.1";
-	SERVERIP = "116.47.180.110";
+	SERVERIP = "127.0.0.1";
+	//SERVERIP = "116.47.180.110";
 	// 윈속 초기화
 	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
 		return 1;

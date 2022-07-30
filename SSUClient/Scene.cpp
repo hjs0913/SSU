@@ -378,33 +378,33 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	}
 
 	// 장판
-	CLoadedModelInfo* pCircleModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/shark_modeling.bin", NULL);
+	CLoadedModelInfo* pCircleModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Boss_Floor.bin", NULL);
 	for (int i = 4; i < 8; i++) {
-		m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pCircleModel, 1);
-		m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
-		m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[0].m_fSpeed = 1.0f;
+		m_ppHierarchicalGameObjects[i] = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pCircleModel, 0);
+		//m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
+		//m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[0].m_fSpeed = 1.0f;
 		m_ppHierarchicalGameObjects[i]->SetPosition(3200.0f, m_pTerrain->GetHeight(3200.0f, 700.0f), 700.0f);
-		m_ppHierarchicalGameObjects[i]->Rotate(-90, 0, 0.0f);
-		m_ppHierarchicalGameObjects[i]->SetScale(15.0f, 15.0f, 15.0f);
+		//m_ppHierarchicalGameObjects[i]->Rotate(-90, 0, 0.0f);
+		m_ppHierarchicalGameObjects[i]->SetScale(40.0f, 40.0f, 40.0f);
 	}
 
 	// 파도
-	//CLoadedModelInfo* pWaveModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Boss_Tiger.bin", NULL);
+	CLoadedModelInfo* pWaveModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Boss_Wave.bin", NULL);
 	for (int i = 8; i < 11; i++) {
-		m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pCircleModel, 1);
+		m_ppHierarchicalGameObjects[i] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pWaveModel, 1);
 		m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
 		m_ppHierarchicalGameObjects[i]->m_pSkinnedAnimationController->m_pAnimationTracks[0].m_fSpeed = 1.0f;
 		m_ppHierarchicalGameObjects[i]->SetPosition(0.f, -100.f, 0.f);
-		m_ppHierarchicalGameObjects[i]->SetScale(25.0f, 25.0f, 25.0f);
+		m_ppHierarchicalGameObjects[i]->SetScale(500.0f, 450.0f, 450.0f);
 	}
 
 	// 참격
-	//CLoadedModelInfo* pSlashModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/shark_modeling.bin", NULL);
-	m_ppHierarchicalGameObjects[11] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pCircleModel, 1);
+	CLoadedModelInfo* pSlashModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Boss_Bird.bin", NULL);
+	m_ppHierarchicalGameObjects[11] = new CMonsterObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pSlashModel, 1);
 	m_ppHierarchicalGameObjects[11]->m_pSkinnedAnimationController->SetTrackAnimationSet(0, 0);
-	m_ppHierarchicalGameObjects[11]->m_pSkinnedAnimationController->m_pAnimationTracks[0].m_fSpeed = 1.0f;
+	m_ppHierarchicalGameObjects[11]->m_pSkinnedAnimationController->m_pAnimationTracks[0].m_fSpeed = 0.2f;
 	m_ppHierarchicalGameObjects[11]->SetPosition(0.0f, -100.f, 0.0f);
-	m_ppHierarchicalGameObjects[11]->SetScale(8.0f, 6.0f, 6.0f);
+	m_ppHierarchicalGameObjects[11]->SetScale(55.0f, 35.0f, 35.0f);
 
 	// 신전기둥
 	CLoadedModelInfo* pRaidObjModel = CGameObject::LoadGeometryAndAnimationFromFile(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, "Model/Raid_Model.bin", NULL);
@@ -1250,16 +1250,20 @@ void CScene::Raid_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pC
 			m_ppHierarchicalGameObjects[i]->SetPosition(m_gaiaPattern.pattern_one[i-4]);
 			m_ppHierarchicalGameObjects[i]->SetPosition(
 				XMFLOAT3(m_ppHierarchicalGameObjects[i]->GetPosition().x,
-					m_pTerrain->GetHeight(m_ppHierarchicalGameObjects[i]->GetPosition().x, m_ppHierarchicalGameObjects[i]->GetPosition().z) - (30.0f - circle_time),
+					m_pTerrain->GetHeight(m_ppHierarchicalGameObjects[i]->GetPosition().x, m_ppHierarchicalGameObjects[i]->GetPosition().z) + 10.0f - (30.0f - circle_time),
 					m_ppHierarchicalGameObjects[i]->GetPosition().z
 				)
 			);
+			
+			if (circle_time < 30.0f)
+				m_ppHierarchicalGameObjects[i]->Rotate(0.0f, circle_time * 6.0f, 0.0f);
+
 			if (circle_time >= 30.0f) circle_time = 30.0f;
 			else if (circle_time >= 10.0f) circle_time += 0.8f;
 			else circle_time += 0.1f;
 
 			
-			m_ppHierarchicalGameObjects[3]->m_pSkinnedAnimationController->m_pAnimationTracks[3].m_fSpeed = 1.0f;
+			m_ppHierarchicalGameObjects[3]->m_pSkinnedAnimationController->m_pAnimationTracks[3].m_fSpeed = 1.3f;
 			m_isIdle = false;
 			// 3, 3 -> 3번 오브젝트(가이아)의 3번 애니메이션을 True로
 			SetAnimationEnableTrue(3, 3, 0.7f);
@@ -1280,7 +1284,7 @@ void CScene::Raid_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pC
 			m_ppHierarchicalGameObjects[i]->SetPosition(m_gaiaPattern.pattern_two[i-8]);
 			m_ppHierarchicalGameObjects[i]->SetPosition(
 				XMFLOAT3(m_ppHierarchicalGameObjects[i]->GetPosition().x,
-					m_pTerrain->GetHeight(m_ppHierarchicalGameObjects[i]->GetPosition().x, m_ppHierarchicalGameObjects[i]->GetPosition().z) + 15.0f,
+					m_pTerrain->GetHeight(m_ppHierarchicalGameObjects[i]->GetPosition().x, m_ppHierarchicalGameObjects[i]->GetPosition().z),
 					m_ppHierarchicalGameObjects[i]->GetPosition().z
 				)
 			);
@@ -1311,8 +1315,11 @@ void CScene::Raid_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pC
 					m_ppHierarchicalGameObjects[i]->GetPosition().z
 				)
 			);
-
 			m_ppHierarchicalGameObjects[i]->SetLook(m_gaiaPattern.pattern_five_look);
+
+			slash_time += 1.0f;
+
+			m_ppHierarchicalGameObjects[i]->Rotate(0.0f, 0.0f, slash_time * 24.0f);
 
 			m_ppHierarchicalGameObjects[3]->m_pSkinnedAnimationController->m_pAnimationTracks[3].m_fSpeed = 0.7f;
 			m_isIdle = false;
@@ -1320,6 +1327,7 @@ void CScene::Raid_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pC
 		}
 		else {
 			m_ppHierarchicalGameObjects[i]->SetPosition(XMFLOAT3(0, -100, 0));
+			slash_time = 0.0f;
 			//m_isIdle = true;
 		}
 	}

@@ -174,6 +174,7 @@ public:
 	int									monster_anim_cnt = 0;
 
 	float circle_time = 0.0f;
+	float slash_time = 0.0f;
 
 	bool m_isIdle = true;
 
