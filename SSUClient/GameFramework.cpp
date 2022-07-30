@@ -1706,6 +1706,16 @@ void CGameFramework::Create_InDungeon_Object()
 	if (m_pPlayer) m_pPlayer->ReleaseUploadBuffers();
 
 	m_GameTimer.Reset();
+
+	m_nDamageLayer = 3;
+	m_pPlayer->m_ppUILayer = new UILayer * [m_nDamageLayer];
+
+	for (int i = 0; i < m_nDamageLayer; ++i) {
+		m_pPlayer->m_ppUILayer[i] = new Damage_UI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::GhostWhite, D2D1::ColorF::Red);
+		m_pPlayer->m_ppUILayer[i]->Resize(m_ppd3dSwapChainBackBuffers, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_FLOW_DIRECTION_TOP_TO_BOTTOM);
+		m_pPlayer->m_ppUILayer[i]->setAlpha(0.0, 1.0);
+	}
 }
 void CGameFramework::Create_Login_Object()
 {
