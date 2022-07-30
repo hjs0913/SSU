@@ -85,6 +85,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <LibraryPath>$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\sky20\OneDrive\바탕 화면\진선\졸업작품\SSU\SSUClient\Sound\inc;$(IncludePath)</IncludePath>
     <IncludePath>C:\Users\정의범\Documents\GitHub\SSU\SSUClient\Sound\inc;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
