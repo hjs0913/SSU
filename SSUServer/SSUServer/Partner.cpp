@@ -361,7 +361,6 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //스킬을 쿨타임 돌때마다 �
 	switch (pa->get_job()) // AI의 직업을 보고 움직임을 나누자 
 	{
 	case J_DILLER: {
-		pattern(0, 11);
 		switch (p)
 		{
 		case 0: {

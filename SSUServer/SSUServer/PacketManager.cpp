@@ -1242,7 +1242,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 ev.obj_id = client_id;
                 ev.start_time = chrono::system_clock::now() + 5s;  //ÄğÅ¸ÀÓ
                 ev.ev = EVENT_SKILL_COOLTIME;
-                ev.target_id = 0; // packet->target;
+                ev.target_id = 1; // packet->target;
                 TimerManager::timer_queue.push(ev);
 
 
@@ -1252,8 +1252,19 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 int taget = packet->target;// -9615;
 
 
-                players[taget]->set_mp(players[taget]->get_mp() + players[taget]->get_maxmp() / 10);
-                send_status_change_packet(reinterpret_cast<Player*>(players[taget]));
+
+                if (!pl->join_dungeon_room) {
+                }
+
+                else {
+                    int indun_id = pl->get_indun_id();
+                    players[taget]->set_mp(players[taget]->get_mp() + players[taget]->get_maxmp() / 10);
+                    Gaia* indun = m_ObjectManger->get_dungeon(indun_id);
+                    for (int i = 0; i < GAIA_ROOM; ++i) {
+                        send_change_mp_packet(indun->get_party_palyer()[i], players[taget]);
+                    }
+                }
+                
 
                 send_buff_ui_packet(reinterpret_cast<Player*>(players[taget]), 0);
                 break;
@@ -1268,7 +1279,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 ev.obj_id = client_id;
                 ev.start_time = chrono::system_clock::now() + 5s;  //ÄğÅ¸ÀÓ
                 ev.ev = EVENT_SKILL_COOLTIME;
-                ev.target_id = 1; //packet->target;
+                ev.target_id = 2; //packet->target;
                 TimerManager::timer_queue.push(ev);
 
                 pl->set_mp(pl->get_mp() - 1000);
@@ -1292,16 +1303,24 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 ev.obj_id = client_id;
                 ev.start_time = chrono::system_clock::now() + 5s;  //ÄğÅ¸ÀÓ
                 ev.ev = EVENT_SKILL_COOLTIME;
-                ev.target_id = 2;// packet->target;
+                ev.target_id = 0;// packet->target;
                 TimerManager::timer_queue.push(ev);
 
                 pl->set_mp(pl->get_mp() - 1000);
                 send_status_change_packet(pl);
 
                 int taget = packet->target;// - 9615;
+                if (!pl->join_dungeon_room) {
+                }
 
-                players[taget]->set_hp(players[taget]->get_hp() + players[taget]->get_maxhp() / 10);
-                send_status_change_packet(reinterpret_cast<Player*>(players[taget]));
+                else {
+                    int indun_id = pl->get_indun_id();
+                    players[taget]->set_hp(players[taget]->get_hp() + players[taget]->get_maxhp() / 10);
+                    Gaia* indun = m_ObjectManger->get_dungeon(indun_id);
+                    for (int i = 0; i < GAIA_ROOM; ++i) {
+                        send_change_hp_packet(indun->get_party_palyer()[i], players[taget]);
+                    }
+                }
                 send_buff_ui_packet(reinterpret_cast<Player*>(players[taget]), 2);
                 break;
 
