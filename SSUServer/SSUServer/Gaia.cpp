@@ -614,7 +614,7 @@ void Gaia::judge_pattern_two_rightup(Player* p, int pattern_number)
 			p->set_hp(p->get_hp() - 3000);
 			if (p->get_hp() <= 0) player_death(p);
 			for (auto send_pl : party) {
-				send_change_hp_packet(send_pl, p, 0);
+				send_change_hp_packet(send_pl, p, 0);	// 플레이어 데미지
 			}
 		}
 	}
@@ -651,7 +651,7 @@ void Gaia::judge_pattern_two_leftup(Player* p, int pattern_number)
 			p->set_hp(p->get_hp() - 3000);
 			if (p->get_hp() <= 0) player_death(p);
 			for (auto send_pl : party) {
-				send_change_hp_packet(send_pl, p, 0);
+				send_change_hp_packet(send_pl, p, 0);		// 플레이어 데미지
 			}
 		}
 	}

@@ -450,7 +450,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                 // physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
                                 //send_status_change_packet(pl);
                                 for (int i = 0; i < GAIA_ROOM; ++i) {
-                                    send_change_hp_packet(indun->get_party_palyer()[i], indun->boss, 0);
+                                    send_change_hp_packet(indun->get_party_palyer()[i], indun->boss, damage);
                                 }
                                 if (bos->get_hp() <= 0) {
                                     bos->set_hp(0);
@@ -531,7 +531,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                 bos->set_hp(bos->get_hp() - damage);
                                 //send_status_change_packet(pl);
                                 for (int i = 0; i < GAIA_ROOM; ++i) {
-                                    send_change_hp_packet(indun->get_party_palyer()[i], indun->boss, 0);
+                                    send_change_hp_packet(indun->get_party_palyer()[i], indun->boss, damage);
                                 }
                                 if (bos->get_hp() <= 0) {
                                     bos->set_hp(0);
@@ -634,7 +634,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                 bos->set_hp(indun->boss->get_hp() - damage);
                                 //send_move_packet(pl, dungeons[client_id]->boss, 1);  //나중에 수정필요 
                                 for (int i = 0; i < GAIA_ROOM; ++i) {
-                                    send_change_hp_packet(indun->get_party_palyer()[i], indun->boss, 0);
+                                    send_change_hp_packet(indun->get_party_palyer()[i], indun->boss, damage);
                                 }
                                 send_status_change_packet(pl);
                                 if (bos->get_hp() <= 0) {
@@ -1027,7 +1027,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                         Npc* bos = indun->boss;
                         Coord gaia_pos = { bos->get_x(),bos->get_z() };
                         if (isInsideTriangle(a, b, c, gaia_pos) || isInsideTriangle(d, e, f, gaia_pos)) {
-                            cout << "플레이어 멤테오 " << endl;
+                            cout << "플레이어 메테오 " << endl;
                             pl->set_skill_factor(1, 1);
                             pl->magical_skill_success(bos, pl->get_skill_factor(1, 1));
                             send_play_effect_packet(pl, bos); // 이펙트 터트릴 위치 

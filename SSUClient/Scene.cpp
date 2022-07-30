@@ -1258,17 +1258,18 @@ void CScene::Raid_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pC
 			else if (circle_time >= 10.0f) circle_time += 0.8f;
 			else circle_time += 0.1f;
 
-			if (i == 4) {
-				m_ppHierarchicalGameObjects[3]->m_pSkinnedAnimationController->m_pAnimationTracks[3].m_fSpeed = 1.5f;
-				// 3, 3 -> 3번 오브젝트(가이아)의 3번 애니메이션을 True로
-				SetAnimationEnableTrue(3, 3, 0.7f);
-				m_isIdle = false;
-			}
+			
+			m_ppHierarchicalGameObjects[3]->m_pSkinnedAnimationController->m_pAnimationTracks[3].m_fSpeed = 1.0f;
+			m_isIdle = false;
+			// 3, 3 -> 3번 오브젝트(가이아)의 3번 애니메이션을 True로
+			SetAnimationEnableTrue(3, 3, 0.7f);
+			
+
 		}
 		else {
 			m_ppHierarchicalGameObjects[i]->SetPosition(XMFLOAT3(0, -100, 0));
 			circle_time = 0.0f;
-			m_isIdle = true;
+			//m_isIdle = true;
 		}
 	}
 	else if (i >= 8 && i < 11) {	// 파도
@@ -1285,16 +1286,17 @@ void CScene::Raid_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pC
 			);
 
 			m_ppHierarchicalGameObjects[i]->SetLook(m_gaiaPattern.pattern_two_look);
-			if (i == 8) {
-				m_ppHierarchicalGameObjects[3]->m_pSkinnedAnimationController->m_pAnimationTracks[4].m_fSpeed = 0.2f;
-				SetAnimationEnableTrue(3, 4, 1.0f);
-				m_isIdle = false;
-			}
+		
+
+			m_ppHierarchicalGameObjects[3]->m_pSkinnedAnimationController->m_pAnimationTracks[4].m_fSpeed = 1.2f;
+			m_isIdle = false;
+			SetAnimationEnableTrue(3, 4, 1.0f);
+			
 		}
 
 		else {
 			m_ppHierarchicalGameObjects[i]->SetPosition(XMFLOAT3(0, -100, 0));
-			m_isIdle = true;
+			//m_isIdle = true;
 		}
 	}
 	else if (i == 11) { // 참격
@@ -1312,14 +1314,13 @@ void CScene::Raid_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pC
 
 			m_ppHierarchicalGameObjects[i]->SetLook(m_gaiaPattern.pattern_five_look);
 
-			m_ppHierarchicalGameObjects[3]->m_pSkinnedAnimationController->m_pAnimationTracks[3].m_fSpeed = 1.0f;
-			SetAnimationEnableTrue(3, 2, 0.7f);
+			m_ppHierarchicalGameObjects[3]->m_pSkinnedAnimationController->m_pAnimationTracks[3].m_fSpeed = 0.7f;
 			m_isIdle = false;
-
+			SetAnimationEnableTrue(3, 2, 0.7f);
 		}
 		else {
 			m_ppHierarchicalGameObjects[i]->SetPosition(XMFLOAT3(0, -100, 0));
-			m_isIdle = true;
+			//m_isIdle = true;
 		}
 	}
 
@@ -1366,9 +1367,9 @@ void CScene::SetAnimationEnableTrue(int objIndex, int animIndex, int speed)
 		m_ppHierarchicalGameObjects[objIndex]->m_pSkinnedAnimationController->SetTrackEnable(i, false);
 	}
 
-	if (IsAnimationEnd(3, animIndex/*2*/)) {
+	if (IsAnimationEnd(objIndex/*3*/, animIndex/*2*/)) {
 		m_isIdle = true;
-		m_ppHierarchicalGameObjects[3]->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[2]->m_fPosition = 0.0f;
+		m_ppHierarchicalGameObjects[3]->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[animIndex]->m_fPosition = 0.0f;
 		m_ppHierarchicalGameObjects[3]->m_pSkinnedAnimationController->SetTrackEnable(animIndex, false);
 		m_ppHierarchicalGameObjects[3]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
 	}
@@ -1390,7 +1391,7 @@ bool CScene::IsAnimationEnd(int objIndex, int animIndex)
 	float anim_now = m_ppHierarchicalGameObjects[objIndex]->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[animIndex]->m_fPosition;
 	float anim_end = m_ppHierarchicalGameObjects[objIndex]->m_pSkinnedAnimationController->m_pAnimationSets->m_pAnimationSets[animIndex]->m_fLength;
 	
-	return (anim_end - anim_now <= 0.1f);
+	return (anim_end - anim_now <= 0.05f);
 }
 
 void CScene::SetTreePosition(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, int start, int end)

@@ -631,7 +631,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //스킬을 쿨타임 돌때마다 �
 					gaia->boss->set_hp(gaia->boss->get_hp() - damage);
 					for (int i = 0; i < GAIA_ROOM; ++i) {
 						send_move_packet(gaia->get_party_palyer()[i], gaia->boss, 1);
-						send_change_hp_packet(gaia->get_party_palyer()[i], gaia->boss, damage);
+						send_change_hp_packet(gaia->get_party_palyer()[i], gaia->boss, 0);
 						send_change_hp_packet(gaia->get_party_palyer()[i], pa, 0);
 					}
 					if (gaia->boss->get_hp() <= 0) {

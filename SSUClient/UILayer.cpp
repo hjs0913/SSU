@@ -1328,14 +1328,22 @@ void Damage_UI::UpdateLabels(CCamera* camera, vector<int> vector)
             mPlayer[vec]->m_nDamageTime = 0;
             return;
         }
-            
-        XMFLOAT3 xmf3ViewProj = Vector3::TransformCoord(Vector3::TransformCoord(mPlayer[vec]->GetPosition(), camera->GetViewMatrix()), camera->GetProjectionMatrix());
+        
+        int raidY = 0;
+        float uiUp = 180.0f;
+        if (vec == GAIA_ID) {
+            raidY = 1300;
+            uiUp = 380.0f;
+        }
+        XMFLOAT3 xmf3ObjectPos = XMFLOAT3(mPlayer[vec]->GetPosition().x, mPlayer[vec]->GetPosition().y + raidY, mPlayer[vec]->GetPosition().z);
+        XMFLOAT3 xmf3ViewProj = Vector3::TransformCoord(Vector3::TransformCoord(xmf3ObjectPos, camera->GetViewMatrix()), camera->GetProjectionMatrix());
 
         float fScreenX = xmf3ViewProj.x * (FRAME_BUFFER_WIDTH / 2) + FRAME_BUFFER_WIDTH / 2;
         float fScreenY = -xmf3ViewProj.y * (FRAME_BUFFER_HEIGHT / 2) + FRAME_BUFFER_HEIGHT / 2;
 
+
         m_vTextBlocks[++n] = { to_wstring(mPlayer[vec]->m_nDamage), 
-            D2D1::RectF(fScreenX - 100.0f, fScreenY - 200.0f - mPlayer[vec]->m_nDamageTime,
-                        fScreenX  + 100.0f, fScreenY - 180.0f - mPlayer[vec]->m_nDamageTime), m_pdwTextFormat };
+            D2D1::RectF(fScreenX - 100.0f, fScreenY - uiUp + 20.0f - mPlayer[vec]->m_nDamageTime,
+                        fScreenX  + 100.0f, fScreenY - uiUp - mPlayer[vec]->m_nDamageTime), m_pdwTextFormat };
     }
 }

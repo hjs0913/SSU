@@ -130,7 +130,7 @@ void ObjectManager::Initialize_Dungeons()
 
 void ObjectManager::Initialize_Ai()
 {
-    for (int i = AI_ID_START; i < AI_ID_END; i++) {
+    for (int i = AI_ID_START; i < AI_ID_END; ++i) {
         players[i] = new Partner(i);
     }
 }
@@ -404,7 +404,7 @@ void ObjectManager::worker()
                 ev.target_id = 0;
                 TimerManager::timer_queue.push(ev);
             }
-            send_change_hp_packet(pl, pl, 0);
+            send_change_hp_packet(pl, pl, 0);   // 플레이어 hp 자동 회복
             //send_status_change_packet(pl);
             break;
         }
