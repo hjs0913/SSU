@@ -4,6 +4,7 @@
 #define FRAME_BUFFER_HEIGHT		900 //480
 #define UICOUNT 44
 
+#include "SoundManager.h"
 #include "Timer.h"
 #include "Player.h"
 #include "Scene.h"
