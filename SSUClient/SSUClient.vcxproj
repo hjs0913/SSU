@@ -73,7 +73,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\ASIAS\Desktop\SSU\SSUClient\Sound\inc;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\정의범\Documents\GitHub\SSU\SSUClient\Sound\inc;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\ASIAS\Desktop\SSU\SSUClient\Sound\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -85,7 +85,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <LibraryPath>$(LibraryPath)</LibraryPath>
-    <IncludePath>C:\Users\ASIAS\Desktop\SSU\SSUClient\Sound\inc;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\정의범\Documents\GitHub\SSU\SSUClient\Sound\inc;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

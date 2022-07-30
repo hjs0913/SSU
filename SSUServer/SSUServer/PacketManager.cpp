@@ -406,7 +406,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                             players[i]->state_lock.unlock();
 
 
-                            if ((players[i]->get_x() >= pl->get_x() - 10 && players[i]->get_x() <= pl->get_x() + 10) && (players[i]->get_z() >= pl->get_z() - 10 && players[i]->get_z() <= pl->get_z() + 10)) {
+                            if ((players[i]->get_x() >= pl->get_x() - 30 && players[i]->get_x() <= pl->get_x() + 30) && (players[i]->get_z() >= pl->get_z() - 30 && players[i]->get_z() <= pl->get_z() + 30)) {
                                 pl->set_skill_factor(packet->skill_type, packet->skill_num);
                                 pl->phisical_skill_success(players[i], pl->get_skill_factor(packet->skill_type, packet->skill_num));
 
@@ -438,7 +438,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                         int indun_id = pl->get_indun_id();
                         Gaia* indun = m_ObjectManger->get_dungeon(indun_id);
                         Npc* bos = indun->boss;
-                        if ((bos->get_x() >= pl->get_x() - 10 && bos->get_x() <= pl->get_x() + 10) && (bos->get_z() >= pl->get_z() - 10 && bos->get_z() <= pl->get_z() + 10)) {
+                        if ((bos->get_x() >= pl->get_x() - 30 && bos->get_x() <= pl->get_x() + 30) && (bos->get_z() >= pl->get_z() - 30 && bos->get_z() <= pl->get_z() + 30)) {
                             pl->set_skill_factor(0, 0);
                             float give_damage = pl->get_physical_attack() * pl->get_skill_factor(0, 0);
                             float defence_damage = (bos->get_defence_factor() *
@@ -470,10 +470,10 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                     skill_cooltime(client_id, chrono::system_clock::now() + 3s, 1);
 
                     Coord a = { pl->get_x(), pl->get_z() };    //플레이어 기준 전방 삼각형 범위 
-                    Coord b = { pl->get_x() - pl->get_right_x() * 40 + pl->get_look_x() * 100,
-                        pl->get_z() - pl->get_right_z() * 40 + pl->get_look_z() * 100 };  // 왼쪽 위
-                    Coord c = { pl->get_x() + pl->get_right_x() * 40 + pl->get_look_x() * 100,
-                        pl->get_z() + pl->get_right_z() * 40 + pl->get_look_z() * 100 };  // 오른쪽 위
+                    Coord b = { pl->get_x() - pl->get_right_x() * 30 + pl->get_look_x() * 70,
+                        pl->get_z() - pl->get_right_z() * 30 + pl->get_look_z() * 70 };  // 왼쪽 위
+                    Coord c = { pl->get_x() + pl->get_right_x() * 30 + pl->get_look_x() * 70,
+                        pl->get_z() + pl->get_right_z() * 30 + pl->get_look_z() * 70 };  // 오른쪽 위
 
                     pl->set_mp(pl->get_mp() - pl->get_lv() * 10);
                     send_status_change_packet(pl);
@@ -901,7 +901,8 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 switch ((int)packet->skill_num) {
                 case 0:// hp희생해 상대 hp를 mp로 흡수 
                     skill_cooltime(client_id, chrono::system_clock::now() + 5s, 0);
-                    pl->set_hp(pl->get_hp() - 300);
+
+                    pl->set_hp(pl->get_hp() - pl->get_lv() * 10);
                     send_status_change_packet(pl);
 
                     if (!pl->join_dungeon_room) {
@@ -971,9 +972,8 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 {
                 case 0: {
                     skill_cooltime(client_id, chrono::system_clock::now() + 5s, 1);
-                    send_play_shoot_packet(pl);
-
-                    pl->set_mp(pl->get_mp() - 1500);
+                //    send_play_shoot_packet(pl);
+                    pl->set_mp(pl->get_mp() - pl->get_lv() * 10);
                     send_status_change_packet(pl);
                     //좌우 삼각형 두개로 사각형 범위 ?
                     Coord a = { pl->get_x() + pl->get_right_x() * -30, pl->get_z() + pl->get_right_z() * -30 };
@@ -1058,7 +1058,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 case 0:
                     skill_cooltime(client_id, chrono::system_clock::now() + 5s, 2);
                     // send_play_shoot_packet(pl); 다른 걸로 
-                    pl->set_mp(pl->get_mp() - 1500);
+                    pl->set_mp(pl->get_mp() - pl->get_lv() * 10);
                     send_status_change_packet(pl);
 
                     Coord a1 = { pl->get_x() + pl->get_right_x() * -10, pl->get_z() + pl->get_right_z() * -10 };

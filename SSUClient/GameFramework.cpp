@@ -775,11 +775,12 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 				for (int i = 0; i < GAIA_ROOM; i++) {
 				//	cout << m_party[m_party_info->get_party_id()]->player_id[i] << endl;
 					if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, mPlayer[m_party[m_party_info->get_party_id()]->player_id[i] ])) {
-					
-						send_picking_skill_packet(0, 0, m_party[m_party_info->get_party_id()]->player_id[i]); //여기 i 수정 요망
+						send_picking_skill_packet(0, 0, m_party[m_party_info->get_party_id()]->player_id[i]); 
 						f4_picking_possible = false;
 						cout << "f4 보내기" << endl;
 					}
+					if (f4_picking_possible == false)
+						break;
 				}
 			}
 	
@@ -800,10 +801,12 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 					//	cout << m_party[m_party_info->get_party_id()]->player_id[i] << endl;
 					if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, mPlayer[m_party[m_party_info->get_party_id()]->player_id[i]])) {
 
-						send_picking_skill_packet(1, 0, m_party[m_party_info->get_party_id()]->player_id[i]); //여기 i 수정 요망
+						send_picking_skill_packet(1, 0, m_party[m_party_info->get_party_id()]->player_id[i]); 
 						f5_picking_possible = false;
 						cout << "f5 보내기" << endl;
 					}
+					if (f5_picking_possible == false)
+						break;
 				}
 			}
 		}
@@ -823,10 +826,12 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 					//	cout << m_party[m_party_info->get_party_id()]->player_id[i] << endl;
 					if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, mPlayer[m_party[m_party_info->get_party_id()]->player_id[i]])) {
 
-						send_picking_skill_packet(2, 0, m_party[m_party_info->get_party_id()]->player_id[i]); //여기 i 수정 요망
+						send_picking_skill_packet(2, 0, m_party[m_party_info->get_party_id()]->player_id[i]); 
 						f6_picking_possible = false;
 						cout << "f6 보내기" << endl;
 					}
+					if (f6_picking_possible == false)
+						break;
 				}
 			}
 		}

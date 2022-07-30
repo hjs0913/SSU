@@ -411,10 +411,10 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //스킬을 쿨타임 돌때마다 �
 
 
 			pos a = { pa->get_x(), pa->get_z() };    //플레이어 기준 전방 삼각형 범위 
-			pos b = { pa->get_x() - pa->get_right_x() * 40 + pa->get_look_x() * 100,
-				pa->get_z() - pa->get_right_z() * 40 + pa->get_look_z() * 100 };  // 왼쪽 위
-			pos c = { pa->get_x() + pa->get_right_x() * 40 + pa->get_look_x() * 100,
-				pa->get_z() + pa->get_right_z() * 40 + pa->get_look_z() * 100 };  // 오른쪽 위
+			pos b = { pa->get_x() - pa->get_right_x() * 30 + pa->get_look_x() * 70,
+				pa->get_z() - pa->get_right_z() * 30 + pa->get_look_z() * 70 };  // 왼쪽 위
+			pos c = { pa->get_x() + pa->get_right_x() * 30 + pa->get_look_x() * 70,
+				pa->get_z() + pa->get_right_z() * 30 + pa->get_look_z() * 70 };  // 오른쪽 위
 
 			pa->set_mp(pa->get_mp() - 1000);
 
