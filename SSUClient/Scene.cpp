@@ -1261,6 +1261,7 @@ void CScene::Raid_Render(ID3D12GraphicsCommandList* pd3dCommandList, CCamera* pC
 				SetAnimationEnableTrue(3, 3, 0.7f);
 				m_isIdle = false;
 			}
+
 		}
 		else {
 			m_ppHierarchicalGameObjects[i]->SetPosition(XMFLOAT3(0, -100, 0));
@@ -1358,6 +1359,39 @@ void CScene::SetAnimationEnableTrue(int objIndex, int animIndex, int speed)
 	for (int i = 0; i < max_anim; ++i) {
 		if (i == animIndex) {
 			m_ppHierarchicalGameObjects[objIndex]->m_pSkinnedAnimationController->SetTrackEnable(i, true);
+
+			//-사운드
+			if (i == 2) {
+				m_ppHierarchicalGameObjects[objIndex]->m_pSkinnedAnimationController->SetTrackAllDisable();
+				m_ppHierarchicalGameObjects[objIndex]->m_pSkinnedAnimationController->SetTrackEnable(2, true);
+				m_ppHierarchicalGameObjects[objIndex]->m_pSkinnedAnimationController->SetCallbackKeys(2, 3);
+			}
+			else if (i == 3) {
+				m_ppHierarchicalGameObjects[objIndex]->m_pSkinnedAnimationController->SetTrackAllDisable();
+				m_ppHierarchicalGameObjects[objIndex]->m_pSkinnedAnimationController->SetTrackEnable(3, true);
+				m_ppHierarchicalGameObjects[objIndex]->m_pSkinnedAnimationController->SetCallbackKeys(3, 4);
+			}
+			else if (i == 4) {
+				m_ppHierarchicalGameObjects[objIndex]->m_pSkinnedAnimationController->SetTrackAllDisable();
+				m_ppHierarchicalGameObjects[objIndex]->m_pSkinnedAnimationController->SetTrackEnable(4, true);
+				m_ppHierarchicalGameObjects[objIndex]->m_pSkinnedAnimationController->SetCallbackKeys(4, 5);
+			}
+		
+#ifdef _WITH_SOUND_RESOURCE
+			m_ppHierarchicalGameObjects[objIndex]->m_pSkinnedAnimationController->SetCallbackKey(i, 0.1f, _T("boss_attack"));
+#else
+			if (i == 2) {
+				m_ppHierarchicalGameObjects[objIndex]->m_pSkinnedAnimationController->SetCallbackKey(2, 1, 0.125f, _T("Sound/가이아_참격.wav"));
+			}
+			else if (i == 3) {
+				m_ppHierarchicalGameObjects[objIndex]->m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.125f, _T("Sound/가이아_장판.wav"));
+			}
+			else if (i == 4) {
+				m_ppHierarchicalGameObjects[objIndex]->m_pSkinnedAnimationController->SetCallbackKey(4, 3, 0.125f, _T("Sound/가이아_파도.wav"));
+			}
+#endif
+			CAnimationCallbackHandler* pAnimationCallbackHandler = new CSoundCallbackHandler();
+			m_ppHierarchicalGameObjects[objIndex]->m_pSkinnedAnimationController->SetAnimationCallbackHandler(i, pAnimationCallbackHandler);
 			continue;
 		}
 		m_ppHierarchicalGameObjects[objIndex]->m_pSkinnedAnimationController->SetTrackEnable(i, false);
@@ -1369,6 +1403,8 @@ void CScene::SetAnimationEnableTrue(int objIndex, int animIndex, int speed)
 		m_ppHierarchicalGameObjects[3]->m_pSkinnedAnimationController->SetTrackEnable(2, false);
 		m_ppHierarchicalGameObjects[3]->m_pSkinnedAnimationController->SetTrackEnable(0, true);
 	}
+
+
 }
 
 // nAnim을 제외한 나머지를 제로로 만드렁

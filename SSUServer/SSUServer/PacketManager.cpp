@@ -1069,7 +1069,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
 
                     Coord d1 = { pl->get_x() + pl->get_right_x() * 10, pl->get_z() + pl->get_right_z() * 10 };
                     Coord e1 = { (pl->get_x() + pl->get_right_x() * 10) + pl->get_look_x() * 140
-                        , (pl->get_z() + pl->get_right_z() * 10) + pl->get_look_x() * 50 };
+                        , (pl->get_z() + pl->get_right_z() * 10) + pl->get_look_x() * 140 };
                     Coord f1 = { (pl->get_x() + pl->get_right_x() * -10) + pl->get_look_x() * 140,
                    (pl->get_z() + pl->get_right_z() * -10) + pl->get_look_z() * 140, };
 
@@ -1318,7 +1318,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                     players[taget]->set_hp(players[taget]->get_hp() + players[taget]->get_maxhp() / 10);
                     Gaia* indun = m_ObjectManger->get_dungeon(indun_id);
                     for (int i = 0; i < GAIA_ROOM; ++i) {
-                        send_change_hp_packet(indun->get_party_palyer()[i], players[taget]);
+                        send_change_hp_packet(indun->get_party_palyer()[i], players[taget], 0);
                     }
                 }
                 send_buff_ui_packet(reinterpret_cast<Player*>(players[taget]), 2);
