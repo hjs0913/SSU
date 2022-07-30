@@ -198,6 +198,11 @@ bool CGameFramework::OnCreate(HINSTANCE hInstance, HWND hMainWnd)
 
 	//BuildObjects();
 
+	SoundManager* sm = SoundManager::GetSoundManager();
+	sm->Init();
+	sm->SettingSound();
+	sm->GetSound(0)->SoundPlay(true);
+
 	BuildObjects_login();
 	return(true);
 }
@@ -1673,6 +1678,9 @@ void CGameFramework::Create_OpenWorld_Object()
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_FLOW_DIRECTION_TOP_TO_BOTTOM);
 		m_pPlayer->m_ppUILayer[i]->setAlpha(0.0, 1.0);
 	}
+	SoundManager::GetSoundManager()->GetSound(0)->SoundStop();
+	SoundManager::GetSoundManager()->GetSound(2)->SoundStop();
+	SoundManager::GetSoundManager()->GetSound(1)->SoundPlay(true);
 
 }
 
@@ -1716,6 +1724,8 @@ void CGameFramework::Create_InDungeon_Object()
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_FLOW_DIRECTION_TOP_TO_BOTTOM);
 		m_pPlayer->m_ppUILayer[i]->setAlpha(0.0, 1.0);
 	}
+	SoundManager::GetSoundManager()->GetSound(1)->SoundStop();
+	SoundManager::GetSoundManager()->GetSound(2)->SoundPlay(true);
 }
 void CGameFramework::Create_Login_Object()
 {

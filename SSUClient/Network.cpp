@@ -1036,8 +1036,8 @@ int netInit()
 {
 	const char* SERVERIP;
 	char tempIP[16];
-	//SERVERIP = "127.0.0.1";
-	SERVERIP = "116.47.180.110";
+	SERVERIP = "127.0.0.1";
+	//SERVERIP = "116.47.180.110";
 	// 윈속 초기화
 	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
 		return 1;
@@ -1338,22 +1338,28 @@ void get_object_information(CGameObject* m_otherPlayer, int id)
 			m_otherPlayer->m_pSkinnedAnimationController->SetCallbackKey(3, 0.1f, _T("Animal_attack"));
 #else
 			if (MAX_USER < id &&  id < MAX_USER + 30) {
-				m_otherPlayer->m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.125f, _T("Sound/토끼_울음소리.wav"));
+				//m_otherPlayer->m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.125f, _T("Sound/토끼_울음소리.wav"));
+				SoundManager::GetSoundManager()->GetSound(3)->SoundPlay(false);
 			}
 			else if (MAX_USER + 30< id && id < MAX_USER + 60) {
-				m_otherPlayer->m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.125f, _T("Sound/거미_울음소리.wav"));
+				//m_otherPlayer->m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.125f, _T("Sound/거미_울음소리.wav"));
+				SoundManager::GetSoundManager()->GetSound(4)->SoundPlay(false);
 			}
 			else if (MAX_USER + 60 < id && id < MAX_USER + 90) {
-				m_otherPlayer->m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.125f, _T("Sound/개구리_울음소리.wav"));
+				//m_otherPlayer->m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.125f, _T("Sound/개구리_울음소리.wav"));
+				SoundManager::GetSoundManager()->GetSound(5)->SoundPlay(false);
 			}
 			else if (MAX_USER + 90 < id && id < MAX_USER + 120) {
-				m_otherPlayer->m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.125f, _T("Sound/원숭이_울음소리.wav"));
+				//m_otherPlayer->m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.125f, _T("Sound/원숭이_울음소리.wav"));
+				SoundManager::GetSoundManager()->GetSound(6)->SoundPlay(false);
 			}
 			else if (MAX_USER + 120 < id && id < MAX_USER + 150) {
-				m_otherPlayer->m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.125f, _T("Sound/늑대_울음소리.wav"));
+				//m_otherPlayer->m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.125f, _T("Sound/늑대_울음소리.wav"));
+				SoundManager::GetSoundManager()->GetSound(7)->SoundPlay(false);
 			}
 			else if (MAX_USER + 150 < id && id < MAX_USER + 180) {
-				m_otherPlayer->m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.125f, _T("Sound/맷돼지_울음소리.wav"));
+				//m_otherPlayer->m_pSkinnedAnimationController->SetCallbackKey(3, 2, 0.125f, _T("Sound/맷돼지_울음소리.wav"));
+				SoundManager::GetSoundManager()->GetSound(8)->SoundPlay(false);
 			}
 
 		}
