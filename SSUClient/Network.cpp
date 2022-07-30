@@ -662,14 +662,14 @@ void process_packet(unsigned char* p)
 
 			Combat_str.append(L"\n속성 : ");
 			switch (mPlayer[combat_id]->m_element) {
-			case E_NONE: my_element_str = Combat_str.append(L"무속성"); break;
-			case E_WATER: my_element_str = Combat_str.append(L"물"); break;
-			case E_FULLMETAL: my_element_str = Combat_str.append(L"강철"); break;
-			case E_WIND: my_element_str = Combat_str.append(L"바람"); break;
-			case E_FIRE: my_element_str = Combat_str.append(L"불"); break;
-			case E_TREE: my_element_str = Combat_str.append(L"나무"); break;
-			case E_EARTH: my_element_str = Combat_str.append(L"땅"); break;
-			case E_ICE: my_element_str = Combat_str.append(L"얼음"); break;
+			case E_NONE: Combat_str.append(L"무속성"); break;
+			case E_WATER: Combat_str.append(L"물"); break;
+			case E_FULLMETAL: Combat_str.append(L"강철"); break;
+			case E_WIND: Combat_str.append(L"바람"); break;
+			case E_FIRE: Combat_str.append(L"불"); break;
+			case E_TREE: Combat_str.append(L"나무"); break;
+			case E_EARTH: Combat_str.append(L"땅"); break;
+			case E_ICE: Combat_str.append(L"얼음"); break;
 			}
 		}
 		LeaveCriticalSection(&UI_cs);
@@ -695,6 +695,7 @@ void process_packet(unsigned char* p)
 		party_info_on = false;
 		PartyInviteUI_ON = false;
 		InvitationCardUI_On = false;
+		Combat_On = false;
 
 		sc_packet_start_gaia* packet = reinterpret_cast<sc_packet_start_gaia*>(p);
 		combat_id = GAIA_ID;

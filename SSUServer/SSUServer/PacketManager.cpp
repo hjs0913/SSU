@@ -150,6 +150,8 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 pl->_auto_hp = true;
             }
         }
+        else pl->_auto_hp = false;
+
         if(login == true) send_login_ok_packet(pl);
         pl->state_lock.lock();
         pl->set_state(ST_INGAME);
@@ -1774,6 +1776,8 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 reinterpret_cast<Player*>(players[client_id])->_auto_hp = true;
             }
         }
+        else pl->_auto_hp = false;
+
         if (login == true)
             send_login_ok_packet(pl);
         else if (DB_On == false && login == false) {

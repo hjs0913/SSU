@@ -301,7 +301,7 @@ void Player::revive()
     }
     _state = ST_INGAME;
     state_lock.unlock();
-
+	_auto_hp = false;
     // 플레이어 죽은 후 초기화 설정
 	if (strcmp(_login_id, "admin") == 0) {
 		// stress Test teleport

@@ -405,6 +405,7 @@ void ObjectManager::worker()
                 TimerManager::timer_queue.push(ev);
             }
             send_change_hp_packet(pl, pl, 0);
+            cout << pl->get_hp() << endl;
             //send_status_change_packet(pl);
             break;
         }
