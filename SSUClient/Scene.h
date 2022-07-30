@@ -6,6 +6,7 @@
 
 #include "Shader.h"
 #include "Player.h"
+#include "SoundManager.h"
 
 #define MAX_LIGHTS						16 
 #define MAX_MATERIAL					8

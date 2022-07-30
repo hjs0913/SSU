@@ -2621,6 +2621,12 @@ void CGameFramework::FrameAdvance()
 			if (!InDungeon) break;
 			UINT width_pos = std::chrono::duration_cast<std::chrono::milliseconds>((chrono::system_clock::now() - BossSkillUiTimer)).count();
 			width_pos = width_pos;
+			if (width_pos <= 200) {
+				if (m_gaiaPattern.pattern_on[0] == true) SoundManager::GetSoundManager()->GetSound(9)->SoundPlay(false);
+				if (m_gaiaPattern.pattern_on[1] == true) SoundManager::GetSoundManager()->GetSound(10)->SoundPlay(false);
+				if (m_gaiaPattern.pattern_on[4] == true) SoundManager::GetSoundManager()->GetSound(11)->SoundPlay(false);
+			}
+
 			if (width_pos >= 500) width_pos = 500;
 			
 			if(m_gaiaPattern.pattern_on[0] == true) m_ppUILayer[i]->UpdateLabels(L"올라와 상어!!", FRAME_BUFFER_WIDTH - width_pos, FRAME_BUFFER_HEIGHT - 400, FRAME_BUFFER_WIDTH + 500 - width_pos, FRAME_BUFFER_HEIGHT);
