@@ -2623,9 +2623,9 @@ void CGameFramework::FrameAdvance()
 			width_pos = width_pos;
 			if (width_pos >= 500) width_pos = 500;
 			
-			if(m_gaiaPattern.pattern_on[0] == true) m_ppUILayer[i]->UpdateLabels(L"올라와 상어!!", FRAME_BUFFER_WIDTH - width_pos, FRAME_BUFFER_HEIGHT - 400, FRAME_BUFFER_WIDTH + 500 - width_pos, FRAME_BUFFER_HEIGHT);
-			else if(m_gaiaPattern.pattern_on[1] == true) m_ppUILayer[i]->UpdateLabels(L"도와줘 상어!!", FRAME_BUFFER_WIDTH - width_pos, FRAME_BUFFER_HEIGHT - 400, FRAME_BUFFER_WIDTH + 500 - width_pos, FRAME_BUFFER_HEIGHT);
-			else if (m_gaiaPattern.pattern_on[4] == true) m_ppUILayer[i]->UpdateLabels(L"상어 돌진!!", FRAME_BUFFER_WIDTH - width_pos, FRAME_BUFFER_HEIGHT - 400, FRAME_BUFFER_WIDTH + 500 - width_pos, FRAME_BUFFER_HEIGHT);
+			if(m_gaiaPattern.pattern_on[0] == true) m_ppUILayer[i]->UpdateLabels(L"감당할 수 있겠어?", FRAME_BUFFER_WIDTH - width_pos - 20, FRAME_BUFFER_HEIGHT - 450, FRAME_BUFFER_WIDTH + 500 - width_pos, FRAME_BUFFER_HEIGHT);
+			else if(m_gaiaPattern.pattern_on[1] == true) m_ppUILayer[i]->UpdateLabels(L"피할 수 있겠어?", FRAME_BUFFER_WIDTH - width_pos - 20, FRAME_BUFFER_HEIGHT - 450, FRAME_BUFFER_WIDTH + 500 - width_pos, FRAME_BUFFER_HEIGHT);
+			else if (m_gaiaPattern.pattern_on[4] == true) m_ppUILayer[i]->UpdateLabels(L"가소롭군!", FRAME_BUFFER_WIDTH - width_pos + 30, FRAME_BUFFER_HEIGHT - 420, FRAME_BUFFER_WIDTH + 500 - width_pos + 30, FRAME_BUFFER_HEIGHT);
 			else m_ppUILayer[i]->UpdateLabels(L"", FRAME_BUFFER_WIDTH - 500, FRAME_BUFFER_HEIGHT - 400, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT);
 			break;
 		}
