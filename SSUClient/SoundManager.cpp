@@ -32,17 +32,22 @@ bool SoundManager::Init()
 
 void SoundManager::SettingSound()
 {
-	m_SoundManager->LoadSound(L"Sound/Login.mp3");
-	m_SoundManager->LoadSound(L"Sound/OpenWorld.mp3");
-	m_SoundManager->LoadSound(L"Sound/indun.mp3");
+	m_SoundManager->LoadSound(L"Sound/Login.mp3");	//0
+	m_SoundManager->LoadSound(L"Sound/OpenWorld.mp3");	//1
+	m_SoundManager->LoadSound(L"Sound/indun.mp3");	//2
 
 	// Monster attack
-	m_SoundManager->LoadSound(L"Sound/Rabbit_attack.wav");
-	m_SoundManager->LoadSound(L"Sound/Spider_attack.wav");
-	m_SoundManager->LoadSound(L"Sound/Frog_attack.wav");
-	m_SoundManager->LoadSound(L"Sound/Monkey_attack.wav");
-	m_SoundManager->LoadSound(L"Sound/Wolf_attack.wav");
-	m_SoundManager->LoadSound(L"Sound/Pig_attack.wav");
+	m_SoundManager->LoadSound(L"Sound/Rabbit_attack.wav");	//3
+	m_SoundManager->LoadSound(L"Sound/Spider_attack.wav");	//4
+	m_SoundManager->LoadSound(L"Sound/Frog_attack.wav");	//5
+	m_SoundManager->LoadSound(L"Sound/Monkey_attack.wav");	//6
+	m_SoundManager->LoadSound(L"Sound/Wolf_attack.wav");	//7
+	m_SoundManager->LoadSound(L"Sound/Pig_attack.wav");		//8
+
+	// Boss Skill
+	m_SoundManager->LoadSound(L"Sound/Gaia_chamkyuck.wav");	//9
+	m_SoundManager->LoadSound(L"Sound/Gaia_jangpan.wav");	//10
+	m_SoundManager->LoadSound(L"Sound/Gaia_wave.wav");		//11
 }
 
 void SoundManager::Relase()
