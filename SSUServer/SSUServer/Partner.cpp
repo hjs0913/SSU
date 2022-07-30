@@ -361,6 +361,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //스킬을 쿨타임 돌때마다 �
 	switch (pa->get_job()) // AI의 직업을 보고 움직임을 나누자 
 	{
 	case J_DILLER: {
+		pattern(0, 11);
 		switch (p)
 		{
 		case 0: {
@@ -511,7 +512,15 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //스킬을 쿨타임 돌때마다 �
 						gaia->boss->get_physical_defence()));
 				float damage = give_damage * (1 - defence_damage);
 		
-				gaia->boss->set_pos(gaia->boss->get_x() + pa->get_look_x() * 40, gaia->boss->get_z() + pa->get_look_z() * 40);
+				int m_x = 2037;
+				int m_z = 2112;
+				float r = 515.f;
+
+	
+				if (sqrt(pow((gaia->boss->get_x() + pa->get_look_x() * 100 - m_x), 2) + pow((gaia->boss->get_z() + pa->get_look_z() * 100 - m_z), 2)) < r)
+					gaia->boss->set_pos(gaia->boss->get_x() + pa->get_look_x() * 100, gaia->boss->get_z() + pa->get_look_z() * 100);
+			
+
 				if (gaia->boss->get_hp() > 0) {
 					gaia->boss->set_hp(gaia->boss->get_hp() - damage);
 					for (int i = 0; i < GAIA_ROOM; ++i) {

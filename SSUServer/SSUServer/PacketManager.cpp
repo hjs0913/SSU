@@ -630,7 +630,13 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                     bos->get_physical_defence()));
                             float damage = give_damage * (1 - defence_damage);
                             if (bos->get_hp() > 0) {
+                                int m_x = 2037;
+                                int m_z = 2112;
+                                float r = 515.f;
+
+                                if (sqrt(pow((bos->get_x() + pl->get_look_x() * 100 - m_x), 2) + pow((bos->get_z() + pl->get_look_z() * 100 - m_z), 2)) < r)
                                 bos->set_pos(indun->boss->get_x() + pl->get_look_x() * 100, indun->boss->get_z() + pl->get_look_z() * 100);
+                         
                                 bos->set_hp(indun->boss->get_hp() - damage);
                                 //send_move_packet(pl, dungeons[client_id]->boss, 1);  //나중에 수정필요 
                                 for (int i = 0; i < GAIA_ROOM; ++i) {
