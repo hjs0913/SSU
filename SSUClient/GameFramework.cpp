@@ -1708,6 +1708,17 @@ void CGameFramework::Create_OpenWorld_Object()
 	reinterpret_cast<SkillUI*>(m_ppUILayer[23])->Setup(); //아래 스킬 ui
 	reinterpret_cast<BuffUI*>(m_ppUILayer[16])->Setup();  //위에 버프 ui
 
+
+	m_nDamageLayer = 3;
+	m_pPlayer->m_ppUILayer = new UILayer * [m_nDamageLayer];
+
+	for (int i = 0; i < m_nDamageLayer; ++i) {
+		m_pPlayer->m_ppUILayer[i] = new Damage_UI(m_nSwapChainBuffers, m_pd3dDevice, m_pd3dCommandQueue, D2D1::ColorF::GhostWhite, D2D1::ColorF::Red);
+		m_pPlayer->m_ppUILayer[i]->Resize(m_ppd3dSwapChainBackBuffers, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_FLOW_DIRECTION_TOP_TO_BOTTOM);
+		m_pPlayer->m_ppUILayer[i]->setAlpha(0.0, 1.0);
+	}
+
 }
 
 void CGameFramework::Create_InDungeon_Object()
@@ -2192,6 +2203,7 @@ void CGameFramework::FrameAdvance()
 	// 서버 연결X 용
 
 	EnterCriticalSection(&UI_cs);
+
 	for (int i = 0; i < UICOUNT; i++) {
 		switch (i) {
 		case 0: {
@@ -2586,7 +2598,6 @@ void CGameFramework::FrameAdvance()
 		}
 	}
 
-
 	for (int i = 0; i < UICOUNT; i++) {
 		if ((i == 7 || i == 8)) {
 			if (!Combat_On) continue;
@@ -2614,6 +2625,44 @@ void CGameFramework::FrameAdvance()
 		}
 		m_ppUILayer[i]->Render(m_nSwapChainBufferIndex);
 	}
+
+	if (!vectorDamageID1.empty()) {	// 비어있지 않으면
+		if (++(m_pPlayer->m_ppUILayer[0]->m_DamageTime) < 30) {
+			reinterpret_cast<Damage_UI*>(m_pPlayer->m_ppUILayer[0])->Resize(vectorDamageID1.size());
+			reinterpret_cast<Damage_UI*>(m_pPlayer->m_ppUILayer[0])->UpdateLabels(m_pCamera, vectorDamageID1);
+			m_pPlayer->m_ppUILayer[0]->Render(m_nSwapChainBufferIndex);
+		}
+		else {
+			m_pPlayer->m_ppUILayer[0]->m_DamageTime = 0;
+			vectorDamageID1.clear();
+			vectorDamageID1.shrink_to_fit();
+		}
+	}
+	if (!vectorDamageID2.empty()) {	// 비어있지 않으면
+		if (++(m_pPlayer->m_ppUILayer[1]->m_DamageTime) < 30) {
+			reinterpret_cast<Damage_UI*>(m_pPlayer->m_ppUILayer[1])->Resize(vectorDamageID2.size());
+			reinterpret_cast<Damage_UI*>(m_pPlayer->m_ppUILayer[1])->UpdateLabels(m_pCamera, vectorDamageID2);
+			m_pPlayer->m_ppUILayer[1]->Render(m_nSwapChainBufferIndex);
+		}
+		else {
+			m_pPlayer->m_ppUILayer[1]->m_DamageTime = 0;
+			vectorDamageID2.clear();
+			vectorDamageID2.shrink_to_fit();
+		}
+	}
+	if (!vectorDamageID3.empty()) {	// 비어있지 않으면
+		if (++(m_pPlayer->m_ppUILayer[2]->m_DamageTime) < 30) {
+			reinterpret_cast<Damage_UI*>(m_pPlayer->m_ppUILayer[2])->Resize(vectorDamageID3.size());
+			reinterpret_cast<Damage_UI*>(m_pPlayer->m_ppUILayer[2])->UpdateLabels(m_pCamera, vectorDamageID3);
+			m_pPlayer->m_ppUILayer[2]->Render(m_nSwapChainBufferIndex);
+		}
+		else {
+			m_pPlayer->m_ppUILayer[2]->m_DamageTime = 0;
+			vectorDamageID3.clear();
+			vectorDamageID3.shrink_to_fit();
+		}
+	}
+
 	LeaveCriticalSection(&UI_cs);
 
 #ifdef _WITH_PRESENT_PARAMETERS
@@ -2659,6 +2708,7 @@ void CGameFramework::FrameAdvance()
 				Notice_str = L"사망했습니다. ";
 				Notice_str.append(to_wstring(chrono::duration_cast<chrono::seconds>(t).count()));
 				Notice_str.append(L"초 후 부활합니다");
+				Damage_On = false;
 			}
 
 			if (RaidEnterNotice) {

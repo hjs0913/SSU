@@ -58,6 +58,13 @@ bool Open_Build_Once = false;;
 bool Join_On = false;
 bool Fail_On = false;
 extern int Fail_Reason = 0;
+bool Damage_On = false;
+int Damage = 0;
+
+vector<int> vectorDamageID1;
+vector<int> vectorDamageID2;
+vector<int> vectorDamageID3;
+
 bool JOIN_ID_On = false;
 bool JOIN_PASSWORD_On = false;
 bool JOIN_NICKNAME_On = false;
@@ -609,6 +616,30 @@ void process_packet(unsigned char* p)
 	case SC_PACKET_CHANGE_HP: {
 		sc_packet_change_hp* packet = reinterpret_cast<sc_packet_change_hp*>(p);
 		mPlayer[packet->id]->m_hp = packet->hp;
+		
+		if (packet->id < NPC_ID_START)			// packet->id가 NPC_ID_START보다 크거나 같을 떄(몬스터 일때) 만 데미지 띄워주기
+			break;
+		Damage = round(packet->damage);
+		
+		Damage_On = true;
+		switch (mPlayer[packet->id]->m_nDamageCnt) {
+		case 0:
+			vectorDamageID1.emplace_back(packet->id);
+			++mPlayer[packet->id]->m_nDamageCnt;
+			break;
+		case 1:
+			vectorDamageID2.emplace_back(packet->id);
+			++mPlayer[packet->id]->m_nDamageCnt;
+			break;
+		case 2:
+			vectorDamageID3.emplace_back(packet->id);
+			mPlayer[packet->id]->m_nDamageCnt = 0;
+			break;
+		}
+
+		mPlayer[packet->id]->m_nDamageTime = 0;
+		mPlayer[packet->id]->m_nDamage = Damage;
+
 		break;
 	}
 	case SC_PACKET_COMBAT_ID: {

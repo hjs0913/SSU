@@ -75,7 +75,11 @@ public:
 	bool						m_net_skill_animation[3];
 
 	DWORD						dwDir = 0;
-
+	bool						m_bIsDamaged = false;
+	int							m_nDamage = 0;
+	UILayer						**m_ppUILayer = NULL;
+	int							m_nDamageTime = 0;
+	int							m_nDamageCnt = 0;
 public:
 	CPlayer();
 	virtual ~CPlayer();

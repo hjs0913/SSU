@@ -4,6 +4,8 @@
 #include <dwrite.h>
 #include <wincodec.h>
 #include "stdafx.h"
+#include "Camera.h"
+
 #pragma comment(lib, "D2D1.lib")
 using namespace D2D1;
 
@@ -49,7 +51,7 @@ public:
     void ReleaseResources();
     void setAlpha(float Layout_a, float Text_a);
 
- 
+    int m_DamageTime = 0;
 
 protected:
     UINT GetRenderTargetsCount() { return static_cast<UINT>(m_vWrappedRenderTargets.size()); }
@@ -253,4 +255,19 @@ public:
     virtual void UpdateLabels(const std::wstring& strUIText, UINT LeftTop_x, UINT LeftTop_y, UINT RightBottom_x, UINT RightBottom_y);
     virtual void Render(UINT nFrame);
     virtual void Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT nHeight, UINT TextAlignment, UINT ParagraphAlignment);
+};
+
+class Damage_UI : public UILayer
+{
+private:
+    IDWriteTextFormat* m_pdwTextFormat2 = NULL;
+    ID2D1SolidColorBrush* m_pTextLayoutBrush;
+    int nTextBlock = 1;
+
+public:
+    Damage_UI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor);
+   
+    ~Damage_UI();
+    void UpdateLabels(CCamera* camera, vector<int> vector);
+    void Resize(UINT nFrame);
 };

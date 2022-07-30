@@ -268,7 +268,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
 
                         Player** ps = indun->get_party_palyer();
                         for (int i = 0; i < GAIA_ROOM; i++) {
-                            send_change_hp_packet(ps[i], bos);
+                            send_change_hp_packet(ps[i], bos, 0);
                         }
 
                         if (bos->get_hp() <= 0) {
@@ -450,7 +450,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                 // physical_skill_success(client_id, players[i]->get_id(), pl->get_skill_factor(packet->skill_type, packet->skill_num));
                                 //send_status_change_packet(pl);
                                 for (int i = 0; i < GAIA_ROOM; ++i) {
-                                    send_change_hp_packet(indun->get_party_palyer()[i], indun->boss);
+                                    send_change_hp_packet(indun->get_party_palyer()[i], indun->boss, 0);
                                 }
                                 if (bos->get_hp() <= 0) {
                                     bos->set_hp(0);
@@ -531,7 +531,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                 bos->set_hp(bos->get_hp() - damage);
                                 //send_status_change_packet(pl);
                                 for (int i = 0; i < GAIA_ROOM; ++i) {
-                                    send_change_hp_packet(indun->get_party_palyer()[i], indun->boss);
+                                    send_change_hp_packet(indun->get_party_palyer()[i], indun->boss, 0);
                                 }
                                 if (bos->get_hp() <= 0) {
                                     bos->set_hp(0);
@@ -640,7 +640,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                 bos->set_hp(indun->boss->get_hp() - damage);
                                 //send_move_packet(pl, dungeons[client_id]->boss, 1);  //나중에 수정필요 
                                 for (int i = 0; i < GAIA_ROOM; ++i) {
-                                    send_change_hp_packet(indun->get_party_palyer()[i], indun->boss);
+                                    send_change_hp_packet(indun->get_party_palyer()[i], indun->boss, 0);
                                 }
                                 send_status_change_packet(pl);
                                 if (bos->get_hp() <= 0) {
@@ -775,7 +775,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                             indun->get_party_palyer()[target_player]->set_hp(indun->get_party_palyer()[target_player]->get_maxhp());
 
                         for (int i = 0; i < GAIA_ROOM; ++i) {
-                            send_change_hp_packet(indun->get_party_palyer()[i], indun->get_party_palyer()[target_player]);
+                            send_change_hp_packet(indun->get_party_palyer()[i], indun->get_party_palyer()[target_player], 0);
                         }
                     }
                 }
@@ -955,7 +955,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                             Npc* bos = indun->boss;
                             pl->magical_skill_success(bos, pl->get_skill_factor(1, 0));
                             for (int i = 0; i < GAIA_ROOM; ++i) {
-                                send_change_hp_packet(indun->get_party_palyer()[i], indun->boss);
+                                send_change_hp_packet(indun->get_party_palyer()[i], indun->boss, 0);
                             }
                             if (bos->get_hp() <= 0) {
                                 bos->set_hp(0);
@@ -1039,7 +1039,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                             send_play_effect_packet(pl, bos); // 이펙트 터트릴 위치 
 
                             for (int i = 0; i < GAIA_ROOM; ++i) {
-                                send_change_hp_packet(indun->get_party_palyer()[i], indun->boss);
+                                send_change_hp_packet(indun->get_party_palyer()[i], indun->boss, 0);
                             }
                             if (bos->get_hp() <= 0) {
                                 bos->set_hp(0);
@@ -1124,7 +1124,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                             send_play_effect_packet(pl, bos); // 이펙트 터트릴 위치 
 
                             for (int i = 0; i < GAIA_ROOM; ++i) {
-                                send_change_hp_packet(indun->get_party_palyer()[i], indun->boss);
+                                send_change_hp_packet(indun->get_party_palyer()[i], indun->boss, 0);
                             }
                             if (bos->get_hp() <= 0) {
                                 bos->set_hp(0);

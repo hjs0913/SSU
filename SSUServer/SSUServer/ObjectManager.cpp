@@ -404,7 +404,7 @@ void ObjectManager::worker()
                 ev.target_id = 0;
                 TimerManager::timer_queue.push(ev);
             }
-            send_change_hp_packet(pl, pl);
+            send_change_hp_packet(pl, pl, 0);
             //send_status_change_packet(pl);
             break;
         }
@@ -469,7 +469,7 @@ void ObjectManager::worker()
                 if ((players[exp_over->_target]->get_hp() - players[exp_over->_target]->get_lv() * 10) <= 0)
                     break;
                 players[exp_over->_target]->set_hp(players[exp_over->_target]->get_hp() - players[exp_over->_target]->get_lv() * 10);
-                send_change_hp_packet(reinterpret_cast<Player*>(players[client_id]), players[exp_over->_target]);
+                send_change_hp_packet(reinterpret_cast<Player*>(players[client_id]), players[exp_over->_target], players[exp_over->_target]->get_lv() * 10);
                 if ((players[exp_over->_target]->get_hp() - players[exp_over->_target]->get_lv() * 10) <= 0)
                     break;
                 ev.obj_id = client_id;
@@ -846,7 +846,7 @@ void ObjectManager::worker()
             if ((players[exp_over->_target]->get_hp() - players[exp_over->_target]->get_lv() * 10) <= 0)
                 break;
             players[exp_over->_target]->set_hp(players[exp_over->_target]->get_hp() - players[exp_over->_target]->get_lv() * 10);
-            send_change_hp_packet(reinterpret_cast<Player*>(players[client_id]), players[exp_over->_target]);
+            send_change_hp_packet(reinterpret_cast<Player*>(players[client_id]), players[exp_over->_target], players[exp_over->_target]->get_lv() * 10);
             // players[client_id]->set_element_cooltime(false);
             if ((players[exp_over->_target]->get_hp() - players[exp_over->_target]->get_lv() * 10) <= 0)
                 break;

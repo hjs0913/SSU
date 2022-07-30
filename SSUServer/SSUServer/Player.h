@@ -139,7 +139,7 @@ public:
     void CloseSocketPlayer();
 
     // 공격
-    virtual void attack_dead_judge(Npc* target);	// 죽었는지 아닌지 판정
+    virtual void attack_dead_judge(Npc* target, float fDamage);	// 죽었는지 아닌지 판정
     virtual void attack_element_judge(Npc* target);	// 공격에 대한 속성 판정
     virtual void basic_attack_success(Npc* target);	// 일반공격 데미지 계산
     virtual void phisical_skill_success(Npc* target, float skill_factor);	// 물리스킬 데미지 계산

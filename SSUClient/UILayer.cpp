@@ -22,6 +22,7 @@ bool second_skill_used = false;
 bool third_skill_used = false;
 clock_t start_skill[3]; 
 clock_t end_skill[3];
+
 UILayer::UILayer(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor)
 {
     m_fWidth = 0.0f;
@@ -102,7 +103,6 @@ void UILayer::UpdateLabels(const std::wstring& strUIText, UINT LeftTop_x, UINT L
 
 void UILayer::Render(UINT nFrame)
 {
-
     ID3D11Resource* ppResources[] = { m_vWrappedRenderTargets[nFrame] };
 
     m_pd2dDeviceContext->SetTarget(m_vd2dRenderTargets[nFrame]);
@@ -111,7 +111,7 @@ void UILayer::Render(UINT nFrame)
 
     m_pd2dDeviceContext->BeginDraw();
 
-    for (auto textBlock : m_vTextBlocks)
+    for (const auto& textBlock : m_vTextBlocks)
     {
         m_pd2dDeviceContext->FillRectangle(textBlock.d2dLayoutRect, m_pBrush);
         m_pd2dDeviceContext->DrawRectangle(textBlock.d2dLayoutRect, m_pBrush);
@@ -1294,4 +1294,48 @@ void BossSkillUI::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT 
     m_pdwTextFormat->SetParagraphAlignment(static_cast<DWRITE_PARAGRAPH_ALIGNMENT>(ParagraphAlignment));
 
     m_vTextBlocks[1] = { L"", D2D1::RectF(FRAME_BUFFER_WIDTH - 300, FRAME_BUFFER_HEIGHT - 400, FRAME_BUFFER_WIDTH, FRAME_BUFFER_HEIGHT), m_pdwTextFormat };
+}
+
+///-----------------------------------------------------------------------
+Damage_UI::Damage_UI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor) : UILayer(nFrame, pd3dDevice, pd3dCommandQueue, LayoutColor, TextColor)
+{
+    m_vTextBlocks.resize(nFrame);
+
+    m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(LayoutColor), (ID2D1SolidColorBrush**)&m_pTextLayoutBrush);
+    m_pTextLayoutBrush->SetColor(D2D1::ColorF(TextColor));
+    m_pTextLayoutBrush->SetOpacity(1.0f);
+}
+
+Damage_UI::~Damage_UI()
+{
+
+}
+
+void Damage_UI::Resize(UINT nFrame)
+{
+    m_vTextBlocks.resize(nFrame);
+}
+
+void Damage_UI::UpdateLabels(CCamera* camera, vector<int> vector)
+{
+    int n = -1;
+
+    for (auto& vec : vector) {
+        if (!mPlayer[vec]->GetUse())
+            continue;
+
+        if (++(mPlayer[vec]->m_nDamageTime) >= 30) {
+            mPlayer[vec]->m_nDamageTime = 0;
+            return;
+        }
+            
+        XMFLOAT3 xmf3ViewProj = Vector3::TransformCoord(Vector3::TransformCoord(mPlayer[vec]->GetPosition(), camera->GetViewMatrix()), camera->GetProjectionMatrix());
+
+        float fScreenX = xmf3ViewProj.x * (FRAME_BUFFER_WIDTH / 2) + FRAME_BUFFER_WIDTH / 2;
+        float fScreenY = -xmf3ViewProj.y * (FRAME_BUFFER_HEIGHT / 2) + FRAME_BUFFER_HEIGHT / 2;
+
+        m_vTextBlocks[++n] = { to_wstring(mPlayer[vec]->m_nDamage), 
+            D2D1::RectF(fScreenX - 100.0f, fScreenY - 200.0f - mPlayer[vec]->m_nDamageTime,
+                        fScreenX  + 100.0f, fScreenY - 180.0f - mPlayer[vec]->m_nDamageTime), m_pdwTextFormat };
+    }
 }

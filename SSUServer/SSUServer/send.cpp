@@ -152,13 +152,14 @@ void send_look_packet(Player* pl, Npc* changer)
     pl->do_send(sizeof(packet), &packet);
 }
 
-void send_change_hp_packet(Player* pl, Npc* victim)
+void send_change_hp_packet(Player* pl, Npc* victim, float fDamage)
 {
     sc_packet_change_hp packet;
     packet.size = sizeof(packet);
     packet.type = SC_PACKET_CHANGE_HP;
     packet.id = victim->get_id();
     packet.hp = victim->get_hp();
+    packet.damage = fDamage;
     pl->do_send(sizeof(packet), &packet);
 }
 
