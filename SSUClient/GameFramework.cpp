@@ -163,7 +163,11 @@ bool CGameFramework::TestIntersection(int mouseX, int mouseY, CPlayer* obj)
 //	worldMatrix = XMLoadFloat4x4(&worldllook);//XMMatrixIdentity();
 	worldMatrix = XMMatrixIdentity();
 	//translateMatrix = XMMatrixTranslation(obj->vCenter.x, obj->vCenter.y, obj->vCenter.z);
+	if(!InDungeon)
 	translateMatrix = XMMatrixTranslation(obj->GetPosition().x, obj->GetPosition().y, obj->GetPosition().z);
+	else
+		translateMatrix = XMMatrixTranslation(obj->GetPosition().x,1300.0f, obj->GetPosition().z);
+	//cout << obj->GetPosition().x << " " << obj->GetPosition().y<< " " << obj->GetPosition().z << endl;
 	worldMatrix = XMMatrixMultiply(worldMatrix, translateMatrix);
 
 	// 이제 번역 된 행렬의 역함수를 구하십시오.
@@ -728,6 +732,8 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 				if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360)  //취소 
 					&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 + 80)) {
 					Join_On = false;
+					ID_Str = L"";
+					PASSWORD_Str = L"";
 					JOIN_ID_Str = L"";
 					JOIN_PASSWORD_Str = L"";
 					JOIN_NICKNAME_Str = L"";
@@ -753,35 +759,82 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 
 
 		if (f4_picking_possible) {
+			
 			//cRay r; 
 			//r.RayAtWorldSpace(LOWORD(lParam), HIWORD(lParam));
-			for (int i = 0; i < MAX_USER; ++i) {  //9615  for (int i = 10615; i < 10795; i++) 
-				//if(r.isPicked(m_ppObjects[i])){
-				if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, mPlayer[i])) {
-					send_picking_skill_packet(0, 0, i);
-					//	m_ppObjects[i]->SetMesh(0, pOtherPlayerMesh[1]);  //피킹 확인위해 색상변경 
-					f4_picking_possible = false;
-					cout << "f4 보내기" << endl;
+
+			if (!InDungeon) {
+				for (int i = 0; i < MAX_USER; ++i) {  //9615  for (int i = 10615; i < 10795; i++) 
+		//if(r.isPicked(m_ppObjects[i])){
+					if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, mPlayer[i])) {
+						send_picking_skill_packet(0, 0, i);
+						//	m_ppObjects[i]->SetMesh(0, pOtherPlayerMesh[1]);  //피킹 확인위해 색상변경 
+						f4_picking_possible = false;
+						cout << "f4 보내기" << endl;
+					}
 				}
 			}
+			else {
+				for (int i = 0; i < GAIA_ROOM; i++) {
+				//	cout << m_party[m_party_info->get_party_id()]->player_id[i] << endl;
+					if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, mPlayer[m_party[m_party_info->get_party_id()]->player_id[i] ])) {
+						send_picking_skill_packet(0, 0, m_party[m_party_info->get_party_id()]->player_id[i]); 
+						f4_picking_possible = false;
+						cout << "f4 보내기" << endl;
+					}
+					if (f4_picking_possible == false)
+						break;
+				}
+			}
+	
 		}
 
 		if (f5_picking_possible) {
-			for (int i = 0; i < MAX_USER; ++i) {
-				if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, mPlayer[i])) {
-					send_picking_skill_packet(1, 0, i);
-					f5_picking_possible = false;
-					cout << "f5 보내기" << endl;
+			if (!InDungeon) {
+				for (int i = 0; i < MAX_USER; ++i) {
+					if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, mPlayer[i])) {
+						send_picking_skill_packet(1, 0, i);
+						f5_picking_possible = false;
+						cout << "f5 보내기" << endl;
+					}
+				}
+			}
+			else {
+				for (int i = 0; i < GAIA_ROOM; i++) {
+					//	cout << m_party[m_party_info->get_party_id()]->player_id[i] << endl;
+					if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, mPlayer[m_party[m_party_info->get_party_id()]->player_id[i]])) {
+
+						send_picking_skill_packet(1, 0, m_party[m_party_info->get_party_id()]->player_id[i]); 
+						f5_picking_possible = false;
+						cout << "f5 보내기" << endl;
+					}
+					if (f5_picking_possible == false)
+						break;
 				}
 			}
 		}
 
 		if (f6_picking_possible) {
-			for (int i = 0; i < MAX_USER; ++i) {
-				if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, mPlayer[i])) {
-					send_picking_skill_packet(2, 0, i);
-					f6_picking_possible = false;
-					cout << "f6 보내기" << endl;
+			if (!InDungeon) {
+				for (int i = 0; i < MAX_USER; ++i) {
+					if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, mPlayer[i])) {
+						send_picking_skill_packet(2, 0, i);
+						f6_picking_possible = false;
+						cout << "f6 보내기" << endl;
+					}
+				}
+			}
+			else {
+				for (int i = 0; i < GAIA_ROOM; i++) {
+					//	cout << m_party[m_party_info->get_party_id()]->player_id[i] << endl;
+					if (TestIntersection(m_ptOldCursorPos.x, m_ptOldCursorPos.y, mPlayer[m_party[m_party_info->get_party_id()]->player_id[i]])) {
+
+						send_picking_skill_packet(2, 0, m_party[m_party_info->get_party_id()]->player_id[i]); 
+						f6_picking_possible = false;
+						cout << "f6 보내기" << endl;
+					}
+					if (f6_picking_possible == false)
+						break;
 				}
 			}
 		}
@@ -1885,6 +1938,8 @@ void CGameFramework::ProcessInput()
 				&& !m_pPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[4].m_bEnable
 				&& !m_pPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[5].m_bEnable) {
 				if ((pKeysBuffer[VK_NUMPAD1] & 0xF0) || (pKeysBuffer['1'] & 0xF0)) {
+					if (m_pPlayer->m_mp - m_pPlayer->m_lv * 40 < 0)
+						return;
 					switch (my_job)
 					{
 					case J_DILLER:
@@ -1916,6 +1971,8 @@ void CGameFramework::ProcessInput()
 				&& !m_pPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[3].m_bEnable
 				&& !m_pPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[5].m_bEnable) {
 				if ((pKeysBuffer[VK_NUMPAD2] & 0xF0) || (pKeysBuffer['2'] & 0xF0)) {     //
+					if (m_pPlayer->m_mp - m_pPlayer->m_lv * 40 < 0)
+						return;
 					switch (my_job)
 					{
 					case J_DILLER:
@@ -1947,6 +2004,8 @@ void CGameFramework::ProcessInput()
 				&& !m_pPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[3].m_bEnable
 				&& !m_pPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[4].m_bEnable) {
 				if ((pKeysBuffer[VK_NUMPAD3] & 0xF0) || (pKeysBuffer['3'] & 0xF0)) {     //   3
+					if (m_pPlayer->m_mp - m_pPlayer->m_lv * 40 < 0)
+						return;
 					switch (my_job)
 					{
 					case J_DILLER:
