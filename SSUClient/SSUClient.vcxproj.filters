@@ -16,6 +16,9 @@
     <Filter Include="TownNpc">
       <UniqueIdentifier>{52a1045d-bdb6-4775-a926-5eba1eb5a355}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sound">
+      <UniqueIdentifier>{3951519e-9c01-4a4d-a966-c49a7c1f7afd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">
@@ -81,6 +84,12 @@
     <ClInclude Include="TownNpc.h">
       <Filter>TownNpc</Filter>
     </ClInclude>
+    <ClInclude Include="CSound.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundManager.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -133,6 +142,12 @@
     </ClCompile>
     <ClCompile Include="TownNpc.cpp">
       <Filter>TownNpc</Filter>
+    </ClCompile>
+    <ClCompile Include="CSound.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="SoundManager.cpp">
+      <Filter>Sound</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
