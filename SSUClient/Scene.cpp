@@ -240,7 +240,7 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 		if (!pMagicainSkill2) {
 			pMagicainSkill2 = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMagicainSkillModel2, 0);
 			pMagicainSkill2->SetPosition(0.f, -100.f, 0.f);
-			pMagicainSkill2->SetScale(20.0f, 20.0f, 20.0f);
+			pMagicainSkill2->SetScale(30.0f, 30.0f, 30.0f);
 		}
 	}
 
@@ -333,12 +333,12 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 			// Skill Model 추가
 			CMagicianSKillObject* skill_model1 = new CMagicianSKillObject(m_pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMagicainSkillModel1, 0, i);
 			skill_model1->skillModel->SetPosition(0, -100, 0);
-			skill_model1->skillModel->SetScale(1.0f, 1.0f, 1.0f);
+			skill_model1->skillModel->SetScale(100.0f, 100.0f, 100.0f);
 			vMagicianSkillModel1p.push_back(skill_model1);
 
 			CMagicianSKillObject* skill_model2 = new CMagicianSKillObject(m_pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMagicainSkillModel2, 0, i);
 			skill_model2->skillModel->SetPosition(0, -100, 0);
-			skill_model2->skillModel->SetScale(1.0f, 1.0f, 1.0f);
+			skill_model2->skillModel->SetScale(30.0f, 30.0f, 30.0f);
 			vMagicianSkillModel2p.push_back(skill_model2);
 			break;
 		}
@@ -428,7 +428,7 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 		if (!pMagicainSkill2) {
 			pMagicainSkill2 = new CCastleObject(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, pMagicainSkillModel2, 0);
 			pMagicainSkill2->SetPosition(0.f, -100.f, 0.f);
-			pMagicainSkill2->SetScale(20.0f, 20.0f, 20.0f);
+			pMagicainSkill2->SetScale(30.0f, 30.0f, 30.0f);
 		}
 	}
 
@@ -974,9 +974,9 @@ void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera
 			else {
 				XMFLOAT3 temp_pos = pMagicainSkill2->GetPosition();
 				XMFLOAT3 temp_look = pMagicainSkill2->GetLook();
-				temp_pos.x += m_fElapsedTime * temp_look.x * 300;
-				temp_pos.y += m_fElapsedTime * temp_look.y * 300;
-				temp_pos.z += m_fElapsedTime * temp_look.z * 300;
+				temp_pos.x += m_fElapsedTime * temp_look.x * 400;
+				temp_pos.y += m_fElapsedTime * temp_look.y * 400;
+				temp_pos.z += m_fElapsedTime * temp_look.z * 400;
 				pMagicainSkill2->SetPosition(temp_pos);
 			}
 		}
