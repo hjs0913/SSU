@@ -732,6 +732,8 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 				if (CursorPosInClient.x >= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360)  //√Îº“ 
 					&& CursorPosInClient.x <= (FRAME_BUFFER_WIDTH / 2 + FRAME_BUFFER_WIDTH / 360 + 80)) {
 					Join_On = false;
+					ID_Str = L"";
+					PASSWORD_Str = L"";
 					JOIN_ID_Str = L"";
 					JOIN_PASSWORD_Str = L"";
 					JOIN_NICKNAME_Str = L"";
@@ -757,6 +759,7 @@ void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM
 
 
 		if (f4_picking_possible) {
+			
 			//cRay r; 
 			//r.RayAtWorldSpace(LOWORD(lParam), HIWORD(lParam));
 
@@ -1935,6 +1938,8 @@ void CGameFramework::ProcessInput()
 				&& !m_pPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[4].m_bEnable
 				&& !m_pPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[5].m_bEnable) {
 				if ((pKeysBuffer[VK_NUMPAD1] & 0xF0) || (pKeysBuffer['1'] & 0xF0)) {
+					if (m_pPlayer->m_mp - m_pPlayer->m_lv * 40 < 0)
+						return;
 					switch (my_job)
 					{
 					case J_DILLER:
@@ -1966,6 +1971,8 @@ void CGameFramework::ProcessInput()
 				&& !m_pPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[3].m_bEnable
 				&& !m_pPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[5].m_bEnable) {
 				if ((pKeysBuffer[VK_NUMPAD2] & 0xF0) || (pKeysBuffer['2'] & 0xF0)) {     //
+					if (m_pPlayer->m_mp - m_pPlayer->m_lv * 40 < 0)
+						return;
 					switch (my_job)
 					{
 					case J_DILLER:
@@ -1997,6 +2004,8 @@ void CGameFramework::ProcessInput()
 				&& !m_pPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[3].m_bEnable
 				&& !m_pPlayer->m_pSkinnedAnimationController->m_pAnimationTracks[4].m_bEnable) {
 				if ((pKeysBuffer[VK_NUMPAD3] & 0xF0) || (pKeysBuffer['3'] & 0xF0)) {     //   3
+					if (m_pPlayer->m_mp - m_pPlayer->m_lv * 40 < 0)
+						return;
 					switch (my_job)
 					{
 					case J_DILLER:
