@@ -1063,7 +1063,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
 
                     Coord d1 = { pl->get_x() + pl->get_right_x() * 10, pl->get_z() + pl->get_right_z() * 10 };
                     Coord e1 = { (pl->get_x() + pl->get_right_x() * 10) + pl->get_look_x() * 140
-                        , (pl->get_z() + pl->get_right_z() * 10) + pl->get_look_x() * 50 };
+                        , (pl->get_z() + pl->get_right_z() * 10) + pl->get_look_x() * 140 };
                     Coord f1 = { (pl->get_x() + pl->get_right_x() * -10) + pl->get_look_x() * 140,
                    (pl->get_z() + pl->get_right_z() * -10) + pl->get_look_z() * 140, };
 
