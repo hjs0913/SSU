@@ -805,29 +805,37 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			int tmp_hp = 0;
 			int target_player = 0;
 			for (int i = 0; i < GAIA_ROOM; ++i) {   // ³·Àº Ã¼·Â ÇÃ·¹ÀÌ¾î Ã£±â 
-				if (i == 0) {
-					target_player = i;
-					tmp_hp = gaia->get_party_palyer()[i]->get_hp();
-				}
-				else {
-					if (tmp_hp > gaia->get_party_palyer()[i]->get_hp()) {
+				if (gaia->get_party_palyer()[target_player]->get_state() == ST_DEAD)
+					continue;
+
+					if (i == 0) {
 						target_player = i;
 						tmp_hp = gaia->get_party_palyer()[i]->get_hp();
+
 					}
-				}
+					else {
+						if (tmp_hp > gaia->get_party_palyer()[i]->get_hp()) {
+							target_player = i;
+							tmp_hp = gaia->get_party_palyer()[i]->get_hp();
+						}
+					}
+				
 			}
 			skill_check = true;
-			pa->set_mp(pa->get_mp() - 1000);
-			send_buff_ui_packet(gaia->get_party_palyer()[target_player], 2); //ui
+			if (gaia->get_party_palyer()[target_player]->get_state() != ST_DEAD) {
+				pa->set_mp(pa->get_mp() - 1000);
+				send_buff_ui_packet(gaia->get_party_palyer()[target_player], 2); //ui
 
-			if (gaia->get_party_palyer()[target_player]->get_hp() + gaia->get_party_palyer()[target_player]->get_maxhp() / 10 >= gaia->get_party_palyer()[target_player]->get_maxhp())
-				gaia->get_party_palyer()[target_player]->set_hp(gaia->get_party_palyer()[target_player]->get_maxhp());
-			else
-				gaia->get_party_palyer()[target_player]->set_hp(gaia->get_party_palyer()[target_player]->get_hp() + gaia->get_party_palyer()[target_player]->get_maxhp() / 10);
-			for (int i = 0; i < GAIA_ROOM; ++i) {
-				send_change_hp_packet(gaia->get_party_palyer()[i], gaia->get_party_palyer()[target_player], 0);
+
+				if (gaia->get_party_palyer()[target_player]->get_hp() + gaia->get_party_palyer()[target_player]->get_maxhp() / 10 >= gaia->get_party_palyer()[target_player]->get_maxhp())
+					gaia->get_party_palyer()[target_player]->set_hp(gaia->get_party_palyer()[target_player]->get_maxhp());
+				else
+					gaia->get_party_palyer()[target_player]->set_hp(gaia->get_party_palyer()[target_player]->get_hp() + gaia->get_party_palyer()[target_player]->get_maxhp() / 10);
+
+				for (int i = 0; i < GAIA_ROOM; ++i) {
+					send_change_hp_packet(gaia->get_party_palyer()[i], gaia->get_party_palyer()[target_player], 0);
+				}
 			}
-
 			ev.obj_id = _id;
 			ev.start_time = chrono::system_clock::now() + 5s;  //ÄðÅ¸ÀÓ
 			ev.ev = EVENT_PARTNER_SKILL;
@@ -860,29 +868,34 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			int tmp_mp = 0;
 			int target_player = 0;
 			for (int i = 0; i < GAIA_ROOM; ++i) {   // ³·Àº ¸¶³ª ÇÃ·¹ÀÌ¾î Ã£±â 
-				if (i == 0) {
-					target_player = i;
-					tmp_mp = gaia->get_party_palyer()[i]->get_mp();
-				}
-				else {
-					if (tmp_mp > gaia->get_party_palyer()[i]->get_mp()) {
+				if (gaia->get_party_palyer()[i]->get_mp() > 0) {
+					if (gaia->get_party_palyer()[target_player]->get_state() == ST_DEAD)
+						continue;
+					if (i == 0) {
 						target_player = i;
 						tmp_mp = gaia->get_party_palyer()[i]->get_mp();
+					}
+					else {
+						if (tmp_mp > gaia->get_party_palyer()[i]->get_mp()) {
+							target_player = i;
+							tmp_mp = gaia->get_party_palyer()[i]->get_mp();
+						}
 					}
 				}
 			}
 			skill_check = true;
-			pa->set_mp(pa->get_mp() - 1000);
-			send_buff_ui_packet(gaia->get_party_palyer()[target_player], 0); //ui
-			if(gaia->get_party_palyer()[target_player]->get_mp() + gaia->get_party_palyer()[target_player]->get_maxmp() / 10 >= gaia->get_party_palyer()[target_player]->get_maxmp())
-				gaia->get_party_palyer()[target_player]->set_mp(gaia->get_party_palyer()[target_player]->get_maxmp());
-			else
-				gaia->get_party_palyer()[target_player]->set_mp(gaia->get_party_palyer()[target_player]->get_mp() + gaia->get_party_palyer()[target_player]->get_maxmp() / 10);
-	
-			for (int i = 0; i < GAIA_ROOM; ++i) {
-				send_change_mp_packet(gaia->get_party_palyer()[i], gaia->get_party_palyer()[target_player]); 
-			}
+			if (gaia->get_party_palyer()[target_player]->get_state() != ST_DEAD) {
+				pa->set_mp(pa->get_mp() - 1000);
+				send_buff_ui_packet(gaia->get_party_palyer()[target_player], 0); //ui
+				if (gaia->get_party_palyer()[target_player]->get_mp() + gaia->get_party_palyer()[target_player]->get_maxmp() / 10 >= gaia->get_party_palyer()[target_player]->get_maxmp())
+					gaia->get_party_palyer()[target_player]->set_mp(gaia->get_party_palyer()[target_player]->get_maxmp());
+				else
+					gaia->get_party_palyer()[target_player]->set_mp(gaia->get_party_palyer()[target_player]->get_mp() + gaia->get_party_palyer()[target_player]->get_maxmp() / 10);
 
+				for (int i = 0; i < GAIA_ROOM; ++i) {
+					send_change_mp_packet(gaia->get_party_palyer()[i], gaia->get_party_palyer()[target_player]);
+				}
+			}
 			ev.obj_id = _id;
 			ev.start_time = chrono::system_clock::now() + 5s;  //ÄðÅ¸ÀÓ
 			ev.ev = EVENT_PARTNER_SKILL;
@@ -901,9 +914,12 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			cout << "Àü±¤¼®È­" << endl;
 
 			skill_check = true;
+
 			for (int i = 0; i < GAIA_ROOM; ++i) {
-				gaia->get_party_palyer()[i]->attack_speed_up = 1;
-				send_buff_ui_packet(gaia->get_party_palyer()[i], 4); 
+				if (gaia->get_party_palyer()[i]->get_state() != ST_DEAD) {
+					gaia->get_party_palyer()[i]->attack_speed_up = 1;
+					send_buff_ui_packet(gaia->get_party_palyer()[i], 4);
+				}
 			}
 			pa->set_mp(pa->get_mp() - 1000);
 
