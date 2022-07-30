@@ -70,13 +70,13 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
             if (strcmp(reinterpret_cast<Player*>(p)->get_login_id(), packet->id) == 0) {
                 cout << "중복된 아이디 접속 확인" << endl;
                 send_login_fail_packet(pl, 1);   // 중복 로그인
-                m_ObjectManger->Disconnect(client_id);
+               // m_ObjectManger->Disconnect(client_id);
                 return;
             }
             if (strcmp(reinterpret_cast<Player*>(p)->get_name(), packet->name) == 0) {
                 cout << "중복된 닉네임 접속 확인" << endl;
                 send_login_fail_packet(pl, 1);   // 중복 로그인
-                m_ObjectManger->Disconnect(client_id);
+               // m_ObjectManger->Disconnect(client_id);
                 return;
             }
 
@@ -150,6 +150,8 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 pl->_auto_hp = true;
             }
         }
+        else pl->_auto_hp = false;
+
         if(login == true) send_login_ok_packet(pl);
         pl->state_lock.lock();
         pl->set_state(ST_INGAME);
@@ -367,7 +369,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
         break;
     }
     case CS_PACKET_SKILL:{
-        if (pl->get_mp() - pl->get_lv() * 10 < 0)  //mp없으면 안됨 
+        if (pl->get_mp() - pl->get_lv() * 40 < 0)  //mp없으면 안됨 
             return;
         pl->state_lock.lock();
         if (pl->get_state() == ST_DEAD || pl->get_state() == ST_FREE) {
@@ -394,7 +396,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 {
                 case 0: { //물리 공격스킬 중 0번 스킬 -> 십자공격 어택 
                     skill_cooltime(client_id, chrono::system_clock::now() + 3s, 0);
-                    pl->set_mp(pl->get_mp() - pl->get_lv() * 10);
+                    pl->set_mp(pl->get_mp() - pl->get_lv() * 40);
                     send_status_change_packet(pl);
                     if (!pl->join_dungeon_room) {
                         for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
@@ -406,7 +408,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                             players[i]->state_lock.unlock();
 
 
-                            if ((players[i]->get_x() >= pl->get_x() - 10 && players[i]->get_x() <= pl->get_x() + 10) && (players[i]->get_z() >= pl->get_z() - 10 && players[i]->get_z() <= pl->get_z() + 10)) {
+                            if ((players[i]->get_x() >= pl->get_x() - 30 && players[i]->get_x() <= pl->get_x() + 30) && (players[i]->get_z() >= pl->get_z() - 30 && players[i]->get_z() <= pl->get_z() + 30)) {
                                 pl->set_skill_factor(packet->skill_type, packet->skill_num);
                                 pl->phisical_skill_success(players[i], pl->get_skill_factor(packet->skill_type, packet->skill_num));
 
@@ -438,7 +440,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                         int indun_id = pl->get_indun_id();
                         Gaia* indun = m_ObjectManger->get_dungeon(indun_id);
                         Npc* bos = indun->boss;
-                        if ((bos->get_x() >= pl->get_x() - 10 && bos->get_x() <= pl->get_x() + 10) && (bos->get_z() >= pl->get_z() - 10 && bos->get_z() <= pl->get_z() + 10)) {
+                        if ((bos->get_x() >= pl->get_x() - 30 && bos->get_x() <= pl->get_x() + 30) && (bos->get_z() >= pl->get_z() - 30 && bos->get_z() <= pl->get_z() + 30)) {
                             pl->set_skill_factor(0, 0);
                             float give_damage = pl->get_physical_attack() * pl->get_skill_factor(0, 0);
                             float defence_damage = (bos->get_defence_factor() *
@@ -470,12 +472,12 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                     skill_cooltime(client_id, chrono::system_clock::now() + 3s, 1);
 
                     Coord a = { pl->get_x(), pl->get_z() };    //플레이어 기준 전방 삼각형 범위 
-                    Coord b = { pl->get_x() - pl->get_right_x() * 40 + pl->get_look_x() * 100,
-                        pl->get_z() - pl->get_right_z() * 40 + pl->get_look_z() * 100 };  // 왼쪽 위
-                    Coord c = { pl->get_x() + pl->get_right_x() * 40 + pl->get_look_x() * 100,
-                        pl->get_z() + pl->get_right_z() * 40 + pl->get_look_z() * 100 };  // 오른쪽 위
+                    Coord b = { pl->get_x() - pl->get_right_x() * 30 + pl->get_look_x() * 70,
+                        pl->get_z() - pl->get_right_z() * 30 + pl->get_look_z() * 70 };  // 왼쪽 위
+                    Coord c = { pl->get_x() + pl->get_right_x() * 30 + pl->get_look_x() * 70,
+                        pl->get_z() + pl->get_right_z() * 30 + pl->get_look_z() * 70 };  // 오른쪽 위
 
-                    pl->set_mp(pl->get_mp() - pl->get_lv() * 10);
+                    pl->set_mp(pl->get_mp() - pl->get_lv() * 40);
                     send_status_change_packet(pl);
                     if (!pl->join_dungeon_room) {
                         for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
@@ -550,7 +552,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 case 0:
                     skill_cooltime(client_id, chrono::system_clock::now() + 10s, 2);
 
-                    pl->set_mp(pl->get_mp() - pl->get_lv() * 10);
+                    pl->set_mp(pl->get_mp() - pl->get_lv() * 40);
                     send_buff_ui_packet(pl, 3); //ui
                     pl->set_physical_attack(0.6 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv()); //일단 두배 
                     pl->set_magical_attack(0.2 * pl->get_lv() * pl->get_lv() + 5 * pl->get_lv());
@@ -575,7 +577,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                     skill_cooltime(client_id, chrono::system_clock::now() + 3s, 0);
 
 
-                    pl->set_mp(pl->get_mp() - pl->get_lv() * 10);
+                    pl->set_mp(pl->get_mp() - pl->get_lv() * 40);
                     send_status_change_packet(pl);
                     if (!pl->join_dungeon_room) {
                         for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
@@ -630,7 +632,13 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                     bos->get_physical_defence()));
                             float damage = give_damage * (1 - defence_damage);
                             if (bos->get_hp() > 0) {
+                                int m_x = 2037;
+                                int m_z = 2112;
+                                float r = 515.f;
+
+                                if (sqrt(pow((bos->get_x() + pl->get_look_x() * 100 - m_x), 2) + pow((bos->get_z() + pl->get_look_z() * 100 - m_z), 2)) < r)
                                 bos->set_pos(indun->boss->get_x() + pl->get_look_x() * 100, indun->boss->get_z() + pl->get_look_z() * 100);
+                         
                                 bos->set_hp(indun->boss->get_hp() - damage);
                                 //send_move_packet(pl, dungeons[client_id]->boss, 1);  //나중에 수정필요 
                                 for (int i = 0; i < GAIA_ROOM; ++i) {
@@ -653,7 +661,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 case 0:   //어그로
                     skill_cooltime(client_id, chrono::system_clock::now() + 3s, 1);
 
-                    pl->set_mp(pl->get_mp() - pl->get_lv() * 10);
+                    pl->set_mp(pl->get_mp() - pl->get_lv() * 40);
                     send_status_change_packet(pl);
                     if (!pl->join_dungeon_room) {
                         for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
@@ -701,7 +709,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 case 0:
                     skill_cooltime(client_id, chrono::system_clock::now() + 10s, 2);
 
-                    pl->set_mp(pl->get_mp() - pl->get_lv() * 10);
+                    pl->set_mp(pl->get_mp() - pl->get_lv() * 40);
                     send_buff_ui_packet(pl, 1);
                     pl->set_physical_defence(0.54 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv()); //일단 두배 
                     pl->set_magical_defence(0.4 * pl->get_lv() * pl->get_lv() + 10 * pl->get_lv());
@@ -726,7 +734,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 case 0: {// 사각형 내부 범위 플레이어 hp 회복  
                     skill_cooltime(client_id, chrono::system_clock::now() + 5s, 0);
 
-                    pl->set_mp(pl->get_mp() - pl->get_lv() * 10);
+                    pl->set_mp(pl->get_mp() - pl->get_lv() * 40);
                     send_status_change_packet(pl);
 
                     if (!pl->join_dungeon_room) {
@@ -761,7 +769,6 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                 }
                             }
                         }
-                        pl->set_mp(pl->get_mp() - pl->get_lv() * 10);
                         send_status_change_packet(pl);
                         send_buff_ui_packet(indun->get_party_palyer()[target_player], 2); //ui
                         indun->get_party_palyer()[target_player]->set_hp(indun->get_party_palyer()[target_player]->get_hp() + indun->get_party_palyer()[target_player]->get_maxhp() / 10);
@@ -782,7 +789,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 case 0: {  //mp회복 
                     skill_cooltime(client_id, chrono::system_clock::now() + 5s, 1);
 
-                    pl->set_mp(pl->get_mp() - pl->get_lv() * 10);
+                    pl->set_mp(pl->get_mp() - pl->get_lv() * 40);
                     send_status_change_packet(pl);
 
                     if (!pl->join_dungeon_room) {
@@ -818,7 +825,6 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                                 }
                             }
                         }
-                        pl->set_mp(pl->get_mp() - 1000);
                         send_status_change_packet(pl);
                         send_buff_ui_packet(indun->get_party_palyer()[target_player], 0); //ui
                         indun->get_party_palyer()[target_player]->set_mp(indun->get_party_palyer()[target_player]->get_mp() + indun->get_party_palyer()[target_player]->get_maxmp() / 10);
@@ -839,7 +845,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 case 0: {//공속 
                     skill_cooltime(client_id, chrono::system_clock::now() + 5s, 2);
 
-                    pl->set_mp(pl->get_mp() - pl->get_lv() * 10);
+                    pl->set_mp(pl->get_mp() - pl->get_lv() * 40);
                     send_status_change_packet(pl);
 
                     if (!pl->join_dungeon_room) {
@@ -895,7 +901,8 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 switch ((int)packet->skill_num) {
                 case 0:// hp희생해 상대 hp를 mp로 흡수 
                     skill_cooltime(client_id, chrono::system_clock::now() + 5s, 0);
-                    pl->set_hp(pl->get_hp() - 300);
+
+                    pl->set_hp(pl->get_hp() - pl->get_lv() * 40);
                     send_status_change_packet(pl);
 
                     if (!pl->join_dungeon_room) {
@@ -965,9 +972,8 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 {
                 case 0: {
                     skill_cooltime(client_id, chrono::system_clock::now() + 5s, 1);
-                    send_play_shoot_packet(pl);
-
-                    pl->set_mp(pl->get_mp() - 1500);
+                //    send_play_shoot_packet(pl);
+                    pl->set_mp(pl->get_mp() - pl->get_lv() * 40);
                     send_status_change_packet(pl);
                     //좌우 삼각형 두개로 사각형 범위 ?
                     Coord a = { pl->get_x() + pl->get_right_x() * -30, pl->get_z() + pl->get_right_z() * -30 };
@@ -1052,7 +1058,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 case 0:
                     skill_cooltime(client_id, chrono::system_clock::now() + 5s, 2);
                     // send_play_shoot_packet(pl); 다른 걸로 
-                    pl->set_mp(pl->get_mp() - 1500);
+                    pl->set_mp(pl->get_mp() - pl->get_lv() * 40);
                     send_status_change_packet(pl);
 
                     Coord a1 = { pl->get_x() + pl->get_right_x() * -10, pl->get_z() + pl->get_right_z() * -10 };
@@ -1236,7 +1242,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 ev.obj_id = client_id;
                 ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
                 ev.ev = EVENT_SKILL_COOLTIME;
-                ev.target_id = 0; // packet->target;
+                ev.target_id = 1; // packet->target;
                 TimerManager::timer_queue.push(ev);
 
 
@@ -1246,8 +1252,19 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 int taget = packet->target;// -9615;
 
 
-                players[taget]->set_mp(players[taget]->get_mp() + players[taget]->get_maxmp() / 10);
-                send_status_change_packet(reinterpret_cast<Player*>(players[taget]));
+
+                if (!pl->join_dungeon_room) {
+                }
+
+                else {
+                    int indun_id = pl->get_indun_id();
+                    players[taget]->set_mp(players[taget]->get_mp() + players[taget]->get_maxmp() / 10);
+                    Gaia* indun = m_ObjectManger->get_dungeon(indun_id);
+                    for (int i = 0; i < GAIA_ROOM; ++i) {
+                        send_change_mp_packet(indun->get_party_palyer()[i], players[taget]);
+                    }
+                }
+                
 
                 send_buff_ui_packet(reinterpret_cast<Player*>(players[taget]), 0);
                 break;
@@ -1262,7 +1279,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 ev.obj_id = client_id;
                 ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
                 ev.ev = EVENT_SKILL_COOLTIME;
-                ev.target_id = 1; //packet->target;
+                ev.target_id = 2; //packet->target;
                 TimerManager::timer_queue.push(ev);
 
                 pl->set_mp(pl->get_mp() - 1000);
@@ -1286,16 +1303,24 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 ev.obj_id = client_id;
                 ev.start_time = chrono::system_clock::now() + 5s;  //쿨타임
                 ev.ev = EVENT_SKILL_COOLTIME;
-                ev.target_id = 2;// packet->target;
+                ev.target_id = 0;// packet->target;
                 TimerManager::timer_queue.push(ev);
 
                 pl->set_mp(pl->get_mp() - 1000);
                 send_status_change_packet(pl);
 
                 int taget = packet->target;// - 9615;
+                if (!pl->join_dungeon_room) {
+                }
 
-                players[taget]->set_hp(players[taget]->get_hp() + players[taget]->get_maxhp() / 10);
-                send_status_change_packet(reinterpret_cast<Player*>(players[taget]));
+                else {
+                    int indun_id = pl->get_indun_id();
+                    players[taget]->set_hp(players[taget]->get_hp() + players[taget]->get_maxhp() / 10);
+                    Gaia* indun = m_ObjectManger->get_dungeon(indun_id);
+                    for (int i = 0; i < GAIA_ROOM; ++i) {
+                        send_change_hp_packet(indun->get_party_palyer()[i], players[taget], 0);
+                    }
+                }
                 send_buff_ui_packet(reinterpret_cast<Player*>(players[taget]), 2);
                 break;
 
@@ -1659,13 +1684,13 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
             if (strcmp(reinterpret_cast<Player*>(p)->get_login_id(), packet->id) == 0) {
                 cout << "중복된 아이디 접속 확인" << endl;
                 send_login_fail_packet(pl, 1);   // 중복 로그인
-                m_ObjectManger->Disconnect(client_id);
+               // m_ObjectManger->Disconnect(client_id);
                 return;
             }
             if (strcmp(reinterpret_cast<Player*>(p)->get_name(), packet->name) == 0) {
                 cout << "중복된 닉네임 접속 확인" << endl;
                 send_login_fail_packet(pl, 1);   // 중복 로그인
-                m_ObjectManger->Disconnect(client_id);
+               // m_ObjectManger->Disconnect(client_id);
                 return;
             }
 
@@ -1751,6 +1776,8 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 reinterpret_cast<Player*>(players[client_id])->_auto_hp = true;
             }
         }
+        else pl->_auto_hp = false;
+
         if (login == true)
             send_login_ok_packet(pl);
         else if (DB_On == false && login == false) {
