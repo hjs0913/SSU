@@ -7,7 +7,7 @@
 #include "Scene.h"
 #include "Network.h"
 
-#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console") //夔樂 嗥辦濠 
+//#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console") //夔樂 嗥辦濠 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 

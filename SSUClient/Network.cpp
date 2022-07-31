@@ -386,7 +386,7 @@ void process_packet(unsigned char* p)
 	
 
 		// 플레이어의 모든 정보를 보내주자
-		cout << "로그인 성공" << endl;
+		//cout << "로그인 성공" << endl;
 		sc_packet_login_ok* packet = reinterpret_cast<sc_packet_login_ok*>(p);
 		my_id = packet->id;
 		my_position.x = packet->x;
