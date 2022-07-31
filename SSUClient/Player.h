@@ -76,7 +76,9 @@ public:
 
 	DWORD						dwDir = 0;
 	bool						m_bIsDamaged = false;
-	int							m_nDamage = 0;
+	int							m_nDamage1 = 0;
+	int							m_nDamage2 = 0;
+	int							m_nDamage3 = 0;
 	UILayer						**m_ppUILayer = NULL;
 	int							m_nDamageTime = 0;
 	int							m_nDamageCnt = 0;

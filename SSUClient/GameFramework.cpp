@@ -1849,7 +1849,10 @@ void CGameFramework::Release_OpenWorld_Object()
 	if (m_pPlayer) m_pPlayer->Release();
 
 	if (m_pScene) m_pScene->ReleaseObjects();
-	if (m_pScene) delete m_pScene;
+	if (m_pScene) {
+		delete m_pScene;
+		m_pScene = NULL;
+	}
 }
 
 void CGameFramework::Release_InDungeon_Object()
@@ -1857,8 +1860,12 @@ void CGameFramework::Release_InDungeon_Object()
 	if (m_pPlayer) m_pPlayer->Release();
 
 	if (m_pRaid_Scene) m_pRaid_Scene->ReleaseObjects();
-	if (m_pRaid_Scene) delete m_pRaid_Scene;
+	if (m_pRaid_Scene) {
+		delete m_pRaid_Scene;
+		m_pRaid_Scene = NULL;
+	}
 }
+
 void CGameFramework::Release_Login_Object()
 {
 	if (m_pPlayer) m_pPlayer->Release();
@@ -2669,7 +2676,7 @@ void CGameFramework::FrameAdvance()
 	if (!vectorDamageID1.empty()) {	// 비어있지 않으면
 		if (++(m_pPlayer->m_ppUILayer[0]->m_DamageTime) < 30) {
 			reinterpret_cast<Damage_UI*>(m_pPlayer->m_ppUILayer[0])->Resize(vectorDamageID1.size());
-			reinterpret_cast<Damage_UI*>(m_pPlayer->m_ppUILayer[0])->UpdateLabels(m_pCamera, vectorDamageID1);
+			reinterpret_cast<Damage_UI*>(m_pPlayer->m_ppUILayer[0])->UpdateLabels(m_pCamera, vectorDamageID1, m_pPlayer->m_ppUILayer[0]->m_DamageTime, 0);
 			m_pPlayer->m_ppUILayer[0]->Render(m_nSwapChainBufferIndex);
 		}
 		else {
@@ -2681,7 +2688,7 @@ void CGameFramework::FrameAdvance()
 	if (!vectorDamageID2.empty()) {	// 비어있지 않으면
 		if (++(m_pPlayer->m_ppUILayer[1]->m_DamageTime) < 30) {
 			reinterpret_cast<Damage_UI*>(m_pPlayer->m_ppUILayer[1])->Resize(vectorDamageID2.size());
-			reinterpret_cast<Damage_UI*>(m_pPlayer->m_ppUILayer[1])->UpdateLabels(m_pCamera, vectorDamageID2);
+			reinterpret_cast<Damage_UI*>(m_pPlayer->m_ppUILayer[1])->UpdateLabels(m_pCamera, vectorDamageID2, m_pPlayer->m_ppUILayer[1]->m_DamageTime, 1);
 			m_pPlayer->m_ppUILayer[1]->Render(m_nSwapChainBufferIndex);
 		}
 		else {
@@ -2693,7 +2700,7 @@ void CGameFramework::FrameAdvance()
 	if (!vectorDamageID3.empty()) {	// 비어있지 않으면
 		if (++(m_pPlayer->m_ppUILayer[2]->m_DamageTime) < 30) {
 			reinterpret_cast<Damage_UI*>(m_pPlayer->m_ppUILayer[2])->Resize(vectorDamageID3.size());
-			reinterpret_cast<Damage_UI*>(m_pPlayer->m_ppUILayer[2])->UpdateLabels(m_pCamera, vectorDamageID3);
+			reinterpret_cast<Damage_UI*>(m_pPlayer->m_ppUILayer[2])->UpdateLabels(m_pCamera, vectorDamageID3, m_pPlayer->m_ppUILayer[2]->m_DamageTime, 2);
 			m_pPlayer->m_ppUILayer[2]->Render(m_nSwapChainBufferIndex);
 		}
 		else {
