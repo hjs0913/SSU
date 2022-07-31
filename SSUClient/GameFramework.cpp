@@ -2294,7 +2294,7 @@ void CGameFramework::FrameAdvance()
 		}
 		case 5: {
 			m_ppUILayer[i]->UpdateLabels(L"Exp", 0, m_nWndClientHeight - 20,	// x0, y0
-				((float)m_pPlayer->m_exp / (100 * (m_pPlayer->m_lv * m_pPlayer->m_lv)) * m_nWndClientWidth, m_nWndClientHeight); // x1, y1
+				((float)m_pPlayer->m_exp / (100 * (m_pPlayer->m_lv * m_pPlayer->m_lv))) * m_nWndClientWidth, m_nWndClientHeight); // x1, y1
 			break;
 		}
 		case 6: {
