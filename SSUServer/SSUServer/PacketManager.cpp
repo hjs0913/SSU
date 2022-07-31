@@ -1634,19 +1634,41 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
             partner->set_x(2100);
             partner->set_y(0);
             partner->set_z(1940);
-            partner->set_maxmp(10000);
-            partner->set_maxhp(10000);
-            partner->set_hp(500);
-            partner->set_mp(8000);
+
             partner->set_job(static_cast<JOB>(packet->job));
-            partner->set_lv(25);
+            partner->set_lv(35);
+
+            switch (partner->get_job()) {
+            case J_DILLER: {
+                Diller::Initialize(partner);
+                break;
+            }
+            case J_TANKER: {
+                Tanker::Initialize(partner);
+                break;
+            }
+            case J_MAGICIAN: {
+                Magician::Initialize(partner);
+                break;
+            }
+            case J_SUPPORTER: {
+                Supporter::Initialize(partner);
+                break;
+            }
+            }
+
+            /*partner->set_maxhp(10000);
+            partner->set_maxmp(10000);
+            partner->set_hp(1000);
+            partner->set_mp(partner->get_maxmp());
             partner->set_physical_attack(0.3 * 25 * 25 + 10 * 25);
             partner->set_magical_attack(0.1 * 25 * 25 + 5 * 25);
             partner->set_physical_defence(0.24 * 25 * 25 + 10 * 25);
             partner->set_magical_defence(0.17 * 25 * 25 + 10 * 25);
             partner->set_basic_attack_factor(50.0f);
-            partner->set_defence_factor(0.0002);
-            partner->set_element(E_WATER);
+            partner->set_defence_factor(0.0002);*/
+            
+            partner->set_element(players[client_id]->get_element());
 
             partner->set_origin_physical_attack(partner->get_physical_attack());
             partner->set_origin_magical_attack(partner->get_magical_attack());
