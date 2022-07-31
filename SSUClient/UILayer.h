@@ -268,6 +268,6 @@ public:
     Damage_UI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor);
    
     ~Damage_UI();
-    void UpdateLabels(CCamera* camera, vector<int> vector);
+    void UpdateLabels(CCamera* camera, vector<int> vector, int time, int damageIndex);
     void Resize(UINT nFrame);
 };
