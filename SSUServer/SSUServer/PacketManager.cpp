@@ -158,6 +158,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
         pl->state_lock.unlock();
 
         m_SectorManager->player_put(pl);
+        Save_position(pl);
 
         break;
     }
@@ -1035,7 +1036,6 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                         Npc* bos = indun->boss;
                         Coord gaia_pos = { bos->get_x(),bos->get_z() };
                         if (isInsideTriangle(a, b, c, gaia_pos) || isInsideTriangle(d, e, f, gaia_pos)) {
-                            cout << "플레이어 메테오 " << endl;
                             pl->set_skill_factor(1, 1);
                             pl->magical_skill_success(bos, pl->get_skill_factor(1, 1));
                             send_play_effect_packet(pl, bos); // 이펙트 터트릴 위치 
@@ -1812,7 +1812,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
         pl->state_lock.unlock();
 
         m_SectorManager->player_put(pl);
-
+        Save_position(pl);
         break;
     }
     default:
