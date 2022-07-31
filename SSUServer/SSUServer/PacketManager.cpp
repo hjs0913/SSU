@@ -491,8 +491,8 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                             Coord n = { players[i]->get_x(), players[i]->get_z() };
 
                             if (isInsideTriangle(a, b, c, n)) {
-                                pl->set_skill_factor(packet->skill_type, packet->skill_num);
-                                pl->magical_skill_success(players[i], pl->get_skill_factor(packet->skill_type, packet->skill_num));
+                                pl->set_skill_factor(0, 1);
+                                pl->phisical_skill_success(players[i], pl->get_skill_factor(0, 1));
 
                                 players[i]->state_lock.lock();
                                 if (players[i]->get_state() == ST_DEAD) {
@@ -523,11 +523,11 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                         Coord n = { bos->get_x(), bos->get_z() };
 
                         if (isInsideTriangle(a, b, c, n)) {
-                            pl->set_skill_factor(1, 0);
-                            float give_damage = pl->get_magical_attack() * pl->get_skill_factor(1, 0);
+                            pl->set_skill_factor(0, 1);
+                            float give_damage = pl->get_physical_attack() * pl->get_skill_factor(0, 1);
                             float defence_damage = (bos->get_defence_factor() *
-                                bos->get_magical_defence()) / (1 + (bos->get_defence_factor() *
-                                    bos->get_magical_defence()));
+                                bos->get_physical_defence()) / (1 + (bos->get_defence_factor() *
+                                    bos->get_physical_defence()));
                             float damage = give_damage * (1 - defence_damage);
                             if (bos->get_hp() > 0) {
                                 bos->set_hp(bos->get_hp() - damage);
@@ -626,6 +626,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                         if ((bos->get_x() >= pl->get_x() - 15 && bos->get_x() <= pl->get_x() + 15) &&
                             (bos->get_z() >= pl->get_z() - 15 && bos->get_z() <= pl->get_z() + 15)) {
                             pl->set_skill_factor(0, 0);
+
                             float give_damage = pl->get_physical_attack() * pl->get_skill_factor(0, 0);
                             float defence_damage = (bos->get_defence_factor() *
                                 bos->get_physical_defence()) / (1 + (bos->get_defence_factor() *
