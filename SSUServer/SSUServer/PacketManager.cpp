@@ -158,6 +158,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
         pl->state_lock.unlock();
 
         m_SectorManager->player_put(pl);
+        Save_position(pl);
 
         break;
     }
@@ -1812,7 +1813,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
         pl->state_lock.unlock();
 
         m_SectorManager->player_put(pl);
-
+        Save_position(pl);
         break;
     }
     default:
