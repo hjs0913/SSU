@@ -367,7 +367,6 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 
 			pa->set_mp(pa->get_mp() - pa->get_lv() * 10);
 			if ((gaia->boss->get_x() >= pa->get_x() - 30 && gaia->boss->get_x() <= pa->get_x() + 30) && (gaia->boss->get_z() >= pa->get_z() - 30 && gaia->boss->get_z() <= pa->get_z() + 30)) {
-				cout << "È¸ÀüÈ¸¿À¸®" << endl;
 				skill_check = true;
 				pa->set_skill_factor(0, 0);
 
@@ -422,7 +421,6 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 
 
 			if (isInsideTriangle(a, b, c, n)) {
-				cout << "ÃÖÈÄÀÇ ÀÏ°Ý" << endl;
 				skill_check = true;
 				pa->set_skill_factor(1, 0);
 				float give_damage = pa->get_magical_attack() * pa->get_skill_factor(1, 0);
@@ -457,7 +455,6 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			break;
 		}
 		case 2: {
-			cout << "µé²ú´Â ÇÇ" << endl;
 
 			skill_check = true;
 			pa->set_mp(pa->get_mp() - pa->get_lv() * 10);
@@ -502,7 +499,6 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			pa->set_mp(pa->get_mp() - pa->get_lv() * 10);
 
 			if ((gaia->boss->get_x() >= pa->get_x() - 20 && gaia->boss->get_x() <= pa->get_x() + 20) && (gaia->boss->get_z() >= pa->get_z() - 20 && gaia->boss->get_z() <= pa->get_z() + 20)) {
-				cout << "¹æÆÐ ¹ÐÄ¡±â" << endl;
 				skill_check = true;
 				pa->set_skill_factor(0, 0);
 				float give_damage = pa->get_physical_attack() * pa->get_skill_factor(0, 0);
@@ -552,7 +548,6 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			pa->set_mp(pa->get_mp() - pa->get_lv() * 10);
 	
 			if ((gaia->boss->get_x() >= pa->get_x() - 40 && gaia->boss->get_x() <= pa->get_x() + 40) && (gaia->boss->get_z() >= pa->get_z() - 40 && gaia->boss->get_z() <= pa->get_z() + 40)) {
-				cout << "³ª¸¦ µû¸£¶ó" << endl;
 				skill_check = true;
 				pa->set_skill_factor(1, 0);
 
@@ -579,7 +574,6 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			break;
 		}
 		case 2: {  //ÀÚ±â ¹æ¾î·Â Áõ°¡ 
-			cout << "°©¿Ê µÐ°©" << endl;
 
 			skill_check = true;
 			pa->set_mp(pa->get_mp() - 1000);
@@ -622,7 +616,6 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			pa->set_hp(pa->get_hp() - pa->get_lv() * 10);
 
 			if ((gaia->boss->get_x() >= pa->get_x() - 30 && gaia->boss->get_x() <= pa->get_x() + 30) && (gaia->boss->get_z() >= pa->get_z() - 30 && gaia->boss->get_z() <= pa->get_z() + 30)) {
-				cout << "¸¶³ª µå·¹ÀÎ" << endl;
 				skill_check = true;
 				pa->set_mp(pa->get_mp() + gaia->boss->get_hp() / 10);
 				if (pa->get_mp() > pa->get_maxmp())
@@ -684,7 +677,6 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			pos n = {gaia->boss->get_x(), gaia->boss->get_z()};
 
 			if (isInsideTriangle(a, b, c, n) || isInsideTriangle(d, e, f, n)) {
-				cout << "¸ÞÅ×¿À" << endl;
 				skill_check = true;
 				pa->set_skill_factor(1, 1);
 				float give_damage = pa->get_magical_attack() * pa->get_skill_factor(1, 1);
@@ -737,7 +729,6 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			pos n = { gaia->boss->get_x(), gaia->boss->get_z() };
 
 			if (isInsideTriangle(a1, b1, c1, n) || isInsideTriangle(d1, e1, f1, n)) {
-				cout << "¿¡³ÊÁö º¼" << endl;
 				skill_check = true;
 				pa->set_skill_factor(1, 2);
 				float give_damage = pa->get_magical_attack() * pa->get_skill_factor(1, 2);
@@ -787,7 +778,6 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 		switch (p)
 		{
 		case 0: {  //hp È¸º¹ 
-			cout << "Ãµ»çÀÇ Ä¡À¯" << endl;
 
 			if (gaia->get_party_palyer()[0]->get_maxhp() == gaia->get_party_palyer()[0]->get_hp() &&
 				gaia->get_party_palyer()[1]->get_maxhp() == gaia->get_party_palyer()[1]->get_hp() &&
@@ -852,7 +842,6 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			break;
 		}
 		case 1: { //mp È¸º¹   //¿©±âÀÌ»ó 
-			cout << "¿äÁ¤ÀÇ Ãàº¹" << endl;
 
 			if (gaia->get_party_palyer()[0]->get_maxmp() == gaia->get_party_palyer()[0]->get_mp() &&
 				gaia->get_party_palyer()[1]->get_maxmp() == gaia->get_party_palyer()[1]->get_mp() &&
@@ -911,7 +900,6 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //½ºÅ³À» ÄðÅ¸ÀÓ µ¹¶§¸¶´Ù °
 			break;
 		}
 		case 2: { // °ø¼Ó ¿Ã¸®±â 
-			cout << "Àü±¤¼®È­" << endl;
 
 			skill_check = true;
 

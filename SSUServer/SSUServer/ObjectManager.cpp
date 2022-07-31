@@ -689,7 +689,6 @@ void ObjectManager::worker()
             break;
         }
         case OP_GAMESTART_TIMER: {
-            //cout << "들어오는가" << endl;
             Gaia* dun = dungeons[exp_over->_target];
             dun->game_start();
             dun->state_lock.lock();
