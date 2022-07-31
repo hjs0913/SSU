@@ -117,7 +117,7 @@ void Player::attack_dead_judge(Npc* target, float fDamage)
 
 		send_status_change_packet(this);
 
-		float max_exp = 100 * pow(2, (_lv - 1));
+		float max_exp = 100 * pow((_lv -1 ),2 );
 		if (_exp + get_exp >= max_exp) {
 			_lv += 1;
 			_exp = _exp + get_exp - max_exp;
