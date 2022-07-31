@@ -2068,15 +2068,19 @@ void CGameFramework::ProcessInput()
 			}*/
 		}
 		if (pKeysBuffer['L'] & 0xF0) {
-			m_pScene->m_pLights[1].m_xmf4Diffuse.x += 0.1f;
-			m_pScene->m_pLights[1].m_xmf4Diffuse.y += 0.1f;
-			m_pScene->m_pLights[1].m_xmf4Diffuse.z += 0.1f;
+			if (!InDungeon) {
+				m_pScene->m_pLights[1].m_xmf4Diffuse.x += 0.1f;
+				m_pScene->m_pLights[1].m_xmf4Diffuse.y += 0.1f;
+				m_pScene->m_pLights[1].m_xmf4Diffuse.z += 0.1f;
+			}
 		}
 		if (pKeysBuffer['K'] & 0xF0) {
-			if ((m_pScene->m_pLights[1].m_xmf4Diffuse.x > 0.0f) && (m_pScene->m_pLights[1].m_xmf4Diffuse.y > 0.0f) && (m_pScene->m_pLights[1].m_xmf4Diffuse.z > 0.0f)) {
-				m_pScene->m_pLights[1].m_xmf4Diffuse.x -= 0.1f;
-				m_pScene->m_pLights[1].m_xmf4Diffuse.y -= 0.1f;
-				m_pScene->m_pLights[1].m_xmf4Diffuse.z -= 0.1f;
+			if (!InDungeon) {
+				if ((m_pScene->m_pLights[1].m_xmf4Diffuse.x > 0.0f) && (m_pScene->m_pLights[1].m_xmf4Diffuse.y > 0.0f) && (m_pScene->m_pLights[1].m_xmf4Diffuse.z > 0.0f)) {
+					m_pScene->m_pLights[1].m_xmf4Diffuse.x -= 0.1f;
+					m_pScene->m_pLights[1].m_xmf4Diffuse.y -= 0.1f;
+					m_pScene->m_pLights[1].m_xmf4Diffuse.z -= 0.1f;
+				}
 			}
 		}
 
@@ -2289,7 +2293,7 @@ void CGameFramework::FrameAdvance()
 		}
 		case 5: {
 			m_ppUILayer[i]->UpdateLabels(L"Exp", 0, m_nWndClientHeight - 20,	// x0, y0
-				((float)m_pPlayer->m_exp / (100 * (m_pPlayer->m_lv * m_pPlayer->m_lv) + 200 * m_pPlayer->m_lv)) * m_nWndClientWidth, m_nWndClientHeight); // x1, y1
+				((float)m_pPlayer->m_exp / (100 * (m_pPlayer->m_lv * m_pPlayer->m_lv)) * m_nWndClientWidth, m_nWndClientHeight); // x1, y1
 			break;
 		}
 		case 6: {
@@ -2663,7 +2667,7 @@ void CGameFramework::FrameAdvance()
 		if ((i >= 32 && i <= 39) && !Join_On) continue;
 		if (i == 40 && !Fail_On) continue;
 		if (i == 41 && !Fail_On) continue;
-		//f (i == 42 && !Login_OK) continue;
+		//if (i == 42 && !Login_OK) continue;
 		if (i == 42) continue;
 		if (i == 43) {
 			if (!InDungeon) continue;
