@@ -110,7 +110,7 @@ void Player::attack_dead_judge(Npc* target, float fDamage)
 		if (target->get_tribe() == BOSS)
 			get_exp = get_exp * 2;
 		char mess[MAX_CHAT_SIZE];
-		sprintf_s(mess, MAX_CHAT_SIZE, "%sÀ» Á×¿´½À´Ï´Ù, %dÀÇ °æÇèÄ¡¸¦ È¹µæÇÕ´Ï´Ù",
+		sprintf_s(mess, MAX_CHAT_SIZE, "%sÀ»(¸¦) Á×¿´½À´Ï´Ù, %dÀÇ °æÇèÄ¡¸¦ È¹µæÇÕ´Ï´Ù",
 			target->get_name(), (int)get_exp);
 		send_chat_packet(this, _id, mess);
 		cout << mess << endl;

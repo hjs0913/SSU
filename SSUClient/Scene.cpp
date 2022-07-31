@@ -882,13 +882,13 @@ void CScene::AnimateObjects(float fTimeElapsed)
 	for (int i = 0; i < m_nGameObjects; i++) if (m_ppGameObjects[i]) m_ppGameObjects[i]->Animate(fTimeElapsed);
 	for (int i = 0; i < m_nShaders; i++) if (m_ppShaders[i]) m_ppShaders[i]->AnimateObjects(fTimeElapsed);
 
-	/*if (m_pLights)
+	if (m_pLights)
 	{
 		XMFLOAT3 Light_pos = m_pPlayer->GetPosition();
 		m_pLights[0].m_xmf3Position = XMFLOAT3(Light_pos.x, Light_pos.y, Light_pos.z);
 		
 		m_pLights[0].m_xmf3Direction = m_pPlayer->GetLookVector();
-	}*/
+	}
 }
 
 void CScene::Render(ID3D12GraphicsCommandList *pd3dCommandList, CCamera *pCamera)

@@ -1221,7 +1221,7 @@ void CGameFramework::BuildObjects_login()
 		m_ppUILayer[38]->setAlpha(1.0, 1.0);
 		m_ppUILayer[39]->setAlpha(1.0, 1.0);
 		m_ppUILayer[40]->setAlpha(0.5, 1.0);
-		m_ppUILayer[41]->setAlpha(1.0, 1.0);
+		m_ppUILayer[41]->setAlpha(0.0, 1.0);
 		m_ppUILayer[42]->setAlpha(0.0, 1.0);
 
 		m_ppUILayer[43]->setAlpha(0.0, 1.0);
@@ -1317,7 +1317,7 @@ void CGameFramework::BuildObjects_login()
 		m_ppUILayer[41]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_FLOW_DIRECTION_LEFT_TO_RIGHT);
 		reinterpret_cast<Skill_Name_UI*>(m_ppUILayer[42])->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
-			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		m_ppUILayer[43]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 
@@ -1604,7 +1604,7 @@ void CGameFramework::BuildObjects()
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 		m_ppUILayer[43]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
-			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 		// UIBar Setting
 		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, m_nWndClientHeight / 5 - 2 * (m_nWndClientHeight / 22.5) - 20,
@@ -2619,7 +2619,7 @@ void CGameFramework::FrameAdvance()
 				reinterpret_cast<Skill_Name_UI*>(m_ppUILayer[i])->UpdateLabels(L"마나 드레인", L"메테오 낙하", L"에너지 볼");
 				break;
 			case 3:
-				reinterpret_cast<Skill_Name_UI*>(m_ppUILayer[i])->UpdateLabels(L"천사의 치유", L"요정의 축복", L"전광석화");
+				reinterpret_cast<Skill_Name_UI*>(m_ppUILayer[i])->UpdateLabels(L"천사의 치유", L"요정의 축복", L"전광 석화");
 				break;
 			}
 			break;

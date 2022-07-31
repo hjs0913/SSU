@@ -1123,7 +1123,7 @@ void Fail_UI::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UINT nHei
 
 Skill_Name_UI::Skill_Name_UI(UINT nFrame, ID3D12Device* pd3dDevice, ID3D12CommandQueue* pd3dCommandQueue, D2D1::ColorF::Enum LayoutColor, D2D1::ColorF::Enum TextColor) : UILayer(nFrame, pd3dDevice, pd3dCommandQueue, LayoutColor, TextColor)
 {
-    m_vTextBlocks.resize(3);
+    m_vTextBlocks.resize(10);
 
     m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), (ID2D1SolidColorBrush**)&m_pTextLayoutBrush);
     m_pTextLayoutBrush->SetColor(D2D1::ColorF(D2D1::ColorF::White));
@@ -1139,12 +1139,12 @@ Skill_Name_UI::~Skill_Name_UI()
 
 void Skill_Name_UI::UpdateLabels(const std::wstring& strUIText1, const std::wstring& strUIText2, const std::wstring& strUIText3)
 {
-    m_vTextBlocks[0] = { strUIText1, D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - 185, FRAME_BUFFER_HEIGHT / 2 + 360 ,
-        FRAME_BUFFER_WIDTH / 2 - 60 , FRAME_BUFFER_HEIGHT / 2 + 380), m_pdwTextFormat };
-    m_vTextBlocks[1] = { strUIText2, D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - 105, FRAME_BUFFER_HEIGHT / 2 + 360,
-        FRAME_BUFFER_WIDTH / 2 + 65, FRAME_BUFFER_HEIGHT / 2 + 380), m_pdwTextFormat2 };
+    m_vTextBlocks[0] = { strUIText1, D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - 200, FRAME_BUFFER_HEIGHT / 2 + 360 ,
+        FRAME_BUFFER_WIDTH / 2 - 120 , FRAME_BUFFER_HEIGHT / 2 + 380), m_pdwTextFormat };
+    m_vTextBlocks[1] = { strUIText2, D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - 111, FRAME_BUFFER_HEIGHT / 2 + 360,
+        FRAME_BUFFER_WIDTH / 2 - 36, FRAME_BUFFER_HEIGHT / 2 + 380), m_pdwTextFormat };
     m_vTextBlocks[2] = { strUIText3, D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - 25 , FRAME_BUFFER_HEIGHT / 2 + 360,
-    FRAME_BUFFER_WIDTH / 2 + 190, FRAME_BUFFER_HEIGHT / 2 + 380), m_pdwTextFormat2 };
+    FRAME_BUFFER_WIDTH / 2 + 43, FRAME_BUFFER_HEIGHT / 2 + 380), m_pdwTextFormat };
 }
 
 void Skill_Name_UI::Render(UINT nFrame)
@@ -1213,9 +1213,9 @@ void Skill_Name_UI::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UIN
     m_pdwTextFormat->SetTextAlignment(static_cast<DWRITE_TEXT_ALIGNMENT>(TextAlignment));
     m_pdwTextFormat->SetParagraphAlignment(static_cast<DWRITE_PARAGRAPH_ALIGNMENT>(ParagraphAlignment));
 
-    m_pd2dWriteFactory->CreateTextFormat(L"Arial", nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fSmallFontSize, L"en-us", &m_pdwTextFormat2);
-    m_pdwTextFormat2->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
-    m_pdwTextFormat2->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+
+
 
 
 }
