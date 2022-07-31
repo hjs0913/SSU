@@ -111,7 +111,7 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 				
 				break;
 			case 4:
-				move = pa->non_a_star(gaia->boss->get_look_x() + gaia->boss->get_right_x() * 10, gaia->boss->get_look_z() + gaia->boss->get_right_z() * 10, pa->get_x(), pa->get_z());
+				move = pa->non_a_star(gaia->boss->get_look_x() + gaia->boss->get_right_x() * 30, gaia->boss->get_look_z() + gaia->boss->get_right_z() * 30, pa->get_x(), pa->get_z());
 				if (static_ObjectManager::get_objManger()->check_move_alright_indun(move.first, move.second)) {
 					pa->set_x(move.first);
 					pa->set_z(move.second);
@@ -178,7 +178,7 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 
 				break;
 			case 4:
-				move = pa->non_a_star(gaia->boss->get_look_x() + gaia->boss->get_right_x() * 10, gaia->boss->get_look_z() + gaia->boss->get_right_z() * 10, pa->get_x(), pa->get_z());
+				move = pa->non_a_star(gaia->boss->get_look_x() + gaia->boss->get_right_x() * 30, gaia->boss->get_look_z() + gaia->boss->get_right_z() * 30, pa->get_x(), pa->get_z());
 				if (static_ObjectManager::get_objManger()->check_move_alright_indun(move.first, move.second)) {
 					pa->set_x(move.first);
 					pa->set_z(move.second);
@@ -250,7 +250,7 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 
 				break;
 			case 4:
-				move = pa->non_a_star(gaia->boss->get_look_x() + gaia->boss->get_right_x() * 10, gaia->boss->get_look_z() + gaia->boss->get_right_z() * 10, pa->get_x(), pa->get_z());
+				move = pa->non_a_star(gaia->boss->get_look_x() + gaia->boss->get_right_x() * 30, gaia->boss->get_look_z() + gaia->boss->get_right_z() * 30, pa->get_x(), pa->get_z());
 				if (static_ObjectManager::get_objManger()->check_move_alright_indun(move.first, move.second)) {
 					pa->set_x(move.first);
 					pa->set_z(move.second);
@@ -321,7 +321,7 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 				break;
 			case 4:
 
-				move = pa->non_a_star(gaia->boss->get_look_x() + gaia->boss->get_right_x() * 10, gaia->boss->get_look_z() + gaia->boss->get_right_z() * 10, pa->get_x(), pa->get_z());
+				move = pa->non_a_star(gaia->boss->get_look_x() + gaia->boss->get_right_x() * 30, gaia->boss->get_look_z() + gaia->boss->get_right_z() * 30, pa->get_x(), pa->get_z());
 				if (static_ObjectManager::get_objManger()->check_move_alright_indun(move.first, move.second)) {
 					pa->set_x(move.first);
 					pa->set_z(move.second);

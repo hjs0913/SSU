@@ -1319,7 +1319,7 @@ void CGameFramework::BuildObjects_login()
 		reinterpret_cast<Skill_Name_UI*>(m_ppUILayer[42])->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		m_ppUILayer[43]->Resize(m_ppd3dSwapChainBackBuffers, m_nWndClientWidth, m_nWndClientHeight,
-			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 
 		// UIBar Setting
 		reinterpret_cast<UIBar*>(m_ppUILayer[3])->SetBehindBrush(D2D1::ColorF::Black, 1.0, 20, m_nWndClientHeight / 5 - 2 * (m_nWndClientHeight / 22.5) - 20,
@@ -2663,8 +2663,8 @@ void CGameFramework::FrameAdvance()
 		if ((i >= 32 && i <= 39) && !Join_On) continue;
 		if (i == 40 && !Fail_On) continue;
 		if (i == 41 && !Fail_On) continue;
-		if (i == 42 && !Login_OK) continue;
-		//if (i == 42) continue;
+		//f (i == 42 && !Login_OK) continue;
+		if (i == 42) continue;
 		if (i == 43) {
 			if (!InDungeon) continue;
 			if (!m_gaiaPattern.pattern_on[0] && !m_gaiaPattern.pattern_on[1] && !m_gaiaPattern.pattern_on[4]) continue;

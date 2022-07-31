@@ -334,23 +334,24 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 vl_pl = m_ObjectManger->get_dungeon(pl->get_indun_id())->get_party_palyer();
                 for (int i = 0; i < GAIA_ROOM; i++) {
                     if (vl_pl[i]->get_state() == ST_INGAME || vl_pl[i]->get_state() == ST_INDUN) {
-                        send_chat_packet(vl_pl[i], client_id, c_temp);
+                        if(vl_pl[i]->get_tribe() != PARTNER)
+                            send_chat_packet(vl_pl[i], client_id, c_temp);
                     }
-                    else break;
                 }
                 break;
             }
         }
-
-        for (auto& s_pl : players) {
-            s_pl->state_lock.lock();
-            if (s_pl->get_state() != ST_INGAME) {
+        else {
+            for (auto& s_pl : players) {
+                s_pl->state_lock.lock();
+                if (s_pl->get_state() != ST_INGAME) {
+                    s_pl->state_lock.unlock();
+                    continue;
+                }
                 s_pl->state_lock.unlock();
-                continue;
+                if (s_pl->get_tribe() == MONSTER) break;
+                send_chat_packet(reinterpret_cast<Player*>(s_pl), client_id, c_temp);
             }
-            s_pl->state_lock.unlock();
-            if (s_pl->get_tribe() == MONSTER) break;
-            send_chat_packet(reinterpret_cast<Player*>(s_pl), client_id, c_temp);
         }
         break;
     }
@@ -977,17 +978,17 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                     pl->set_mp(pl->get_mp() - pl->get_lv() * 10);
                     send_status_change_packet(pl);
                     //좌우 삼각형 두개로 사각형 범위 ?
-                    Coord a = { pl->get_x() + pl->get_right_x() * -30, pl->get_z() + pl->get_right_z() * -30 };
-                    Coord b = { pl->get_x() + pl->get_right_x() * 30, pl->get_z() + pl->get_right_z() * 30 };
-                    Coord c = { (pl->get_x() + pl->get_right_x() * -30) + pl->get_look_x() * 140,
-                   (pl->get_z() + pl->get_right_z() * -30) + pl->get_look_z() * 140, };
+                    Coord a = { pl->get_x() + pl->get_right_x() * -5, pl->get_z() + pl->get_right_z() * -5 };
+                    Coord b = { pl->get_x() + pl->get_right_x() * 5, pl->get_z() + pl->get_right_z() * 5 };
+                    Coord c = { (pl->get_x() + pl->get_right_x() * -5) + pl->get_look_x() * 140,
+                   (pl->get_z() + pl->get_right_z() * -5) + pl->get_look_z() * 140, };
 
 
-                    Coord d = { pl->get_x() + pl->get_right_x() * 30, pl->get_z() + pl->get_right_z() * 30 };
-                    Coord e = { (pl->get_x() + pl->get_right_x() * 30) + pl->get_look_x() * 140
-                        , (pl->get_z() + pl->get_right_z() * 30) + pl->get_look_x() * 140 };
-                    Coord f = { (pl->get_x() + pl->get_right_x() * -30) + pl->get_look_x() * 140,
-                   (pl->get_z() + pl->get_right_z() * -30) + pl->get_look_z() * 140, };
+                    Coord d = { pl->get_x() + pl->get_right_x() * 5, pl->get_z() + pl->get_right_z() * 5 };
+                    Coord e = { (pl->get_x() + pl->get_right_x() * 5) + pl->get_look_x() * 140
+                        , (pl->get_z() + pl->get_right_z() * 5) + pl->get_look_x() * 140 };
+                    Coord f = { (pl->get_x() + pl->get_right_x() * -5) + pl->get_look_x() * 140,
+                   (pl->get_z() + pl->get_right_z() * -5) + pl->get_look_z() * 140, };
 
                     if (!pl->join_dungeon_room) {
                         for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {

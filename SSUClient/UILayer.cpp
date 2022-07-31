@@ -1144,7 +1144,7 @@ void Skill_Name_UI::UpdateLabels(const std::wstring& strUIText1, const std::wstr
     m_vTextBlocks[1] = { strUIText2, D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - 111, FRAME_BUFFER_HEIGHT / 2 + 360,
         FRAME_BUFFER_WIDTH / 2 - 36, FRAME_BUFFER_HEIGHT / 2 + 380), m_pdwTextFormat };
     m_vTextBlocks[2] = { strUIText3, D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - 25 , FRAME_BUFFER_HEIGHT / 2 + 360,
-    FRAME_BUFFER_WIDTH / 2 + 43, FRAME_BUFFER_HEIGHT / 2 + 380), m_pdwTextFormat };
+    FRAME_BUFFER_WIDTH / 2 + 60, FRAME_BUFFER_HEIGHT / 2 + 380), m_pdwTextFormat };
 }
 
 void Skill_Name_UI::Render(UINT nFrame)
@@ -1206,7 +1206,7 @@ void Skill_Name_UI::Resize(ID3D12Resource** ppd3dRenderTargets, UINT nWidth, UIN
     m_pd2dDeviceContext->CreateSolidColorBrush(D2D1::ColorF(m_TextColor), &m_pd2dTextBrush);
 
     const float fFontSize = m_fHeight / 25.0f;
-    const float fSmallFontSize = m_fHeight / 70.0f;
+    const float fSmallFontSize = m_fHeight / 75.0f;
 
     //m_pd2dWriteFactory->CreateTextFormat(L"궁서체", nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fFontSize, L"en-us", &m_pdwTextFormat);
     m_pd2dWriteFactory->CreateTextFormat(L"Arial", nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fSmallFontSize, L"en-us", &m_pdwTextFormat);
