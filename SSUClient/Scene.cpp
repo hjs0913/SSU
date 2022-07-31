@@ -81,8 +81,10 @@ void CScene::BuildObjects(ID3D12Device *pd3dDevice, ID3D12GraphicsCommandList *p
 	XMFLOAT4 xmf4Color(0.1f, 0.1f, 0.1f, 0.0f);
 	m_pTerrain = new CHeightMapTerrain(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature, _T("Image/HeightMap.raw"), 512, 512, xmf3Scale, xmf4Color);
 
+
 	m_nHierarchicalGameObjects = 3 + MAX_NPC + NUM_PLAYER + NUM_TOWN_NPC +  609;	// 성벽 1 + 집 2 + 몬스터 MAX_NPC(180) + 플레이어 30 + 마을 내에 NPC 10명+ 나무609
 	m_ppHierarchicalGameObjects = new CGameObject * [m_nHierarchicalGameObjects];
+
 	//for (int i = 0; i < m_nHierarchicalGameObjects; ++i) m_ppHierarchicalGameObjects[i] = NULL;
 
 
@@ -253,7 +255,7 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 	m_pd3dGraphicsRootSignature = CreateGraphicsRootSignature(pd3dDevice);
 
-	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 150); //SuperCobra(17), Gunship(2), Player:Mi24(1), Angrybot()
+	CreateCbvSrvDescriptorHeaps(pd3dDevice, 0, 200); //SuperCobra(17), Gunship(2), Player:Mi24(1), Angrybot()
 
 	CMaterial::PrepareShaders(pd3dDevice, pd3dCommandList, m_pd3dGraphicsRootSignature);
 
@@ -371,6 +373,7 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 	m_ppHierarchicalGameObjects[3]->m_pSkinnedAnimationController->SetTrackEnable(0,true);
 	m_ppHierarchicalGameObjects[3]->SetPosition(3500.0f, m_pTerrain->GetHeight(3500.0f, 650.0f), 650.0f);
 	m_ppHierarchicalGameObjects[3]->SetScale(20.0f, 20.0f, 20.0f);
+	if (pGaiaModel) delete pGaiaModel;
 
 	// 2번 부터 ANIMATION_TYPE_ONCE
 	for (int i = 2; i < gaia_anim_cnt; ++i) {
@@ -414,8 +417,8 @@ void CScene::BuildObjects_Raid(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandLi
 
 	if (pRaidObjModel) delete pRaidObjModel;
 	if (pCircleModel) delete pCircleModel;
-	//if (pWaveModel) delete pWaveModel;
-	//if (pSlashModel) delete pSlashModel;
+	if (pWaveModel) delete pWaveModel;
+	if (pSlashModel) delete pSlashModel;
 
 	for (int i = 0; i < 4; i++) get_raid_initialize_position(m_ppHierarchicalGameObjects[i], i);
 

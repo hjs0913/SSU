@@ -1715,6 +1715,7 @@ void CGameFramework::Create_OpenWorld_Object()
 		break;
 	}
 	}
+
 	if (!Login_OK)
 		reinterpret_cast<UIBitmap*>(m_ppUILayer[27])->Setup(L"\Image/Title.png");
 
@@ -1734,7 +1735,6 @@ void CGameFramework::Create_OpenWorld_Object()
 	SoundManager::GetSoundManager()->GetSound(0)->SoundStop();
 	SoundManager::GetSoundManager()->GetSound(2)->SoundStop();
 	SoundManager::GetSoundManager()->GetSound(1)->SoundPlay(true);
-
 }
 
 void CGameFramework::Create_InDungeon_Object()
@@ -1777,9 +1777,12 @@ void CGameFramework::Create_InDungeon_Object()
 			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_FLOW_DIRECTION_TOP_TO_BOTTOM);
 		m_pPlayer->m_ppUILayer[i]->setAlpha(0.0, 1.0);
 	}
+
+	SoundManager::GetSoundManager()->GetSound(0)->SoundStop();
 	SoundManager::GetSoundManager()->GetSound(1)->SoundStop();
 	SoundManager::GetSoundManager()->GetSound(2)->SoundPlay(true);
 }
+
 void CGameFramework::Create_Login_Object()
 {
 	m_pd3dCommandList->Reset(m_pd3dCommandAllocator, NULL);
@@ -1791,8 +1794,6 @@ void CGameFramework::Create_Login_Object()
 	m_pLogin_Scene->m_pPlayer = m_pPlayer = pPlayer;
 	m_pCamera = m_pPlayer->GetCamera();
 	m_pPlayer->SetUse(true);
-
-
 
 	m_pd3dCommandList->Close();
 	ID3D12CommandList* ppd3dCommandLists[] = { m_pd3dCommandList };
@@ -2663,8 +2664,8 @@ void CGameFramework::FrameAdvance()
 		if ((i >= 32 && i <= 39) && !Join_On) continue;
 		if (i == 40 && !Fail_On) continue;
 		if (i == 41 && !Fail_On) continue;
-		if (i == 42 && !Login_OK) continue;
-		//if (i == 42) continue;
+		//if (i == 42 && !Login_OK) continue;
+		if (i == 42) continue;
 		if (i == 43) {
 			if (!InDungeon) continue;
 			if (!m_gaiaPattern.pattern_on[0] && !m_gaiaPattern.pattern_on[1] && !m_gaiaPattern.pattern_on[4]) continue;
@@ -2681,6 +2682,9 @@ void CGameFramework::FrameAdvance()
 		}
 		else {
 			m_pPlayer->m_ppUILayer[0]->m_DamageTime = 0;
+			for (auto& vec : vectorDamageID1) {
+				mPlayer[vec]->m_nDamage1 = 0;
+			}
 			vectorDamageID1.clear();
 			vectorDamageID1.shrink_to_fit();
 		}
@@ -2693,6 +2697,9 @@ void CGameFramework::FrameAdvance()
 		}
 		else {
 			m_pPlayer->m_ppUILayer[1]->m_DamageTime = 0;
+			for (auto& vec : vectorDamageID2) {
+				mPlayer[vec]->m_nDamage2 = 0;
+			}
 			vectorDamageID2.clear();
 			vectorDamageID2.shrink_to_fit();
 		}
@@ -2704,6 +2711,9 @@ void CGameFramework::FrameAdvance()
 			m_pPlayer->m_ppUILayer[2]->Render(m_nSwapChainBufferIndex);
 		}
 		else {
+			for (auto& vec : vectorDamageID3) {
+				mPlayer[vec]->m_nDamage3 = 0;
+			}
 			m_pPlayer->m_ppUILayer[2]->m_DamageTime = 0;
 			vectorDamageID3.clear();
 			vectorDamageID3.shrink_to_fit();

@@ -1142,14 +1142,13 @@ void Skill_Name_UI::UpdateLabels(const std::wstring& strUIText1, const std::wstr
     m_vTextBlocks[0] = { strUIText1, D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - 185, FRAME_BUFFER_HEIGHT / 2 + 360 ,
         FRAME_BUFFER_WIDTH / 2 - 60 , FRAME_BUFFER_HEIGHT / 2 + 380), m_pdwTextFormat };
     m_vTextBlocks[1] = { strUIText2, D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - 105, FRAME_BUFFER_HEIGHT / 2 + 360,
-        FRAME_BUFFER_WIDTH / 2 + 65, FRAME_BUFFER_HEIGHT / 2 + 380), m_pdwTextFormat2 };
+        FRAME_BUFFER_WIDTH / 2 + 65, FRAME_BUFFER_HEIGHT / 2 + 380), m_pdwTextFormat };
     m_vTextBlocks[2] = { strUIText3, D2D1::RectF(FRAME_BUFFER_WIDTH / 2 - 25 , FRAME_BUFFER_HEIGHT / 2 + 360,
-    FRAME_BUFFER_WIDTH / 2 + 190, FRAME_BUFFER_HEIGHT / 2 + 380), m_pdwTextFormat2 };
+    FRAME_BUFFER_WIDTH / 2 + 190, FRAME_BUFFER_HEIGHT / 2 + 380), m_pdwTextFormat };
 }
 
 void Skill_Name_UI::Render(UINT nFrame)
 {
-
     ID3D11Resource* ppResources[] = { m_vWrappedRenderTargets[nFrame] };
 
     m_pd2dDeviceContext->SetTarget(m_vd2dRenderTargets[nFrame]);
@@ -1340,7 +1339,7 @@ void Damage_UI::UpdateLabels(CCamera* camera, vector<int> vector, int time, int 
         float fScreenX = xmf3ViewProj.x * (FRAME_BUFFER_WIDTH / 2) + FRAME_BUFFER_WIDTH / 2;
         float fScreenY = -xmf3ViewProj.y * (FRAME_BUFFER_HEIGHT / 2) + FRAME_BUFFER_HEIGHT / 2;
 
-        float damage = 0;
+        int damage = 0;
         switch (damageIndex) {
         case 0:
             damage = mPlayer[vec]->m_nDamage1;
