@@ -670,7 +670,7 @@ void CSkinnedMesh::ReleaseShaderVariables()
 
 void CSkinnedMesh::ReleaseUploadBuffers()
 {
-	CStandardMesh::ReleaseUploadBuffers();
+	//CStandardMesh::ReleaseUploadBuffers();
 
 	if (m_pd3dBoneIndexUploadBuffer) m_pd3dBoneIndexUploadBuffer->Release();
 	m_pd3dBoneIndexUploadBuffer = NULL;

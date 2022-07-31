@@ -1077,7 +1077,7 @@ int netInit()
 		pl = new CPlayer();
 	}
 	
-	for (int i = 0; i < (MAX_USER / GAIA_ROOM); i++) {
+	for (int i = 0; i < 1/*(MAX_USER / GAIA_ROOM)*/; i++) {
 		m_party[i] = new Party(i);
 	}
 	do_recv();
