@@ -619,26 +619,30 @@ void process_packet(unsigned char* p)
 		
 		if ((packet->id >= NPC_ID_START || packet->id == GAIA_ID) && packet->damage ) {		// packet->id가 NPC_ID_START보다 크거나 같을 떄(몬스터 일때), 보스일때 데미지 띄워주기
 			Damage = round(packet->damage);
-
+			
 			Damage_On = true;
+
+			//mPlayer[packet->id]->m_nDamageTime = 0;
+
 			switch (mPlayer[packet->id]->m_nDamageCnt) {
 			case 0:
 				vectorDamageID1.emplace_back(packet->id);
-				++mPlayer[packet->id]->m_nDamageCnt;
+				++(mPlayer[packet->id]->m_nDamageCnt);
+				mPlayer[packet->id]->m_nDamage1 = Damage;
+
 				break;
 			case 1:
 				vectorDamageID2.emplace_back(packet->id);
-				++mPlayer[packet->id]->m_nDamageCnt;
+				++(mPlayer[packet->id]->m_nDamageCnt);
+				mPlayer[packet->id]->m_nDamage2 = Damage;
+
 				break;
 			case 2:
 				vectorDamageID3.emplace_back(packet->id);
 				mPlayer[packet->id]->m_nDamageCnt = 0;
+				mPlayer[packet->id]->m_nDamage3 = Damage;
 				break;
 			}
-
-			mPlayer[packet->id]->m_nDamageTime = 0;
-			mPlayer[packet->id]->m_nDamage = Damage;
-
 		}
 		break;
 	}
@@ -1038,8 +1042,8 @@ int netInit()
 {
 	const char* SERVERIP;
 	char tempIP[16];
-	SERVERIP = "127.0.0.1";
-	//SERVERIP = "116.47.180.110";
+	//SERVERIP = "127.0.0.1";
+	SERVERIP = "116.47.180.110";
 	// 윈속 초기화
 	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
 		return 1;

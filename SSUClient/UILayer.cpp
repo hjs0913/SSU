@@ -1316,7 +1316,7 @@ void Damage_UI::Resize(UINT nFrame)
     m_vTextBlocks.resize(nFrame);
 }
 
-void Damage_UI::UpdateLabels(CCamera* camera, vector<int> vector)
+void Damage_UI::UpdateLabels(CCamera* camera, vector<int> vector, int time, int damageIndex)
 {
     int n = -1;
 
@@ -1324,11 +1324,6 @@ void Damage_UI::UpdateLabels(CCamera* camera, vector<int> vector)
         if (!mPlayer[vec]->GetUse())
             continue;
 
-        if (++(mPlayer[vec]->m_nDamageTime) >= 30) {
-            mPlayer[vec]->m_nDamageTime = 0;
-            return;
-        }
-        
         int raidY = 0;
         float uiUp = 180.0f;
         if (vec == GAIA_ID) {
@@ -1345,9 +1340,21 @@ void Damage_UI::UpdateLabels(CCamera* camera, vector<int> vector)
         float fScreenX = xmf3ViewProj.x * (FRAME_BUFFER_WIDTH / 2) + FRAME_BUFFER_WIDTH / 2;
         float fScreenY = -xmf3ViewProj.y * (FRAME_BUFFER_HEIGHT / 2) + FRAME_BUFFER_HEIGHT / 2;
 
+        float damage = 0;
+        switch (damageIndex) {
+        case 0:
+            damage = mPlayer[vec]->m_nDamage1;
+            break;
+        case 1:
+            damage = mPlayer[vec]->m_nDamage2;
+            break;
+        case 2:
+            damage = mPlayer[vec]->m_nDamage3;
+            break;
+        }
 
-        m_vTextBlocks[++n] = { to_wstring(mPlayer[vec]->m_nDamage), 
-            D2D1::RectF(fScreenX - 100.0f, fScreenY - uiUp + 20.0f - mPlayer[vec]->m_nDamageTime,
-                        fScreenX  + 100.0f, fScreenY - uiUp - mPlayer[vec]->m_nDamageTime), m_pdwTextFormat };
+        m_vTextBlocks[++n] = { to_wstring(damage),
+            D2D1::RectF(fScreenX - 100.0f, fScreenY - uiUp + 20.0f - time,
+                        fScreenX  + 100.0f, fScreenY - uiUp - time), m_pdwTextFormat };
     }
 }
