@@ -2666,6 +2666,7 @@ void CGameFramework::FrameAdvance()
 		if (i == 41 && !Fail_On) continue;
 		//if (i == 42 && !Login_OK) continue;
 		if (i == 42) continue;
+
 		if (i == 43) {
 			if (!InDungeon) continue;
 			if (!m_gaiaPattern.pattern_on[0] && !m_gaiaPattern.pattern_on[1] && !m_gaiaPattern.pattern_on[4]) continue;
@@ -2745,7 +2746,7 @@ void CGameFramework::FrameAdvance()
 	_stprintf_s(m_pszFrameRate + nLength, 70 - nLength, _T("(%4f, %4f, %4f)"), xmf3Position.x, xmf3Position.y, xmf3Position.z);
 	::SetWindowText(m_hWnd, m_pszFrameRate);
 
-	if (robby_cnt > 0) delete[]party_name_index;
+	if (robby_cnt > 0) delete[] party_name_index;
 	if (InvitationCardUI_On) {
 		if (chrono::system_clock::now() > InvitationCardTimer) {
 			InvitationCardUI_On = false;
