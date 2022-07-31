@@ -1703,7 +1703,7 @@ void CGameFramework::Create_OpenWorld_Object()
 		break;
 	}
 	case E_EARTH: {
-		reinterpret_cast<UIBitmap*>(m_ppUILayer[6])->Setup(L"\Image/Element/eartg.png");
+		reinterpret_cast<UIBitmap*>(m_ppUILayer[6])->Setup(L"\Image/Element/earth.png");
 		break;
 	}
 	case E_ICE: {
