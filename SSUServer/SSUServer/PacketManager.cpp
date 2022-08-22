@@ -1355,7 +1355,6 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
         pl->state_lock.unlock();
 
         for (auto& dun : m_ObjectManger->get_dungeons()) {
-            // join dungeon party
             dun->state_lock.lock();
             if (dun->get_dun_st() == DUN_ST_FREE) {
                 dun->set_dun_st(DUN_ST_ROBBY);
@@ -1657,17 +1656,6 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 break;
             }
             }
-
-            /*partner->set_maxhp(10000);
-            partner->set_maxmp(10000);
-            partner->set_hp(1000);
-            partner->set_mp(partner->get_maxmp());
-            partner->set_physical_attack(0.3 * 25 * 25 + 10 * 25);
-            partner->set_magical_attack(0.1 * 25 * 25 + 5 * 25);
-            partner->set_physical_defence(0.24 * 25 * 25 + 10 * 25);
-            partner->set_magical_defence(0.17 * 25 * 25 + 10 * 25);
-            partner->set_basic_attack_factor(50.0f);
-            partner->set_defence_factor(0.0002);*/
             
             partner->set_element(players[client_id]->get_element());
 
@@ -1682,7 +1670,6 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
             // 이 방에 이 플레이어를 집어 넣는다
             dun->partner_cnt++;
             dun->join_player(reinterpret_cast<Player*>(players[new_id]));
-           // dun->player_cnt
 
             // 이 방에 대한 정보를 보내준다
             Player** party_players = dun->get_party_palyer();     
