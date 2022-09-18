@@ -53,8 +53,6 @@ public:
 	~Npc();
 
 	void Initialize_Lua(const char* f_lua);
-	void Initialize_Lua_Boss(const char* f_lua, int dungeon_id);
-	void Initialize_Boss(int dungeon_id);
 
 	void set_pos(int x, int z);
 	void set_state(STATE s);
@@ -146,4 +144,10 @@ public:
 
 
 	virtual void revive();
+
+	//boss
+	void Initialize_Lua_Boss(const char* f_lua, int dungeon_id);
+	void Initialize_Boss(int dungeon_id);
+	lua_State* get_Boss_Lua_Machine();
+	mutex* get_mutex();
 };

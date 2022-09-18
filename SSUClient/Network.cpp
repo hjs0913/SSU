@@ -1042,8 +1042,8 @@ int netInit()
 {
 	const char* SERVERIP;
 	char tempIP[16];
-	//SERVERIP = "127.0.0.1";
-	SERVERIP = "116.47.180.110";
+	SERVERIP = "127.0.0.1";
+	//SERVERIP = "116.47.180.110";
 	// 윈속 초기화
 	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
 		return 1;
@@ -1077,7 +1077,7 @@ int netInit()
 		pl = new CPlayer();
 	}
 	
-	for (int i = 0; i < 1/*(MAX_USER / GAIA_ROOM)*/; i++) {
+	for (int i = 0; i < (MAX_USER / GAIA_ROOM); i++) {
 		m_party[i] = new Party(i);
 	}
 	do_recv();

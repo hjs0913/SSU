@@ -131,6 +131,12 @@ void Npc::Initialize_Lua_Boss(const char* f_lua, int dungeon_id)
 	}
 
 	Initialize_Boss(dungeon_id);
+
+	lua_register(L, "API_get_x", API_get_x);
+	lua_register(L, "API_get_y", API_get_y);
+	lua_register(L, "API_get_z", API_get_z);
+
+	lua_register(L, "API_get_hp", API_get_hp);
 }
 
 void Npc::Initialize_Boss(int dungeon_id)
@@ -1063,4 +1069,16 @@ void Npc::revive()
 	_hp = lua_tointeger(L, -1);
 	lua_pop(L, 4);
 	lua_lock.unlock();
+}
+
+lua_State* Npc::get_Boss_Lua_Machine()
+{
+	if (_tribe == BOSS)
+		return L;
+	else return NULL;
+}
+
+mutex* Npc::get_mutex()
+{
+	return &lua_lock;
 }

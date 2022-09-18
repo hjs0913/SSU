@@ -1,5 +1,6 @@
 #include "ObjectManager.h"
 #include "TimerManager.h"
+#include "LuaFunction.h"
 #include "Gaia.h"
 #include "send.h"
 #include <random>
@@ -277,9 +278,9 @@ void Gaia::boss_attack()
 	uniform_int_distribution<int> pattern(0, 99);
 	timer_event ev;
 
-	pattern_num = pattern(gen) % 5;
-
-	if (fifteen_pattern == false) {
+	//pattern_num = pattern(gen) % 5;
+	pattern_num = 0;
+	/*if (fifteen_pattern == false) {
 		if (boss->get_hp() < boss->get_maxhp() / 2) {
 			fifteen_pattern = true;
 			return;
@@ -289,28 +290,61 @@ void Gaia::boss_attack()
 		if (boss->get_hp() <= 0) {
 			return;
 		}
+	}*/
+	if (boss->get_hp() <= 0) {
+		return;
 	}
+
 
 	switch (pattern_num) {
 	case 0: {  //장판
 		running_pattern = true;
 		// 목표지점
-		// 1차 타점
-		pattern_one_position[0].first = boss->get_x() + boss->get_look_x() * 50;
-		pattern_one_position[0].second = boss->get_z() + boss->get_look_z() * 50;
-		// 2차 타점
-		pattern_one_position[1].first = boss->get_x() - boss->get_look_x() * 50;
-		pattern_one_position[1].second = boss->get_z() - boss->get_look_z() * 50;
-		// 3차 타점
-		pattern_one_position[2].first = boss->get_x() + boss->get_right_x() * 50;
-		pattern_one_position[2].second = boss->get_z() + boss->get_right_z() * 50;
-		// 4차 타점
-		pattern_one_position[3].first = boss->get_x() - boss->get_right_x() * 50;
-		pattern_one_position[3].second = boss->get_z() - boss->get_right_z() * 50;
+		
+		lua_State* boss_lua = boss->get_Boss_Lua_Machine();
+		if (boss_lua != NULL) {
+			boss->get_mutex()->lock();
+			lua_getglobal(boss_lua, "pattern_one_set_position");
+			lua_pushnumber(boss_lua, boss->get_x());
+			lua_pushnumber(boss_lua, boss->get_z());
+			lua_pushnumber(boss_lua, boss->get_look_x());
+			lua_pushnumber(boss_lua, boss->get_look_z());
+			lua_pushnumber(boss_lua, boss->get_right_x());
+			lua_pushnumber(boss_lua, boss->get_right_z());
+			int err = lua_pcall(boss_lua, 6, 8, 0);
+			if (err != 0) {
+				boss->get_mutex()->unlock();
 
-		for (int i = 0; i < GAIA_ROOM; i++) {
-			if (party[i]->get_tribe() != HUMAN) continue;
-			send_gaia_pattern_one_packet(party[i], pattern_one_position);
+				ev.obj_id = dungeon_id;
+				ev.start_time = chrono::system_clock::now() + 10s;
+				ev.ev = EVENT_BOSS_ATTACK;
+				ev.target_id = -1;
+				TimerManager::timer_queue.push(ev);
+
+				cout << "LUA_pattern_one_set_position ERROR" << endl;
+				return;
+			}
+
+			// 1차 타점
+			pattern_one_position[0].first = lua_tonumber(boss_lua, -8);
+			pattern_one_position[0].second = lua_tonumber(boss_lua, -7);
+			// 2차 타점
+			pattern_one_position[1].first = lua_tonumber(boss_lua, -6);
+			pattern_one_position[1].second = lua_tonumber(boss_lua, -5);
+			// 3차 타점
+			pattern_one_position[2].first = lua_tonumber(boss_lua, -4);
+			pattern_one_position[2].second = lua_tonumber(boss_lua, -3);
+			// 4차 타점
+			pattern_one_position[3].first = lua_tonumber(boss_lua, -2);
+			pattern_one_position[3].second = lua_tonumber(boss_lua, -1);
+
+			lua_pop(boss_lua, 9);
+			boss->get_mutex()->unlock();
+
+			for (int i = 0; i < GAIA_ROOM; i++) {
+				if (party[i]->get_tribe() != HUMAN) continue;
+				send_gaia_pattern_one_packet(party[i], pattern_one_position);
+			}
 		}
 
 		ev.obj_id = dungeon_id;
@@ -665,30 +699,39 @@ void Gaia::pattern_active(int pattern)
 		// 패턴이 발동되었다고 클라에 보내주자
 
 		// 패턴 판정 확인
-		for (auto& p : party) {
-			for (int i = 0; i < 4; i++) {
-				int x = pattern_one_position[i].first;
-				int z = pattern_one_position[i].second;
-
+		lua_State* boss_lua = boss->get_Boss_Lua_Machine();
+		if (boss_lua != NULL) {
+			boss->get_mutex()->lock();
+			for (auto& p : party) {
 				p->state_lock.lock();
 				if (p->get_state() != ST_INDUN) {
 					p->state_lock.unlock();
 					continue;
 				}
 				p->state_lock.unlock();
+				lua_getglobal(boss_lua, "pattern_one_set_damage");
+				lua_pushnumber(boss_lua, p->get_id());
+				int err = lua_pcall(boss_lua, 1, 1, 0);
+				if (err != 0) {
+					cout << "LUA_pattern_one_set_damage ERROR" << endl;
+				}
+				int prior_hp = p->get_hp();
+				p->set_hp(lua_tointeger(boss_lua, -1));
+				lua_pop(boss_lua, 2);
 
-				if (sqrt((p->get_x() - x) * (p->get_x() - x) + (p->get_z() - z) * (p->get_z() - z)) < 20) {
-					p->set_hp(p->get_hp() - 2000);
+				if (prior_hp != p->get_hp()) {
 					if (p->get_hp() <= 0) player_death(p);
 					// 패턴 맞은사람이 있으면 맞았다고 보내주자
 					for (auto send_pl : party) {
 						send_change_hp_packet(send_pl, p, 0);
 					}
 				}
+
+				send_gaia_pattern_finish_packet(p, 0);
 			}
-			send_gaia_pattern_finish_packet(p, 0);
-			running_pattern = false;
+			boss->get_mutex()->unlock();
 		}
+		running_pattern = false;
 
 		break;
 	}
