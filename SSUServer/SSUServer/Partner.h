@@ -20,7 +20,10 @@ private:
     pos move;
     bool move_once;
     bool skill_check;
-
+    int pattern_num;
+    
+    chrono::system_clock::time_point start_skill[3];
+    chrono::system_clock::time_point end_skill[3];
 protected:
     char	_name[MAX_NAME_SIZE];
     int     party_id;	//서버(파티)에서의 파티원 id

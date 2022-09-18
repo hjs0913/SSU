@@ -21,6 +21,8 @@ Partner::Partner(int d_id) : Player(d_id)
 	
 	party_id = 0;
 	skill_check = false;
+
+	
 }
 
 Partner::~Partner()
@@ -53,12 +55,37 @@ bool Partner::isInsideTriangle(pos a, pos b, pos c, pos n)
 
 void Partner::partner_move(Partner* pa, Gaia* gaia)  
 {
-	if (running_pattern ) //|| running_attack) // && skill_check
-		return;
+
+
+	//if (running_pattern ) //|| running_attack) // && skill_check
+	//	return;
 
 	switch (pa->get_job()) // AI의 직업을 보고 움직임을 나누자 
 	{
 	case J_DILLER: {      //전사류는 일단 보스몬스터를 따라가자 
+		end_skill[0] = chrono::system_clock::now();
+
+		switch (pattern_num)
+		{
+			end_skill[0] = chrono::system_clock::now();
+		case 0:
+			if (end_skill[0] - start_skill[0] > 2s + 600ms) {
+				running_pattern = false;
+			}
+			break;
+		case 1:
+			if (end_skill[0] - start_skill[0] > 1s + 800ms) {
+				running_pattern = false;
+			}
+			break;
+		case 2:
+			if (end_skill[0] - start_skill[0] > 1s + 100ms) {
+				running_pattern = false;
+			}
+			break;
+		}
+		if (running_pattern)
+			return;
 		if (gaia->running_pattern == false) {   //보스 패턴을 실행 안하면 붙어
 			if (sqrt(pow((gaia->get_x() - pa->get_x()), 2) + pow((gaia->get_z() - pa->get_z()), 2)) < 10.0f) return;
 			target_id = gaia->get_dungeon_id();
@@ -354,7 +381,7 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //스킬을 쿨타임 돌때마다 �
 		running_pattern = false;
 		return;
 	}
-	int p =  pattern(gen) % 3;
+	int p = pattern(gen) % 3; pattern_num = p;
 
 	Player** party_player = gaia->get_party_palyer();
 
@@ -397,11 +424,13 @@ void Partner::partner_attack(Partner* pa, Gaia* gaia) //스킬을 쿨타임 돌때마다 �
 			ev.target_id = _id;
 			TimerManager::timer_queue.push(ev);
 
-			ev.obj_id = _id;
+			start_skill[0] = chrono::system_clock::now();
+
+		/*	ev.obj_id = _id;
 			ev.start_time = chrono::system_clock::now() + 2s + 600ms;  //쿨타임
 			ev.ev = EVENT_PARTNER_SKILL_STOP;
 			ev.target_id = _id;
-			TimerManager::timer_queue.push(ev);
+			TimerManager::timer_queue.push(ev);*/
 
 			running_pattern = true;
 			break;
