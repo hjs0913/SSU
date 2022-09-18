@@ -2101,7 +2101,7 @@ void CGameFramework::ProcessInput()
 			}
 			if (dwDirection) {
 				float moveSpeed = (60.0f / static_cast<float>(m_GameTimer.GetFrameRate())) * 1.1f;
-				m_pPlayer->Move(dwDirection, /*12.25f*/moveSpeed, false);
+				m_pPlayer->Move(dwDirection, moveSpeed, false);
 
 			}
 			if (dwAttack
