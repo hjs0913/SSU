@@ -371,7 +371,6 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
         break;
     }
     case CS_PACKET_SKILL:{
-        cout << "스킬" << endl;
         if ((pl->get_mp() - pl->get_lv() * 10 < 0 ) || ( (pl->get_mp() - pl->get_lv() * 10 < 0) && (pl->get_hp() - pl->get_lv() * 10 < 0)) ) //mp, hp없으면 안됨 
             return;
         pl->state_lock.lock();
@@ -389,6 +388,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
         unordered_set <int> my_vl{ pl->viewlist };
         pl->vl.unlock();
 
+            
         switch (pl->get_job())
         {
         case J_DILLER: {
@@ -398,22 +398,24 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                 switch ((int)packet->skill_num)
                 {
                 case 0: { //물리 공격스킬 중 0번 스킬 -> 십자공격 어택 
-                    cout << "전사 0" << endl;
                     skill_cooltime(client_id, chrono::system_clock::now() + 3s, 0);
                     pl->set_mp(pl->get_mp() - pl->get_lv() * 10);
                     send_status_change_packet(pl);
                     if (!pl->join_dungeon_room) {
-                        for (int i : my_vl) {//    for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
-                            players[i]->state_lock.lock();
-                            if (players[i]->get_state() != ST_INGAME) {
+                        for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
+           
+                           players[i]->state_lock.lock();
+                        if (players[i]->get_state() != ST_INGAME) {
                                 players[i]->state_lock.unlock();
                                 continue;
                             }
-                            players[i]->state_lock.unlock();
-                   
-                         
-                            
-
+                        players[i]->state_lock.unlock();
+                                /*   pl->vl.lock();
+                            if (pl->viewlist.count(i) == 0) {
+                                pl->vl.unlock();
+                                continue;
+                            }
+                            pl->vl.unlock();*/
                             if ((players[i]->get_x() >= pl->get_x() - 30 && players[i]->get_x() <= pl->get_x() + 30) && (players[i]->get_z() >= pl->get_z() - 30 && players[i]->get_z() <= pl->get_z() + 30)) {
                                 pl->set_skill_factor(packet->skill_type, packet->skill_num);
                                 pl->phisical_skill_success(players[i], pl->get_skill_factor(packet->skill_type, packet->skill_num));
@@ -486,7 +488,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                     pl->set_mp(pl->get_mp() - pl->get_lv() * 10);
                     send_status_change_packet(pl);
                     if (!pl->join_dungeon_room) {
-                        for (int i : my_vl) {
+                        for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
                             players[i]->state_lock.lock();
                             if (players[i]->get_state() != ST_INGAME) {
                                 players[i]->state_lock.unlock();
@@ -586,7 +588,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                     pl->set_mp(pl->get_mp() - pl->get_lv() * 10);
                     send_status_change_packet(pl);
                     if (!pl->join_dungeon_room) {
-                        for (int i : my_vl) {
+                        for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
                             players[i]->state_lock.lock();
                             if (players[i]->get_state() != ST_INGAME) {
                                 players[i]->state_lock.unlock();
@@ -671,7 +673,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                     pl->set_mp(pl->get_mp() - pl->get_lv() * 10);
                     send_status_change_packet(pl);
                     if (!pl->join_dungeon_room) {
-                        for (int i : my_vl)  {
+                        for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
                             players[i]->state_lock.lock();
                             if (players[i]->get_state() != ST_INGAME) {
                                 players[i]->state_lock.unlock();
@@ -914,7 +916,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
 
                     if (!pl->join_dungeon_room) {
 
-                        for (int i : my_vl) {
+                    for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
                         players[i]->state_lock.lock();
                         if (players[i]->get_state() != ST_INGAME) {
                             players[i]->state_lock.unlock();
@@ -996,7 +998,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                    (pl->get_z() + pl->get_right_z() * -5) + pl->get_look_z() * 140, };
 
                     if (!pl->join_dungeon_room) {
-                        for (int i : my_vl) {
+                        for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
                             players[i]->state_lock.lock();
                             if (players[i]->get_state() != ST_INGAME) {
                                 players[i]->state_lock.unlock();
@@ -1080,7 +1082,7 @@ void PacketManager::process_packet(Player* pl, unsigned char* p)
                    (pl->get_z() + pl->get_right_z() * -10) + pl->get_look_z() * 140, };
 
                     if (!pl->join_dungeon_room) {
-                        for (int i : my_vl) {
+                        for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
                             players[i]->state_lock.lock();
                             if (players[i]->get_state() != ST_INGAME) {
                                 players[i]->state_lock.unlock();
