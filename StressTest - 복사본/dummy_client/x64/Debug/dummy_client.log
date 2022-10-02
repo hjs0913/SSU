@@ -1,0 +1,10 @@
+﻿  dummy.cpp
+C:\Users\정의범\Documents\GitHub\SSU\StressTest\dummy_client\dummy.cpp(138,36): warning C4244: '=': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\정의범\Documents\GitHub\SSU\StressTest\dummy_client\dummy.cpp(139,36): warning C4244: '=': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\정의범\Documents\GitHub\SSU\StressTest\dummy_client\dummy.cpp(152,37): warning C4244: '=': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\정의범\Documents\GitHub\SSU\StressTest\dummy_client\dummy.cpp(153,37): warning C4244: '=': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\정의범\Documents\GitHub\SSU\StressTest\dummy_client\dummy.cpp(181,32): warning C4244: '=': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\정의범\Documents\GitHub\SSU\StressTest\dummy_client\dummy.cpp(182,32): warning C4244: '=': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\정의범\Documents\GitHub\SSU\StressTest\dummy_client\dummy.cpp(385,30): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\정의범\Documents\GitHub\SSU\StressTest\dummy_client\dummy.cpp(387,30): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  dummy_client.vcxproj -> C:\Users\정의범\Documents\GitHub\SSU\StressTest\x64\Debug\dummy_client.exe

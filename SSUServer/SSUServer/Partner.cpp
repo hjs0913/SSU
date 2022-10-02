@@ -65,7 +65,7 @@ void Partner::partner_move(Partner* pa, Gaia* gaia)
 	case J_DILLER: {      //전사류는 일단 보스몬스터를 따라가자 
 		end_skill[0] = chrono::system_clock::now();
 
-		switch (pattern_num)
+		switch (pattern_num)   //stop 타이머 없이 변수로 제어하는 부분
 		{
 			end_skill[0] = chrono::system_clock::now();
 		case 0:
