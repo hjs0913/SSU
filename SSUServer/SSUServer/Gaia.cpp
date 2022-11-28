@@ -278,8 +278,8 @@ void Gaia::boss_attack()
 	uniform_int_distribution<int> pattern(0, 99);
 	timer_event ev;
 
-	//pattern_num = pattern(gen) % 5;
-	pattern_num = 0;
+	pattern_num = pattern(gen) % 5;
+	//pattern_num = 0;
 	/*if (fifteen_pattern == false) {
 		if (boss->get_hp() < boss->get_maxhp() / 2) {
 			fifteen_pattern = true;
